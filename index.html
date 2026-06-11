@@ -2,123 +2,333 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | HMS Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Dashboard | MedFlow HMS</title>
+    <!-- Google Fonts: Poppins Light + Regular + Medium -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            background: #fffdf9;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-weight: 400;
+        }
+        
+        .bg-subtle {
+            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f0ebe4;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #d4c9bc;
+            border-radius: 10px;
+        }
+        
+        .stat-card {
+            transition: all 0.25s ease;
+            border-radius: 20px;
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
+            border-color: #e8dcd0;
+        }
+        
+        .stat-icon-bg {
+            background: #faf7f2;
+            border-radius: 14px;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #1e293b;
+            letter-spacing: -0.3px;
+        }
+        
+        .stat-card p:first-child {
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-card .text-2xl {
+            font-weight: 500;
+        }
+        
+        .data-table th {
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            letter-spacing: 0.8px;
+            color: #c2b5a8;
+        }
+        
+        .appointment-row {
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f5f0ea;
+        }
+        
+        .appointment-row:hover {
+            background-color: #fefcf9;
+        }
+        
+        p, span, div, a {
+            font-weight: 400;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #334155;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        
+        .status-badge-completed {
+            background: #dcfce7;
+            color: #16a34a;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .status-badge-progress {
+            background: #fef5e8;
+            color: #f59e0b;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .status-badge-scheduled {
+            background: #e0f2fe;
+            color: #0284c7;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .quick-action-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .quick-action-btn:active {
+            transform: scale(0.97);
+        }
+        
+        .welcome-banner {
+            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
+            border-radius: 20px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+        
+        .live-badge {
+            animation: pulse 2s ease-in-out infinite;
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-subtle">
 
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="ml-64 mt-16 p-6 transition-all duration-300">
+    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+        
         <!-- Welcome Banner -->
-        <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 mb-6 text-white">
-            <h1 class="text-2xl font-bold" id="welcomeMsg">Welcome back, Admin!</h1>
-            <p class="mt-2" id="todayDate"></p>
+        <div class="welcome-banner relative p-6 mb-8 shadow-sm overflow-hidden">
+            <div class="absolute top-0 right-0 opacity-5">
+                <i class="fas fa-heartbeat text-7xl -mr-4 -mt-4 text-white"></i>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center relative z-10">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-medium text-white mb-1" id="welcomeMessage">
+                        <i class="fas fa-spinner fa-pulse mr-2"></i> Loading...
+                    </h1>
+                    <div class="flex items-center gap-2 text-white/80 text-xs font-light">
+                        <i class="fas fa-calendar-week"></i>
+                        <span id="currentDateTime"></span>
+                    </div>
+                </div>
+                <div class="mt-4 md:mt-0 bg-white/12 backdrop-blur-sm rounded-xl px-4 py-1.5 border border-white/15">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-chart-line text-white/80 text-sm"></i>
+                        <span class="text-xs font-light text-white/90 live-badge">Live · <span id="liveTimestamp">Just now</span></span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- KPI Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <div class="bg-white rounded-xl shadow-sm p-6">
-                <div class="flex items-center justify-between">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <div class="stat-card p-5">
+                <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-gray-500 text-sm">OPD Patients</p>
-                        <p class="text-2xl font-bold text-gray-800" id="opdCount">0</p>
-                        <p class="text-green-500 text-xs mt-1">Today</p>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">OPD Patients</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="opdCount">0</p>
+                        <p class="text-[#10b981] text-xs mt-1 font-medium">Today</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-users text-blue-600 text-xl"></i>
+                    <div class="stat-icon-bg w-12 h-12 flex items-center justify-center">
+                        <i class="fas fa-walking text-[#a8c49a] text-xl"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm p-6">
-                <div class="flex items-center justify-between">
+            <div class="stat-card p-5">
+                <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-gray-500 text-sm">IPD Patients</p>
-                        <p class="text-2xl font-bold text-gray-800" id="ipdCount">0</p>
-                        <p class="text-green-500 text-xs mt-1">Currently Admitted</p>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">IPD Patients</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="ipdCount">0</p>
+                        <p class="text-[#10b981] text-xs mt-1 font-medium">Currently Admitted</p>
                     </div>
-                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-procedures text-purple-600 text-xl"></i>
+                    <div class="stat-icon-bg w-12 h-12 flex items-center justify-center">
+                        <i class="fas fa-procedures text-[#a8c49a] text-xl"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm p-6">
-                <div class="flex items-center justify-between">
+            <div class="stat-card p-5">
+                <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-gray-500 text-sm">Today's Revenue</p>
-                        <p class="text-2xl font-bold text-gray-800" id="revenueCount">$0</p>
-                        <p class="text-green-500 text-xs mt-1">+12% from yesterday</p>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Today's Revenue</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="revenueCount">₹0</p>
+                        <p class="text-[#10b981] text-xs mt-1 font-medium">+12% from yesterday</p>
                     </div>
-                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-dollar-sign text-green-600 text-xl"></i>
+                    <div class="stat-icon-bg w-12 h-12 flex items-center justify-center">
+                        <i class="fas fa-rupee-sign text-[#a8c49a] text-xl"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm p-6">
-                <div class="flex items-center justify-between">
+            <div class="stat-card p-5">
+                <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-gray-500 text-sm">Bed Occupancy</p>
-                        <p class="text-2xl font-bold text-gray-800" id="bedCount">0%</p>
-                        <p class="text-yellow-500 text-xs mt-1">Total Beds: 100</p>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Bed Occupancy</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="bedOccupancy">0%</p>
+                        <p class="text-[#64748b] text-xs mt-1 font-medium">Total Beds: <span id="totalBeds">100</span></p>
                     </div>
-                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-bed text-orange-600 text-xl"></i>
+                    <div class="stat-icon-bg w-12 h-12 flex items-center justify-center">
+                        <i class="fas fa-bed text-[#a8c49a] text-xl"></i>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Quick Actions -->
-        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-            <h2 class="text-lg font-bold mb-4">Quick Actions</h2>
-            <div class="flex flex-wrap gap-3">
-                <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                    <i class="fas fa-user-plus mr-2"></i> Add Patient
+        <div class="bg-white rounded-2xl shadow-sm border border-[#f0e8e0] p-5 mb-8">
+            <div class="flex items-center gap-2 mb-4">
+                <i class="fas fa-bolt text-[#a8c49a] text-base"></i>
+                <h2 class="text-base font-medium text-[#1e293b]">Quick Actions</h2>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <button onclick="window.location.href='modules/clinical/patients.html'" class="quick-action-btn btn-primary flex items-center justify-center gap-2 py-2.5 rounded-xl">
+                    <i class="fas fa-user-plus text-sm"></i>
+                    <span class="text-sm font-medium">Add Patient</span>
                 </button>
-                <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-                    <i class="fas fa-calendar-plus mr-2"></i> Book Appointment
+                <button onclick="window.location.href='modules/clinical/appointments.html'" class="quick-action-btn btn-primary flex items-center justify-center gap-2 py-2.5 rounded-xl">
+                    <i class="fas fa-calendar-plus text-sm"></i>
+                    <span class="text-sm font-medium">Book Appointment</span>
                 </button>
-                <button class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">
-                    <i class="fas fa-procedures mr-2"></i> Admit Patient
+                <button onclick="window.location.href='modules/clinical/ipd.html'" class="quick-action-btn btn-primary flex items-center justify-center gap-2 py-2.5 rounded-xl">
+                    <i class="fas fa-procedures text-sm"></i>
+                    <span class="text-sm font-medium">Admit Patient</span>
                 </button>
-                <button class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition">
-                    <i class="fas fa-file-invoice mr-2"></i> Create Bill
+                <button onclick="window.location.href='modules/billing/invoices.html'" class="quick-action-btn btn-primary flex items-center justify-center gap-2 py-2.5 rounded-xl">
+                    <i class="fas fa-file-invoice-dollar text-sm"></i>
+                    <span class="text-sm font-medium">Create Bill</span>
                 </button>
             </div>
         </div>
 
         <!-- Recent Appointments Table -->
-        <div class="bg-white rounded-xl shadow-sm p-6">
-            <h2 class="text-lg font-bold mb-4">Recent Appointments</h2>
+        <div class="bg-white rounded-2xl shadow-sm border border-[#f0e8e0] overflow-hidden">
+            <div class="px-5 py-4 border-b border-[#f0e8e0]">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-calendar-check text-[#a8c49a] text-base"></i>
+                        <h2 class="text-base font-medium text-[#1e293b]">Recent Appointments</h2>
+                    </div>
+                    <button onclick="window.location.href='modules/clinical/appointments.html'" class="text-xs text-[#a8c49a] hover:text-[#8aae7a] font-medium transition">
+                        View all →
+                    </button>
+                </div>
+            </div>
             <div class="overflow-x-auto">
                 <table class="w-full">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Patient</th>
-                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Doctor</th>
-                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Date</th>
-                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Time</th>
-                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Status</th>
+                    <thead class="bg-[#faf7f2] border-b border-[#f0e8e0]">
+                        <tr class="text-left data-table">
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Patient</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Doctor</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Date</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Time</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Status</th>
                         </tr>
                     </thead>
                     <tbody id="appointmentsTable">
-                        <tr>
-                            <td class="px-4 py-2 text-sm" colspan="5" class="text-center">Loading...</td>
-                        </tr>
+                        <tr><td colspan="5" class="text-center py-12 text-[#94a3b8]"><i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i><p class="font-normal">Loading appointments...</p> </td></tr>
                     </tbody>
-                </table>
+                <table>
             </div>
         </div>
     </main>
 
-    <!-- Core JS -->
     <script src="js/core/common.js"></script>
-    <script src="js/core/dashboard-data.js"></script>
+    <script src="js/core/dashboard.js"></script>
 </body>
 </html>

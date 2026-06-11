@@ -2,137 +2,579 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Admin HMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Login | MedFlow HMS</title>
+    <!-- Google Fonts: Poppins Light + Regular + Medium -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 50%, #6a8e5a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 460px;
+        }
+        
+        .login-card {
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+        
+        .login-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 32px 32px 24px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .logo-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            box-shadow: 0 8px 20px -8px rgba(139, 174, 122, 0.4);
+        }
+        
+        .logo-icon i {
+            font-size: 32px;
+            color: white;
+        }
+        
+        .login-header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+        
+        .login-header p {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 400;
+        }
+        
+        .login-body {
+            padding: 32px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 6px;
+            letter-spacing: 0.3px;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: #94a3b8;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 14px 12px 42px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 13px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 400;
+            transition: all 0.2s ease;
+            background: #ffffff;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #a8c49a;
+            box-shadow: 0 0 0 3px rgba(168, 196, 154, 0.2);
+        }
+        
+        .form-input.error {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #94a3b8;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        
+        .password-toggle:hover {
+            color: #a8c49a;
+        }
+        
+        .error-text {
+            font-size: 11px;
+            color: #ef4444;
+            margin-top: 6px;
+            display: none;
+        }
+        
+        .error-text.show {
+            display: block;
+        }
+        
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-login:hover {
+            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(139, 174, 122, 0.3);
+        }
+        
+        .btn-login:active {
+            transform: translateY(0);
+        }
+        
+        .demo-section {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        
+        .demo-title {
+            font-size: 11px;
+            font-weight: 500;
+            color: #64748b;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .demo-credentials {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .demo-badge {
+            background: #f1f5f9;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-family: monospace;
+            color: #334155;
+        }
+        
+        .demo-badge span {
+            color: #a8c49a;
+            font-weight: 600;
+        }
+        
+        .toast-message {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        .toast-success {
+            background: #10b981;
+        }
+        
+        .toast-error {
+            background: #ef4444;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+        
+        .toast-fade-out {
+            animation: fadeOut 0.3s ease-out forwards;
+        }
+        
+        .role-select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+        
+        /* Loading state */
+        .btn-login.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .btn-login.loading i {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body class="h-screen flex items-center justify-center">
+<body>
 
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 mx-4">
-        <!-- Logo & Title -->
-        <div class="text-center mb-8">
-            <div class="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-hospital-user text-white text-4xl"></i>
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="logo-icon">
+                <i class="fas fa-hospital-user"></i>
             </div>
-            <h1 class="text-2xl font-bold text-gray-800">Hospital Management System</h1>
-            <p class="text-gray-500 mt-2">Admin Portal</p>
+            <h1>MedFlow HMS</h1>
+            <p>Hospital Management System</p>
         </div>
-
-        <!-- Login Form -->
-        <form id="loginForm">
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Email Address</label>
-                <div class="relative">
-                    <i class="fas fa-envelope absolute left-3 top-3 text-gray-400"></i>
-                    <input type="email" id="email" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="admin@hospital.com" required>
+        
+        <div class="login-body">
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" id="email" class="form-input" placeholder="admin@medflow.com" value="admin@medflow.com">
+                    </div>
+                    <div class="error-text" id="emailError">Please enter a valid email address</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="password" class="form-input" placeholder="Enter your password" value="admin123">
+                        <button type="button" id="togglePassword" class="password-toggle">
+                            <i class="fas fa-eye-slash"></i>
+                        </button>
+                    </div>
+                    <div class="error-text" id="passwordError">Password must be at least 6 characters</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Login As</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user-tag input-icon"></i>
+                        <select id="role" class="form-input role-select">
+                            <option value="admin">Administrator</option>
+                            <option value="doctor">Doctor</option>
+                            <option value="receptionist">Receptionist</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" id="loginBtn" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Sign In</span>
+                </button>
+            </form>
+            
+            <div class="demo-section">
+                <p class="demo-title">DEMO CREDENTIALS</p>
+                <div class="demo-credentials">
+                    <span class="demo-badge">📧 <span>admin@medflow.com</span></span>
+                    <span class="demo-badge">🔑 <span>admin123</span></span>
                 </div>
             </div>
-
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                <div class="relative">
-                    <i class="fas fa-lock absolute left-3 top-3 text-gray-400"></i>
-                    <input type="password" id="password" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••" required>
-                </div>
-            </div>
-
-            <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Login As</label>
-                <select id="role" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="admin">Admin</option>
-                    <option value="doctor">Doctor</option>
-                    <option value="receptionist">Receptionist</option>
-                </select>
-            </div>
-
-            <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition duration-300">
-                <i class="fas fa-sign-in-alt mr-2"></i> Login
-            </button>
-        </form>
-
-        <!-- Demo Credentials -->
-        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-            <p class="text-xs text-gray-500 text-center">Demo Credentials</p>
-            <p class="text-xs text-gray-400 text-center mt-1">admin@hospital.com / admin123</p>
         </div>
     </div>
+</div>
 
-    <!-- ALL JS IN ONE FILE - NO EXTERNAL DEPENDENCIES -->
-    <script>
-        // Wait for page to load
-        document.addEventListener('DOMContentLoaded', function() {
-            const loginForm = document.getElementById('loginForm');
-            
-            if (loginForm) {
-                loginForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    const email = document.getElementById('email').value;
-                    const password = document.getElementById('password').value;
-                    const role = document.getElementById('role').value;
-                    
-                    // Demo validation
-                    if (email === 'admin@hospital.com' && password === 'admin123') {
-                        // Store user data
-                        const user = {
-                            name: role === 'admin' ? 'Admin User' : role === 'doctor' ? 'Dr. Smith' : 'Receptionist',
-                            email: email,
-                            role: role,
-                            avatar: role === 'admin' ? 'A' : role === 'doctor' ? 'D' : 'R'
-                        };
-                        
-                        localStorage.setItem('auth_token', 'demo_token_12345');
-                        localStorage.setItem('user', JSON.stringify(user));
-                        
-                        // Show success message
-                        showToast('Login successful! Redirecting...', 'success');
-                        
-                        // Redirect to dashboard
-                        setTimeout(function() {
-                            window.location.href = 'index.html';
-                        }, 1000);
-                    } else {
-                        showToast('Invalid credentials! Use admin@hospital.com / admin123', 'error');
-                    }
-                });
-            }
+<script>
+    // DOM Elements
+    const loginForm = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const roleSelect = document.getElementById('role');
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const loginBtn = document.getElementById('loginBtn');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    
+    // Toggle Password Visibility
+    if (togglePasswordBtn) {
+        togglePasswordBtn.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            const icon = togglePasswordBtn.querySelector('i');
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
         });
-        
-        // Toast notification function
-        function showToast(message, type) {
-            // Remove existing toast if any
-            const existingToast = document.querySelector('.custom-toast');
-            if (existingToast) {
-                existingToast.remove();
-            }
-            
-            // Create toast element
-            const toast = document.createElement('div');
-            toast.className = 'custom-toast fixed top-5 right-5 z-50 px-6 py-3 rounded-lg shadow-lg text-white ' + 
-                (type === 'success' ? 'bg-green-500' : 'bg-red-500');
-            toast.innerHTML = `
-                <div class="flex items-center">
-                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>
-                    <span>${message}</span>
-                </div>
-            `;
-            
-            document.body.appendChild(toast);
-            
-            // Remove after 3 seconds
-            setTimeout(function() {
-                toast.style.opacity = '0';
-                setTimeout(function() {
-                    toast.remove();
-                }, 300);
-            }, 3000);
+    }
+    
+    // Real-time validation
+    emailInput.addEventListener('input', function() {
+        if (validateEmail(this.value)) {
+            emailError.classList.remove('show');
+            this.classList.remove('error');
         }
-    </script>
+    });
+    
+    passwordInput.addEventListener('input', function() {
+        if (this.value.length >= 6) {
+            passwordError.classList.remove('show');
+            this.classList.remove('error');
+        }
+    });
+    
+    // Validate Email
+    function validateEmail(email) {
+        const re = /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/;
+        return re.test(email);
+    }
+    
+    // Validate Form
+    function validateForm() {
+        let isValid = true;
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+        
+        // Email validation
+        if (!email) {
+            emailError.textContent = 'Email is required';
+            emailError.classList.add('show');
+            emailInput.classList.add('error');
+            isValid = false;
+        } else if (!validateEmail(email)) {
+            emailError.textContent = 'Please enter a valid email address';
+            emailError.classList.add('show');
+            emailInput.classList.add('error');
+            isValid = false;
+        } else {
+            emailError.classList.remove('show');
+            emailInput.classList.remove('error');
+        }
+        
+        // Password validation
+        if (!password) {
+            passwordError.textContent = 'Password is required';
+            passwordError.classList.add('show');
+            passwordInput.classList.add('error');
+            isValid = false;
+        } else if (password.length < 6) {
+            passwordError.textContent = 'Password must be at least 6 characters';
+            passwordError.classList.add('show');
+            passwordInput.classList.add('error');
+            isValid = false;
+        } else {
+            passwordError.classList.remove('show');
+            passwordInput.classList.remove('error');
+        }
+        
+        return isValid;
+    }
+    
+    // Show Toast Notification
+    function showToast(message, type = 'success') {
+        // Remove existing toast
+        const existingToast = document.querySelector('.toast-message');
+        if (existingToast) {
+            existingToast.remove();
+        }
+        
+        const toast = document.createElement('div');
+        toast.className = `toast-message ${type === 'success' ? 'toast-success' : 'toast-error'}`;
+        toast.innerHTML = `
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+            <span>${message}</span>
+        `;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('toast-fade-out');
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }, 3000);
+    }
+    
+    // Set Loading State
+    function setLoading(isLoading) {
+        if (isLoading) {
+            loginBtn.classList.add('loading');
+            loginBtn.disabled = true;
+            loginBtn.querySelector('i').className = 'fas fa-spinner fa-pulse';
+            loginBtn.querySelector('span').textContent = 'Signing in...';
+        } else {
+            loginBtn.classList.remove('loading');
+            loginBtn.disabled = false;
+            loginBtn.querySelector('i').className = 'fas fa-sign-in-alt';
+            loginBtn.querySelector('span').textContent = 'Sign In';
+        }
+    }
+    
+    // Handle Login
+    function handleLogin(e) {
+        e.preventDefault();
+        
+        if (!validateForm()) {
+            return;
+        }
+        
+        setLoading(true);
+        
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+        const role = roleSelect.value;
+        
+        // Simulate API call delay
+        setTimeout(() => {
+            // Demo validation - In production, this would be an API call
+            if (email === 'admin@medflow.com' && password === 'admin123') {
+                // Store user data
+                const userData = {
+                    name: role === 'admin' ? 'Administrator' : role === 'doctor' ? 'Dr. Anjali Nair' : 'Priya Sharma',
+                    email: email,
+                    role: role,
+                    loginTime: new Date().toISOString()
+                };
+                
+                localStorage.setItem('auth_token', 'medflow_token_' + Date.now());
+                localStorage.setItem('user', JSON.stringify(userData));
+                
+                showToast('Login successful! Redirecting to dashboard...', 'success');
+                
+                // Add audit log
+                addAuditLog('LOGIN', `User ${email} logged in as ${role}`);
+                
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } else {
+                setLoading(false);
+                showToast('Invalid email or password. Please try again.', 'error');
+                
+                // Shake effect on form
+                const loginCard = document.querySelector('.login-card');
+                loginCard.style.transform = 'translateX(0)';
+                loginCard.style.animation = 'shake 0.5s ease-in-out';
+                setTimeout(() => {
+                    loginCard.style.animation = '';
+                }, 500);
+            }
+        }, 800);
+    }
+    
+    // Add audit log
+    function addAuditLog(action, details) {
+        let auditLogs = JSON.parse(localStorage.getItem('audit_logs') || '[]');
+        auditLogs.unshift({
+            id: Date.now(),
+            action: action,
+            details: details,
+            user: 'system',
+            timestamp: new Date().toLocaleString(),
+            ip: '127.0.0.1'
+        });
+        if (auditLogs.length > 500) auditLogs = auditLogs.slice(0, 500);
+        localStorage.setItem('audit_logs', JSON.stringify(auditLogs));
+    }
+    
+    // Add shake animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Check if already logged in
+    const token = localStorage.getItem('auth_token');
+    if (token && window.location.pathname.includes('login.html')) {
+        window.location.href = 'index.html';
+    }
+    
+    // Event listener
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleLogin);
+    }
+    
+    // Enter key submit
+    passwordInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            loginForm.dispatchEvent(new Event('submit'));
+        }
+    });
+</script>
+
 </body>
 </html>
