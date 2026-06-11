@@ -1,0 +1,366 @@
+/**
+ * Units Management Module
+ * MedFlow Pharmacy - Medicine Units CRUD
+ * Matching Executive Dashboard UI/UX - Indian Context
+ */
+
+// Data Store
+let units = [];
+
+// Helper: Escape HTML to prevent XSS
+function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+// Toast notification matching dashboard style
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    const icons = { success: 'fa-check-circle', error: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+    const colors = { success: '#8aae7a', error: '#d8b48c', info: '#a8c49a' };
+    
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border-radius: 12px;
+        background: ${colors[type]};
+        color: white;
+        font-weight: 500;
+        font-size: 0.75rem;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        animation: slideInRight 0.25s ease-out;
+        font-family: 'Poppins', system-ui, sans-serif;
+    `;
+    toast.innerHTML = `<i class="fas ${icons[type]} text-sm"></i><span>${escapeHtml(message)}</span>`;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 250);
+    }, 3000);
+}
+
+// Save to localStorage
+function saveUnits() {
+    localStorage.setItem('pharmacy_units', JSON.stringify(units));
+}
+
+// Load initial data with Indian pharmacy units
+function loadUnits() {
+    const stored = localStorage.getItem('pharmacy_units');
+    if (stored) {
+        units = JSON.parse(stored);
+    } else {
+        // Default Indian units with descriptions
+        units = [
+            { id: 1, name: 'Milligram (मिलीग्राम)', symbol: 'mg', description: 'Milligram - used for small quantity medicines like Paracetamol 500mg' },
+            { id: 2, name: 'Milliliter (मिलीलीटर)', symbol: 'ml', description: 'Milliliter - used for liquid medicines, syrups, suspensions' },
+            { id: 3, name: 'Tablet (टैबलेट)', symbol: 'tab', description: 'Tablet - solid dosage form, e.g., Crocin, Dolo' },
+            { id: 4, name: 'Capsule (कैप्सूल)', symbol: 'cap', description: 'Capsule - gelatin shell containing medicine, e.g., Amoxicillin' },
+            { id: 5, name: 'Microgram (माइक्रोग्राम)', symbol: 'mcg', description: 'Microgram - used for high potency medicines like Thyroxine' },
+            { id: 6, name: 'Gram (ग्राम)', symbol: 'g', description: 'Gram - used for creams, ointments, powders' },
+            { id: 7, name: 'Unit (यूनिट)', symbol: 'U', description: 'International Unit - for vitamins, insulin, vaccines' },
+            { id: 8, name: 'Drop (बूंद)', symbol: 'drop', description: 'Drop - for eye drops, ear drops, oral drops' },
+            { id: 9, name: 'Vial (शीशी)', symbol: 'vial', description: 'Vial - for injections, liquid multi-dose containers' },
+            { id: 10, name: 'Ampoule (शीशी)', symbol: 'amp', description: 'Ampoule - single-dose sealed glass container for injections' }
+        ];
+        saveUnits();
+    }
+    renderTable();
+}
+
+// Validate form fields with proper constraints
+function validateUnitForm(name, symbol, isEditMode = false, currentId = null) {
+    let isValid = true;
+    
+    // Clear previous errors
+    const nameErrorEl = document.getElementById('unitNameError');
+    const symbolErrorEl = document.getElementById('unitSymbolError');
+    const nameInput = document.getElementById('unitName');
+    const symbolInput = document.getElementById('unitSymbol');
+    
+    if (nameErrorEl) nameErrorEl.innerText = '';
+    if (symbolErrorEl) symbolErrorEl.innerText = '';
+    if (nameInput) nameInput.classList.remove('error');
+    if (symbolInput) symbolInput.classList.remove('error');
+    
+    // Name validation
+    if (!name || name.trim() === '') {
+        if (nameErrorEl) nameErrorEl.innerText = 'Unit name is required';
+        if (nameInput) nameInput.classList.add('error');
+        isValid = false;
+    } else if (name.trim().length < 2) {
+        if (nameErrorEl) nameErrorEl.innerText = 'Unit name must be at least 2 characters';
+        if (nameInput) nameInput.classList.add('error');
+        isValid = false;
+    } else if (name.trim().length > 50) {
+        if (nameErrorEl) nameErrorEl.innerText = 'Unit name cannot exceed 50 characters';
+        if (nameInput) nameInput.classList.add('error');
+        isValid = false;
+    } else {
+        // Check for duplicate name (excluding current in edit mode)
+        const duplicate = units.some(unit => {
+            if (isEditMode && unit.id === currentId) return false;
+            return unit.name.toLowerCase() === name.trim().toLowerCase();
+        });
+        if (duplicate) {
+            if (nameErrorEl) nameErrorEl.innerText = 'Unit name already exists';
+            if (nameInput) nameInput.classList.add('error');
+            isValid = false;
+        }
+    }
+    
+    // Symbol validation
+    if (!symbol || symbol.trim() === '') {
+        if (symbolErrorEl) symbolErrorEl.innerText = 'Symbol is required';
+        if (symbolInput) symbolInput.classList.add('error');
+        isValid = false;
+    } else if (symbol.trim().length < 1) {
+        if (symbolErrorEl) symbolErrorEl.innerText = 'Symbol must be at least 1 character';
+        if (symbolInput) symbolInput.classList.add('error');
+        isValid = false;
+    } else if (symbol.trim().length > 10) {
+        if (symbolErrorEl) symbolErrorEl.innerText = 'Symbol cannot exceed 10 characters';
+        if (symbolInput) symbolInput.classList.add('error');
+        isValid = false;
+    } else if (!/^[a-zA-Z0-9]+$/.test(symbol.trim())) {
+        if (symbolErrorEl) symbolErrorEl.innerText = 'Symbol must contain only letters and numbers';
+        if (symbolInput) symbolInput.classList.add('error');
+        isValid = false;
+    } else {
+        // Check for duplicate symbol
+        const duplicate = units.some(unit => {
+            if (isEditMode && unit.id === currentId) return false;
+            return unit.symbol.toLowerCase() === symbol.trim().toLowerCase();
+        });
+        if (duplicate) {
+            if (symbolErrorEl) symbolErrorEl.innerText = 'Symbol already exists';
+            if (symbolInput) symbolInput.classList.add('error');
+            isValid = false;
+        }
+    }
+    
+    return isValid;
+}
+
+// Render table with units
+function renderTable() {
+    const tbody = document.getElementById('unitsTable');
+    if (!tbody) return;
+    
+    if (units.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-[#d4c9bc] text-sm"><i class="fas fa-folder-open mr-2"></i>No units found. Click "Add Unit" to create one.</td></tr>`;
+        return;
+    }
+    
+    tbody.innerHTML = units.map((unit, idx) => `
+        <tr class="dashboard-table-row">
+            <td class="px-5 py-3 text-sm text-[#6a5a4a]">${idx + 1}</td>
+            <td class="px-5 py-3 text-sm font-medium text-[#5a4a3a]">${escapeHtml(unit.name)}</td>
+            <td class="px-5 py-3"><span class="badge-unit">${escapeHtml(unit.symbol)}</span></td>
+            <td class="px-5 py-3 text-sm text-[#9a8e82] max-w-xs truncate">${escapeHtml(unit.description) || '—'}</td>
+            <td class="px-5 py-3 text-center">
+                <button onclick="window.editUnitHandler(${unit.id})" class="action-edit mr-3 text-base transition">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="window.deleteUnitHandler(${unit.id})" class="action-delete text-base transition">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Modal management
+const modal = document.getElementById('unitModal');
+const modalTitle = document.getElementById('modalTitle');
+const form = document.getElementById('unitForm');
+const unitIdInput = document.getElementById('unitId');
+const unitNameInput = document.getElementById('unitName');
+const unitSymbolInput = document.getElementById('unitSymbol');
+const unitDescInput = document.getElementById('unitDesc');
+
+function openModal() {
+    if (!modal) return;
+    modal.classList.remove('opacity-0', 'invisible');
+    modal.classList.add('opacity-100', 'visible');
+    const modalCard = modal.querySelector('.form-card');
+    if (modalCard) {
+        modalCard.classList.remove('scale-95');
+        modalCard.classList.add('scale-100');
+    }
+}
+
+function closeModal() {
+    if (!modal) return;
+    modal.classList.add('opacity-0', 'invisible');
+    modal.classList.remove('opacity-100', 'visible');
+    const modalCard = modal.querySelector('.form-card');
+    if (modalCard) {
+        modalCard.classList.add('scale-95');
+        modalCard.classList.remove('scale-100');
+    }
+    // Reset form and errors
+    if (form) form.reset();
+    if (unitIdInput) unitIdInput.value = '';
+    
+    const nameErrorEl = document.getElementById('unitNameError');
+    const symbolErrorEl = document.getElementById('unitSymbolError');
+    const nameInput = document.getElementById('unitName');
+    const symbolInput = document.getElementById('unitSymbol');
+    
+    if (nameErrorEl) nameErrorEl.innerText = '';
+    if (symbolErrorEl) symbolErrorEl.innerText = '';
+    if (nameInput) nameInput.classList.remove('error');
+    if (symbolInput) symbolInput.classList.remove('error');
+}
+
+// Add unit handler
+function addUnit() {
+    if (modalTitle) {
+        modalTitle.innerHTML = '<i class="fas fa-weight-hanging text-[#a8c49a] mr-2"></i> Add Unit';
+    }
+    if (unitIdInput) unitIdInput.value = '';
+    if (unitNameInput) unitNameInput.value = '';
+    if (unitSymbolInput) unitSymbolInput.value = '';
+    if (unitDescInput) unitDescInput.value = '';
+    
+    // Clear errors
+    const nameErrorEl = document.getElementById('unitNameError');
+    const symbolErrorEl = document.getElementById('unitSymbolError');
+    const nameInput = document.getElementById('unitName');
+    const symbolInput = document.getElementById('unitSymbol');
+    
+    if (nameErrorEl) nameErrorEl.innerText = '';
+    if (symbolErrorEl) symbolErrorEl.innerText = '';
+    if (nameInput) nameInput.classList.remove('error');
+    if (symbolInput) symbolInput.classList.remove('error');
+    
+    openModal();
+}
+
+// Edit unit (exposed globally)
+window.editUnitHandler = function(id) {
+    const unit = units.find(u => u.id === id);
+    if (!unit) {
+        showToast('Unit not found', 'error');
+        return;
+    }
+    if (unitIdInput) unitIdInput.value = unit.id;
+    if (unitNameInput) unitNameInput.value = unit.name;
+    if (unitSymbolInput) unitSymbolInput.value = unit.symbol;
+    if (unitDescInput) unitDescInput.value = unit.description || '';
+    
+    if (modalTitle) {
+        modalTitle.innerHTML = '<i class="fas fa-edit text-[#a8c49a] mr-2"></i> Edit Unit';
+    }
+    
+    // Clear errors
+    const nameErrorEl = document.getElementById('unitNameError');
+    const symbolErrorEl = document.getElementById('unitSymbolError');
+    const nameInput = document.getElementById('unitName');
+    const symbolInput = document.getElementById('unitSymbol');
+    
+    if (nameErrorEl) nameErrorEl.innerText = '';
+    if (symbolErrorEl) symbolErrorEl.innerText = '';
+    if (nameInput) nameInput.classList.remove('error');
+    if (symbolInput) symbolInput.classList.remove('error');
+    
+    openModal();
+};
+
+// Delete unit handler (exposed globally)
+window.deleteUnitHandler = function(id) {
+    const unit = units.find(u => u.id === id);
+    if (!unit) return;
+    
+    if (confirm(`Are you sure you want to delete unit "${unit.name}" (${unit.symbol})? This action cannot be undone.`)) {
+        units = units.filter(u => u.id !== id);
+        saveUnits();
+        renderTable();
+        showToast(`Unit "${escapeHtml(unit.name)}" deleted successfully`, 'success');
+    }
+};
+
+// Save unit (add/edit with validation)
+function saveUnitHandler(e) {
+    e.preventDefault();
+    
+    const id = unitIdInput && unitIdInput.value ? parseInt(unitIdInput.value) : null;
+    const name = unitNameInput ? unitNameInput.value.trim() : '';
+    const symbol = unitSymbolInput ? unitSymbolInput.value.trim() : '';
+    const description = unitDescInput ? unitDescInput.value.trim() : '';
+    
+    const isEdit = !!id;
+    if (!validateUnitForm(name, symbol, isEdit, id)) {
+        showToast('Please fix the errors in the form', 'error');
+        return;
+    }
+    
+    if (isEdit) {
+        // Update existing
+        const index = units.findIndex(u => u.id === id);
+        if (index !== -1) {
+            units[index] = {
+                ...units[index],
+                name: name,
+                symbol: symbol.toLowerCase(),
+                description: description
+            };
+            saveUnits();
+            renderTable();
+            showToast(`Unit "${escapeHtml(name)}" updated successfully`, 'success');
+            closeModal();
+        } else {
+            showToast('Unit not found', 'error');
+        }
+    } else {
+        // Create new
+        const newId = units.length > 0 ? Math.max(...units.map(u => u.id)) + 1 : 1;
+        const newUnit = {
+            id: newId,
+            name: name,
+            symbol: symbol.toLowerCase(),
+            description: description
+        };
+        units.push(newUnit);
+        saveUnits();
+        renderTable();
+        showToast(`Unit "${escapeHtml(name)}" added successfully`, 'success');
+        closeModal();
+    }
+}
+
+// Initialize event listeners
+document.addEventListener('DOMContentLoaded', () => {
+    loadUnits();
+    
+    const addBtn = document.getElementById('addUnitBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const cancelModalBtn = document.getElementById('cancelModalBtn');
+    const modalOverlay = document.querySelector('#unitModal .modal-overlay');
+    const unitForm = document.getElementById('unitForm');
+    
+    if (addBtn) addBtn.addEventListener('click', addUnit);
+    if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+    if (cancelModalBtn) cancelModalBtn.addEventListener('click', closeModal);
+    if (modalOverlay) modalOverlay.addEventListener('click', closeModal);
+    if (unitForm) unitForm.addEventListener('submit', saveUnitHandler);
+    
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal && !modal.classList.contains('invisible')) {
+            closeModal();
+        }
+    });
+});

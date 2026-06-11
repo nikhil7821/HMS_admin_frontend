@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Admin HMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="h-screen flex items-center justify-center">
+
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 mx-4">
+        <!-- Logo & Title -->
+        <div class="text-center mb-8">
+            <div class="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-hospital-user text-white text-4xl"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-800">Hospital Management System</h1>
+            <p class="text-gray-500 mt-2">Admin Portal</p>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Email Address</label>
+                <div class="relative">
+                    <i class="fas fa-envelope absolute left-3 top-3 text-gray-400"></i>
+                    <input type="email" id="email" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="admin@hospital.com" required>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                <div class="relative">
+                    <i class="fas fa-lock absolute left-3 top-3 text-gray-400"></i>
+                    <input type="password" id="password" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Login As</label>
+                <select id="role" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="admin">Admin</option>
+                    <option value="doctor">Doctor</option>
+                    <option value="receptionist">Receptionist</option>
+                </select>
+            </div>
+
+            <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-2 px-4 rounded-lg hover:opacity-90 transition duration-300">
+                <i class="fas fa-sign-in-alt mr-2"></i> Login
+            </button>
+        </form>
+
+        <!-- Demo Credentials -->
+        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+            <p class="text-xs text-gray-500 text-center">Demo Credentials</p>
+            <p class="text-xs text-gray-400 text-center mt-1">admin@hospital.com / admin123</p>
+        </div>
+    </div>
+
+    <!-- ALL JS IN ONE FILE - NO EXTERNAL DEPENDENCIES -->
+    <script>
+        // Wait for page to load
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    const role = document.getElementById('role').value;
+                    
+                    // Demo validation
+                    if (email === 'admin@hospital.com' && password === 'admin123') {
+                        // Store user data
+                        const user = {
+                            name: role === 'admin' ? 'Admin User' : role === 'doctor' ? 'Dr. Smith' : 'Receptionist',
+                            email: email,
+                            role: role,
+                            avatar: role === 'admin' ? 'A' : role === 'doctor' ? 'D' : 'R'
+                        };
+                        
+                        localStorage.setItem('auth_token', 'demo_token_12345');
+                        localStorage.setItem('user', JSON.stringify(user));
+                        
+                        // Show success message
+                        showToast('Login successful! Redirecting...', 'success');
+                        
+                        // Redirect to dashboard
+                        setTimeout(function() {
+                            window.location.href = 'index.html';
+                        }, 1000);
+                    } else {
+                        showToast('Invalid credentials! Use admin@hospital.com / admin123', 'error');
+                    }
+                });
+            }
+        });
+        
+        // Toast notification function
+        function showToast(message, type) {
+            // Remove existing toast if any
+            const existingToast = document.querySelector('.custom-toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+            
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = 'custom-toast fixed top-5 right-5 z-50 px-6 py-3 rounded-lg shadow-lg text-white ' + 
+                (type === 'success' ? 'bg-green-500' : 'bg-red-500');
+            toast.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Remove after 3 seconds
+            setTimeout(function() {
+                toast.style.opacity = '0';
+                setTimeout(function() {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

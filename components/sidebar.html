@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar Component | Aesthetic Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+        }
+        
+        /* Sidebar Styles - Aesthetic Cream & Dusty Tones */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 260px;
+            background: #fef9f0;
+            background-image: radial-gradient(circle at 10% 20%, rgba(233, 216, 190, 0.08) 0%, rgba(250, 242, 228, 0) 80%);
+            border-right: 1px solid #e8ddce;
+            z-index: 100;
+            transition: width 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            overflow-y: auto;
+            overflow-x: visible; /* FIX: allow collapse-btn to be visible outside when collapsed */
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+        }
+        
+        /* Custom Scrollbar */
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: #ede3d4;
+            border-radius: 10px;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #c9b69a;
+            border-radius: 10px;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #b8a080;
+        }
+        
+        /* Collapsed state */
+        .sidebar.collapsed {
+            width: 72px;
+        }
+        
+        .sidebar.collapsed .logo-text,
+        .sidebar.collapsed .logo-sub,
+        .sidebar.collapsed .nav-item > span,
+        .sidebar.collapsed .dropdown-left > span,
+        .sidebar.collapsed .nav-dropdown-btn > .fa-chevron-down,
+        .sidebar.collapsed .dropdown-link span {
+            display: none;
+        }
+        
+        .sidebar.collapsed .nav-item,
+        .sidebar.collapsed .nav-dropdown-btn {
+            justify-content: center;
+            padding: 0.625rem 0;
+        }
+        
+        .sidebar.collapsed .nav-item i,
+        .sidebar.collapsed .dropdown-left i {
+            margin-right: 0;
+            width: auto;
+        }
+        
+        .sidebar.collapsed .dropdown-left {
+            gap: 0;
+        }
+        
+        .sidebar.collapsed .nav-dropdown {
+            position: relative;
+        }
+        
+        .sidebar.collapsed .nav-dropdown-content {
+            position: fixed;
+            left: 72px;
+            background: #fef9f0;
+            border: 1px solid #e8ddce;
+            border-radius: 12px;
+            min-width: 200px;
+            padding: 8px 0;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            z-index: 101;
+            display: none;
+        }
+        
+        .sidebar.collapsed .nav-dropdown:hover .nav-dropdown-content {
+            display: block !important;
+        }
+        
+        .sidebar.collapsed .nav-dropdown-content .dropdown-link {
+            padding: 8px 16px;
+            white-space: nowrap;
+            margin: 0;
+        }
+        
+        .sidebar.collapsed .sidebar-logo {
+            justify-content: center;
+            padding: 0;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        
+        .sidebar.collapsed .logo-content {
+            justify-content: center;
+            padding-left: 0 !important;
+        }
+
+        /* FIX: collapsed collapse-btn — pill shape hanging off right edge */
+        .sidebar.collapsed .collapse-btn {
+            right: -18px;
+            background: #fef9f0;
+            border: 1px solid #e8ddce;
+            border-left: none;
+            border-radius: 0 36px 36px 0;
+            width: 36px;
+            height: 36px;
+        }
+        
+        .sidebar.collapsed .collapse-btn i {
+            transform: rotate(180deg);
+        }
+        
+        /* Logo Section - EXACT 70px HEIGHT */
+        .sidebar-logo {
+            padding: 0;
+            height: 70px;
+            border-bottom: 1px solid #eadbc8;
+            background: linear-gradient(135deg, #fef9f0 0%, #fcf5e8 100%);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: visible; /* FIX: allow collapse-btn to visually overflow */
+        }
+        
+        .logo-content {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            width: 100%;
+        }
+        
+        .logo-icon {
+            background: linear-gradient(135deg, #9bb88b 0%, #7d9b6e 100%);
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(125, 155, 110, 0.12);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        
+        .logo-icon i {
+            font-size: 1rem;
+        }
+        
+        .logo-text {
+            color: #5c4b3a;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .logo-sub {
+            color: #b8a69b;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+            font-size: 0.7rem;
+            font-weight: 400;
+        }
+        
+        /* FIX: Collapse Button — always on top, always clickable */
+        .collapse-btn {
+            position: absolute;
+            right: 12px;
+            top: 17px;
+            width: 36px;
+            height: 36px;
+            background: #f5ede2;
+            border: 1px solid #e8d9ca;
+            border-radius: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease, right 0.3s ease, border-radius 0.3s ease;
+            z-index: 9999; /* FIX: always on top */
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            pointer-events: auto; /* FIX: always clickable */
+            flex-shrink: 0;
+        }
+        
+        .collapse-btn:hover {
+            background: #e8d9ca;
+            border-color: #d4c3ae;
+            transform: scale(1.05);
+        }
+        
+        .collapse-btn i {
+            color: #9bb88b;
+            font-size: 0.9rem;
+            transition: transform 0.3s ease;
+        }
+        
+        /* Navigation Items */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5625rem 1rem;
+            margin: 0.25rem 0.75rem;
+            border-radius: 10px;
+            color: #6b5b4e;
+            font-weight: 450;
+            font-size: 0.85rem;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .nav-item i {
+            width: 1.5rem;
+            font-size: 1rem;
+            margin-right: 0.75rem;
+            color: #c9b69a;
+            transition: all 0.25s ease;
+            flex-shrink: 0;
+        }
+        
+        .nav-item:hover {
+            background: #f5ede2;
+            color: #8b7a6b;
+        }
+        
+        .nav-item:hover i {
+            color: #9bb88b;
+            transform: translateX(2px);
+        }
+        
+        .nav-item.active {
+            background: linear-gradient(135deg, #f0eae0 0%, #ebe1d4 100%);
+            color: #7d6b5a;
+            border-left: 3px solid #9bb88b;
+        }
+        
+        .nav-item.active i {
+            color: #9bb88b;
+        }
+        
+        /* Module Spacing - Proper gap after each module */
+        .nav-module {
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Dropdown Styles */
+        .nav-dropdown {
+            margin: 0.125rem 0;
+        }
+        
+        .nav-dropdown-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5625rem 1rem;
+            margin: 0.25rem 0.75rem;
+            border-radius: 10px;
+            color: #6b5b4e;
+            font-weight: 450;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
+        }
+        
+        .nav-dropdown-btn .dropdown-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .nav-dropdown-btn i:first-child {
+            width: 1.5rem;
+            font-size: 1rem;
+            color: #c9b69a;
+            transition: all 0.25s ease;
+            flex-shrink: 0;
+        }
+        
+        .nav-dropdown-btn .fa-chevron-down {
+            font-size: 0.7rem;
+            color: #c9b69a;
+            transition: transform 0.25s ease;
+            flex-shrink: 0;
+        }
+        
+        .nav-dropdown-btn:hover {
+            background: #f5ede2;
+            color: #8b7a6b;
+        }
+        
+        .nav-dropdown-btn:hover i:first-child {
+            color: #9bb88b;
+        }
+        
+        .nav-dropdown-content {
+            margin-left: 1.5rem;
+            padding-left: 0.5rem;
+            border-left: 1.5px solid #e8d9ca;
+            margin-top: 0.25rem;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-link {
+            display: flex;
+            align-items: center;
+            padding: 0.4375rem 1rem;
+            margin: 0.125rem 0;
+            border-radius: 8px;
+            color: #8a7a6b;
+            font-weight: 400;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .dropdown-link i {
+            width: 1.5rem;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+            color: #d4c3ae;
+            flex-shrink: 0;
+        }
+        
+        .dropdown-link:hover {
+            background: #f5ede2;
+            color: #9bb88b;
+        }
+        
+        .dropdown-link:hover i {
+            color: #9bb88b;
+        }
+        
+        /* Section divider */
+        .nav-divider {
+            height: 1px;
+            background: linear-gradient(90deg, #e8d9ca 0%, transparent 100%);
+            margin: 1rem 1rem;
+        }
+        
+        /* Sidebar wrapper */
+        .sidebar-wrapper {
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-nav-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 260px;
+                transition: transform 0.3s ease;
+            }
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            .sidebar.collapsed {
+                width: 260px;
+            }
+            .sidebar.collapsed .logo-text,
+            .sidebar.collapsed .logo-sub,
+            .sidebar.collapsed .nav-item > span,
+            .sidebar.collapsed .dropdown-left > span {
+                display: inline-block;
+            }
+            .sidebar.collapsed .nav-item,
+            .sidebar.collapsed .nav-dropdown-btn {
+                justify-content: flex-start;
+                padding: 0.5625rem 1rem;
+            }
+            .sidebar.collapsed .nav-item i,
+            .sidebar.collapsed .dropdown-left i {
+                margin-right: 0.75rem;
+            }
+            .sidebar.collapsed .dropdown-left {
+                gap: 0.75rem;
+            }
+            .sidebar.collapsed .nav-dropdown-content {
+                position: static;
+                background: transparent;
+                border: none;
+                box-shadow: none;
+            }
+            .collapse-btn {
+                display: flex !important;
+                right: 12px;
+                background: #f5ede2;
+                border-radius: 36px;
+                border: 1px solid #e8d9ca;
+            }
+            .sidebar.collapsed .collapse-btn {
+                position: absolute;
+                right: 12px;
+                background: #f5ede2;
+                border-radius: 36px;
+                border: 1px solid #e8d9ca;
+            }
+            .sidebar-logo {
+                height: 70px;
+            }
+        }
+        
+        /* Hidden class */
+        .hidden {
+            display: none;
+        }
+        
+        /* Active state for dropdown links */
+        .dropdown-link.active {
+            background: #f0eae0;
+            color: #7d6b5a;
+        }
+        
+        .dropdown-link.active i {
+            color: #9bb88b;
+        }
+        
+        /* Flex utilities */
+        .items-center {
+            display: flex;
+            align-items: center;
+        }
+        
+        .gap-2\.5 {
+            gap: 0.625rem;
+        }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar" id="mainSidebar">
+    <div class="sidebar-wrapper">
+        <div class="sidebar-logo">
+            <div class="logo-content">
+                <div class="logo-icon">
+                    <i class="fas fa-leaf text-white"></i>
+                </div>
+                <div>
+                    <span class="text-base font-semibold logo-text">MedFlow</span>
+                    <span class="text-xs logo-sub block font-light">Hospital Management</span>
+                </div>
+            </div>
+            <!-- Collapse Button - VISIBLE at top right -->
+            <div class="collapse-btn" id="collapseBtn">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+        
+        <div class="sidebar-nav-wrapper">
+            <nav class="py-3">
+                <!-- Dashboard -->
+                <a href="../../modules/dashboard/dashboard.html" class="nav-item" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                
+                <!-- User Management -->
+                <div class="nav-dropdown nav-module">
+                    <div class="nav-dropdown-btn">
+                        <div class="dropdown-left">
+                            <i class="fas fa-users"></i>
+                            <span>User Management</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="nav-dropdown-content hidden">
+                        <a href="../../modules/user-management/users.html" class="dropdown-link" data-page="users">📋 Users</a>
+                        <a href="../../modules/user-management/roles.html" class="dropdown-link" data-page="roles">🔐 Roles & Permissions</a>
+                        <a href="../../modules/user-management/departments.html" class="dropdown-link" data-page="departments">🏢 Departments</a>
+                    </div>
+                </div>
+                
+                <!-- Clinical -->
+                <div class="nav-dropdown nav-module">
+                    <div class="nav-dropdown-btn">
+                        <div class="dropdown-left">
+                            <i class="fas fa-stethoscope"></i>
+                            <span>Clinical</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="nav-dropdown-content hidden">
+                        <a href="../../modules/clinical/doctors.html" class="dropdown-link" data-page="doctors">👨‍⚕️ Doctors</a>
+                        <a href="../../modules/clinical/patients.html" class="dropdown-link" data-page="patients">👥 Patients</a>
+                        <a href="../../modules/clinical/patient-profile.html" class="dropdown-link" data-page="patient-profile">📄 Patient Profile</a>
+                        <a href="../../modules/clinical/opd.html" class="dropdown-link" data-page="opd">🚪 OPD</a>
+                        <a href="../../modules/clinical/ipd.html" class="dropdown-link" data-page="ipd">🛏️ IPD</a>
+                        <a href="../../modules/clinical/appointments.html" class="dropdown-link" data-page="appointments">📅 Appointments</a>
+                        <a href="../../modules/clinical/consultation.html" class="dropdown-link" data-page="consultation">💊 Consultation</a>
+                        <a href="../../modules/clinical/doctor-schedule.html" class="dropdown-link" data-page="doctor-schedule">📆 Doctor Schedule</a>
+                    </div>
+                </div>
+                
+                <!-- Emergency -->
+                <div class="nav-dropdown nav-module">
+                    <div class="nav-dropdown-btn">
+                        <div class="dropdown-left">
+                            <i class="fas fa-ambulance"></i>
+                            <span>Emergency</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="nav-dropdown-content hidden">
+                        <a href="../../modules/emergency/emergency.html" class="dropdown-link" data-page="emergency-register">🚨 Emergency Register</a>
+                        <a href="../../modules/emergency/emergency-queue.html" class="dropdown-link" data-page="emergency-queue">⏳ Emergency Queue</a>
+                        <a href="../../modules/emergency/ambulance.html" class="dropdown-link" data-page="ambulance">🚑 Ambulance Request</a>
+                    </div>
+                </div>
+                
+                <!-- Ward Management -->
+                <div class="nav-dropdown nav-module">
+                    <div class="nav-dropdown-btn">
+                        <div class="dropdown-left">
+                            <i class="fas fa-bed"></i>
+                            <span>Ward Management</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="nav-dropdown-content hidden">
+                        <a href="../../modules/ward-management/wards.html" class="dropdown-link" data-page="wards">🏥 Wards</a>
+                        <a href="../../modules/ward-management/rooms.html" class="dropdown-link" data-page="rooms">🚪 Rooms</a>
+                        <a href="../../modules/ward-management/beds.html" class="dropdown-link" data-page="beds">🛏️ Beds</a>
+                    </div>
+                </div>
+                
+                <!-- Pharmacy -->
+                <div class="nav-dropdown nav-module">
+                    <div class="nav-dropdown-btn">
+                        <div class="dropdown-left">
+                            <i class="fas fa-capsules"></i>
+                            <span>Pharmacy</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="nav-dropdown-content hidden">
+                        <a href="../../modules/pharmacy/categories.html" class="dropdown-link" data-page="categories">📁 Categories</a>
+                        <a href="../../modules/pharmacy/units.html" class="dropdown-link" data-page="units">⚖️ Units</a>
+                        <a href="../../modules/pharmacy/medicines.html" class="dropdown-link" data-page="medicines">💊 Medicines</a>
+                        <a href="../../modules/pharmacy/suppliers.html" class="dropdown-link" data-page="suppliers">🚚 Suppliers</a>
+                        <a href="../../modules/pharmacy/purchases.html" class="dropdown-link" data-page="purchases">🛒 Purchases</a>
+                        <a href="../../modules/pharmacy/issue-medicines.html" class="dropdown-link" data-page="issue-medicines">📤 Issue Medicines</a>
+                        <a href="../../modules/pharmacy/stock-adjustments.html" class="dropdown-link" data-page="stock-adjustments">📊 Stock Adjustments</a>
+                    </div>
+                </div>
+                
+                <!-- Laboratory -->
+                <div class="nav-dropdown nav-module">
+                    <div class="nav-dropdown-btn">
+                        <div class="dropdown-left">
+                            <i class="fas fa-microscope"></i>
+                            <span>Laboratory</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="nav-dropdown-content hidden">
+                        <a href="../../modules/laboratory/lab-categories.html" class="dropdown-link" data-page="lab-categories">📁 Test Categories</a>
+                        <a href="../../modules/laboratory/lab-tests.html" class="dropdown-link" data-page="lab-tests">🔬 Lab Tests</a>
+                        <a href="../../modules/laboratory/lab-requests.html" class="dropdown-link" data-page="lab-requests">📋 Test Requests</a>
+                    </div>
+                </div>
+                
+                <!-- Radiology -->
+                <div class="nav-dropdown nav-module">
+                    <div class="nav-dropdown-btn">
+                        <div class="dropdown-left">
+                            <i class="fas fa-x-ray"></i>
+                            <span>Radiology</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="nav-dropdown-content hidden">
+                        <a href="../../modules/radiology/radio-categories.html" class="dropdown-link" data-page="radio-categories">📁 Scan Categories</a>
+                        <a href="../../modules/radiology/radio-tests.html" class="dropdown-link" data-page="radio-tests">🩻 Radiology Tests</a>
+                        <a href="../../modules/radiology/radio-requests.html" class="dropdown-link" data-page="radio-requests">📋 Scan Requests</a>
+                    </div>
+                </div>
+                
+                <!-- Billing & Finance -->
+                <div class="nav-dropdown nav-module">
+                    <div class="nav-dropdown-btn">
+                        <div class="dropdown-left">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                            <span>Billing & Finance</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="nav-dropdown-content hidden">
+                        <a href="../../modules/billing/invoices.html" class="dropdown-link" data-page="invoices">🧾 Invoices</a>
+                        <a href="../../modules/billing/payments.html" class="dropdown-link" data-page="payments">💳 Payments</a>
+                        <a href="../../modules/billing/financial-reports.html" class="dropdown-link" data-page="financial-reports">📊 Financial Reports</a>
+                    </div>
+                </div>
+                
+                <!-- Documents -->
+                <div class="nav-dropdown nav-module">
+                    <div class="nav-dropdown-btn">
+                        <div class="dropdown-left">
+                            <i class="fas fa-folder-open"></i>
+                            <span>Documents</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="nav-dropdown-content hidden">
+                        <a href="../../modules/documents/patient-documents.html" class="dropdown-link" data-page="patient-documents">📄 Patient Documents</a>
+                        <a href="../../modules/documents/reports-storage.html" class="dropdown-link" data-page="reports-storage">📁 Reports Storage</a>
+                        <a href="../../modules/documents/prescriptions.html" class="dropdown-link" data-page="prescriptions">📋 Prescriptions</a>
+                    </div>
+                </div>
+                
+                <!-- Staff Management -->
+                <div class="nav-dropdown nav-module">
+                    <div class="nav-dropdown-btn">
+                        <div class="dropdown-left">
+                            <i class="fas fa-user-md"></i>
+                            <span>Staff Management</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="nav-dropdown-content hidden">
+                        <a href="../../modules/staff/staff-list.html" class="dropdown-link" data-page="staff-list">👥 Staff List</a>
+                        <a href="../../modules/staff/shifts.html" class="dropdown-link" data-page="shifts">🕒 Shift Scheduling</a>
+                        <a href="../../modules/staff/attendance.html" class="dropdown-link" data-page="attendance">📅 Attendance</a>
+                    </div>
+                </div>
+                
+                <!-- Reports & Analytics -->
+                <div class="nav-dropdown nav-module">
+                    <div class="nav-dropdown-btn">
+                        <div class="dropdown-left">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Reports & Analytics</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="nav-dropdown-content hidden">
+                        <a href="../../modules/reports/patient-reports.html" class="dropdown-link" data-page="patient-reports">📊 Patient Reports</a>
+                        <a href="../../modules/reports/doctor-performance.html" class="dropdown-link" data-page="doctor-performance">👨‍⚕️ Doctor Performance</a>
+                        <a href="../../modules/reports/revenue-reports.html" class="dropdown-link" data-page="revenue-reports">💰 Revenue Reports</a>
+                        <a href="../../modules/reports/bed-occupancy.html" class="dropdown-link" data-page="bed-occupancy">🛏️ Bed Occupancy</a>
+                        <a href="../../modules/reports/lab-reports.html" class="dropdown-link" data-page="lab-reports">🔬 Lab Activity</a>
+                    </div>
+                </div>
+                
+                <!-- Settings -->
+                <div class="nav-dropdown nav-module">
+                    <div class="nav-dropdown-btn">
+                        <div class="dropdown-left">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="nav-dropdown-content hidden">
+                        <a href="../../modules/settings/hospital-profile.html" class="dropdown-link" data-page="hospital-profile">🏥 Hospital Profile</a>
+                        <a href="../../modules/settings/system-config.html" class="dropdown-link" data-page="system-config">⚙️ System Config</a>
+                        <a href="../../modules/settings/notification-settings.html" class="dropdown-link" data-page="notification-settings">🔔 Notification Settings</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+</aside>
+
+<script>
+    (function() {
+        // Initialize sidebar functionality
+        function initSidebar() {
+            initDropdowns();
+            setActiveMenuItem();
+            initCollapseButton();
+            initMobileMenu();
+        }
+        
+        // Initialize dropdowns
+        function initDropdowns() {
+            const dropdownBtns = document.querySelectorAll('.nav-dropdown-btn');
+            
+            dropdownBtns.forEach(btn => {
+                btn.removeEventListener('click', handleDropdownClick);
+                btn.addEventListener('click', handleDropdownClick);
+            });
+        }
+        
+        function handleDropdownClick(e) {
+            const sidebar = document.getElementById('mainSidebar');
+            if (sidebar && sidebar.classList.contains('collapsed')) {
+                return;
+            }
+            
+            e.stopPropagation();
+            const content = this.nextElementSibling;
+            const chevron = this.querySelector('.fa-chevron-down');
+            
+            if (content) {
+                content.classList.toggle('hidden');
+                if (chevron) {
+                    chevron.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+                }
+            }
+        }
+        
+        // Set active menu item
+        function setActiveMenuItem() {
+            const currentPath = window.location.pathname;
+            
+            document.querySelectorAll('.nav-item, .dropdown-link').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-item, .dropdown-link').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && href !== '#' && currentPath.includes(href)) {
+                    link.classList.add('active');
+                    
+                    const parentDropdown = link.closest('.nav-dropdown-content');
+                    if (parentDropdown) {
+                        parentDropdown.classList.remove('hidden');
+                        const parentBtn = parentDropdown.previousElementSibling;
+                        if (parentBtn) {
+                            const chevron = parentBtn.querySelector('.fa-chevron-down');
+                            if (chevron) {
+                                chevron.style.transform = 'rotate(180deg)';
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Initialize collapse button — FIXED
+        function initCollapseButton() {
+            const collapseBtn = document.getElementById('collapseBtn');
+            const sidebar = document.getElementById('mainSidebar');
+
+            if (!collapseBtn || !sidebar) return;
+
+            // Restore saved state
+            const savedState = localStorage.getItem('sidebarCollapsed');
+            if (savedState === 'true') {
+                sidebar.classList.add('collapsed');
+                updateHeaderPosition(true);
+            }
+
+            // FIX: Use mousedown instead of click so it fires before any blur/focus event
+            // that might cause the button to lose interactivity.
+            // Also removed stopPropagation so nothing blocks the event chain.
+            collapseBtn.addEventListener('mousedown', function (e) {
+                e.preventDefault(); // prevent focus shift that can cause glitches
+            });
+
+            collapseBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+
+                const isCollapsed = sidebar.classList.toggle('collapsed');
+
+                // Save state
+                localStorage.setItem('sidebarCollapsed', isCollapsed);
+
+                // Update header position
+                updateHeaderPosition(isCollapsed);
+
+                // Dispatch event for other components
+                window.dispatchEvent(new CustomEvent('sidebarToggle', {
+                    detail: { collapsed: isCollapsed }
+                }));
+            });
+        }
+        
+        // Update header left position based on sidebar state
+        function updateHeaderPosition(isCollapsed) {
+            const header = document.getElementById('mainHeader');
+            
+            if (header && window.innerWidth >= 1024) {
+                if (isCollapsed) {
+                    header.style.left = '72px';
+                } else {
+                    header.style.left = '260px';
+                }
+            }
+        }
+        
+        // Initialize mobile menu
+        function initMobileMenu() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const sidebar = document.getElementById('mainSidebar');
+            
+            if (mobileMenuBtn && sidebar) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('mobile-open');
+                });
+            }
+            
+            document.addEventListener('click', function(event) {
+                const sidebar = document.getElementById('mainSidebar');
+                const mobileBtn = document.getElementById('mobileMenuBtn');
+                const isMobile = window.innerWidth <= 1024;
+                
+                if (isMobile && sidebar && sidebar.classList.contains('mobile-open')) {
+                    if (mobileBtn && mobileBtn.contains(event.target)) {
+                        return;
+                    }
+                    if (!sidebar.contains(event.target)) {
+                        sidebar.classList.remove('mobile-open');
+                    }
+                }
+            });
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('mainSidebar');
+            const header = document.getElementById('mainHeader');
+            
+            if (header && sidebar && window.innerWidth >= 1024) {
+                const isCollapsed = sidebar.classList.contains('collapsed');
+                header.style.left = isCollapsed ? '72px' : '260px';
+            } else if (header && window.innerWidth < 1024) {
+                header.style.left = '0';
+            }
+            
+            if (sidebar && window.innerWidth >= 1024) {
+                sidebar.classList.remove('mobile-open');
+            }
+        });
+        
+        // Export functions for global use
+        window.sidebarAPI = {
+            toggleCollapse: function() {
+                const btn = document.getElementById('collapseBtn');
+                if (btn) btn.click();
+            },
+            expand: function() {
+                const sidebar = document.getElementById('mainSidebar');
+                if (sidebar && sidebar.classList.contains('collapsed')) {
+                    const btn = document.getElementById('collapseBtn');
+                    if (btn) btn.click();
+                }
+            },
+            collapse: function() {
+                const sidebar = document.getElementById('mainSidebar');
+                if (sidebar && !sidebar.classList.contains('collapsed')) {
+                    const btn = document.getElementById('collapseBtn');
+                    if (btn) btn.click();
+                }
+            },
+            refreshActive: setActiveMenuItem,
+            isCollapsed: function() {
+                const sidebar = document.getElementById('mainSidebar');
+                return sidebar ? sidebar.classList.contains('collapsed') : false;
+            }
+        };
+        
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initSidebar);
+        } else {
+            initSidebar();
+        }
+    })();
+</script>
+
+</body>
+</html>

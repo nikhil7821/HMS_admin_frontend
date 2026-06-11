@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Attendance | Staff Management | MedFlow</title>
+    <!-- Google Fonts: Poppins Light + Regular + Medium -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            background: #fffdf9;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-weight: 400;
+        }
+        
+        .bg-subtle {
+            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f0ebe4;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #d4c9bc;
+            border-radius: 10px;
+        }
+        
+        .stat-card {
+            transition: all 0.25s ease;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
+            border-color: #e8dcd0;
+        }
+        
+        .stat-icon-bg {
+            background: #faf7f2;
+            border-radius: 14px;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #1e293b;
+            letter-spacing: -0.3px;
+        }
+        
+        .stat-card p:first-child {
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-card .text-2xl {
+            font-weight: 500;
+        }
+        
+        .data-table th {
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            letter-spacing: 0.8px;
+            color: #c2b5a8;
+        }
+        
+        .attendance-row {
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f5f0ea;
+        }
+        
+        .attendance-row:hover {
+            background-color: #fefcf9;
+        }
+        
+        p, span, div, a {
+            font-weight: 400;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
+            transform: translateY(-1px);
+        }
+        
+        .btn-success {
+            background: #10b981;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+        
+        .form-input, .form-select {
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            padding: 10px 14px;
+            width: 100%;
+            font-size: 13px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 400;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #a8c49a;
+            box-shadow: 0 0 0 3px rgba(168, 196, 154, 0.2);
+        }
+        
+        label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 6px;
+            display: block;
+            letter-spacing: 0.3px;
+        }
+        
+        .status-present {
+            background: #dcfce7;
+            color: #16a34a;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .status-absent {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .status-late {
+            background: #fef5e8;
+            color: #f59e0b;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .status-halfday {
+            background: #e0f2fe;
+            color: #0284c7;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .status-holiday {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .time-input {
+            width: 100px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 12px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .time-input:focus {
+            outline: none;
+            border-color: #a8c49a;
+            box-shadow: 0 0 0 2px rgba(168, 196, 154, 0.2);
+        }
+        
+        .notes-input {
+            width: 140px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 12px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .notes-input:focus {
+            outline: none;
+            border-color: #a8c49a;
+            box-shadow: 0 0 0 2px rgba(168, 196, 154, 0.2);
+        }
+        
+        .status-select {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 12px;
+            font-family: 'Poppins', sans-serif;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .status-select:focus {
+            outline: none;
+            border-color: #a8c49a;
+            box-shadow: 0 0 0 2px rgba(168, 196, 154, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-subtle">
+
+    <div id="sidebar-container"></div>
+    <div id="header-container"></div>
+
+    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+        
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-medium text-[#1e293b] mb-1">
+                    <i class="fas fa-calendar-check text-[#a8c49a] mr-3"></i>Staff Attendance
+                </h1>
+                <p class="text-[#64748b] text-sm font-normal">Mark daily attendance for staff members</p>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <div class="stat-card p-5 border-l-4 border-l-green-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Present</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="presentCount">0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-user-check text-[#a8c49a] text-lg"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card p-5 border-l-4 border-l-red-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Absent</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="absentCount">0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-user-slash text-[#a8c49a] text-lg"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card p-5 border-l-4 border-l-yellow-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Late</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="lateCount">0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-clock text-[#a8c49a] text-lg"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card p-5 border-l-4 border-l-purple-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Total Staff</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="totalStaff">0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-users text-[#a8c49a] text-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Date Selection & Actions -->
+        <div class="bg-white rounded-2xl p-4 mb-6 border border-[#f0e8e0]">
+            <div class="flex flex-col sm:flex-row gap-3 items-end">
+                <div>
+                    <label class="block text-xs font-medium text-[#64748b] mb-1">Select Date</label>
+                    <input type="date" id="attendanceDate" class="form-input w-48">
+                </div>
+                <button id="loadAttendanceBtn" class="btn-primary">
+                    <i class="fas fa-sync-alt mr-2"></i> Load Attendance
+                </button>
+                <button id="saveAttendanceBtn" class="btn-success">
+                    <i class="fas fa-save mr-2"></i> Save Attendance
+                </button>
+            </div>
+        </div>
+
+        <!-- Attendance Table -->
+        <div class="bg-white rounded-2xl shadow-sm border border-[#f0e8e0] overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-[#faf7f2] border-b border-[#f0e8e0]">
+                        <tr class="text-left data-table">
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Staff Name</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Role</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Status</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Check In</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Check Out</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceTable">
+                        <tr><td colspan="6" class="text-center py-12 text-[#94a3b8]"><i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i><p class="font-normal">Loading attendance...</p> </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="../../js/core/common.js"></script>
+    <script src="attendance.js"></script>
+</body>
+</html>

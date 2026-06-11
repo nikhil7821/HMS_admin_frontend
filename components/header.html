@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header Component</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        .header {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 260px;
+            background: #ffffff;
+            border-bottom: 1px solid #f0e8e0;
+            z-index: 99;
+            transition: left 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+        }
+        
+        /* Header container - EXACT 70px HEIGHT to match sidebar */
+        .header-container {
+            padding: 0;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .header-container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+                height: 70px;
+            }
+        }
+        
+        /* Search input */
+        .search-input {
+            border: 1px solid #efe6dc;
+            border-radius: 40px;
+            transition: all 0.2s ease;
+            background: #fefcf9;
+            font-size: 0.8rem;
+            font-weight: 400;
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #b5cfaa;
+            box-shadow: 0 0 0 3px rgba(155, 184, 139, 0.08);
+            background: #ffffff;
+        }
+        
+        .search-input::placeholder {
+            color: #d4c9bc;
+            font-weight: 300;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #d4c9bc;
+            font-size: 0.85rem;
+        }
+        
+        /* Icon buttons */
+        .icon-btn {
+            transition: all 0.2s ease;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 36px;
+            color: #b8aa9a;
+            background: transparent;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .icon-btn:hover {
+            background: #faf7f2;
+            color: #a8c49a;
+        }
+        
+        .icon-btn i {
+            font-size: 1.1rem;
+        }
+        
+        /* Notification badge */
+        .notif-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #d8b48c;
+            color: white;
+            font-size: 0.6rem;
+            font-weight: 600;
+            width: 16px;
+            height: 16px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* User avatar */
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
+            border-radius: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .user-avatar:hover {
+            transform: scale(1.02);
+            box-shadow: 0 2px 8px rgba(155, 184, 139, 0.2);
+        }
+        
+        /* User name */
+        .user-name {
+            color: #5a4a3a;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+        
+        /* Dropdown menu */
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 8px);
+            margin-top: 0;
+            width: 240px;
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            border-radius: 14px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            z-index: 100;
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            color: #6a5a4a;
+            font-size: 0.8rem;
+            font-weight: 400;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .dropdown-item i {
+            width: 18px;
+            font-size: 0.9rem;
+            color: #d4c9bc;
+        }
+        
+        .dropdown-item:hover {
+            background: #fefcf9;
+            color: #a8c49a;
+        }
+        
+        .dropdown-item:hover i {
+            color: #a8c49a;
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background: #f0e8e0;
+            margin: 4px 0;
+        }
+        
+        .logout-item {
+            color: #d8b48c;
+        }
+        
+        .logout-item:hover {
+            background: #fef8f0;
+            color: #d4a574;
+        }
+        
+        /* Mobile menu button */
+        .mobile-menu-btn {
+            display: none;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 36px;
+            color: #b8aa9a;
+            transition: all 0.2s ease;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .mobile-menu-btn:hover {
+            background: #faf7f2;
+            color: #a8c49a;
+        }
+        
+        .mobile-menu-btn i {
+            font-size: 1.1rem;
+        }
+        
+        /* Mobile logo */
+        .mobile-logo {
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo-icon {
+            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-icon i {
+            font-size: 0.9rem;
+        }
+        
+        .logo-text {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #5a4a3a;
+        }
+        
+        /* Chevron icon */
+        .chevron-icon {
+            color: #d4c9bc;
+            font-size: 0.65rem;
+            transition: transform 0.2s ease;
+        }
+        
+        /* Desktop search container */
+        .desktop-search {
+            flex: 1;
+            max-width: 420px;
+            margin: 0 1.5rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .header {
+                left: 0 !important;
+            }
+            .mobile-menu-btn {
+                display: flex;
+            }
+            .mobile-logo {
+                display: flex;
+            }
+            .desktop-search {
+                display: none;
+            }
+            .user-name {
+                display: none;
+            }
+            .header-container {
+                height: 70px;
+            }
+        }
+        
+        /* Hidden class */
+        .hidden {
+            display: none;
+        }
+        
+        /* Animation */
+        @keyframes dropdownFade {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .dropdown-menu.show {
+            display: block;
+            animation: dropdownFade 0.2s ease-out;
+        }
+        
+        /* Flex utilities */
+        .flex {
+            display: flex;
+        }
+        
+        .items-center {
+            align-items: center;
+        }
+        
+        .justify-between {
+            justify-content: space-between;
+        }
+        
+        .gap-2 {
+            gap: 0.5rem;
+        }
+        
+        .gap-3 {
+            gap: 0.75rem;
+        }
+        
+        .relative {
+            position: relative;
+        }
+        
+        .w-full {
+            width: 100%;
+        }
+        
+        @media (min-width: 768px) {
+            .md\\:inline {
+                display: inline;
+            }
+            .md\\:gap-3 {
+                gap: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header class="header" id="mainHeader">
+    <div class="header-container">
+        <!-- Mobile Menu Button -->
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <!-- Mobile Logo -->
+        <div class="mobile-logo">
+            <div class="logo-icon">
+                <i class="fas fa-leaf text-white"></i>
+            </div>
+            <span class="logo-text">MedFlow</span>
+        </div>
+        
+        <!-- Desktop Search Bar -->
+        <div class="desktop-search">
+            <div class="relative w-full">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" 
+                       placeholder="Search patients, doctors, appointments..." 
+                       class="search-input w-full">
+            </div>
+        </div>
+        
+        <!-- Right Section -->
+        <div class="flex items-center gap-2 md:gap-3">
+            <!-- Notifications -->
+            <div class="relative">
+                <button class="icon-btn" id="notifBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notif-badge">3</span>
+                </button>
+            </div>
+            
+            <!-- User Profile -->
+            <div class="relative">
+                <div class="flex items-center gap-2" id="profileBtn" style="cursor: pointer;">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <span class="user-name" id="userName">Admin User</span>
+                    <i class="fas fa-chevron-down chevron-icon hidden md:inline" id="chevronIcon"></i>
+                </div>
+                
+                <!-- Dropdown Menu -->
+                <div class="dropdown-menu hidden" id="profileDropdown">
+                    <a href="#" class="dropdown-item" id="profileLink">
+                        <i class="fas fa-user"></i>
+                        <span>My Profile</span>
+                    </a>
+                    <a href="#" class="dropdown-item" id="settingsLink">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item logout-item" id="logoutLink">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<script>
+    (function() {
+        // Load user data from localStorage
+        function loadUserData() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userNameSpan = document.getElementById('userName');
+            const userAvatar = document.getElementById('userAvatar');
+            
+            if (userNameSpan && user.name) {
+                userNameSpan.textContent = user.name;
+            }
+            if (userAvatar && user.name) {
+                userAvatar.textContent = user.name.charAt(0).toUpperCase();
+            } else if (userAvatar) {
+                userAvatar.textContent = 'A';
+            }
+        }
+        
+        // Profile dropdown toggle
+        function initProfileDropdown() {
+            const profileBtn = document.getElementById('profileBtn');
+            const profileDropdown = document.getElementById('profileDropdown');
+            const chevronIcon = document.getElementById('chevronIcon');
+            
+            if (profileBtn && profileDropdown) {
+                profileBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isHidden = profileDropdown.classList.contains('hidden');
+                    
+                    if (isHidden) {
+                        profileDropdown.classList.remove('hidden');
+                        profileDropdown.classList.add('show');
+                        if (chevronIcon) chevronIcon.style.transform = 'rotate(180deg)';
+                    } else {
+                        profileDropdown.classList.add('hidden');
+                        profileDropdown.classList.remove('show');
+                        if (chevronIcon) chevronIcon.style.transform = 'rotate(0deg)';
+                    }
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+                        profileDropdown.classList.add('hidden');
+                        profileDropdown.classList.remove('show');
+                        if (chevronIcon) chevronIcon.style.transform = 'rotate(0deg)';
+                    }
+                });
+            }
+        }
+        
+        // Notification click handler
+        function initNotifications() {
+            const notifBtn = document.getElementById('notifBtn');
+            if (notifBtn) {
+                notifBtn.addEventListener('click', () => {
+                    if (window.showToast) {
+                        window.showToast('🔔 Notifications feature coming soon!', 'info');
+                    } else {
+                        alert('🔔 Notifications feature coming soon!');
+                    }
+                });
+            }
+        }
+        
+        // Mobile menu toggle
+        function initMobileMenu() {
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+            const sidebar = document.getElementById('mainSidebar');
+            
+            if (mobileBtn && sidebar) {
+                mobileBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('mobile-open');
+                });
+            }
+        }
+        
+        // Logout functionality
+        function initLogout() {
+            const logoutLink = document.getElementById('logoutLink');
+            if (logoutLink) {
+                logoutLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('token');
+                    window.location.href = '../../login.html';
+                });
+            }
+        }
+        
+        // Profile and settings links
+        function initProfileLinks() {
+            const profileLink = document.getElementById('profileLink');
+            const settingsLink = document.getElementById('settingsLink');
+            
+            if (profileLink) {
+                profileLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (window.showToast) {
+                        window.showToast('👤 Profile page coming soon!', 'info');
+                    } else {
+                        alert('👤 Profile page coming soon!');
+                    }
+                });
+            }
+            
+            if (settingsLink) {
+                settingsLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (window.showToast) {
+                        window.showToast('⚙️ Settings page coming soon!', 'info');
+                    } else {
+                        alert('⚙️ Settings page coming soon!');
+                    }
+                });
+            }
+        }
+        
+        // Search functionality
+        function initSearch() {
+            const searchInput = document.querySelector('.search-input');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        const query = searchInput.value.trim();
+                        if (query) {
+                            if (window.showToast) {
+                                window.showToast(`🔍 Searching for "${query}"`, 'info');
+                            } else {
+                                alert(`🔍 Searching for: ${query}`);
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Listen for sidebar collapse events to adjust header position
+        function initSidebarListener() {
+            window.addEventListener('sidebarToggle', (e) => {
+                const header = document.getElementById('mainHeader');
+                if (header && window.innerWidth >= 1024) {
+                    if (e.detail.collapsed) {
+                        header.style.left = '72px';
+                    } else {
+                        header.style.left = '260px';
+                    }
+                }
+            });
+        }
+        
+        // Handle window resize
+        function initResizeHandler() {
+            window.addEventListener('resize', () => {
+                const header = document.getElementById('mainHeader');
+                const sidebar = document.getElementById('mainSidebar');
+                
+                if (window.innerWidth >= 1024 && sidebar) {
+                    const isCollapsed = sidebar.classList.contains('collapsed');
+                    if (header) {
+                        header.style.left = isCollapsed ? '72px' : '260px';
+                    }
+                } else if (header) {
+                    header.style.left = '0';
+                }
+            });
+        }
+        
+        // Initialize everything
+        function initHeader() {
+            loadUserData();
+            initProfileDropdown();
+            initNotifications();
+            initMobileMenu();
+            initLogout();
+            initProfileLinks();
+            initSearch();
+            initSidebarListener();
+            initResizeHandler();
+        }
+        
+        // Start when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initHeader);
+        } else {
+            initHeader();
+        }
+    })();
+</script>
+
+</body>
+</html>

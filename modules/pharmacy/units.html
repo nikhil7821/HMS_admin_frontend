@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Units | Pharmacy | MedFlow</title>
+    <!-- Google Fonts: Poppins (matching dashboard) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            background: #fffdf9;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-weight: 400;
+        }
+        
+        /* Subtle background pattern - matching dashboard */
+        .bg-subtle {
+            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f0ebe4;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #d4c9bc;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c4b8a8;
+        }
+        
+        /* Card Styles */
+        .content-card {
+            transition: all 0.25s ease;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        .content-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
+            border-color: #e8dcd0;
+        }
+        
+        /* Button Styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
+            transition: all 0.2s ease;
+            border-radius: 12px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            border: 1px solid #efe6dc;
+            background: white;
+            transition: all 0.2s ease;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+        
+        .btn-secondary:hover {
+            background: #fefcf9;
+            border-color: #e0d4c8;
+        }
+        
+        /* Table styles */
+        .data-table th {
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            letter-spacing: 0.8px;
+            color: #c2b5a8;
+        }
+        
+        .dashboard-table-row {
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f5f0ea;
+        }
+        
+        .dashboard-table-row:hover {
+            background-color: #fefcf9;
+        }
+        
+        /* Badge */
+        .badge-unit {
+            background: #faf7f2;
+            color: #9a8e82;
+            padding: 0.2rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        /* Modal Overlay */
+        .modal-overlay {
+            background: rgba(120, 100, 80, 0.3);
+            backdrop-filter: blur(3px);
+            transition: opacity 0.25s ease;
+        }
+        
+        .form-card {
+            transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            border-radius: 20px;
+            border: 1px solid #efe6dc;
+            background: #ffffff;
+        }
+        
+        /* Form inputs */
+        .form-input, .form-textarea {
+            border-radius: 12px;
+            border: 1px solid #efe6dc;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            font-family: 'Poppins', system-ui, sans-serif;
+            font-size: 0.875rem;
+            padding: 0.625rem 1rem;
+            width: 100%;
+        }
+        
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #b5cfaa;
+            box-shadow: 0 0 0 3px rgba(155, 184, 139, 0.06);
+        }
+        
+        .form-input.error, .form-textarea.error {
+            border-color: #d8b48c;
+            background-color: #fffaf5;
+        }
+        
+        .error-message {
+            color: #d8b48c;
+            font-size: 0.7rem;
+            margin-top: 0.25rem;
+            display: block;
+            font-weight: 400;
+        }
+        
+        /* Toast animation */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Action buttons */
+        .action-edit {
+            color: #a8c49a;
+            transition: color 0.2s;
+        }
+        .action-edit:hover { color: #7da06c; }
+        .action-delete {
+            color: #d8b48c;
+            transition: color 0.2s;
+        }
+        .action-delete:hover { color: #c49a6c; }
+    </style>
+</head>
+<body class="bg-subtle">
+
+    <div id="sidebar-container"></div>
+    <div id="header-container"></div>
+
+    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+        <!-- Page Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+            <div>
+                <h1 class="text-xl md:text-2xl font-medium tracking-tight text-[#5a4a3a]">
+                    <i class="fas fa-weight-hanging text-[#a8c49a] mr-2"></i>Medicine Units
+                </h1>
+                <p class="text-[#b8aa9a] text-sm mt-1 font-light">Manage measurement units (mg, ml, tablets, etc.)</p>
+            </div>
+            <button id="addUnitBtn" class="btn-primary text-white px-5 py-2.5 flex items-center gap-2 shadow-sm mt-3 md:mt-0 transition-all">
+                <i class="fas fa-plus text-sm"></i>
+                <span class="text-xs font-medium">Add Unit</span>
+            </button>
+        </div>
+
+        <!-- Units Table Card -->
+        <div class="content-card overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="border-b border-[#f0e8e0] bg-[#fefcf9]">
+                        <tr class="text-left data-table">
+                            <th class="px-5 py-4">S.No</th>
+                            <th class="px-5 py-4">Unit Name</th>
+                            <th class="px-5 py-4">Symbol</th>
+                            <th class="px-5 py-4">Description</th>
+                            <th class="px-5 py-4 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="unitsTable">
+                        <tr>
+                            <td colspan="5" class="text-center py-8 text-[#d4c9bc] text-sm">
+                                <i class="fas fa-spinner fa-pulse mr-2"></i>Loading units...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Modal -->
+    <div id="unitModal" class="fixed inset-0 z-50 opacity-0 invisible transition-all duration-200">
+        <div class="modal-overlay fixed inset-0"></div>
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="form-card bg-white w-full max-w-md mx-4 shadow-xl border-t-4 border-[#a8c49a] transform scale-95 transition-all duration-200">
+                <div class="flex justify-between items-center p-5 border-b border-[#f0e8e0]">
+                    <h3 id="modalTitle" class="text-lg font-medium text-[#5a4a3a] flex items-center gap-2">
+                        <i class="fas fa-weight-hanging text-[#a8c49a]"></i> Add Unit
+                    </h3>
+                    <button id="closeModalBtn" class="text-[#d4c9bc] hover:text-[#b8aa9a] transition">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+                <form id="unitForm">
+                    <input type="hidden" id="unitId">
+                    <div class="p-5 space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-[#b8aa9a] mb-1">Unit Name <span class="text-[#d8b48c]">*</span></label>
+                            <input type="text" id="unitName" class="form-input" placeholder="e.g., Milligram, Milliliter, Tablet" autocomplete="off">
+                            <span class="error-message" id="unitNameError"></span>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-[#b8aa9a] mb-1">Symbol <span class="text-[#d8b48c]">*</span></label>
+                            <input type="text" id="unitSymbol" class="form-input" placeholder="e.g., mg, ml, tab, cap" autocomplete="off" maxlength="10">
+                            <span class="error-message" id="unitSymbolError"></span>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-[#b8aa9a] mb-1">Description</label>
+                            <textarea id="unitDesc" rows="3" class="form-textarea" placeholder="Brief description of the unit..."></textarea>
+                            <span class="error-message" id="unitDescError"></span>
+                        </div>
+                    </div>
+                    <div class="p-5 bg-[#fefcf9] rounded-b-xl flex justify-end gap-3 border-t border-[#f0e8e0]">
+                        <button type="button" id="cancelModalBtn" class="btn-secondary px-4 py-2 rounded-xl text-[#b8aa9a] text-sm font-medium transition">Cancel</button>
+                        <button type="submit" class="btn-primary px-4 py-2 rounded-xl text-white text-sm font-medium shadow-sm transition">
+                            <i class="fas fa-save mr-2 text-xs"></i>Save Unit
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/core/common.js"></script>
+    <script src="units.js"></script>
+</body>
+</html>

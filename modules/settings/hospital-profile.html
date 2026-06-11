@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Profile | Settings | HMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f3f4f6; }
+        .modal-overlay { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+        .modal-content { animation: slideIn 0.3s ease; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div id="header-container"></div>
+
+    <main class="lg:ml-64 mt-16 p-6">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">
+                <i class="fas fa-hospital text-blue-600 mr-2"></i>Hospital Profile
+            </h1>
+            <p class="text-gray-500 mt-1">Manage hospital information, contact details, and branding</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Profile Form -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-lg font-bold mb-4 border-b pb-2">Basic Information</h2>
+                    <form id="profileForm">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Hospital Name *</label>
+                                <input type="text" id="hospitalName" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Address *</label>
+                                <textarea id="address" rows="2" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                                <input type="text" id="city" class="w-full px-3 py-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
+                                <input type="text" id="state" class="w-full px-3 py-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
+                                <input type="text" id="pincode" class="w-full px-3 py-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                                <input type="text" id="country" class="w-full px-3 py-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
+                                <input type="tel" id="phone" required class="w-full px-3 py-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                                <input type="email" id="email" required class="w-full px-3 py-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Emergency Hotline</label>
+                                <input type="tel" id="emergencyHotline" class="w-full px-3 py-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                                <input type="url" id="website" class="w-full px-3 py-2 border rounded-lg">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 pt-4 border-t">
+                            <h3 class="font-bold mb-3">Registration & Tax Info</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div><label class="block text-sm font-medium text-gray-700 mb-1">Registration Number</label><input type="text" id="regNumber" class="w-full px-3 py-2 border rounded-lg"></div>
+                                <div><label class="block text-sm font-medium text-gray-700 mb-1">GST Number</label><input type="text" id="gstNumber" class="w-full px-3 py-2 border rounded-lg"></div>
+                                <div><label class="block text-sm font-medium text-gray-700 mb-1">PAN Number</label><input type="text" id="panNumber" class="w-full px-3 py-2 border rounded-lg"></div>
+                                <div><label class="block text-sm font-medium text-gray-700 mb-1">License Number</label><input type="text" id="licenseNumber" class="w-full px-3 py-2 border rounded-lg"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+                            <button type="button" id="resetProfileBtn" class="px-4 py-2 border rounded-lg hover:bg-gray-50 transition">Reset</button>
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Logo & Branding -->
+            <div>
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+                    <h2 class="text-lg font-bold mb-4 border-b pb-2">Hospital Logo</h2>
+                    <div class="text-center">
+                        <div id="logoPreview" class="w-32 h-32 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center text-white text-4xl font-bold mx-auto mb-4">
+                            H
+                        </div>
+                        <div class="mt-2">
+                            <label class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg inline-block transition">
+                                <i class="fas fa-upload mr-2"></i> Upload Logo
+                                <input type="file" id="logoUpload" class="hidden" accept="image/*">
+                            </label>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-2">Recommended size: 200x200px</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-lg font-bold mb-4 border-b pb-2">Working Hours</h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center"><span class="text-gray-600">Monday - Friday:</span><input type="text" id="weekdayHours" class="w-40 px-2 py-1 border rounded-lg text-sm"></div>
+                        <div class="flex justify-between items-center"><span class="text-gray-600">Saturday:</span><input type="text" id="saturdayHours" class="w-40 px-2 py-1 border rounded-lg text-sm"></div>
+                        <div class="flex justify-between items-center"><span class="text-gray-600">Sunday:</span><input type="text" id="sundayHours" class="w-40 px-2 py-1 border rounded-lg text-sm"></div>
+                        <div class="flex justify-between items-center"><span class="text-gray-600">Emergency:</span><input type="text" id="emergencyHours" class="w-40 px-2 py-1 border rounded-lg text-sm" value="24/7"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../../js/core/common.js"></script>
+    <script src="hospital-profile.js"></script>
+</body>
+</html>

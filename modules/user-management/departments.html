@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Departments | User Management | MedFlow</title>
+    <!-- Google Fonts: Poppins Light + Regular + Medium - SAME AS DASHBOARD -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            background: #fffdf9;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-weight: 400;
+        }
+        
+        /* Subtle background pattern - exactly like dashboard */
+        .bg-subtle {
+            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
+        }
+        
+        /* Custom scrollbar - matching dashboard */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f0ebe4;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #d4c9bc;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c4b8a8;
+        }
+        
+        /* Card Styles - EXACTLY like dashboard */
+        .stat-card {
+            transition: all 0.25s ease;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
+            border-color: #e8dcd0;
+        }
+        
+        /* Department Card */
+        .dept-card {
+            transition: all 0.25s ease;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+        }
+        
+        .dept-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -12px rgba(0, 0, 0, 0.1);
+            border-color: #e0d4c8;
+        }
+        
+        /* MODAL OVERLAY - PERFECT CENTERING */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-container {
+            position: relative;
+            width: 100%;
+            max-width: 520px;
+            margin: 0 20px;
+        }
+        
+        /* MODAL CONTENT - RECTANGLE SHAPE */
+        .modal-content {
+            background: white;
+            border-radius: 0px;
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            transform: scale(0.95);
+            transition: transform 0.25s ease;
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+        
+        .modal-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+        }
+        
+        .modal-body {
+            padding: 24px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e2e8f0;
+            background: #f8fafc;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        /* Button Styles - EXACTLY like dashboard */
+        .btn-primary {
+            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            border: 1px solid #cbd5e1;
+            background: white;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #334155;
+        }
+        
+        .btn-secondary:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+        
+        /* Form elements */
+        .form-input, .form-select {
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            padding: 10px 14px;
+            width: 100%;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #a8c49a;
+            box-shadow: 0 0 0 3px rgba(168, 196, 154, 0.2);
+        }
+        
+        .form-textarea {
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            padding: 10px 14px;
+            width: 100%;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            resize: vertical;
+        }
+        
+        .form-textarea:focus {
+            outline: none;
+            border-color: #a8c49a;
+            box-shadow: 0 0 0 3px rgba(168, 196, 154, 0.2);
+        }
+        
+        label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 6px;
+            display: block;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #94a3b8;
+            transition: color 0.2s;
+        }
+        
+        .close-btn:hover {
+            color: #64748b;
+        }
+        
+        .float-right {
+            float: right;
+        }
+        
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+        
+        h1, h2, h3 {
+            color: #1e293b;
+        }
+        
+        .dept-code {
+            background: #f0fdf4;
+            color: #a8c49a;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .stat-icon-bg {
+            background: #faf7f2;
+            border-radius: 14px;
+        }
+    </style>
+</head>
+<body class="bg-subtle">
+
+    <div id="sidebar-container"></div>
+    <div id="header-container"></div>
+
+    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+        
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-medium text-[#1e293b] mb-1">
+                    <i class="fas fa-building text-[#a8c49a] mr-3"></i>Departments
+                </h1>
+                <p class="text-[#64748b] text-sm">Manage hospital departments and their heads</p>
+            </div>
+            <button id="addDeptBtn" class="btn-primary flex items-center gap-2 shadow-sm transition-all">
+                <i class="fas fa-plus text-sm"></i>
+                <span class="text-sm">Add Department</span>
+            </button>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <div class="stat-card p-5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Total Departments</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="totalDepts">0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-building text-[#a8c49a] text-lg"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card p-5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">With HOD Assigned</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="hodCount">0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-user-tie text-[#a8c49a] text-lg"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card p-5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Active Departments</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="activeDepts">0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-check-circle text-[#a8c49a] text-lg"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card p-5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Last Updated</p>
+                        <p class="text-lg font-medium text-[#1e293b] mt-1" id="lastUpdated">Today</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-calendar-alt text-[#a8c49a] text-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Departments Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="departmentsGrid">
+            <div class="col-span-3 text-center py-12 text-[#94a3b8]">
+                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
+                <p>Loading departments...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Department Modal -->
+    <div id="deptModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Add Department</h2>
+                    <button id="closeModalBtn" class="close-btn float-right">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="clearfix"></div>
+                </div>
+                <form id="deptForm">
+                    <input type="hidden" id="deptId">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <label>Department Name *</label>
+                            <input type="text" id="deptName" required class="form-input" placeholder="e.g., Cardiology">
+                        </div>
+                        <div class="mb-4">
+                            <label>Department Code *</label>
+                            <input type="text" id="deptCode" required class="form-input" placeholder="e.g., CARD">
+                        </div>
+                        <div class="mb-4">
+                            <label>Head of Department</label>
+                            <input type="text" id="hod" class="form-input" placeholder="e.g., Dr. Anjali Nair">
+                        </div>
+                        <div class="mb-4">
+                            <label>Description</label>
+                            <textarea id="deptDesc" rows="2" class="form-textarea" placeholder="Brief description of the department"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Department</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Confirm Delete</h2>
+                    <button id="closeDeleteModalBtn" class="close-btn float-right">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-trash-alt text-red-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-[#1e293b] mb-2">Delete Department?</h3>
+                    <p class="text-[#64748b] text-sm">This action cannot be undone. All department data will be permanently removed.</p>
+                </div>
+                <div class="modal-footer justify-center gap-3">
+                    <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
+                    <button id="confirmDeleteBtn" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg text-sm font-medium transition shadow-sm">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/core/common.js"></script>
+    <script src="departments.js"></script>
+</body>
+</html>

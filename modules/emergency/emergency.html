@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Emergency | Emergency | MedFlow</title>
+    <!-- Google Fonts: Poppins Light + Regular + Medium -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            background: #fffdf9;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-weight: 400;
+        }
+        
+        .bg-subtle {
+            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f0ebe4;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #d4c9bc;
+            border-radius: 10px;
+        }
+        
+        /* Card Styles */
+        .stat-card {
+            transition: all 0.25s ease;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
+            border-color: #e8dcd0;
+        }
+        
+        /* MODAL OVERLAY - PERFECT CENTERING */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-container {
+            position: relative;
+            width: 100%;
+            max-width: 720px;
+            margin: 0 20px;
+        }
+        
+        /* MODAL CONTENT - RECTANGLE SHAPE */
+        .modal-content {
+            background: white;
+            border-radius: 0px;
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            transform: scale(0.95);
+            transition: transform 0.25s ease;
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+        
+        .modal-header h2 {
+            font-size: 18px;
+            font-weight: 500;
+            color: #1e293b;
+            margin: 0;
+        }
+        
+        .modal-body {
+            padding: 24px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e2e8f0;
+            background: #f8fafc;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        /* Button Styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            border: 1px solid #cbd5e1;
+            background: white;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 13px;
+            color: #334155;
+        }
+        
+        .btn-secondary:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            transform: translateY(-1px);
+        }
+        
+        .btn-success {
+            background: #10b981;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+        
+        /* Form elements */
+        .form-input, .form-select {
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            padding: 10px 14px;
+            width: 100%;
+            font-size: 13px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 400;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+        
+        label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 6px;
+            display: block;
+            letter-spacing: 0.3px;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #94a3b8;
+            transition: color 0.2s;
+        }
+        
+        .close-btn:hover {
+            color: #64748b;
+        }
+        
+        .float-right {
+            float: right;
+        }
+        
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #1e293b;
+            letter-spacing: -0.3px;
+        }
+        
+        .stat-card p:first-child {
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-card .text-3xl {
+            font-weight: 500;
+        }
+        
+        .stat-icon-bg {
+            background: #faf7f2;
+            border-radius: 14px;
+        }
+        
+        /* Table Styles */
+        .data-table th {
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            letter-spacing: 0.8px;
+            color: #c2b5a8;
+        }
+        
+        .emergency-row {
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f5f0ea;
+        }
+        
+        .emergency-row:hover {
+            background-color: #fefcf9;
+        }
+        
+        p, span, div, a {
+            font-weight: 400;
+        }
+        
+        /* Priority Badges */
+        .priority-critical {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .priority-high {
+            background: #fef5e8;
+            color: #f59e0b;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .priority-medium {
+            background: #fefce8;
+            color: #eab308;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .priority-low {
+            background: #dcfce7;
+            color: #10b981;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        /* Status Badges with Icons */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 500;
+        }
+        
+        .status-waiting {
+            background: #fef5e8;
+            color: #f59e0b;
+        }
+        
+        .status-treatment {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
+        
+        .status-admitted {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        
+        .status-discharged {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        
+        .status-icon {
+            font-size: 0.6rem;
+        }
+        
+        .pulse {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .section-header {
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body class="bg-subtle">
+
+    <div id="sidebar-container"></div>
+    <div id="header-container"></div>
+
+    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+        
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-medium text-[#1e293b] mb-1">
+                    <i class="fas fa-ambulance text-red-500 mr-3"></i>Emergency Registration
+                </h1>
+                <p class="text-[#64748b] text-sm font-normal">Fast-track emergency patient registration and triage</p>
+            </div>
+            <button id="newEmergencyBtn" class="btn-danger flex items-center gap-2 shadow-sm transition-all pulse">
+                <i class="fas fa-plus-circle text-sm"></i>
+                <span class="text-sm">New Emergency Case</span>
+            </button>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <div class="stat-card p-5 border-l-4 border-l-red-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Critical</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="criticalCount">0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-exclamation-triangle text-red-500 text-lg"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card p-5 border-l-4 border-l-yellow-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">High Priority</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="highCount">0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-arrow-up text-yellow-500 text-lg"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card p-5 border-l-4 border-l-green-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Stable</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="stableCount">0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-smile text-green-500 text-lg"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card p-5 border-l-4 border-l-purple-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Waiting</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="waitingCount">0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-clock text-purple-500 text-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="bg-white rounded-2xl p-4 mb-6 border border-[#f0e8e0]">
+            <div class="flex flex-col md:flex-row gap-3">
+                <div class="flex-1 relative">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-[#94a3b8] text-sm"></i>
+                    <input type="text" id="searchInput" placeholder="Search by patient name, case ID, or phone..." 
+                           class="w-full pl-11 pr-4 py-2 border border-[#e2e8f0] rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-sm font-normal">
+                </div>
+                <select id="priorityFilter" class="px-4 py-2 border border-[#e2e8f0] rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-sm font-normal">
+                    <option value="">All Priorities</option>
+                    <option value="Critical">Critical (Red)</option>
+                    <option value="High">High (Yellow)</option>
+                    <option value="Medium">Medium (Green)</option>
+                    <option value="Low">Low (Blue)</option>
+                </select>
+                <select id="statusFilter" class="px-4 py-2 border border-[#e2e8f0] rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 bg-white text-sm font-normal">
+                    <option value="">All Status</option>
+                    <option value="Waiting">Waiting</option>
+                    <option value="In Treatment">In Treatment</option>
+                    <option value="Admitted">Admitted</option>
+                    <option value="Discharged">Discharged</option>
+                </select>
+                <button id="resetFilter" class="px-4 py-2 border border-[#e2e8f0] rounded-xl hover:bg-[#f8fafc] transition text-sm font-medium">
+                    <i class="fas fa-undo-alt mr-2"></i> Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Emergency Cases Table -->
+        <div class="bg-white rounded-2xl shadow-sm border border-[#f0e8e0] overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-[#faf7f2] border-b border-[#f0e8e0]">
+                        <tr class="text-left data-table">
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Case ID</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Patient</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Priority</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Condition</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Arrival</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Status</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Doctor</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="emergencyTable">
+                        <tr><td colspan="8" class="text-center py-12 text-[#94a3b8]"><i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i><p class="font-normal">Loading emergency cases...</p> </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- New Emergency Case Modal -->
+    <div id="emergencyModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-ambulance text-red-500 mr-2"></i>Emergency Registration</h2>
+                    <button id="closeEmergencyModalBtn" class="close-btn float-right">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="clearfix"></div>
+                </div>
+                <form id="emergencyForm">
+                    <div class="modal-body">
+                        <!-- Patient Information Section -->
+                        <div class="bg-red-50 p-3 rounded-lg mb-4">
+                            <p class="section-header text-red-600"><i class="fas fa-user-injured mr-1"></i> Patient Information</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label>Full Name *</label>
+                                <input type="text" id="fullName" required class="form-input" placeholder="Rajesh Kumar">
+                            </div>
+                            <div>
+                                <label>Phone Number *</label>
+                                <input type="tel" id="phone" required class="form-input" placeholder="+91 98765 43210">
+                            </div>
+                            <div>
+                                <label>Age</label>
+                                <input type="number" id="age" class="form-input" placeholder="45">
+                            </div>
+                            <div>
+                                <label>Gender</label>
+                                <select id="gender" class="form-select">
+                                    <option value="">Select</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label>Address</label>
+                                <textarea id="address" rows="1" class="form-input" placeholder="Enter address..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Emergency Details Section -->
+                        <div class="bg-yellow-50 p-3 rounded-lg mb-4">
+                            <p class="section-header text-yellow-600"><i class="fas fa-chart-line mr-1"></i> Emergency Details</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label>Priority / Triage *</label>
+                                <select id="priority" required class="form-select">
+                                    <option value="Critical">🔴 Critical (Immediate)</option>
+                                    <option value="High">🟡 High (10 minutes)</option>
+                                    <option value="Medium">🟢 Medium (30 minutes)</option>
+                                    <option value="Low">🔵 Low (1 hour)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>Assign Doctor</label>
+                                <select id="doctorId" class="form-select">
+                                    <option value="">Auto Assign</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label>Chief Complaints *</label>
+                                <textarea id="complaints" rows="2" required class="form-input" placeholder="Describe the emergency condition, symptoms..."></textarea>
+                            </div>
+                            <div>
+                                <label>Blood Pressure</label>
+                                <input type="text" id="bp" class="form-input" placeholder="e.g., 120/80">
+                            </div>
+                            <div>
+                                <label>Heart Rate</label>
+                                <input type="text" id="heartRate" class="form-input" placeholder="e.g., 72 bpm">
+                            </div>
+                            <div>
+                                <label>Temperature</label>
+                                <input type="text" id="temperature" class="form-input" placeholder="e.g., 98.6°F">
+                            </div>
+                            <div>
+                                <label>Oxygen Saturation</label>
+                                <input type="text" id="oxygen" class="form-input" placeholder="e.g., 98%">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label>Ambulance Required?</label>
+                                <div class="flex gap-4 mt-1">
+                                    <label class="flex items-center"><input type="radio" name="ambulance" value="yes"> <span class="ml-2 text-sm">Yes</span></label>
+                                    <label class="flex items-center"><input type="radio" name="ambulance" value="no" checked> <span class="ml-2 text-sm">No</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="cancelEmergencyModalBtn" class="btn-secondary">Cancel</button>
+                        <button type="submit" class="btn-danger">Register Emergency</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assign Doctor Modal -->
+    <div id="assignModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Assign Doctor</h2>
+                    <button id="closeAssignModalBtn" class="close-btn float-right">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="clearfix"></div>
+                </div>
+                <form id="assignForm">
+                    <input type="hidden" id="assignCaseId">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <label>Select Doctor *</label>
+                            <select id="assignDoctorId" required class="form-select">
+                                <option value="">-- Select Doctor --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="cancelAssignModalBtn" class="btn-secondary">Cancel</button>
+                        <button type="submit" class="btn-primary">Assign Doctor</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Status Modal -->
+    <div id="statusModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Update Status</h2>
+                    <button id="closeStatusModalBtn" class="close-btn float-right">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="clearfix"></div>
+                </div>
+                <form id="statusForm">
+                    <input type="hidden" id="statusCaseId">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <label>Status *</label>
+                            <select id="newStatus" required class="form-select">
+                                <option value="Waiting">Waiting</option>
+                                <option value="In Treatment">In Treatment</option>
+                                <option value="Admitted">Admitted</option>
+                                <option value="Discharged">Discharged</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label>Notes</label>
+                            <textarea id="statusNotes" rows="2" class="form-input" placeholder="Additional notes..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="cancelUpdateModalBtn" class="btn-secondary">Cancel</button>
+                        <button type="submit" class="btn-success">Update Status</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== VIEW EMERGENCY CASE MODAL (ADDED) ==================== -->
+    <div id="viewEmergencyModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2><i class="fas fa-eye text-[#a8c49a] mr-2"></i>Emergency Case Details</h2>
+                    <button id="closeViewModalBtn" class="close-btn float-right">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="modal-body" id="viewEmergencyContent">
+                    <!-- Content will be loaded dynamically -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="closeViewFooterBtn" class="btn-secondary">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/core/common.js"></script>
+    <script src="emergency.js"></script>
+</body>
+</html>

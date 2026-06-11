@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Patient Documents | Documents | MedFlow</title>
+    <!-- Google Fonts: Poppins (matching dashboard) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            background: #fffdf9;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-weight: 400;
+        }
+        
+        /* Subtle background pattern */
+        .bg-subtle {
+            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f0ebe4;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #d4c9bc;
+            border-radius: 10px;
+        }
+        
+        /* Card Styles */
+        .stat-card {
+            transition: all 0.25s ease;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
+        }
+        
+        .content-card {
+            transition: all 0.25s ease;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        .filter-card {
+            transition: all 0.25s ease;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        /* Button Styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
+            transition: all 0.2s ease;
+            border-radius: 12px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            border: 1px solid #efe6dc;
+            background: white;
+            transition: all 0.2s ease;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+        
+        .btn-secondary:hover {
+            background: #fefcf9;
+            border-color: #e0d4c8;
+        }
+        
+        /* Document Card */
+        .doc-card {
+            transition: all 0.25s ease;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+        }
+        
+        .doc-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
+            border-color: #e8dcd0;
+        }
+        
+        /* Type Badges */
+        .badge-report {
+            background: #edf5e9;
+            color: #7a9a68;
+            padding: 0.2rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        .badge-prescription {
+            background: #fef5e8;
+            color: #d4a853;
+            padding: 0.2rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        .badge-discharge {
+            background: #f5f0eb;
+            color: #b8aa9a;
+            padding: 0.2rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        .badge-insurance {
+            background: #fef5e8;
+            color: #d4a853;
+            padding: 0.2rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        .badge-other {
+            background: #faf7f2;
+            color: #9a8e82;
+            padding: 0.2rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        /* Modal Overlay */
+        .modal-overlay {
+            background: rgba(120, 100, 80, 0.3);
+            backdrop-filter: blur(3px);
+            transition: opacity 0.25s ease;
+        }
+        
+        /* Form card - RECTANGULAR shape (no rounded corners) */
+        .form-card {
+            transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            background: #ffffff;
+            border: 1px solid #efe6dc;
+            border-top: 4px solid #a8c49a;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Form inputs */
+        .form-input, .form-select, .form-textarea {
+            border-radius: 12px;
+            border: 1px solid #efe6dc;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            font-family: 'Poppins', system-ui, sans-serif;
+            font-size: 0.875rem;
+            padding: 0.625rem 1rem;
+            width: 100%;
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #b5cfaa;
+            box-shadow: 0 0 0 3px rgba(155, 184, 139, 0.06);
+        }
+        
+        .form-input.error, .form-select.error, .form-textarea.error {
+            border-color: #d8b48c;
+            background-color: #fffaf5;
+        }
+        
+        .error-message {
+            color: #d8b48c;
+            font-size: 0.7rem;
+            margin-top: 0.25rem;
+            display: block;
+            font-weight: 400;
+        }
+        
+        /* Toast animation */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Dropzone */
+        .dropzone {
+            transition: all 0.2s ease;
+            border: 2px dashed #efe6dc;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        
+        .dropzone:hover {
+            border-color: #a8c49a;
+            background-color: #fefcf9;
+        }
+        
+        .dropzone-active {
+            border-color: #a8c49a;
+            background-color: #faf7f2;
+        }
+        
+        /* Filter inputs */
+        .filter-input, .filter-select {
+            border-radius: 12px;
+            border: 1px solid #efe6dc;
+            padding: 0.625rem 1rem;
+            font-size: 0.875rem;
+            font-family: 'Poppins', system-ui, sans-serif;
+            width: 100%;
+        }
+        
+        .filter-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: #b5cfaa;
+            box-shadow: 0 0 0 3px rgba(155, 184, 139, 0.06);
+        }
+    </style>
+</head>
+<body class="bg-subtle">
+
+    <div id="sidebar-container"></div>
+    <div id="header-container"></div>
+
+    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+        <!-- Page Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+            <div>
+                <h1 class="text-xl md:text-2xl font-medium tracking-tight text-[#5a4a3a]">
+                    <i class="fas fa-folder-open text-[#a8c49a] mr-2"></i>Patient Documents
+                </h1>
+                <p class="text-[#b8aa9a] text-sm mt-1 font-light">Manage patient medical records, reports, and documents</p>
+            </div>
+            <button id="uploadDocBtn" class="btn-primary text-white px-5 py-2.5 flex items-center gap-2 shadow-sm mt-3 md:mt-0 transition-all">
+                <i class="fas fa-upload text-sm"></i>
+                <span class="text-xs font-medium">Upload Document</span>
+            </button>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="stat-card p-4 border-l-4 border-[#a8c49a]">
+                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">Total Documents</p>
+                <p class="text-2xl font-medium text-[#5a4a3a] mt-1" id="totalDocs">0</p>
+            </div>
+            <div class="stat-card p-4 border-l-4 border-[#8aae7a]">
+                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">Reports</p>
+                <p class="text-2xl font-medium text-[#8aae7a] mt-1" id="reportCount">0</p>
+            </div>
+            <div class="stat-card p-4 border-l-4 border-[#d4a853]">
+                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">Prescriptions</p>
+                <p class="text-2xl font-medium text-[#d4a853] mt-1" id="prescriptionCount">0</p>
+            </div>
+            <div class="stat-card p-4 border-l-4 border-[#b8aa9a]">
+                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">Other Files</p>
+                <p class="text-2xl font-medium text-[#b8aa9a] mt-1" id="otherCount">0</p>
+            </div>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="filter-card p-4 mb-6">
+            <div class="flex flex-col md:flex-row gap-3">
+                <div class="flex-1 relative">
+                    <i class="fas fa-search absolute left-3 top-3 text-[#d4c9bc] text-sm"></i>
+                    <input type="text" id="searchInput" placeholder="Search by patient name or document title..." class="filter-input pl-10">
+                </div>
+                <div class="w-full md:w-56">
+                    <select id="patientFilter" class="filter-select">
+                        <option value="">All Patients</option>
+                    </select>
+                </div>
+                <div class="w-full md:w-48">
+                    <select id="typeFilter" class="filter-select">
+                        <option value="">All Types</option>
+                        <option value="Report">Medical Report</option>
+                        <option value="Prescription">Prescription</option>
+                        <option value="Discharge Summary">Discharge Summary</option>
+                        <option value="Insurance">Insurance</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <button id="resetFilter" class="btn-secondary px-5 py-2 rounded-xl text-[#b8aa9a] text-sm font-medium transition whitespace-nowrap">
+                    <i class="fas fa-undo-alt mr-1"></i> Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Documents Grid -->
+        <div id="documentsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+    </main>
+
+    <!-- Upload Document Modal - RECTANGULAR shape -->
+    <div id="uploadModal" class="fixed inset-0 z-50 opacity-0 invisible transition-all duration-200 overflow-y-auto">
+        <div class="modal-overlay fixed inset-0"></div>
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="form-card bg-white w-full max-w-lg mx-4">
+                <div class="flex justify-between items-center p-5 border-b border-[#f0e8e0]">
+                    <h3 class="text-lg font-medium text-[#5a4a3a] flex items-center gap-2">
+                        <i class="fas fa-upload text-[#a8c49a]"></i> Upload Document
+                    </h3>
+                    <button id="closeUploadModalBtn" class="text-[#d4c9bc] hover:text-[#b8aa9a] transition">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+                
+                <form id="uploadForm">
+                    <input type="hidden" id="docId">
+                    <div class="p-5 space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-[#b8aa9a] mb-1">Select Patient <span class="text-[#d8b48c]">*</span></label>
+                            <select id="patientId" class="form-select" required>
+                                <option value="">-- Select Patient --</option>
+                            </select>
+                            <span class="error-message" id="patientError"></span>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-[#b8aa9a] mb-1">Document Type <span class="text-[#d8b48c]">*</span></label>
+                            <select id="docType" class="form-select" required>
+                                <option value="">-- Select Type --</option>
+                                <option value="Report">Medical Report</option>
+                                <option value="Prescription">Prescription</option>
+                                <option value="Discharge Summary">Discharge Summary</option>
+                                <option value="Insurance">Insurance Document</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <span class="error-message" id="docTypeError"></span>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-[#b8aa9a] mb-1">Document Title <span class="text-[#d8b48c]">*</span></label>
+                            <input type="text" id="docTitle" class="form-input" placeholder="e.g., Blood Test Report - June 2024" autocomplete="off">
+                            <span class="error-message" id="titleError"></span>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-[#b8aa9a] mb-1">Description</label>
+                            <textarea id="docDesc" rows="2" class="form-textarea" placeholder="Brief description of the document..."></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-[#b8aa9a] mb-1">Upload File</label>
+                            <div id="dropZone" class="dropzone p-6 text-center">
+                                <i class="fas fa-cloud-upload-alt text-2xl text-[#d4c9bc] mb-2"></i>
+                                <p class="text-[#b8aa9a] text-sm">Click or drag file to upload</p>
+                                <p class="text-[#d4c9bc] text-xs mt-1">PDF, JPG, PNG, DOC (Max 10MB)</p>
+                                <input type="file" id="fileInput" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                            </div>
+                            <div id="fileNameDisplay" class="mt-2 text-xs text-[#8aae7a] hidden"></div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-[#b8aa9a] mb-1">Upload Date</label>
+                            <input type="date" id="uploadDate" class="form-input">
+                            <span class="error-message" id="dateError"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-5 bg-[#fefcf9] flex justify-end gap-3 border-t border-[#f0e8e0]">
+                        <button type="button" id="cancelUploadBtn" class="btn-secondary px-4 py-2 rounded-xl text-[#b8aa9a] text-sm font-medium transition">Cancel</button>
+                        <button type="submit" class="btn-primary px-4 py-2 rounded-xl text-white text-sm font-medium shadow-sm transition">
+                            <i class="fas fa-save mr-2 text-xs"></i>Upload Document
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Document Modal - RECTANGULAR shape -->
+    <div id="viewModal" class="fixed inset-0 z-50 opacity-0 invisible transition-all duration-200">
+        <div class="modal-overlay fixed inset-0"></div>
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="form-card bg-white w-full max-w-2xl mx-4">
+                <div class="flex justify-between items-center p-5 border-b border-[#f0e8e0]">
+                    <h3 id="viewTitle" class="text-lg font-medium text-[#5a4a3a] flex items-center gap-2">
+                        <i class="fas fa-file-alt text-[#a8c49a]"></i> Document Details
+                    </h3>
+                    <div class="flex gap-2">
+                        <button id="downloadDocBtn" class="bg-[#8aae7a] hover:bg-[#7da06c] text-white px-3 py-1.5 rounded-xl transition text-xs font-medium">
+                            <i class="fas fa-download mr-1"></i> Download
+                        </button>
+                        <button id="closeViewModalBtn" class="text-[#d4c9bc] hover:text-[#b8aa9a] transition">
+                            <i class="fas fa-times text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="viewContent" class="p-5"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal - RECTANGULAR shape -->
+    <div id="deleteModal" class="fixed inset-0 z-50 opacity-0 invisible transition-all duration-200">
+        <div class="modal-overlay fixed inset-0"></div>
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="form-card bg-white w-full max-w-md mx-4 text-center">
+                <div class="p-6">
+                    <div class="w-14 h-14 bg-[#fee8e8] rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-trash text-[#d48c8c] text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-[#5a4a3a] mb-2">Delete Document?</h3>
+                    <p class="text-[#b8aa9a] text-sm mb-6">This action cannot be undone.</p>
+                    <div class="flex gap-3 justify-center">
+                        <button id="cancelDeleteBtn" class="btn-secondary px-4 py-2 rounded-xl text-[#b8aa9a] text-sm font-medium transition">Cancel</button>
+                        <button id="confirmDeleteBtn" class="bg-[#d48c8c] hover:bg-[#c98a7a] text-white px-4 py-2 rounded-xl text-sm font-medium transition">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/core/common.js"></script>
+    <script src="patient-documents.js"></script>
+</body>
+</html>

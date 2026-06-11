@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Financial Reports | Billing | MedFlow</title>
+    <!-- Google Fonts: Poppins Light + Regular + Medium -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            background: #fffdf9;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-weight: 400;
+        }
+        
+        .bg-subtle {
+            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f0ebe4;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #d4c9bc;
+            border-radius: 10px;
+        }
+        
+        .stat-card {
+            transition: all 0.25s ease;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
+            border-color: #e8dcd0;
+        }
+        
+        .stat-icon-bg {
+            background: #faf7f2;
+            border-radius: 14px;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #1e293b;
+            letter-spacing: -0.3px;
+        }
+        
+        .stat-card p:first-child {
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-card .text-2xl {
+            font-weight: 500;
+        }
+        
+        p, span, div, a {
+            font-weight: 400;
+        }
+        
+        .chart-container {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #f0e8e0;
+            padding: 16px;
+        }
+        
+        .revenue-type-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0e8e0;
+        }
+        
+        .revenue-type-item:last-child {
+            border-bottom: none;
+        }
+        
+        .revenue-type-label {
+            font-size: 13px;
+            color: #64748b;
+        }
+        
+        .revenue-type-value {
+            font-size: 13px;
+            font-weight: 500;
+            color: #1e293b;
+        }
+    </style>
+</head>
+<body class="bg-subtle">
+
+    <div id="sidebar-container"></div>
+    <div id="header-container"></div>
+
+    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+        
+        <div class="mb-6">
+            <h1 class="text-2xl md:text-3xl font-medium text-[#1e293b] mb-1">
+                <i class="fas fa-chart-pie text-[#a8c49a] mr-3"></i>Financial Reports
+            </h1>
+            <p class="text-[#64748b] text-sm font-normal">Revenue analytics and financial insights</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+            <div class="stat-card p-5 border-l-4 border-l-blue-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Total Revenue</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="reportTotal">₹0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-rupee-sign text-[#a8c49a] text-lg"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card p-5 border-l-4 border-l-green-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Average Transaction</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="avgTransaction">₹0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-chart-line text-[#a8c49a] text-lg"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card p-5 border-l-4 border-l-purple-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Total Transactions</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="totalTransactions">0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-receipt text-[#a8c49a] text-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="chart-container">
+                <h3 class="font-medium text-[#1e293b] text-base mb-4 pb-2 border-b border-[#f0e8e0]">
+                    <i class="fas fa-chart-line text-[#a8c49a] mr-2"></i>Revenue Trend (Last 7 Days)
+                </h3>
+                <canvas id="revenueChart" height="200"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3 class="font-medium text-[#1e293b] text-base mb-4 pb-2 border-b border-[#f0e8e0]">
+                    <i class="fas fa-chart-pie text-[#a8c49a] mr-2"></i>Payment Method Distribution
+                </h3>
+                <canvas id="paymentMethodChart" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Revenue by Type / Department -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="chart-container">
+                <h3 class="font-medium text-[#1e293b] text-base mb-4 pb-2 border-b border-[#f0e8e0]">
+                    <i class="fas fa-building text-[#a8c49a] mr-2"></i>Revenue by Department
+                </h3>
+                <div id="revenueByType" class="space-y-1">
+                    <div class="text-center py-8 text-[#94a3b8]">
+                        <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
+                        <p class="font-normal">Loading data...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <h3 class="font-medium text-[#1e293b] text-base mb-4 pb-2 border-b border-[#f0e8e0]">
+                    <i class="fas fa-calendar-week text-[#a8c49a] mr-2"></i>Monthly Summary
+                </h3>
+                <div id="monthlySummary" class="space-y-2">
+                    <div class="text-center py-8 text-[#94a3b8]">
+                        <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
+                        <p class="font-normal">Loading data...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../../js/core/common.js"></script>
+    <script src="financial-reports.js"></script>
+</body>
+</html>

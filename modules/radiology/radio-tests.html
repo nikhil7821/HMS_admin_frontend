@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Radiology Tests | Radiology | MedFlow</title>
+    <!-- Google Fonts: Poppins Light + Regular + Medium -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            background: #fffdf9;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-weight: 400;
+        }
+        
+        .bg-subtle {
+            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f0ebe4;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #d4c9bc;
+            border-radius: 10px;
+        }
+        
+        .stat-card {
+            transition: all 0.25s ease;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
+            border-color: #e8dcd0;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.25s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-container {
+            position: relative;
+            width: 100%;
+            max-width: 550px;
+            margin: 0 20px;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 0px;
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            transform: scale(0.95);
+            transition: transform 0.25s ease;
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+        
+        .modal-header h2 {
+            font-size: 18px;
+            font-weight: 500;
+            color: #1e293b;
+            margin: 0;
+        }
+        
+        .modal-body {
+            padding: 24px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e2e8f0;
+            background: #f8fafc;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            border: 1px solid #cbd5e1;
+            background: white;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 13px;
+            color: #334155;
+        }
+        
+        .btn-secondary:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+        
+        .form-input, .form-select {
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            padding: 10px 14px;
+            width: 100%;
+            font-size: 13px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 400;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #a8c49a;
+            box-shadow: 0 0 0 3px rgba(168, 196, 154, 0.2);
+        }
+        
+        label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 6px;
+            display: block;
+            letter-spacing: 0.3px;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #94a3b8;
+            transition: color 0.2s;
+        }
+        
+        .close-btn:hover {
+            color: #64748b;
+        }
+        
+        .float-right {
+            float: right;
+        }
+        
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #1e293b;
+            letter-spacing: -0.3px;
+        }
+        
+        .stat-card p:first-child {
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-card .text-3xl {
+            font-weight: 500;
+        }
+        
+        .stat-icon-bg {
+            background: #faf7f2;
+            border-radius: 14px;
+        }
+        
+        .data-table th {
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            letter-spacing: 0.8px;
+            color: #c2b5a8;
+        }
+        
+        .test-row {
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f5f0ea;
+        }
+        
+        .test-row:hover {
+            background-color: #fefcf9;
+        }
+        
+        p, span, div, a {
+            font-weight: 400;
+        }
+        
+        .error-text {
+            color: #ef4444;
+            font-size: 11px;
+            margin-top: 4px;
+            display: none;
+        }
+        
+        .error-text.show {
+            display: block;
+        }
+        
+        .form-input.error, .form-select.error {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+        
+        .category-badge {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body class="bg-subtle">
+
+    <div id="sidebar-container"></div>
+    <div id="header-container"></div>
+
+    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+        
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-medium text-[#1e293b] mb-1">
+                    <i class="fas fa-mri text-[#a8c49a] mr-3"></i>Radiology Scans Master
+                </h1>
+                <p class="text-[#64748b] text-sm font-normal">Manage all radiology scans and pricing</p>
+            </div>
+            <button id="addTestBtn" class="btn-primary flex items-center gap-2 shadow-sm transition-all">
+                <i class="fas fa-plus text-sm"></i>
+                <span class="text-sm">Add Scan</span>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+            <div class="stat-card p-5 border-l-4 border-l-blue-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Scan Categories</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="totalCategories">0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-folder-tree text-[#a8c49a] text-lg"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card p-5 border-l-4 border-l-green-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Total Scans</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="totalTests">0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-x-ray text-[#a8c49a] text-lg"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card p-5 border-l-4 border-l-orange-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Pending Requests</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="pendingRequests">0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-clock text-orange-500 text-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <div class="bg-white rounded-2xl p-4 mb-6 border border-[#f0e8e0]">
+            <div class="flex flex-col md:flex-row gap-3">
+                <div class="flex-1 relative">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-[#94a3b8] text-sm"></i>
+                    <input type="text" id="searchInput" placeholder="Search by scan name..." 
+                           class="w-full pl-11 pr-4 py-2 border border-[#e2e8f0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#a8c49a] text-sm font-normal">
+                </div>
+                <select id="categoryFilter" class="px-4 py-2 border border-[#e2e8f0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#a8c49a] bg-white text-sm font-normal">
+                    <option value="">All Categories</option>
+                </select>
+                <button id="resetFilter" class="px-4 py-2 border border-[#e2e8f0] rounded-xl hover:bg-[#f8fafc] transition text-sm font-medium">
+                    <i class="fas fa-undo-alt mr-2"></i> Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Tests Table -->
+        <div class="bg-white rounded-2xl shadow-sm border border-[#f0e8e0] overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-[#faf7f2] border-b border-[#f0e8e0]">
+                        <tr class="text-left data-table">
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Scan Name</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Category</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Body Part</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Price</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Preparation</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="testsTable">
+                        <tr><td colspan="6" class="text-center py-12 text-[#94a3b8]"><i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i><p class="font-normal">Loading scans...</p> </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Test Modal -->
+    <div id="testModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Add Scan</h2>
+                    <button id="closeModalBtn" class="close-btn float-right">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="clearfix"></div>
+                </div>
+                <form id="testForm">
+                    <input type="hidden" id="testId">
+                    <div class="modal-body">
+                        <div class="mb-4">
+                            <label>Scan Name *</label>
+                            <input type="text" id="testName" required class="form-input" placeholder="e.g., MRI Brain, CT Abdomen">
+                            <div class="error-text" id="testNameError">Scan name is required</div>
+                        </div>
+                        <div class="mb-4">
+                            <label>Category *</label>
+                            <select id="categoryId" required class="form-select">
+                                <option value="">-- Select Category --</option>
+                            </select>
+                            <div class="error-text" id="categoryIdError">Please select a category</div>
+                        </div>
+                        <div class="mb-4">
+                            <label>Body Part</label>
+                            <input type="text" id="bodyPart" class="form-input" placeholder="e.g., Chest, Head, Abdomen">
+                        </div>
+                        <div class="mb-4">
+                            <label>Price (₹) *</label>
+                            <input type="number" id="price" step="0.01" required class="form-input" placeholder="e.g., 1500">
+                            <div class="error-text" id="priceError">Price must be greater than 0</div>
+                        </div>
+                        <div class="mb-4">
+                            <label>Preparation Instructions</label>
+                            <textarea id="preparation" rows="2" class="form-input" placeholder="Fasting required, remove metal objects, etc."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Scan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Confirm Delete</h2>
+                    <button id="closeDeleteModalBtn" class="close-btn float-right">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-trash-alt text-red-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-[#1e293b] mb-2">Delete Scan?</h3>
+                    <p class="text-[#64748b] text-sm font-normal">This action cannot be undone. This scan will be permanently removed.</p>
+                </div>
+                <div class="modal-footer justify-center gap-3">
+                    <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
+                    <button id="confirmDeleteBtn" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg text-sm font-medium transition shadow-sm">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/core/common.js"></script>
+    <script src="radio-tests.js"></script>
+</body>
+</html>

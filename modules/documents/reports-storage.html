@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Reports Storage | Documents | MedFlow</title>
+    <!-- Google Fonts: Poppins (matching dashboard) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            background: #fffdf9;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-weight: 400;
+        }
+        
+        /* Subtle background pattern */
+        .bg-subtle {
+            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f0ebe4;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #d4c9bc;
+            border-radius: 10px;
+        }
+        
+        /* Card Styles */
+        .stat-card {
+            transition: all 0.25s ease;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
+        }
+        
+        .report-card {
+            transition: all 0.25s ease;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            border-left: 4px solid #a8c49a;
+        }
+        
+        .report-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
+            border-color: #e8dcd0;
+            border-left-color: #8aae7a;
+        }
+        
+        .filter-card {
+            transition: all 0.25s ease;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        /* Button Styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
+            transition: all 0.2s ease;
+            border-radius: 12px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            border: 1px solid #efe6dc;
+            background: white;
+            transition: all 0.2s ease;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+        
+        .btn-secondary:hover {
+            background: #fefcf9;
+            border-color: #e0d4c8;
+        }
+        
+        /* Modal Overlay */
+        .modal-overlay {
+            background: rgba(120, 100, 80, 0.3);
+            backdrop-filter: blur(3px);
+            transition: opacity 0.25s ease;
+        }
+        
+        /* Form card - RECTANGULAR shape */
+        .form-card {
+            transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            background: #ffffff;
+            border: 1px solid #efe6dc;
+            border-top: 4px solid #a8c49a;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Filter inputs */
+        .filter-input, .filter-select {
+            border-radius: 12px;
+            border: 1px solid #efe6dc;
+            padding: 0.625rem 1rem;
+            font-size: 0.875rem;
+            font-family: 'Poppins', system-ui, sans-serif;
+            width: 100%;
+        }
+        
+        .filter-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: #b5cfaa;
+            box-shadow: 0 0 0 3px rgba(155, 184, 139, 0.06);
+        }
+        
+        /* Toast animation */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Badge styles */
+        .badge-lab {
+            background: #edf5e9;
+            color: #7a9a68;
+            padding: 0.2rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        .badge-radiology {
+            background: #fef5e8;
+            color: #d4a853;
+            padding: 0.2rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        .badge-discharge {
+            background: #f5f0eb;
+            color: #b8aa9a;
+            padding: 0.2rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        /* Print styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .print-report, .print-report * {
+                visibility: visible;
+            }
+            .print-report {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                padding: 20px;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+        
+        /* Report content styling */
+        .report-content {
+            font-family: 'Poppins', monospace;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body class="bg-subtle">
+
+    <div id="sidebar-container"></div>
+    <div id="header-container"></div>
+
+    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+        <!-- Page Header -->
+        <div class="mb-6">
+            <h1 class="text-xl md:text-2xl font-medium tracking-tight text-[#5a4a3a]">
+                <i class="fas fa-chart-bar text-[#a8c49a] mr-2"></i>Reports Storage
+            </h1>
+            <p class="text-[#b8aa9a] text-sm mt-1 font-light">Store and manage all medical reports</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="stat-card p-4 border-l-4 border-[#a8c49a]">
+                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">Total Reports</p>
+                <p class="text-2xl font-medium text-[#5a4a3a] mt-1" id="totalReports">0</p>
+            </div>
+            <div class="stat-card p-4 border-l-4 border-[#8aae7a]">
+                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">Lab Reports</p>
+                <p class="text-2xl font-medium text-[#8aae7a] mt-1" id="labCount">0</p>
+            </div>
+            <div class="stat-card p-4 border-l-4 border-[#d4a853]">
+                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">Radiology</p>
+                <p class="text-2xl font-medium text-[#d4a853] mt-1" id="radiologyCount">0</p>
+            </div>
+            <div class="stat-card p-4 border-l-4 border-[#b8aa9a]">
+                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">This Month</p>
+                <p class="text-2xl font-medium text-[#b8aa9a] mt-1" id="monthCount">0</p>
+            </div>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="filter-card p-4 mb-6">
+            <div class="flex flex-col md:flex-row gap-3">
+                <div class="flex-1 relative">
+                    <i class="fas fa-search absolute left-3 top-3 text-[#d4c9bc] text-sm"></i>
+                    <input type="text" id="searchInput" placeholder="Search by patient name or test name..." class="filter-input pl-10">
+                </div>
+                <div class="w-full md:w-48">
+                    <select id="typeFilter" class="filter-select">
+                        <option value="">All Types</option>
+                        <option value="Lab">Lab Report</option>
+                        <option value="Radiology">Radiology Report</option>
+                        <option value="Discharge">Discharge Summary</option>
+                    </select>
+                </div>
+                <button id="resetFilter" class="btn-secondary px-5 py-2 rounded-xl text-[#b8aa9a] text-sm font-medium transition whitespace-nowrap">
+                    <i class="fas fa-undo-alt mr-1"></i> Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Reports Grid -->
+        <div id="reportsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+    </main>
+
+    <!-- View Report Modal - RECTANGULAR shape -->
+    <div id="reportModal" class="fixed inset-0 z-50 opacity-0 invisible transition-all duration-200">
+        <div class="modal-overlay fixed inset-0"></div>
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="form-card bg-white w-full max-w-2xl mx-4">
+                <div class="flex justify-between items-center p-5 border-b border-[#f0e8e0]">
+                    <h3 class="text-lg font-medium text-[#5a4a3a] flex items-center gap-2">
+                        <i class="fas fa-file-alt text-[#a8c49a]"></i> Report Details
+                    </h3>
+                    <div class="flex gap-2">
+                        <button id="printReportBtn" class="bg-[#8aae7a] hover:bg-[#7da06c] text-white px-3 py-1.5 rounded-xl transition text-xs font-medium">
+                            <i class="fas fa-print mr-1"></i> Print
+                        </button>
+                        <button id="closeModalBtn" class="text-[#d4c9bc] hover:text-[#b8aa9a] transition">
+                            <i class="fas fa-times text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="reportDetails" class="p-5"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Printable Report Template -->
+    <div id="printableReport" style="display: none;"></div>
+
+    <script src="../../js/core/common.js"></script>
+    <script src="reports-storage.js"></script>
+</body>
+</html>

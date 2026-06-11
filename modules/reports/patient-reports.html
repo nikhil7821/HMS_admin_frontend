@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Patient Reports | Reports | MedFlow</title>
+    <!-- Google Fonts: Poppins (matching dashboard) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            background: #fffdf9;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-weight: 400;
+        }
+        
+        /* Subtle background pattern */
+        .bg-subtle {
+            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f0ebe4;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #d4c9bc;
+            border-radius: 10px;
+        }
+        
+        /* Card Styles */
+        .stat-card {
+            transition: all 0.25s ease;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
+        }
+        
+        .content-card {
+            transition: all 0.25s ease;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        .filter-card {
+            transition: all 0.25s ease;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        /* Button Styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
+            transition: all 0.2s ease;
+            border-radius: 12px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            border: 1px solid #efe6dc;
+            background: white;
+            transition: all 0.2s ease;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+        
+        .btn-secondary:hover {
+            background: #fefcf9;
+            border-color: #e0d4c8;
+        }
+        
+        /* Table styles */
+        .data-table th {
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            letter-spacing: 0.8px;
+            color: #c2b5a8;
+        }
+        
+        .dashboard-table-row {
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f5f0ea;
+        }
+        
+        .dashboard-table-row:hover {
+            background-color: #fefcf9;
+        }
+        
+        /* Filter inputs */
+        .filter-input {
+            border-radius: 12px;
+            border: 1px solid #efe6dc;
+            padding: 0.625rem 1rem;
+            font-size: 0.875rem;
+            font-family: 'Poppins', system-ui, sans-serif;
+            width: 100%;
+        }
+        
+        .filter-input:focus {
+            outline: none;
+            border-color: #b5cfaa;
+            box-shadow: 0 0 0 3px rgba(155, 184, 139, 0.06);
+        }
+        
+        /* Progress bar */
+        .progress-bar {
+            background: linear-gradient(90deg, #a8c49a 0%, #8aae7a 100%);
+            border-radius: 999px;
+            height: 8px;
+            transition: width 0.3s ease;
+        }
+        
+        /* Print styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .print-area, .print-area * {
+                visibility: visible;
+            }
+            .print-area {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                padding: 20px;
+            }
+            .no-print {
+                display: none;
+            }
+            .stat-card, .content-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            canvas {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+        }
+        
+        /* Chart containers */
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-subtle">
+
+    <div id="sidebar-container"></div>
+    <div id="header-container"></div>
+
+    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+        <!-- Page Header -->
+        <div class="mb-6">
+            <h1 class="text-xl md:text-2xl font-medium tracking-tight text-[#5a4a3a]">
+                <i class="fas fa-chart-line text-[#a8c49a] mr-2"></i>Patient Reports
+            </h1>
+            <p class="text-[#b8aa9a] text-sm mt-1 font-light">Comprehensive patient statistics and analytics</p>
+        </div>
+
+        <!-- Date Filter -->
+        <div class="filter-card p-4 mb-6">
+            <div class="flex flex-wrap items-end gap-3">
+                <div class="w-full md:w-auto">
+                    <label class="block text-xs font-medium text-[#b8aa9a] mb-1">From Date</label>
+                    <input type="date" id="fromDate" class="filter-input w-auto">
+                </div>
+                <div class="w-full md:w-auto">
+                    <label class="block text-xs font-medium text-[#b8aa9a] mb-1">To Date</label>
+                    <input type="date" id="toDate" class="filter-input w-auto">
+                </div>
+                <button id="applyFilter" class="btn-primary text-white px-5 py-2 rounded-xl text-sm font-medium transition">
+                    <i class="fas fa-filter mr-1"></i> Apply
+                </button>
+                <button id="printReport" class="btn-secondary px-5 py-2 rounded-xl text-[#b8aa9a] text-sm font-medium transition">
+                    <i class="fas fa-print mr-1"></i> Print
+                </button>
+                <button id="resetFilter" class="btn-secondary px-5 py-2 rounded-xl text-[#b8aa9a] text-sm font-medium transition">
+                    <i class="fas fa-undo-alt mr-1"></i> Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="stat-card p-4 border-l-4 border-[#a8c49a]">
+                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">Total Patients</p>
+                <p class="text-2xl font-medium text-[#5a4a3a] mt-1" id="totalPatients">0</p>
+            </div>
+            <div class="stat-card p-4 border-l-4 border-[#8aae7a]">
+                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">New Patients</p>
+                <p class="text-2xl font-medium text-[#8aae7a] mt-1" id="newPatients">0</p>
+                <p class="text-xs text-[#d4c9bc] mt-1">(Selected Period)</p>
+            </div>
+            <div class="stat-card p-4 border-l-4 border-[#d4a853]">
+                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">Male/Female Ratio</p>
+                <p class="text-2xl font-medium text-[#d4a853] mt-1" id="genderRatio">0:0</p>
+            </div>
+            <div class="stat-card p-4 border-l-4 border-[#b8aa9a]">
+                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">Average Age</p>
+                <p class="text-2xl font-medium text-[#b8aa9a] mt-1" id="avgAge">0</p>
+                <p class="text-xs text-[#d4c9bc] mt-1">Years</p>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div class="content-card p-4">
+                <h3 class="font-medium text-[#5a4a3a] text-sm mb-3">
+                    <i class="fas fa-chart-line text-[#a8c49a] mr-2"></i>Patient Registration Trend
+                </h3>
+                <div class="chart-container">
+                    <canvas id="patientTrendChart"></canvas>
+                </div>
+            </div>
+            <div class="content-card p-4">
+                <h3 class="font-medium text-[#5a4a3a] text-sm mb-3">
+                    <i class="fas fa-venus-mars text-[#a8c49a] mr-2"></i>Gender Distribution
+                </h3>
+                <div class="chart-container">
+                    <canvas id="genderChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Age Group Distribution -->
+        <div class="content-card p-4 mb-6">
+            <h3 class="font-medium text-[#5a4a3a] text-sm mb-3">
+                <i class="fas fa-chart-simple text-[#a8c49a] mr-2"></i>Age Group Distribution
+            </h3>
+            <div id="ageGroupTable" class="space-y-3"></div>
+        </div>
+
+        <!-- Most Frequent Patients -->
+        <div class="content-card p-4">
+            <h3 class="font-medium text-[#5a4a3a] text-sm mb-3">
+                <i class="fas fa-trophy text-[#a8c49a] mr-2"></i>Most Frequent Patients
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-[#fefcf9] border-b border-[#f0e8e0]">
+                        <tr class="text-left data-table">
+                            <th class="px-4 py-3">Patient Name</th>
+                            <th class="px-4 py-3">Phone</th>
+                            <th class="px-4 py-3 text-center">Total Visits</th>
+                            <th class="px-4 py-3">Last Visit</th>
+                         </tr>
+                    </thead>
+                    <tbody id="frequentPatientsTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="../../js/core/common.js"></script>
+    <script src="patient-reports.js"></script>
+</body>
+</html>

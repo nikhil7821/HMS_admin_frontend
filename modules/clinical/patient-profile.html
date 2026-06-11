@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Patient Profile | Clinical | MedFlow</title>
+    <!-- Google Fonts: Poppins Light + Regular + Medium -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            background: #fffdf9;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-weight: 400;
+        }
+        
+        .bg-subtle {
+            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f0ebe4;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #d4c9bc;
+            border-radius: 10px;
+        }
+        
+        .profile-card {
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            border-radius: 20px;
+            transition: all 0.25s ease;
+        }
+        
+        .profile-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .info-card {
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            border-radius: 16px;
+        }
+        
+        .tab-btn {
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 14px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        
+        .tab-btn.active {
+            color: #a8c49a;
+            border-bottom: 2px solid #a8c49a;
+        }
+        
+        .tab-btn:not(.active) {
+            color: #94a3b8;
+        }
+        
+        .tab-btn:not(.active):hover {
+            color: #64748b;
+        }
+        
+        .history-item {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #f0e8e0;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-item:hover {
+            background-color: #fefcf9;
+        }
+        
+        h1, h2, h3 {
+            color: #1e293b;
+        }
+        
+        .stat-icon-bg {
+            background: #faf7f2;
+            border-radius: 14px;
+        }
+        
+        p, span, div, a {
+            font-weight: 400;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #64748b;
+            letter-spacing: 0.3px;
+        }
+        
+        .info-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e293b;
+        }
+    </style>
+</head>
+<body class="bg-subtle">
+
+    <div id="sidebar-container"></div>
+    <div id="header-container"></div>
+
+    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+        
+        <div class="mb-6">
+            <h1 class="text-2xl md:text-3xl font-medium text-[#1e293b] mb-1">
+                <i class="fas fa-user-circle text-[#a8c49a] mr-3"></i>Patient Profile
+            </h1>
+            <p class="text-[#64748b] text-sm font-normal">View patient details and medical history</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Left Column - Profile Info -->
+            <div class="lg:col-span-1">
+                <div class="profile-card p-6 text-center">
+                    <div class="w-28 h-28 bg-gradient-to-r from-[#a8c49a] to-[#8aae7a] rounded-full flex items-center justify-center text-white text-3xl font-medium mx-auto mb-4 shadow-sm">
+                        JD
+                    </div>
+                    <h2 class="text-xl font-semibold text-[#1e293b]" id="profileName">Loading...</h2>
+                    <p class="text-[#94a3b8] text-sm mt-1 font-normal" id="profileId">P-00000</p>
+                    
+                    <div class="mt-5 space-y-3 text-left">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 text-[#a8c49a]"><i class="fas fa-venus-mars"></i></div>
+                            <div>
+                                <p class="info-label">Gender</p>
+                                <p class="info-value" id="profileGender">-</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 text-[#a8c49a]"><i class="fas fa-calendar"></i></div>
+                            <div>
+                                <p class="info-label">Age</p>
+                                <p class="info-value" id="profileAge">-</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 text-[#a8c49a]"><i class="fas fa-tint"></i></div>
+                            <div>
+                                <p class="info-label">Blood Group</p>
+                                <p class="info-value" id="profileBloodGroup">-</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 text-[#a8c49a]"><i class="fas fa-phone"></i></div>
+                            <div>
+                                <p class="info-label">Phone</p>
+                                <p class="info-value" id="profilePhone">-</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 text-[#a8c49a]"><i class="fas fa-envelope"></i></div>
+                            <div>
+                                <p class="info-label">Email</p>
+                                <p class="info-value" id="profileEmail">-</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 text-[#a8c49a]"><i class="fas fa-map-marker-alt"></i></div>
+                            <div>
+                                <p class="info-label">Address</p>
+                                <p class="info-value" id="profileAddress">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Medical Records -->
+            <div class="lg:col-span-2">
+                <div class="info-card overflow-hidden">
+                    <!-- Tabs -->
+                    <div class="border-b border-[#f0e8e0] px-4 pt-2">
+                        <div class="flex gap-1">
+                            <button class="tab-btn active" data-tab="medical">
+                                <i class="fas fa-notes-medical mr-2"></i>Medical History
+                            </button>
+                            <button class="tab-btn" data-tab="consultations">
+                                <i class="fas fa-stethoscope mr-2"></i>Consultations
+                            </button>
+                            <button class="tab-btn" data-tab="prescriptions">
+                                <i class="fas fa-prescription-bottle mr-2"></i>Prescriptions
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Medical History Tab -->
+                    <div id="medicalTab" class="p-5">
+                        <div id="medicalHistoryList" class="space-y-3">
+                            <div class="text-center py-8 text-[#94a3b8]">
+                                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
+                                <p class="font-normal">Loading medical history...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Consultations Tab -->
+                    <div id="consultationsTab" class="p-5 hidden">
+                        <div id="consultationsList" class="space-y-3">
+                            <div class="text-center py-8 text-[#94a3b8]">
+                                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
+                                <p class="font-normal">Loading consultations...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Prescriptions Tab -->
+                    <div id="prescriptionsTab" class="p-5 hidden">
+                        <div id="prescriptionsList" class="space-y-3">
+                            <div class="text-center py-8 text-[#94a3b8]">
+                                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
+                                <p class="font-normal">Loading prescriptions...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../../js/core/common.js"></script>
+    <script src="patient-profile.js"></script>
+</body>
+</html>

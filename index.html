@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | HMS Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+
+    <div id="sidebar-container"></div>
+    <div id="header-container"></div>
+
+    <main class="ml-64 mt-16 p-6 transition-all duration-300">
+        <!-- Welcome Banner -->
+        <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 mb-6 text-white">
+            <h1 class="text-2xl font-bold" id="welcomeMsg">Welcome back, Admin!</h1>
+            <p class="mt-2" id="todayDate"></p>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">OPD Patients</p>
+                        <p class="text-2xl font-bold text-gray-800" id="opdCount">0</p>
+                        <p class="text-green-500 text-xs mt-1">Today</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-users text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">IPD Patients</p>
+                        <p class="text-2xl font-bold text-gray-800" id="ipdCount">0</p>
+                        <p class="text-green-500 text-xs mt-1">Currently Admitted</p>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-procedures text-purple-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Today's Revenue</p>
+                        <p class="text-2xl font-bold text-gray-800" id="revenueCount">$0</p>
+                        <p class="text-green-500 text-xs mt-1">+12% from yesterday</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-dollar-sign text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Bed Occupancy</p>
+                        <p class="text-2xl font-bold text-gray-800" id="bedCount">0%</p>
+                        <p class="text-yellow-500 text-xs mt-1">Total Beds: 100</p>
+                    </div>
+                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-bed text-orange-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+            <h2 class="text-lg font-bold mb-4">Quick Actions</h2>
+            <div class="flex flex-wrap gap-3">
+                <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                    <i class="fas fa-user-plus mr-2"></i> Add Patient
+                </button>
+                <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                    <i class="fas fa-calendar-plus mr-2"></i> Book Appointment
+                </button>
+                <button class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">
+                    <i class="fas fa-procedures mr-2"></i> Admit Patient
+                </button>
+                <button class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition">
+                    <i class="fas fa-file-invoice mr-2"></i> Create Bill
+                </button>
+            </div>
+        </div>
+
+        <!-- Recent Appointments Table -->
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <h2 class="text-lg font-bold mb-4">Recent Appointments</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Patient</th>
+                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Doctor</th>
+                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Date</th>
+                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Time</th>
+                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appointmentsTable">
+                        <tr>
+                            <td class="px-4 py-2 text-sm" colspan="5" class="text-center">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Core JS -->
+    <script src="js/core/common.js"></script>
+    <script src="js/core/dashboard-data.js"></script>
+</body>
+</html>

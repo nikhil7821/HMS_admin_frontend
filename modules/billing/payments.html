@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Payments | Billing | MedFlow</title>
+    <!-- Google Fonts: Poppins Light + Regular + Medium -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            background: #fffdf9;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-weight: 400;
+        }
+        
+        .bg-subtle {
+            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f0ebe4;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #d4c9bc;
+            border-radius: 10px;
+        }
+        
+        .stat-card {
+            transition: all 0.25s ease;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
+            border-color: #e8dcd0;
+        }
+        
+        .data-table th {
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            letter-spacing: 0.8px;
+            color: #c2b5a8;
+        }
+        
+        .payment-row {
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f5f0ea;
+        }
+        
+        .payment-row:hover {
+            background-color: #fefcf9;
+        }
+        
+        .stat-icon-bg {
+            background: #faf7f2;
+            border-radius: 14px;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #1e293b;
+            letter-spacing: -0.3px;
+        }
+        
+        .stat-card p:first-child {
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-card .text-2xl {
+            font-weight: 500;
+        }
+        
+        .payment-method-badge {
+            background: #e0f2fe;
+            color: #0284c7;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        p, span, div, a {
+            font-weight: 400;
+        }
+    </style>
+</head>
+<body class="bg-subtle">
+
+    <div id="sidebar-container"></div>
+    <div id="header-container"></div>
+
+    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+        
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-medium text-[#1e293b] mb-1">
+                    <i class="fas fa-credit-card text-[#a8c49a] mr-3"></i>Payment History
+                </h1>
+                <p class="text-[#64748b] text-sm font-normal">Track all patient payments and transactions</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <div class="stat-card p-5 border-l-4 border-l-blue-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Total Collected</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="totalCollected">₹0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-rupee-sign text-[#a8c49a] text-lg"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card p-5 border-l-4 border-l-green-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">This Month</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="monthCollected">₹0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-calendar-alt text-[#a8c49a] text-lg"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card p-5 border-l-4 border-l-yellow-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Today</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="todayCollected">₹0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-sun text-[#a8c49a] text-lg"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card p-5 border-l-4 border-l-purple-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Transactions</p>
+                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="totalTransactions">0</p>
+                    </div>
+                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
+                        <i class="fas fa-receipt text-[#a8c49a] text-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payments Table -->
+        <div class="bg-white rounded-2xl shadow-sm border border-[#f0e8e0] overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-[#faf7f2] border-b border-[#f0e8e0]">
+                        <tr class="text-left data-table">
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Date</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Patient</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Invoice #</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Amount</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Method</th>
+                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Transaction ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentsTable">
+                        <tr><td colspan="6" class="text-center py-12 text-[#94a3b8]"><i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i><p class="font-normal">Loading payments...</p> </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="../../js/core/common.js"></script>
+    <script src="payments.js"></script>
+</body>
+</html>

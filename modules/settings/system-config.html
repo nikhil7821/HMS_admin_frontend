@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Configuration | Settings | HMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>body{background:#f3f4f6;}</style>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div id="header-container"></div>
+
+    <main class="lg:ml-64 mt-16 p-6">
+        <div class="mb-6"><h1 class="text-2xl font-bold"><i class="fas fa-cogs text-blue-600 mr-2"></i>System Configuration</h1><p class="text-gray-500">Configure system settings, defaults, and preferences</p></div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- General Settings -->
+            <div class="bg-white rounded-xl shadow-sm p-6"><h2 class="text-lg font-bold mb-4 border-b pb-2">General Settings</h2>
+                <div class="space-y-4"><div><label class="block text-sm font-medium mb-1">System Name</label><input type="text" id="systemName" class="w-full px-3 py-2 border rounded-lg"></div>
+                <div><label class="block text-sm font-medium mb-1">Time Zone</label><select id="timezone" class="w-full px-3 py-2 border rounded-lg"><option>UTC-5 (Eastern Time)</option><option>UTC-6 (Central Time)</option><option>UTC-7 (Mountain Time)</option><option>UTC-8 (Pacific Time)</option><option>UTC+5:30 (IST)</option></select></div>
+                <div><label class="block text-sm font-medium mb-1">Date Format</label><select id="dateFormat" class="w-full px-3 py-2 border rounded-lg"><option>DD/MM/YYYY</option><option>MM/DD/YYYY</option><option>YYYY-MM-DD</option></select></div>
+                <div><label class="block text-sm font-medium mb-1">Currency Symbol</label><select id="currency" class="w-full px-3 py-2 border rounded-lg"><option>$ USD</option><option>€ EUR</option><option>£ GBP</option><option>₹ INR</option></select></div></div>
+            </div>
+
+            <!-- Invoice Settings -->
+            <div class="bg-white rounded-xl shadow-sm p-6"><h2 class="text-lg font-bold mb-4 border-b pb-2">Invoice Settings</h2>
+                <div class="space-y-4"><div><label class="block text-sm font-medium mb-1">Tax Percentage (%)</label><input type="number" id="taxRate" step="0.1" class="w-full px-3 py-2 border rounded-lg"></div>
+                <div><label class="block text-sm font-medium mb-1">Invoice Prefix</label><input type="text" id="invoicePrefix" placeholder="INV-" class="w-full px-3 py-2 border rounded-lg"></div>
+                <div><label class="block text-sm font-medium mb-1">Payment Due Days</label><input type="number" id="dueDays" class="w-full px-3 py-2 border rounded-lg"></div>
+                <div><label class="flex items-center"><input type="checkbox" id="autoInvoice" class="mr-2"> <span class="text-sm">Auto-generate invoice on appointment</span></label></div></div>
+            </div>
+
+            <!-- Security Settings -->
+            <div class="bg-white rounded-xl shadow-sm p-6"><h2 class="text-lg font-bold mb-4 border-b pb-2">Security Settings</h2>
+                <div class="space-y-4"><div><label class="flex items-center"><input type="checkbox" id="twoFactorAuth" class="mr-2"> <span class="text-sm">Enable Two-Factor Authentication</span></label></div>
+                <div><label class="block text-sm font-medium mb-1">Session Timeout (minutes)</label><input type="number" id="sessionTimeout" class="w-full px-3 py-2 border rounded-lg"></div>
+                <div><label class="block text-sm font-medium mb-1">Password Expiry (days)</label><input type="number" id="passwordExpiry" class="w-full px-3 py-2 border rounded-lg"></div>
+                <div><label class="block text-sm font-medium mb-1">Max Login Attempts</label><input type="number" id="maxAttempts" class="w-full px-3 py-2 border rounded-lg"></div></div>
+            </div>
+
+            <!-- Backup Settings -->
+            <div class="bg-white rounded-xl shadow-sm p-6"><h2 class="text-lg font-bold mb-4 border-b pb-2">Backup Settings</h2>
+                <div class="space-y-4"><div><label class="block text-sm font-medium mb-1">Auto Backup Frequency</label><select id="backupFrequency" class="w-full px-3 py-2 border rounded-lg"><option>Daily</option><option>Weekly</option><option>Monthly</option><option>Never</option></select></div>
+                <div><label class="block text-sm font-medium mb-1">Backup Time</label><input type="time" id="backupTime" class="w-full px-3 py-2 border rounded-lg"></div>
+                <button id="backupNowBtn" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"><i class="fas fa-database mr-1"></i> Backup Now</button></div>
+            </div>
+        </div>
+
+        <div class="mt-6 flex justify-end gap-3"><button id="resetConfigBtn" class="px-4 py-2 border rounded-lg hover:bg-gray-50 transition">Reset to Default</button><button id="saveConfigBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Save Configuration</button></div>
+    </main>
+
+    <script src="../../js/core/common.js"></script>
+    <script src="system-config.js"></script>
+</body>
+</html>
