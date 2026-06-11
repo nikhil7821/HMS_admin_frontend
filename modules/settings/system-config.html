@@ -2,53 +2,409 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Configuration | Settings | HMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>System Configuration | Settings | MedFlow</title>
+    <!-- Google Fonts: Poppins Light + Regular + Medium -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>body{background:#f3f4f6;}</style>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+            background: #fffdf9;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-weight: 400;
+        }
+        
+        .bg-subtle {
+            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f0ebe4;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #d4c9bc;
+            border-radius: 10px;
+        }
+        
+        .card-white {
+            background: #ffffff;
+            border: 1px solid #f0e8e0;
+            border-radius: 20px;
+            transition: all 0.25s ease;
+        }
+        
+        .card-white:hover {
+            box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.06);
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #1e293b;
+            letter-spacing: -0.3px;
+        }
+        
+        h2 {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1e293b;
+        }
+        
+        .form-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 6px;
+            display: block;
+            letter-spacing: 0.3px;
+        }
+        
+        .form-input, .form-select {
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            padding: 10px 14px;
+            width: 100%;
+            font-size: 13px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 400;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #a8c49a;
+            box-shadow: 0 0 0 3px rgba(168, 196, 154, 0.2);
+        }
+        
+        .form-input.error, .form-select.error {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+        
+        .error-text {
+            color: #ef4444;
+            font-size: 11px;
+            margin-top: 4px;
+            display: none;
+        }
+        
+        .error-text.show {
+            display: block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            border: 1px solid #cbd5e1;
+            background: white;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 13px;
+            color: #334155;
+        }
+        
+        .btn-secondary:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+        
+        .section-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        p, span, div, a {
+            font-weight: 400;
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: 0.3s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #a8c49a;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+        
+        .backup-info {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-subtle">
+
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-6">
-        <div class="mb-6"><h1 class="text-2xl font-bold"><i class="fas fa-cogs text-blue-600 mr-2"></i>System Configuration</h1><p class="text-gray-500">Configure system settings, defaults, and preferences</p></div>
+    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+        
+        <div class="mb-6">
+            <h1 class="text-2xl md:text-3xl font-medium text-[#1e293b] mb-1">
+                <i class="fas fa-cogs text-[#a8c49a] mr-3"></i>System Configuration
+            </h1>
+            <p class="text-[#64748b] text-sm font-normal">Configure system settings, defaults, and preferences</p>
+        </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- General Settings -->
-            <div class="bg-white rounded-xl shadow-sm p-6"><h2 class="text-lg font-bold mb-4 border-b pb-2">General Settings</h2>
-                <div class="space-y-4"><div><label class="block text-sm font-medium mb-1">System Name</label><input type="text" id="systemName" class="w-full px-3 py-2 border rounded-lg"></div>
-                <div><label class="block text-sm font-medium mb-1">Time Zone</label><select id="timezone" class="w-full px-3 py-2 border rounded-lg"><option>UTC-5 (Eastern Time)</option><option>UTC-6 (Central Time)</option><option>UTC-7 (Mountain Time)</option><option>UTC-8 (Pacific Time)</option><option>UTC+5:30 (IST)</option></select></div>
-                <div><label class="block text-sm font-medium mb-1">Date Format</label><select id="dateFormat" class="w-full px-3 py-2 border rounded-lg"><option>DD/MM/YYYY</option><option>MM/DD/YYYY</option><option>YYYY-MM-DD</option></select></div>
-                <div><label class="block text-sm font-medium mb-1">Currency Symbol</label><select id="currency" class="w-full px-3 py-2 border rounded-lg"><option>$ USD</option><option>€ EUR</option><option>£ GBP</option><option>₹ INR</option></select></div></div>
+            
+            <!-- General Settings Card -->
+            <div class="card-white p-6">
+                <div class="flex items-center gap-3 mb-4 pb-2 border-b border-[#f0e8e0]">
+                    <div class="section-icon bg-blue-50">
+                        <i class="fas fa-globe text-blue-500"></i>
+                    </div>
+                    <h2 class="text-base font-medium">General Settings</h2>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="form-label">System Name</label>
+                        <input type="text" id="systemName" class="form-input" placeholder="MedFlow HMS">
+                        <div class="error-text" id="systemNameError">System name is required</div>
+                    </div>
+                    <div>
+                        <label class="form-label">Time Zone</label>
+                        <select id="timezone" class="form-select">
+                            <option value="UTC-12:00">UTC-12:00 (International Date Line West)</option>
+                            <option value="UTC-11:00">UTC-11:00 (Midway Island, Samoa)</option>
+                            <option value="UTC-10:00">UTC-10:00 (Hawaii)</option>
+                            <option value="UTC-09:00">UTC-09:00 (Alaska)</option>
+                            <option value="UTC-08:00">UTC-08:00 (Pacific Time US & Canada)</option>
+                            <option value="UTC-07:00">UTC-07:00 (Mountain Time)</option>
+                            <option value="UTC-06:00">UTC-06:00 (Central Time)</option>
+                            <option value="UTC-05:00">UTC-05:00 (Eastern Time)</option>
+                            <option value="UTC+05:30">UTC+05:30 (India Standard Time)</option>
+                            <option value="UTC+08:00">UTC+08:00 (Singapore, Perth)</option>
+                            <option value="UTC+09:00">UTC+09:00 (Tokyo, Seoul)</option>
+                            <option value="UTC+10:00">UTC+10:00 (Sydney, Melbourne)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Date Format</label>
+                        <select id="dateFormat" class="form-select">
+                            <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                            <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                            <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Currency Symbol</label>
+                        <select id="currency" class="form-select">
+                            <option value="$ USD">$ USD (US Dollar)</option>
+                            <option value="€ EUR">€ EUR (Euro)</option>
+                            <option value="£ GBP">£ GBP (British Pound)</option>
+                            <option value="₹ INR">₹ INR (Indian Rupee)</option>
+                            <option value="¥ JPY">¥ JPY (Japanese Yen)</option>
+                            <option value="A$ AUD">A$ AUD (Australian Dollar)</option>
+                            <option value="C$ CAD">C$ CAD (Canadian Dollar)</option>
+                            <option value="CHF">CHF (Swiss Franc)</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
-            <!-- Invoice Settings -->
-            <div class="bg-white rounded-xl shadow-sm p-6"><h2 class="text-lg font-bold mb-4 border-b pb-2">Invoice Settings</h2>
-                <div class="space-y-4"><div><label class="block text-sm font-medium mb-1">Tax Percentage (%)</label><input type="number" id="taxRate" step="0.1" class="w-full px-3 py-2 border rounded-lg"></div>
-                <div><label class="block text-sm font-medium mb-1">Invoice Prefix</label><input type="text" id="invoicePrefix" placeholder="INV-" class="w-full px-3 py-2 border rounded-lg"></div>
-                <div><label class="block text-sm font-medium mb-1">Payment Due Days</label><input type="number" id="dueDays" class="w-full px-3 py-2 border rounded-lg"></div>
-                <div><label class="flex items-center"><input type="checkbox" id="autoInvoice" class="mr-2"> <span class="text-sm">Auto-generate invoice on appointment</span></label></div></div>
+            <!-- Invoice Settings Card -->
+            <div class="card-white p-6">
+                <div class="flex items-center gap-3 mb-4 pb-2 border-b border-[#f0e8e0]">
+                    <div class="section-icon bg-green-50">
+                        <i class="fas fa-file-invoice-dollar text-green-500"></i>
+                    </div>
+                    <h2 class="text-base font-medium">Invoice Settings</h2>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="form-label">Tax Percentage (%)</label>
+                        <input type="number" id="taxRate" step="0.1" class="form-input" placeholder="5">
+                        <div class="error-text" id="taxRateError">Tax rate must be between 0 and 100</div>
+                    </div>
+                    <div>
+                        <label class="form-label">Invoice Prefix</label>
+                        <input type="text" id="invoicePrefix" class="form-input" placeholder="INV-">
+                    </div>
+                    <div>
+                        <label class="form-label">Payment Due Days</label>
+                        <input type="number" id="dueDays" class="form-input" placeholder="15">
+                        <div class="error-text" id="dueDaysError">Due days must be positive number</div>
+                    </div>
+                    <div class="flex items-center justify-between pt-2">
+                        <span class="text-sm text-[#475569]">Auto-generate invoice on appointment</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="autoInvoice">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
             </div>
 
-            <!-- Security Settings -->
-            <div class="bg-white rounded-xl shadow-sm p-6"><h2 class="text-lg font-bold mb-4 border-b pb-2">Security Settings</h2>
-                <div class="space-y-4"><div><label class="flex items-center"><input type="checkbox" id="twoFactorAuth" class="mr-2"> <span class="text-sm">Enable Two-Factor Authentication</span></label></div>
-                <div><label class="block text-sm font-medium mb-1">Session Timeout (minutes)</label><input type="number" id="sessionTimeout" class="w-full px-3 py-2 border rounded-lg"></div>
-                <div><label class="block text-sm font-medium mb-1">Password Expiry (days)</label><input type="number" id="passwordExpiry" class="w-full px-3 py-2 border rounded-lg"></div>
-                <div><label class="block text-sm font-medium mb-1">Max Login Attempts</label><input type="number" id="maxAttempts" class="w-full px-3 py-2 border rounded-lg"></div></div>
+            <!-- Security Settings Card -->
+            <div class="card-white p-6">
+                <div class="flex items-center gap-3 mb-4 pb-2 border-b border-[#f0e8e0]">
+                    <div class="section-icon bg-purple-50">
+                        <i class="fas fa-shield-alt text-purple-500"></i>
+                    </div>
+                    <h2 class="text-base font-medium">Security Settings</h2>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-[#475569]">Enable Two-Factor Authentication</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="twoFactorAuth">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div>
+                        <label class="form-label">Session Timeout (minutes)</label>
+                        <input type="number" id="sessionTimeout" class="form-input" placeholder="30">
+                        <div class="error-text" id="sessionTimeoutError">Session timeout must be at least 5 minutes</div>
+                    </div>
+                    <div>
+                        <label class="form-label">Password Expiry (days)</label>
+                        <input type="number" id="passwordExpiry" class="form-input" placeholder="90">
+                        <div class="error-text" id="passwordExpiryError">Password expiry must be at least 30 days</div>
+                    </div>
+                    <div>
+                        <label class="form-label">Max Login Attempts</label>
+                        <input type="number" id="maxAttempts" class="form-input" placeholder="5">
+                        <div class="error-text" id="maxAttemptsError">Max attempts must be between 3 and 10</div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Backup Settings -->
-            <div class="bg-white rounded-xl shadow-sm p-6"><h2 class="text-lg font-bold mb-4 border-b pb-2">Backup Settings</h2>
-                <div class="space-y-4"><div><label class="block text-sm font-medium mb-1">Auto Backup Frequency</label><select id="backupFrequency" class="w-full px-3 py-2 border rounded-lg"><option>Daily</option><option>Weekly</option><option>Monthly</option><option>Never</option></select></div>
-                <div><label class="block text-sm font-medium mb-1">Backup Time</label><input type="time" id="backupTime" class="w-full px-3 py-2 border rounded-lg"></div>
-                <button id="backupNowBtn" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"><i class="fas fa-database mr-1"></i> Backup Now</button></div>
+            <!-- Backup Settings Card -->
+            <div class="card-white p-6">
+                <div class="flex items-center gap-3 mb-4 pb-2 border-b border-[#f0e8e0]">
+                    <div class="section-icon bg-orange-50">
+                        <i class="fas fa-database text-orange-500"></i>
+                    </div>
+                    <h2 class="text-base font-medium">Backup Settings</h2>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="form-label">Auto Backup Frequency</label>
+                        <select id="backupFrequency" class="form-select">
+                            <option value="Daily">Daily</option>
+                            <option value="Weekly">Weekly</option>
+                            <option value="Monthly">Monthly</option>
+                            <option value="Never">Never</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Backup Time</label>
+                        <input type="time" id="backupTime" class="form-input">
+                    </div>
+                    <div class="backup-info">
+                        <div class="flex items-center gap-2 text-sm text-[#475569]">
+                            <i class="fas fa-info-circle text-[#a8c49a]"></i>
+                            <span>Backup includes: Patients, Doctors, Appointments, Invoices, Pharmacy data</span>
+                        </div>
+                    </div>
+                    <button id="backupNowBtn" class="btn-success w-full flex items-center justify-center gap-2">
+                        <i class="fas fa-database"></i> Backup Now
+                    </button>
+                </div>
             </div>
         </div>
 
-        <div class="mt-6 flex justify-end gap-3"><button id="resetConfigBtn" class="px-4 py-2 border rounded-lg hover:bg-gray-50 transition">Reset to Default</button><button id="saveConfigBtn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Save Configuration</button></div>
+        <!-- Action Buttons -->
+        <div class="mt-6 flex justify-end gap-3">
+            <button id="resetConfigBtn" class="btn-secondary">Reset to Default</button>
+            <button id="saveConfigBtn" class="btn-primary">Save Configuration</button>
+        </div>
     </main>
 
     <script src="../../js/core/common.js"></script>
