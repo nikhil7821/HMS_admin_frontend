@@ -4,155 +4,120 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Bed Occupancy | Reports | MedFlow</title>
-    <!-- Google Fonts: Poppins Light + Regular + Medium -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- ✅ CENTRALIZED THEME CSS -->
+    <link rel="stylesheet" href="../../css/theme.css">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
-            background: #fffdf9;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            font-weight: 400;
-        }
-        
-        .bg-subtle {
-            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
-        }
-        
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f0ebe4;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #d4c9bc;
-            border-radius: 10px;
-        }
-        
-        .stat-card {
-            transition: all 0.25s ease;
-            border-radius: 16px;
-            background: #ffffff;
-            border: 1px solid #f0e8e0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
-            border-color: #e8dcd0;
-        }
-        
-        .stat-icon-bg {
-            background: #faf7f2;
-            border-radius: 14px;
-        }
-        
-        .data-table th {
-            font-weight: 500;
-            text-transform: uppercase;
-            font-size: 0.65rem;
-            letter-spacing: 0.8px;
-            color: #c2b5a8;
-        }
-        
+        /* Additional page-specific styles that align with theme */
         .report-row {
-            transition: background 0.2s ease;
-            border-bottom: 1px solid #f5f0ea;
+            transition: var(--transition-base);
+            border-bottom: 1px solid var(--border-default);
         }
         
         .report-row:hover {
-            background-color: #fefcf9;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
-            transition: all 0.2s ease;
-            border: none;
-            cursor: pointer;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-weight: 500;
-            font-size: 13px;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
-            transform: translateY(-1px);
-        }
-        
-        .btn-secondary {
-            border: 1px solid #efe6dc;
-            background: white;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-weight: 500;
-            font-size: 13px;
-            color: #5a4a3a;
-        }
-        
-        .btn-secondary:hover {
-            background: #fefcf9;
-            border-color: #e0d4c8;
+            background-color: var(--bg-subtle);
         }
         
         .badge-critical {
-            background: #fee8e8;
-            color: #d48c8c;
-            padding: 0.2rem 0.85rem;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 500;
+            background: var(--color-error-bg);
+            color: var(--color-error-text);
+            padding: 0.2rem 0.75rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6875rem;
+            font-weight: var(--font-weight-medium);
+            display: inline-block;
         }
         
         .badge-high {
-            background: #fef5e8;
-            color: #d4a853;
-            padding: 0.2rem 0.85rem;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 500;
+            background: var(--color-warning-bg);
+            color: var(--color-warning-text);
+            padding: 0.2rem 0.75rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6875rem;
+            font-weight: var(--font-weight-medium);
+            display: inline-block;
         }
         
         .badge-normal {
-            background: #edf5e9;
-            color: #7a9a68;
-            padding: 0.2rem 0.85rem;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 500;
+            background: var(--color-success-bg);
+            color: var(--color-success-text);
+            padding: 0.2rem 0.75rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6875rem;
+            font-weight: var(--font-weight-medium);
+            display: inline-block;
         }
         
         .progress-bar {
-            background: linear-gradient(90deg, #a8c49a 0%, #8aae7a 100%);
-            border-radius: 999px;
-            height: 8px;
+            background: linear-gradient(90deg, var(--color-sage) 0%, var(--color-sage-dark) 100%);
+            border-radius: var(--radius-full);
+            height: 6px;
             transition: width 0.3s ease;
         }
         
         .progress-bar-critical {
-            background: linear-gradient(90deg, #d48c8c 0%, #c98a7a 100%);
+            background: linear-gradient(90deg, var(--color-error-text) 0%, #b91c1c 100%);
         }
         
         .progress-bar-high {
-            background: linear-gradient(90deg, #d4a853 0%, #c49a6c 100%);
+            background: linear-gradient(90deg, var(--color-warning-text) 0%, #b45309 100%);
+        }
+        
+        .chart-container {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-default);
+            padding: 0.75rem;
+            box-shadow: var(--shadow-card);
+        }
+        
+        .chart-container .section-title {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.5rem !important;
+            padding-bottom: 0.375rem !important;
+        }
+        
+        .chart-container .section-title i {
+            font-size: 0.75rem !important;
+        }
+        
+        canvas {
+            max-height: 160px;
+            width: 100%;
+        }
+        
+        .border-l-sage {
+            border-left-color: var(--color-sage) !important;
+        }
+        
+        .border-l-error {
+            border-left-color: var(--color-error-text) !important;
+        }
+        
+        .border-l-success {
+            border-left-color: var(--color-success-text) !important;
+        }
+        
+        .border-l-warning {
+            border-left-color: var(--color-warning-text) !important;
+        }
+        
+        /* Smaller stats cards */
+        .stat-card-sm .stat-value {
+            font-size: 1.25rem !important;
         }
         
         @media print {
@@ -178,105 +143,119 @@
 
     <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
         
-        <div class="mb-6">
-            <h1 class="text-2xl md:text-3xl font-medium text-[#1e293b] mb-1">
-                <i class="fas fa-bed-pulse text-[#a8c49a] mr-3"></i>Bed Occupancy Report
-            </h1>
-            <p class="text-[#64748b] text-sm font-normal">Track bed utilization across all hospital wards</p>
+        <!-- Page Header matching theme -->
+        <div class="page-header mb-5">
+            <div class="page-header-left">
+                <div class="page-header-icon">
+                    <i class="fas fa-bed-pulse"></i>
+                </div>
+                <div>
+                    <h1 class="page-header-title">Bed Occupancy Report</h1>
+                    <p class="page-header-subtitle">Track bed utilization across all hospital wards</p>
+                </div>
+            </div>
         </div>
 
         <!-- Print Button -->
-        <div class="no-print mb-6">
+        <div class="no-print mb-5">
             <button id="printReport" class="btn-secondary">
-                <i class="fas fa-print mr-2"></i> Print Report
+                <i class="fas fa-print mr-1"></i> Print Report
             </button>
         </div>
 
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-            <div class="stat-card p-5 border-l-4 border-l-[#a8c49a]">
+        <!-- Stats Cards using theme classes -->
+        <div class="grid-stats mb-6">
+            <div class="stat-card" style="border-left: 4px solid var(--color-sage);">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Total Beds</p>
-                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="totalBeds">0</p>
+                        <p class="stat-label">Total Beds</p>
+                        <p class="stat-value" id="totalBeds">0</p>
                     </div>
-                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
-                        <i class="fas fa-bed text-[#a8c49a] text-lg"></i>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-bed text-sage text-lg"></i>
                     </div>
                 </div>
             </div>
-            <div class="stat-card p-5 border-l-4 border-l-[#d48c8c]">
+            
+            <div class="stat-card" style="border-left: 4px solid var(--color-error-text);">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Occupied Beds</p>
-                        <p class="text-3xl font-medium text-[#d48c8c] mt-1" id="occupiedBeds">0</p>
+                        <p class="stat-label">Occupied Beds</p>
+                        <p class="stat-value text-error-text" id="occupiedBeds">0</p>
                     </div>
-                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
-                        <i class="fas fa-user-circle text-[#a8c49a] text-lg"></i>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-user-circle text-sage text-lg"></i>
                     </div>
                 </div>
             </div>
-            <div class="stat-card p-5 border-l-4 border-l-[#8aae7a]">
+            
+            <div class="stat-card" style="border-left: 4px solid var(--color-success-text);">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Available Beds</p>
-                        <p class="text-3xl font-medium text-[#8aae7a] mt-1" id="availableBeds">0</p>
+                        <p class="stat-label">Available Beds</p>
+                        <p class="stat-value text-success-text" id="availableBeds">0</p>
                     </div>
-                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
-                        <i class="fas fa-check-circle text-[#a8c49a] text-lg"></i>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-check-circle text-sage text-lg"></i>
                     </div>
                 </div>
             </div>
-            <div class="stat-card p-5 border-l-4 border-l-[#d4a853]">
+            
+            <div class="stat-card" style="border-left: 4px solid var(--color-warning-text);">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Occupancy Rate</p>
-                        <p class="text-3xl font-medium text-[#d4a853] mt-1" id="occupancyRate">0%</p>
+                        <p class="stat-label">Occupancy Rate</p>
+                        <p class="stat-value text-warning-text" id="occupancyRate">0%</p>
                     </div>
-                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
-                        <i class="fas fa-chart-line text-[#a8c49a] text-lg"></i>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-chart-line text-sage text-lg"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Charts Row -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div class="bg-white rounded-2xl shadow-sm border border-[#f0e8e0] p-5">
-                <h3 class="font-medium text-[#1e293b] text-base mb-4 pb-2 border-b border-[#f0e8e0]">
-                    <i class="fas fa-chart-bar text-[#a8c49a] mr-2"></i>Ward-wise Occupancy Rate
+        <!-- Charts Row - Reduced Size -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
+            <div class="chart-container">
+                <h3 class="section-title text-sm mb-2 pb-1.5 border-b border-default">
+                    <i class="fas fa-chart-bar text-sage"></i> Ward-wise Occupancy Rate
                 </h3>
-                <canvas id="wardChart" height="250"></canvas>
+                <canvas id="wardChart" height="150"></canvas>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm border border-[#f0e8e0] p-5">
-                <h3 class="font-medium text-[#1e293b] text-base mb-4 pb-2 border-b border-[#f0e8e0]">
-                    <i class="fas fa-chart-pie text-[#a8c49a] mr-2"></i>Bed Status Distribution
+            <div class="chart-container">
+                <h3 class="section-title text-sm mb-2 pb-1.5 border-b border-default">
+                    <i class="fas fa-chart-pie text-sage"></i> Bed Status Distribution
                 </h3>
-                <canvas id="statusChart" height="250"></canvas>
+                <canvas id="statusChart" height="150"></canvas>
             </div>
         </div>
 
         <!-- Ward-wise Breakdown Table -->
-        <div class="bg-white rounded-2xl shadow-sm border border-[#f0e8e0] overflow-hidden">
-            <div class="px-5 py-4 border-b border-[#f0e8e0]">
-                <h3 class="font-medium text-[#1e293b] text-base">
-                    <i class="fas fa-building text-[#a8c49a] mr-2"></i>Ward-wise Bed Breakdown
+        <div class="card-white overflow-hidden">
+            <div class="px-5 py-2.5 border-b border-default">
+                <h3 class="section-title text-xs mb-0">
+                    <i class="fas fa-building text-sage"></i> Ward-wise Bed Breakdown
                 </h3>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-[#faf7f2] border-b border-[#f0e8e0]">
-                        <tr class="text-left data-table">
-                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Ward Name</th>
-                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider text-right">Total Beds</th>
-                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider text-right">Occupied</th>
-                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider text-right">Available</th>
-                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider text-right">Occupancy Rate</th>
-                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider text-center">Status</th>
+            <div class="table-wrapper">
+                <table class="data-table w-full">
+                    <thead>
+                        <tr>
+                            <th class="px-5 py-2">Ward Name</th>
+                            <th class="px-5 py-2 text-right">Total Beds</th>
+                            <th class="px-5 py-2 text-right">Occupied</th>
+                            <th class="px-5 py-2 text-right">Available</th>
+                            <th class="px-5 py-2 text-right">Occupancy Rate</th>
+                            <th class="px-5 py-2 text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody id="wardTable">
-                        <tr><td colspan="6" class="text-center py-12 text-[#94a3b8]"><i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i><p class="font-normal">Loading data...</p></td></tr>
+                        <tr>
+                            <td colspan="6" class="text-center py-10 text-brown-100">
+                                <i class="fas fa-spinner fa-pulse text-xl mb-1 block"></i>
+                                <p class="text-xs font-light">Loading data...</p>
+                            </tr>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -285,5 +264,6 @@
 
     <script src="../../js/core/common.js"></script>
     <script src="bed-occupancy.js"></script>
+    
 </body>
 </html>

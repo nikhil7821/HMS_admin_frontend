@@ -4,86 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Patient Profile | Clinical | MedFlow</title>
-    <!-- Google Fonts: Poppins Light + Regular + Medium -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- ✅ CENTRALIZED THEME CSS -->
+    <link rel="stylesheet" href="../../css/theme.css">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
-            background: #fffdf9;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            font-weight: 400;
-        }
-        
-        .bg-subtle {
-            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
-        }
-        
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f0ebe4;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #d4c9bc;
-            border-radius: 10px;
-        }
-        
+        /* Additional page-specific styles that align with theme */
         .profile-card {
-            background: #ffffff;
-            border: 1px solid #f0e8e0;
-            border-radius: 20px;
-            transition: all 0.25s ease;
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            transition: var(--transition-base);
         }
         
         .profile-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 24px -12px rgba(0, 0, 0, 0.08);
+            box-shadow: var(--shadow-md);
         }
         
         .info-card {
-            background: #ffffff;
-            border: 1px solid #f0e8e0;
-            border-radius: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
         }
         
         .tab-btn {
-            transition: all 0.2s ease;
-            font-weight: 500;
-            font-size: 14px;
-            padding: 10px 20px;
+            transition: var(--transition-base);
+            font-weight: var(--font-weight-medium);
+            font-size: 0.8125rem;
+            padding: 0.625rem 1.25rem;
             cursor: pointer;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--color-brown-200);
         }
         
         .tab-btn.active {
-            color: #a8c49a;
-            border-bottom: 2px solid #a8c49a;
-        }
-        
-        .tab-btn:not(.active) {
-            color: #94a3b8;
+            color: var(--color-sage-dark);
+            border-bottom-color: var(--color-sage);
         }
         
         .tab-btn:not(.active):hover {
-            color: #64748b;
+            color: var(--color-brown-600);
+            background-color: var(--bg-hover);
         }
         
         .history-item {
-            transition: all 0.2s ease;
-            border-bottom: 1px solid #f0e8e0;
+            transition: var(--transition-base);
+            border-bottom: 1px solid var(--border-default);
+            padding: 1rem;
+            border-radius: var(--radius-md);
         }
         
         .history-item:last-child {
@@ -91,33 +71,36 @@
         }
         
         .history-item:hover {
-            background-color: #fefcf9;
-        }
-        
-        h1, h2, h3 {
-            color: #1e293b;
-        }
-        
-        .stat-icon-bg {
-            background: #faf7f2;
-            border-radius: 14px;
-        }
-        
-        p, span, div, a {
-            font-weight: 400;
+            background-color: var(--bg-subtle);
         }
         
         .info-label {
-            font-size: 12px;
-            font-weight: 500;
-            color: #64748b;
-            letter-spacing: 0.3px;
+            font-size: 0.6875rem;
+            font-weight: var(--font-weight-light);
+            color: var(--color-brown-200);
+            letter-spacing: 0.03em;
+            margin-bottom: 0.25rem;
         }
         
         .info-value {
-            font-size: 14px;
-            font-weight: 500;
-            color: #1e293b;
+            font-size: 0.875rem;
+            font-weight: var(--font-weight-regular);
+            color: var(--color-brown-700);
+        }
+        
+        .avatar-initials {
+            width: 7rem;
+            height: 7rem;
+            background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: var(--font-weight-medium);
+            margin: 0 auto 1rem;
+            box-shadow: var(--shadow-sm);
         }
     </style>
 </head>
@@ -128,11 +111,22 @@
 
     <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
         
-        <div class="mb-6">
-            <h1 class="text-2xl md:text-3xl font-medium text-[#1e293b] mb-1">
-                <i class="fas fa-user-circle text-[#a8c49a] mr-3"></i>Patient Profile
-            </h1>
-            <p class="text-[#64748b] text-sm font-normal">View patient details and medical history</p>
+        <!-- Page Header matching theme -->
+        <div class="page-header mb-6">
+            <div class="page-header-left">
+                <div class="page-header-icon">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div>
+                    <h1 class="page-header-title">Patient Profile</h1>
+                    <p class="page-header-subtitle">View patient details and medical history</p>
+                </div>
+            </div>
+            <div class="page-header-actions">
+                <a href="patients.html" class="btn-secondary">
+                    <i class="fas fa-arrow-left mr-1"></i> Back to Patients
+                </a>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -140,53 +134,67 @@
             <!-- Left Column - Profile Info -->
             <div class="lg:col-span-1">
                 <div class="profile-card p-6 text-center">
-                    <div class="w-28 h-28 bg-gradient-to-r from-[#a8c49a] to-[#8aae7a] rounded-full flex items-center justify-center text-white text-3xl font-medium mx-auto mb-4 shadow-sm">
-                        JD
+                    <div class="avatar-initials" id="profileInitials">
+                        --
                     </div>
-                    <h2 class="text-xl font-semibold text-[#1e293b]" id="profileName">Loading...</h2>
-                    <p class="text-[#94a3b8] text-sm mt-1 font-normal" id="profileId">P-00000</p>
+                    <h2 class="text-lg font-medium text-brown-700" id="profileName">Loading...</h2>
+                    <p class="text-brown-100 text-xs mt-1 font-light" id="profileId">P-00000</p>
                     
-                    <div class="mt-5 space-y-3 text-left">
+                    <div class="mt-6 space-y-4 text-left">
                         <div class="flex items-center gap-3">
-                            <div class="w-8 text-[#a8c49a]"><i class="fas fa-venus-mars"></i></div>
+                            <div class="w-8 text-sage"><i class="fas fa-venus-mars"></i></div>
                             <div>
                                 <p class="info-label">Gender</p>
                                 <p class="info-value" id="profileGender">-</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-3">
-                            <div class="w-8 text-[#a8c49a]"><i class="fas fa-calendar"></i></div>
+                            <div class="w-8 text-sage"><i class="fas fa-calendar"></i></div>
+                            <div>
+                                <p class="info-label">Date of Birth</p>
+                                <p class="info-value" id="profileDob">-</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 text-sage"><i class="fas fa-birthday-cake"></i></div>
                             <div>
                                 <p class="info-label">Age</p>
                                 <p class="info-value" id="profileAge">-</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-3">
-                            <div class="w-8 text-[#a8c49a]"><i class="fas fa-tint"></i></div>
+                            <div class="w-8 text-sage"><i class="fas fa-tint"></i></div>
                             <div>
                                 <p class="info-label">Blood Group</p>
                                 <p class="info-value" id="profileBloodGroup">-</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-3">
-                            <div class="w-8 text-[#a8c49a]"><i class="fas fa-phone"></i></div>
+                            <div class="w-8 text-sage"><i class="fas fa-phone"></i></div>
                             <div>
                                 <p class="info-label">Phone</p>
                                 <p class="info-value" id="profilePhone">-</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-3">
-                            <div class="w-8 text-[#a8c49a]"><i class="fas fa-envelope"></i></div>
+                            <div class="w-8 text-sage"><i class="fas fa-envelope"></i></div>
                             <div>
                                 <p class="info-label">Email</p>
                                 <p class="info-value" id="profileEmail">-</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-3">
-                            <div class="w-8 text-[#a8c49a]"><i class="fas fa-map-marker-alt"></i></div>
+                            <div class="w-8 text-sage"><i class="fas fa-map-marker-alt"></i></div>
                             <div>
                                 <p class="info-label">Address</p>
                                 <p class="info-value" id="profileAddress">-</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 text-sage"><i class="fas fa-calendar-plus"></i></div>
+                            <div>
+                                <p class="info-label">Registered On</p>
+                                <p class="info-value" id="profileRegistered">-</p>
                             </div>
                         </div>
                     </div>
@@ -197,7 +205,7 @@
             <div class="lg:col-span-2">
                 <div class="info-card overflow-hidden">
                     <!-- Tabs -->
-                    <div class="border-b border-[#f0e8e0] px-4 pt-2">
+                    <div class="border-b border-default px-4 pt-3">
                         <div class="flex gap-1">
                             <button class="tab-btn active" data-tab="medical">
                                 <i class="fas fa-notes-medical mr-2"></i>Medical History
@@ -214,9 +222,9 @@
                     <!-- Medical History Tab -->
                     <div id="medicalTab" class="p-5">
                         <div id="medicalHistoryList" class="space-y-3">
-                            <div class="text-center py-8 text-[#94a3b8]">
-                                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
-                                <p class="font-normal">Loading medical history...</p>
+                            <div class="empty-state">
+                                <i class="fas fa-spinner fa-pulse"></i>
+                                <p>Loading medical history...</p>
                             </div>
                         </div>
                     </div>
@@ -224,9 +232,9 @@
                     <!-- Consultations Tab -->
                     <div id="consultationsTab" class="p-5 hidden">
                         <div id="consultationsList" class="space-y-3">
-                            <div class="text-center py-8 text-[#94a3b8]">
-                                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
-                                <p class="font-normal">Loading consultations...</p>
+                            <div class="empty-state">
+                                <i class="fas fa-spinner fa-pulse"></i>
+                                <p>Loading consultations...</p>
                             </div>
                         </div>
                     </div>
@@ -234,9 +242,9 @@
                     <!-- Prescriptions Tab -->
                     <div id="prescriptionsTab" class="p-5 hidden">
                         <div id="prescriptionsList" class="space-y-3">
-                            <div class="text-center py-8 text-[#94a3b8]">
-                                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
-                                <p class="font-normal">Loading prescriptions...</p>
+                            <div class="empty-state">
+                                <i class="fas fa-spinner fa-pulse"></i>
+                                <p>Loading prescriptions...</p>
                             </div>
                         </div>
                     </div>
@@ -247,5 +255,6 @@
 
     <script src="../../js/core/common.js"></script>
     <script src="patient-profile.js"></script>
+    
 </body>
 </html>

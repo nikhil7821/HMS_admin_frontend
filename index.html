@@ -4,185 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Dashboard | MedFlow HMS</title>
-    <!-- Google Fonts: Poppins Light + Regular + Medium -->
+    
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
-            background: #fffdf9;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            font-weight: 400;
-        }
-        
-        .bg-subtle {
-            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
-        }
-        
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f0ebe4;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #d4c9bc;
-            border-radius: 10px;
-        }
-        
-        .stat-card {
-            transition: all 0.25s ease;
-            border-radius: 20px;
-            background: #ffffff;
-            border: 1px solid #f0e8e0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
-            border-color: #e8dcd0;
-        }
-        
-        .stat-icon-bg {
-            background: #faf7f2;
-            border-radius: 14px;
-        }
-        
-        h1 {
-            font-size: 1.5rem;
-            font-weight: 500;
-            color: #1e293b;
-            letter-spacing: -0.3px;
-        }
-        
-        .stat-card p:first-child {
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-        
-        .stat-card .text-2xl {
-            font-weight: 500;
-        }
-        
-        .data-table th {
-            font-weight: 500;
-            text-transform: uppercase;
-            font-size: 0.65rem;
-            letter-spacing: 0.8px;
-            color: #c2b5a8;
-        }
-        
-        .appointment-row {
-            transition: background 0.2s ease;
-            border-bottom: 1px solid #f5f0ea;
-        }
-        
-        .appointment-row:hover {
-            background-color: #fefcf9;
-        }
-        
-        p, span, div, a {
-            font-weight: 400;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
-            transition: all 0.2s ease;
-            border: none;
-            cursor: pointer;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 13px;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
-            transform: translateY(-1px);
-        }
-        
-        .btn-secondary {
-            background: #f1f5f9;
-            color: #334155;
-            transition: all 0.2s ease;
-            border: none;
-            cursor: pointer;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 13px;
-        }
-        
-        .btn-secondary:hover {
-            background: #e2e8f0;
-        }
-        
-        .status-badge-completed {
-            background: #dcfce7;
-            color: #16a34a;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 500;
-            display: inline-block;
-        }
-        
-        .status-badge-progress {
-            background: #fef5e8;
-            color: #f59e0b;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 500;
-            display: inline-block;
-        }
-        
-        .status-badge-scheduled {
-            background: #e0f2fe;
-            color: #0284c7;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 500;
-            display: inline-block;
-        }
-        
-        .quick-action-btn {
-            transition: all 0.2s ease;
-        }
-        
-        .quick-action-btn:active {
-            transform: scale(0.97);
-        }
-        
-        .welcome-banner {
-            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
-            border-radius: 20px;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.85; }
-        }
-        
-        .live-badge {
-            animation: pulse 2s ease-in-out infinite;
-        }
-    </style>
+    
+    <!-- CENTRALIZED THEME CSS -->
+    <link rel="stylesheet" href="css/theme.css">
+    
 </head>
 <body class="bg-subtle">
 
@@ -192,24 +26,21 @@
     <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
         
         <!-- Welcome Banner -->
-        <div class="welcome-banner relative p-6 mb-8 shadow-sm overflow-hidden">
-            <div class="absolute top-0 right-0 opacity-5">
-                <i class="fas fa-heartbeat text-7xl -mr-4 -mt-4 text-white"></i>
-            </div>
+        <div class="welcome-banner p-6 mb-8 relative">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center relative z-10">
                 <div>
-                    <h1 class="text-xl md:text-2xl font-medium text-white mb-1" id="welcomeMessage">
+                    <h1 class="text-2xl md:text-3xl font-semibold mb-2 banner-greeting" id="welcomeMessage">
                         <i class="fas fa-spinner fa-pulse mr-2"></i> Loading...
                     </h1>
-                    <div class="flex items-center gap-2 text-white/80 text-xs font-light">
+                    <div class="flex items-center gap-2 text-sm">
                         <i class="fas fa-calendar-week"></i>
-                        <span id="currentDateTime"></span>
+                        <span id="currentDateTime">--</span>
                     </div>
                 </div>
-                <div class="mt-4 md:mt-0 bg-white/12 backdrop-blur-sm rounded-xl px-4 py-1.5 border border-white/15">
+                <div class="mt-4 md:mt-0 bg-white/20 backdrop-blur-md rounded-xl px-5 py-2.5 border border-white/30 shadow-sm">
                     <div class="flex items-center gap-2">
-                        <i class="fas fa-chart-line text-white/80 text-sm"></i>
-                        <span class="text-xs font-light text-white/90 live-badge">Live · <span id="liveTimestamp">Just now</span></span>
+                        <i class="fas fa-chart-line text-white text-sm"></i>
+                        <span class="text-sm font-medium text-white live-badge">Live · <span id="liveTimestamp">Just now</span></span>
                     </div>
                 </div>
             </div>
@@ -271,7 +102,7 @@
         </div>
 
         <!-- Quick Actions -->
-        <div class="bg-white rounded-2xl shadow-sm border border-[#f0e8e0] p-5 mb-8">
+        <div class="quick-actions-container p-5 mb-8">
             <div class="flex items-center gap-2 mb-4">
                 <i class="fas fa-bolt text-[#a8c49a] text-base"></i>
                 <h2 class="text-base font-medium text-[#1e293b]">Quick Actions</h2>
@@ -323,7 +154,7 @@
                     <tbody id="appointmentsTable">
                         <tr><td colspan="5" class="text-center py-12 text-[#94a3b8]"><i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i><p class="font-normal">Loading appointments...</p> </td></tr>
                     </tbody>
-                <table>
+                </table>
             </div>
         </div>
     </main>

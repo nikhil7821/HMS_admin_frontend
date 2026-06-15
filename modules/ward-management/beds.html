@@ -4,88 +4,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Beds | Ward Management | MedFlow</title>
-    <!-- Google Fonts: Poppins Light + Regular + Medium -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- ✅ CENTRALIZED THEME CSS -->
+    <link rel="stylesheet" href="../../css/theme.css">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
-            background: #fffdf9;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            font-weight: 400;
-        }
-        
-        .bg-subtle {
-            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
-        }
-        
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f0ebe4;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #d4c9bc;
-            border-radius: 10px;
-        }
-        
-        .stat-card {
-            transition: all 0.25s ease;
-            border-radius: 16px;
-            background: #ffffff;
-            border: 1px solid #f0e8e0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
-            border-color: #e8dcd0;
-        }
-        
-        /* Bed Card - Smaller like doctor cards */
+        /* Additional page-specific styles that align with theme */
         .bed-card {
-            transition: all 0.25s ease;
-            border-radius: 14px;
-            background: #ffffff;
-            border: 1px solid #f0e8e0;
+            transition: var(--transition-base);
+            border-radius: var(--radius-lg);
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
             overflow: hidden;
         }
         
         .bed-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.08);
-            border-color: #e0d4c8;
+            box-shadow: var(--shadow-md);
+            border-color: var(--color-sage-pale);
         }
         
+        /* Status badges */
+        .status-available {
+            background: var(--color-success-bg);
+            color: var(--color-success-text);
+            padding: 0.2rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6875rem;
+            font-weight: var(--font-weight-medium);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .status-occupied {
+            background: var(--color-error-bg);
+            color: var(--color-error-text);
+            padding: 0.2rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6875rem;
+            font-weight: var(--font-weight-medium);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .status-maintenance {
+            background: var(--color-warning-bg);
+            color: var(--color-warning-text);
+            padding: 0.2rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6875rem;
+            font-weight: var(--font-weight-medium);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        /* Modal overlay styles matching theme.css */
         .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
+            inset: 0;
+            z-index: 50;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            background-color: var(--bg-overlay);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
             opacity: 0;
             visibility: hidden;
-            transition: all 0.25s ease;
+            transition: var(--transition-base);
         }
         
         .modal-overlay.active {
@@ -93,160 +91,55 @@
             visibility: visible;
         }
         
-        .modal-container {
-            position: relative;
-            width: 100%;
-            max-width: 550px;
-            margin: 0 20px;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 0px;
-            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            transform: scale(0.95);
-            transition: transform 0.25s ease;
-        }
-        
         .modal-overlay.active .modal-content {
             transform: scale(1);
         }
         
+        .modal-container {
+            width: 100%;
+            max-width: 550px;
+            margin: 1rem;
+        }
+        
+        .modal-content {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border-top: 4px solid var(--color-sage);
+            box-shadow: var(--shadow-lg);
+            transform: scale(0.96);
+            transition: var(--transition-base);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
         .modal-header {
-            padding: 18px 24px;
-            border-bottom: 1px solid #e2e8f0;
-            background: #f8fafc;
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border-default);
+            background-color: var(--bg-card);
         }
         
         .modal-header h2 {
-            font-size: 18px;
-            font-weight: 500;
-            color: #1e293b;
+            font-size: 1.0625rem;
+            font-weight: var(--font-weight-light);
+            color: var(--color-brown-700);
             margin: 0;
+            display: inline-block;
         }
         
         .modal-body {
-            padding: 24px;
-            max-height: 70vh;
+            padding: 1.25rem;
+            max-height: 60vh;
             overflow-y: auto;
         }
         
         .modal-footer {
-            padding: 16px 24px;
-            border-top: 1px solid #e2e8f0;
-            background: #f8fafc;
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--border-default);
+            background-color: var(--bg-subtle);
             display: flex;
             justify-content: flex-end;
-            gap: 12px;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
-            transition: all 0.2s ease;
-            border: none;
-            cursor: pointer;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 13px;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
-            transform: translateY(-1px);
-        }
-        
-        .btn-secondary {
-            border: 1px solid #cbd5e1;
-            background: white;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 13px;
-            color: #334155;
-        }
-        
-        .btn-secondary:hover {
-            background: #f8fafc;
-            border-color: #94a3b8;
-        }
-        
-        .btn-success {
-            background: #10b981;
-            transition: all 0.2s ease;
-            border: none;
-            cursor: pointer;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 13px;
-        }
-        
-        .btn-success:hover {
-            background: #059669;
-            transform: translateY(-1px);
-        }
-        
-        .btn-danger {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            transition: all 0.2s ease;
-            border: none;
-            cursor: pointer;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 13px;
-        }
-        
-        .btn-danger:hover {
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-            transform: translateY(-1px);
-        }
-        
-        .form-input, .form-select {
-            border-radius: 8px;
-            border: 1px solid #cbd5e1;
-            transition: all 0.2s ease;
-            background: #ffffff;
-            padding: 10px 14px;
-            width: 100%;
-            font-size: 13px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 400;
-        }
-        
-        .form-input:focus, .form-select:focus {
-            outline: none;
-            border-color: #a8c49a;
-            box-shadow: 0 0 0 3px rgba(168, 196, 154, 0.2);
-        }
-        
-        label {
-            font-size: 12px;
-            font-weight: 500;
-            color: #334155;
-            margin-bottom: 6px;
-            display: block;
-            letter-spacing: 0.3px;
-        }
-        
-        .close-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-            color: #94a3b8;
-            transition: color 0.2s;
-        }
-        
-        .close-btn:hover {
-            color: #64748b;
+            gap: 0.75rem;
         }
         
         .float-right {
@@ -259,81 +152,66 @@
             display: table;
         }
         
-        h1 {
-            font-size: 1.5rem;
-            font-weight: 500;
-            color: #1e293b;
-            letter-spacing: -0.3px;
+        .btn-success {
+            background-color: var(--color-sage);
+            color: white;
+            border: none;
         }
         
-        .stat-card p:first-child {
-            font-weight: 500;
-            letter-spacing: 0.5px;
+        .btn-success:hover {
+            background-color: var(--color-sage-dark);
+            transform: translateY(-1px);
         }
         
-        .stat-card .text-3xl {
-            font-weight: 500;
+        .btn-danger {
+            background-color: var(--color-warm-tan);
+            color: white;
+            border: none;
         }
         
-        .stat-icon-bg {
-            background: #faf7f2;
-            border-radius: 14px;
+        .btn-danger:hover {
+            background-color: var(--color-warm-tan-dark);
+            transform: translateY(-1px);
         }
         
-        .error-text {
-            color: #ef4444;
-            font-size: 11px;
-            margin-top: 4px;
-            display: none;
+        .border-l-blue-500 {
+            border-left-color: #3b82f6 !important;
         }
         
-        .error-text.show {
-            display: block;
+        .border-l-green-500 {
+            border-left-color: var(--color-success-text) !important;
         }
         
-        .form-input.error, .form-select.error {
-            border-color: #ef4444;
-            background-color: #fef2f2;
+        .border-l-purple-500 {
+            border-left-color: #9333ea !important;
         }
         
-        p, span, div, a {
-            font-weight: 400;
+        .border-l-orange-500 {
+            border-left-color: var(--color-warning-text) !important;
         }
         
-        .status-available {
-            background: #dcfce7;
-            color: #16a34a;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.6rem;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
+        .grid-beds {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 1rem;
         }
         
-        .status-occupied {
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.6rem;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
+        @media (min-width: 768px) {
+            .grid-beds {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
         
-        .status-maintenance {
-            background: #fef5e8;
-            color: #f59e0b;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.6rem;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
+        @media (min-width: 1024px) {
+            .grid-beds {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (min-width: 1280px) {
+            .grid-beds {
+                grid-template-columns: repeat(4, 1fr);
+            }
         }
     </style>
 </head>
@@ -344,92 +222,105 @@
 
     <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
         
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-            <div>
-                <h1 class="text-2xl md:text-3xl font-medium text-[#1e293b] mb-1">
-                    <i class="fas fa-bed text-[#a8c49a] mr-3"></i>Bed Management
-                </h1>
-                <p class="text-[#64748b] text-sm font-normal">Manage individual beds, allocations, and availability</p>
+        <!-- Page Header matching theme -->
+        <div class="page-header mb-6">
+            <div class="page-header-left">
+                <div class="page-header-icon">
+                    <i class="fas fa-bed"></i>
+                </div>
+                <div>
+                    <h1 class="page-header-title">Bed Management</h1>
+                    <p class="page-header-subtitle">Manage individual beds, allocations, and availability</p>
+                </div>
             </div>
-            <button id="addBedBtn" class="btn-primary flex items-center gap-2 shadow-sm transition-all">
-                <i class="fas fa-plus text-sm"></i>
-                <span class="text-sm">Add Bed</span>
-            </button>
+            <div class="page-header-actions">
+                <button id="addBedBtn" class="btn-primary">
+                    <i class="fas fa-plus text-sm"></i>
+                    <span>Add Bed</span>
+                </button>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-            <div class="stat-card p-5 border-l-4 border-l-blue-500">
+        <!-- Stats Cards using theme classes -->
+        <div class="grid-stats mb-8">
+            <div class="stat-card" style="border-left: 4px solid #3b82f6;">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Total Wards</p>
-                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="totalWards">0</p>
+                        <p class="stat-label">Total Wards</p>
+                        <p class="stat-value" id="totalWards">0</p>
                     </div>
-                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
-                        <i class="fas fa-building text-[#a8c49a] text-lg"></i>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-building text-sage text-lg"></i>
                     </div>
                 </div>
             </div>
-            <div class="stat-card p-5 border-l-4 border-l-green-500">
+            
+            <div class="stat-card" style="border-left: 4px solid var(--color-success-text);">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Total Rooms</p>
-                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="totalRooms">0</p>
+                        <p class="stat-label">Total Rooms</p>
+                        <p class="stat-value" id="totalRooms">0</p>
                     </div>
-                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
-                        <i class="fas fa-door-open text-[#a8c49a] text-lg"></i>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-door-open text-sage text-lg"></i>
                     </div>
                 </div>
             </div>
-            <div class="stat-card p-5 border-l-4 border-l-purple-500">
+            
+            <div class="stat-card" style="border-left: 4px solid #9333ea;">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Total Beds</p>
-                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="totalBeds">0</p>
+                        <p class="stat-label">Total Beds</p>
+                        <p class="stat-value" id="totalBeds">0</p>
                     </div>
-                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
-                        <i class="fas fa-bed text-[#a8c49a] text-lg"></i>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-bed text-sage text-lg"></i>
                     </div>
                 </div>
             </div>
-            <div class="stat-card p-5 border-l-4 border-l-orange-500">
+            
+            <div class="stat-card" style="border-left: 4px solid var(--color-warning-text);">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-[#64748b] text-xs font-medium uppercase tracking-wide">Available Beds</p>
-                        <p class="text-3xl font-medium text-[#1e293b] mt-1" id="availableBeds">0</p>
+                        <p class="stat-label">Available Beds</p>
+                        <p class="stat-value" id="availableBeds">0</p>
                     </div>
-                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
-                        <i class="fas fa-bed-pulse text-[#a8c49a] text-lg"></i>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-bed-pulse text-sage text-lg"></i>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Filters -->
-        <div class="bg-white rounded-2xl p-4 mb-6 border border-[#f0e8e0]">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                <select id="wardFilter" class="px-4 py-2 border border-[#e2e8f0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#a8c49a] bg-white text-sm font-normal">
-                    <option value="">All Wards</option>
-                </select>
-                <select id="roomFilter" class="px-4 py-2 border border-[#e2e8f0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#a8c49a] bg-white text-sm font-normal">
-                    <option value="">All Rooms</option>
-                </select>
-                <select id="statusFilter" class="px-4 py-2 border border-[#e2e8f0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#a8c49a] bg-white text-sm font-normal">
-                    <option value="">All Status</option>
-                    <option value="Available">Available</option>
-                    <option value="Occupied">Occupied</option>
-                    <option value="Maintenance">Maintenance</option>
-                </select>
-                <button id="resetFilter" class="px-4 py-2 border border-[#e2e8f0] rounded-xl hover:bg-[#f8fafc] transition text-sm font-medium">
-                    <i class="fas fa-undo-alt mr-2"></i> Reset
-                </button>
-            </div>
+        <div class="filter-bar">
+            <select id="wardFilter" class="form-select w-auto min-w-[160px]">
+                <option value="">All Wards</option>
+            </select>
+            <select id="roomFilter" class="form-select w-auto min-w-[160px]">
+                <option value="">All Rooms</option>
+            </select>
+            <select id="statusFilter" class="form-select w-auto min-w-[140px]">
+                <option value="">All Status</option>
+                <option value="Available">Available</option>
+                <option value="Occupied">Occupied</option>
+                <option value="Maintenance">Maintenance</option>
+            </select>
+            <button id="resetFilter" class="btn-secondary">
+                <i class="fas fa-undo-alt mr-1"></i> Reset
+            </button>
         </div>
 
         <!-- Beds Grid -->
-        <div id="bedsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+        <div id="bedsGrid" class="grid-beds">
+            <div class="col-span-full text-center py-12 text-brown-100">
+                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
+                <p class="font-light">Loading beds...</p>
+            </div>
+        </div>
     </main>
 
-    <!-- Add/Edit Bed Modal -->
+    <!-- Add/Edit Bed Modal - Matching theme.css structure -->
     <div id="bedModal" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-content">
@@ -443,27 +334,27 @@
                 <form id="bedForm">
                     <input type="hidden" id="bedId">
                     <div class="modal-body">
-                        <div class="mb-4">
-                            <label>Select Ward *</label>
+                        <div class="form-group">
+                            <label class="form-label">Select Ward *</label>
                             <select id="wardId" required class="form-select">
                                 <option value="">-- Select Ward --</option>
                             </select>
                             <div class="error-text" id="wardIdError">Please select a ward</div>
                         </div>
-                        <div class="mb-4">
-                            <label>Select Room *</label>
+                        <div class="form-group">
+                            <label class="form-label">Select Room *</label>
                             <select id="roomId" required class="form-select">
                                 <option value="">-- Select Room --</option>
                             </select>
                             <div class="error-text" id="roomIdError">Please select a room</div>
                         </div>
-                        <div class="mb-4">
-                            <label>Bed Number *</label>
+                        <div class="form-group">
+                            <label class="form-label">Bed Number *</label>
                             <input type="text" id="bedNumber" required class="form-input" placeholder="e.g., 101A, 201B">
                             <div class="error-text" id="bedNumberError">Bed number is required</div>
                         </div>
-                        <div class="mb-4">
-                            <label>Bed Type</label>
+                        <div class="form-group">
+                            <label class="form-label">Bed Type</label>
                             <select id="bedType" class="form-select">
                                 <option value="Standard">Standard</option>
                                 <option value="ICU">ICU</option>
@@ -472,8 +363,8 @@
                                 <option value="Maternity">Maternity</option>
                             </select>
                         </div>
-                        <div class="mb-4">
-                            <label>Status *</label>
+                        <div class="form-group">
+                            <label class="form-label">Status *</label>
                             <select id="status" required class="form-select">
                                 <option value="Available">Available</option>
                                 <option value="Occupied">Occupied</option>
@@ -481,21 +372,23 @@
                             </select>
                             <div class="error-text" id="statusError">Please select a status</div>
                         </div>
-                        <div class="mb-4">
-                            <label>Features / Amenities</label>
-                            <textarea id="features" rows="2" class="form-input" placeholder="Oxygen supply, Monitor, Side rails, Call bell, etc."></textarea>
+                        <div class="form-group">
+                            <label class="form-label">Features / Amenities</label>
+                            <textarea id="features" rows="3" class="form-textarea" placeholder="Oxygen supply, Monitor, Side rails, Call bell, etc."></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
-                        <button type="submit" class="btn-primary">Save Bed</button>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save mr-1"></i> Save Bed
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Allocate Patient Modal -->
+    <!-- Allocate Patient Modal - Matching theme.css structure -->
     <div id="allocateModal" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-content">
@@ -509,15 +402,15 @@
                 <form id="allocateForm">
                     <input type="hidden" id="allocateBedId">
                     <div class="modal-body">
-                        <div class="mb-4">
-                            <label>Select Patient *</label>
+                        <div class="form-group">
+                            <label class="form-label">Select Patient *</label>
                             <select id="patientId" required class="form-select">
                                 <option value="">-- Select Patient --</option>
                             </select>
                             <div class="error-text" id="patientIdError">Please select a patient</div>
                         </div>
-                        <div class="mb-4">
-                            <label>Admission Type</label>
+                        <div class="form-group">
+                            <label class="form-label">Admission Type</label>
                             <select id="admissionType" class="form-select">
                                 <option value="Emergency">Emergency</option>
                                 <option value="Elective">Elective</option>
@@ -527,14 +420,16 @@
                     </div>
                     <div class="modal-footer justify-center gap-3">
                         <button type="button" id="cancelAllocateModalBtn" class="btn-secondary">Cancel</button>
-                        <button type="submit" class="btn-success">Allocate Bed</button>
+                        <button type="submit" class="btn-success">
+                            <i class="fas fa-check-circle mr-1"></i> Allocate Bed
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
+    <!-- Delete Confirmation Modal - Matching theme.css structure -->
     <div id="deleteModal" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-content">
@@ -546,21 +441,25 @@
                     <div class="clearfix"></div>
                 </div>
                 <div class="modal-body text-center">
-                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-trash-alt text-red-500 text-2xl"></i>
+                    <div class="w-16 h-16 bg-error-bg rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-trash-alt text-error-text text-2xl"></i>
                     </div>
-                    <h3 class="text-lg font-medium text-[#1e293b] mb-2">Delete Bed?</h3>
-                    <p class="text-[#64748b] text-sm font-normal">This action cannot be undone. This bed record will be permanently removed.</p>
+                    <h3 class="text-base font-medium text-brown-700 mb-2">Delete Bed?</h3>
+                    <p class="text-brown-300 text-sm font-light">This action cannot be undone. This bed record will be permanently removed.</p>
                 </div>
                 <div class="modal-footer justify-center gap-3">
                     <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
-                    <button id="confirmDeleteBtn" class="btn-danger">Delete</button>
+                    <button id="confirmDeleteBtn" class="btn-danger">
+                        <i class="fas fa-trash-alt mr-1"></i> Delete
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="../../js/core/common.js"></script>
+    <script src="../../js/core/form-validation.js"></script>
     <script src="beds.js"></script>
+    
 </body>
 </html>

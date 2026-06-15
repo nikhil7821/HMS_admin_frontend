@@ -4,150 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Doctor Performance | Reports | MedFlow</title>
-    <!-- Google Fonts: Poppins (matching dashboard) -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- ✅ CENTRALIZED THEME CSS -->
+    <link rel="stylesheet" href="../../css/theme.css">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
-            background: #fffdf9;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            font-weight: 400;
-        }
-        
-        /* Subtle background pattern */
-        .bg-subtle {
-            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f0ebe4;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #d4c9bc;
-            border-radius: 10px;
-        }
-        
-        /* Card Styles */
-        .stat-card {
-            transition: all 0.25s ease;
-            border-radius: 16px;
-            background: #ffffff;
-            border: 1px solid #f0e8e0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
-        }
-        
-        .content-card {
-            transition: all 0.25s ease;
-            border-radius: 16px;
-            background: #ffffff;
-            border: 1px solid #f0e8e0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-        }
-        
-        .filter-card {
-            transition: all 0.25s ease;
-            border-radius: 16px;
-            background: #ffffff;
-            border: 1px solid #f0e8e0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-        }
-        
-        /* Button Styles */
-        .btn-primary {
-            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
-            transition: all 0.2s ease;
-            border-radius: 12px;
-            font-weight: 500;
-            letter-spacing: 0.3px;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
-            transform: translateY(-1px);
-        }
-        
-        .btn-secondary {
-            border: 1px solid #efe6dc;
-            background: white;
-            transition: all 0.2s ease;
-            border-radius: 12px;
-            font-weight: 500;
-        }
-        
-        .btn-secondary:hover {
-            background: #fefcf9;
-            border-color: #e0d4c8;
-        }
-        
-        /* Filter inputs */
-        .filter-input, .filter-select {
-            border-radius: 12px;
-            border: 1px solid #efe6dc;
-            padding: 0.625rem 1rem;
-            font-size: 0.875rem;
-            font-family: 'Poppins', system-ui, sans-serif;
-            width: 100%;
-        }
-        
-        .filter-input:focus, .filter-select:focus {
-            outline: none;
-            border-color: #b5cfaa;
-            box-shadow: 0 0 0 3px rgba(155, 184, 139, 0.06);
-        }
-        
-        /* Rating stars */
+        /* Additional page-specific styles that align with theme */
         .rating-star {
-            color: #d4a853;
-            font-size: 0.75rem;
+            color: var(--color-gold);
+            font-size: 0.6875rem;
         }
         
         .rating-star-empty {
-            color: #e8e0d8;
-            font-size: 0.75rem;
+            color: var(--border-default);
+            font-size: 0.6875rem;
         }
         
-        /* Table styles */
-        .data-table th {
-            font-weight: 500;
-            text-transform: uppercase;
-            font-size: 0.65rem;
-            letter-spacing: 0.8px;
-            color: #c2b5a8;
+        .chart-container {
+            position: relative;
+            height: 280px;
+            width: 100%;
         }
         
-        .dashboard-table-row {
-            transition: background 0.2s ease;
-            border-bottom: 1px solid #f5f0ea;
+        .border-l-sage {
+            border-left-color: var(--color-sage) !important;
         }
         
-        .dashboard-table-row:hover {
-            background-color: #fefcf9;
+        .border-l-sage-dark {
+            border-left-color: var(--color-sage-dark) !important;
         }
         
-        /* Print styles */
+        .border-l-gold {
+            border-left-color: var(--color-gold) !important;
+        }
+        
+        .border-l-tan {
+            border-left-color: var(--color-warm-tan) !important;
+        }
+        
         @media print {
             body * {
                 visibility: hidden;
@@ -170,13 +76,6 @@
                 page-break-inside: avoid;
             }
         }
-        
-        /* Chart container */
-        .chart-container {
-            position: relative;
-            height: 350px;
-            width: 100%;
-        }
     </style>
 </head>
 <body class="bg-subtle">
@@ -185,61 +84,96 @@
     <div id="header-container"></div>
 
     <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
-        <!-- Page Header -->
-        <div class="mb-6">
-            <h1 class="text-xl md:text-2xl font-medium tracking-tight text-[#5a4a3a]">
-                <i class="fas fa-chart-simple text-[#a8c49a] mr-2"></i>Doctor Performance
-            </h1>
-            <p class="text-[#b8aa9a] text-sm mt-1 font-light">Track doctor-wise consultations, revenue, and patient feedback</p>
-        </div>
-
-        <!-- Date Filter -->
-        <div class="filter-card p-4 mb-6">
-            <div class="flex flex-wrap items-end gap-3">
-                <div class="w-full md:w-auto">
-                    <label class="block text-xs font-medium text-[#b8aa9a] mb-1">From Date</label>
-                    <input type="date" id="fromDate" class="filter-input w-auto">
+        
+        <!-- Page Header matching theme -->
+        <div class="page-header mb-6">
+            <div class="page-header-left">
+                <div class="page-header-icon">
+                    <i class="fas fa-chart-simple"></i>
                 </div>
-                <div class="w-full md:w-auto">
-                    <label class="block text-xs font-medium text-[#b8aa9a] mb-1">To Date</label>
-                    <input type="date" id="toDate" class="filter-input w-auto">
+                <div>
+                    <h1 class="page-header-title">Doctor Performance</h1>
+                    <p class="page-header-subtitle">Track doctor-wise consultations, revenue, and patient feedback</p>
                 </div>
-                <button id="applyFilter" class="btn-primary text-white px-5 py-2 rounded-xl text-sm font-medium transition">
-                    <i class="fas fa-search mr-1"></i> Apply
-                </button>
-                <button id="printReport" class="btn-secondary px-5 py-2 rounded-xl text-[#b8aa9a] text-sm font-medium transition">
-                    <i class="fas fa-print mr-1"></i> Print
-                </button>
-                <button id="resetFilter" class="btn-secondary px-5 py-2 rounded-xl text-[#b8aa9a] text-sm font-medium transition">
-                    <i class="fas fa-undo-alt mr-1"></i> Reset
-                </button>
             </div>
         </div>
 
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div class="stat-card p-4 border-l-4 border-[#a8c49a]">
-                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">Total Doctors</p>
-                <p class="text-2xl font-medium text-[#5a4a3a] mt-1" id="totalDoctors">0</p>
+        <!-- Filter Bar using theme classes -->
+        <div class="filter-bar">
+            <div>
+                <label class="form-label text-xs mb-1">From Date</label>
+                <input type="date" id="fromDate" class="form-input w-auto min-w-[160px]">
             </div>
-            <div class="stat-card p-4 border-l-4 border-[#8aae7a]">
-                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">Total Consultations</p>
-                <p class="text-2xl font-medium text-[#8aae7a] mt-1" id="totalConsultations">0</p>
+            <div>
+                <label class="form-label text-xs mb-1">To Date</label>
+                <input type="date" id="toDate" class="form-input w-auto min-w-[160px]">
             </div>
-            <div class="stat-card p-4 border-l-4 border-[#d4a853]">
-                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">Total Revenue</p>
-                <p class="text-2xl font-medium text-[#d4a853] mt-1" id="doctorRevenue">₹0</p>
+            <button id="applyFilter" class="btn-primary">
+                <i class="fas fa-search mr-1"></i> Apply
+            </button>
+            <button id="printReport" class="btn-secondary">
+                <i class="fas fa-print mr-1"></i> Print
+            </button>
+            <button id="resetFilter" class="btn-secondary">
+                <i class="fas fa-undo-alt mr-1"></i> Reset
+            </button>
+        </div>
+
+        <!-- Stats Cards using theme classes -->
+        <div class="grid-stats mb-8">
+            <div class="stat-card" style="border-left: 4px solid var(--color-sage);">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="stat-label">Total Doctors</p>
+                        <p class="stat-value" id="totalDoctors">0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-user-md text-sage text-lg"></i>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card p-4 border-l-4 border-[#b8aa9a]">
-                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">Avg per Doctor</p>
-                <p class="text-2xl font-medium text-[#b8aa9a] mt-1" id="avgPerDoctor">₹0</p>
+            
+            <div class="stat-card" style="border-left: 4px solid var(--color-sage-dark);">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="stat-label">Total Consultations</p>
+                        <p class="stat-value text-sage-dark" id="totalConsultations">0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-stethoscope text-sage text-lg"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card" style="border-left: 4px solid var(--color-gold);">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="stat-label">Total Revenue</p>
+                        <p class="stat-value text-gold" id="doctorRevenue">₹0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-rupee-sign text-sage text-lg"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card" style="border-left: 4px solid var(--color-warm-tan);">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="stat-label">Avg per Doctor</p>
+                        <p class="stat-value text-tan" id="avgPerDoctor">₹0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-chart-line text-sage text-lg"></i>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Chart Card -->
-        <div class="content-card p-4 mb-6">
-            <h3 class="font-medium text-[#5a4a3a] text-sm mb-4">
-                <i class="fas fa-chart-bar text-[#a8c49a] mr-2"></i>Consultations by Doctor
+        <div class="card-white p-4 mb-6">
+            <h3 class="section-title text-sm mb-4">
+                <i class="fas fa-chart-bar text-sage"></i> Consultations by Doctor
             </h3>
             <div class="chart-container">
                 <canvas id="doctorChart"></canvas>
@@ -247,14 +181,16 @@
         </div>
 
         <!-- Doctor-wise Breakdown Table -->
-        <div class="content-card p-4">
-            <h3 class="font-medium text-[#5a4a3a] text-sm mb-4">
-                <i class="fas fa-table-list text-[#a8c49a] mr-2"></i>Doctor-wise Breakdown
-            </h3>
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-[#fefcf9] border-b border-[#f0e8e0]">
-                        <tr class="text-left data-table">
+        <div class="card-white overflow-hidden">
+            <div class="px-5 py-3 border-b border-default">
+                <h3 class="section-title text-sm mb-0">
+                    <i class="fas fa-table-list text-sage"></i> Doctor-wise Breakdown
+                </h3>
+            </div>
+            <div class="table-wrapper">
+                <table class="data-table w-full">
+                    <thead>
+                        <tr>
                             <th class="px-4 py-3">Doctor Name</th>
                             <th class="px-4 py-3">Specialization</th>
                             <th class="px-4 py-3 text-center">Consultations</th>
@@ -262,7 +198,14 @@
                             <th class="px-4 py-3 text-center">Avg Rating</th>
                         </tr>
                     </thead>
-                    <tbody id="doctorTable"></tbody>
+                    <tbody id="doctorTable">
+                        <tr>
+                            <td colspan="5" class="text-center py-12 text-brown-100">
+                                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
+                                <p class="font-light">Loading data...</p>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -270,5 +213,6 @@
 
     <script src="../../js/core/common.js"></script>
     <script src="doctor-performance.js"></script>
+    
 </body>
 </html>

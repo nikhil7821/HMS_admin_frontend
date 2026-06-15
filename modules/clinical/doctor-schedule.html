@@ -4,73 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Doctor Schedule | Clinical | MedFlow</title>
-    <!-- Google Fonts: Poppins Light + Regular + Medium -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- ✅ CENTRALIZED THEME CSS -->
+    <link rel="stylesheet" href="../../css/theme.css">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* Additional page-specific styles that align with theme */
+        .schedule-row {
+            transition: var(--transition-base);
+            border-bottom: 1px solid var(--border-default);
         }
         
-        body {
-            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
-            background: #fffdf9;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            font-weight: 400;
+        .schedule-row:hover {
+            background-color: var(--bg-subtle);
         }
         
-        .bg-subtle {
-            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
+        .day-badge {
+            background: var(--bg-muted);
+            color: var(--color-brown-600);
+            padding: 0.2rem 0.75rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6875rem;
+            font-weight: var(--font-weight-medium);
+            display: inline-block;
         }
         
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f0ebe4;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #d4c9bc;
-            border-radius: 10px;
-        }
-        
-        .stat-card {
-            transition: all 0.25s ease;
-            border-radius: 16px;
-            background: #ffffff;
-            border: 1px solid #f0e8e0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
-            border-color: #e8dcd0;
-        }
-        
+        /* Modal overlay styles matching theme.css */
         .modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
+            inset: 0;
+            z-index: 50;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            background-color: var(--bg-overlay);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
             opacity: 0;
             visibility: hidden;
-            transition: all 0.25s ease;
+            transition: var(--transition-base);
         }
         
         .modal-overlay.active {
@@ -78,126 +59,55 @@
             visibility: visible;
         }
         
-        .modal-container {
-            position: relative;
-            width: 100%;
-            max-width: 500px;
-            margin: 0 20px;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 0px;
-            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            transform: scale(0.95);
-            transition: transform 0.25s ease;
-        }
-        
         .modal-overlay.active .modal-content {
             transform: scale(1);
         }
         
+        .modal-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 1rem;
+        }
+        
+        .modal-content {
+            background-color: var(--bg-card);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border-top: 4px solid var(--color-sage);
+            box-shadow: var(--shadow-lg);
+            transform: scale(0.96);
+            transition: var(--transition-base);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
         .modal-header {
-            padding: 18px 24px;
-            border-bottom: 1px solid #e2e8f0;
-            background: #f8fafc;
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border-default);
+            background-color: var(--bg-card);
         }
         
         .modal-header h2 {
-            font-size: 18px;
-            font-weight: 500;
-            color: #1e293b;
+            font-size: 1.0625rem;
+            font-weight: var(--font-weight-light);
+            color: var(--color-brown-700);
             margin: 0;
+            display: inline-block;
         }
         
         .modal-body {
-            padding: 24px;
-            max-height: 70vh;
+            padding: 1.25rem;
+            max-height: 60vh;
             overflow-y: auto;
         }
         
         .modal-footer {
-            padding: 16px 24px;
-            border-top: 1px solid #e2e8f0;
-            background: #f8fafc;
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--border-default);
+            background-color: var(--bg-subtle);
             display: flex;
             justify-content: flex-end;
-            gap: 12px;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
-            transition: all 0.2s ease;
-            border: none;
-            cursor: pointer;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 13px;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
-            transform: translateY(-1px);
-        }
-        
-        .btn-secondary {
-            border: 1px solid #cbd5e1;
-            background: white;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 13px;
-            color: #334155;
-        }
-        
-        .btn-secondary:hover {
-            background: #f8fafc;
-            border-color: #94a3b8;
-        }
-        
-        .form-input, .form-select {
-            border-radius: 8px;
-            border: 1px solid #cbd5e1;
-            transition: all 0.2s ease;
-            background: #ffffff;
-            padding: 10px 14px;
-            width: 100%;
-            font-size: 13px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 400;
-        }
-        
-        .form-input:focus, .form-select:focus {
-            outline: none;
-            border-color: #a8c49a;
-            box-shadow: 0 0 0 3px rgba(168, 196, 154, 0.2);
-        }
-        
-        label {
-            font-size: 12px;
-            font-weight: 500;
-            color: #334155;
-            margin-bottom: 6px;
-            display: block;
-            letter-spacing: 0.3px;
-        }
-        
-        .close-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-            color: #94a3b8;
-            transition: color 0.2s;
-        }
-        
-        .close-btn:hover {
-            color: #64748b;
+            gap: 0.75rem;
         }
         
         .float-right {
@@ -209,58 +119,6 @@
             clear: both;
             display: table;
         }
-        
-        h1 {
-            font-size: 1.5rem;
-            font-weight: 500;
-            color: #1e293b;
-            letter-spacing: -0.3px;
-        }
-        
-        .stat-card p:first-child {
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-        
-        .stat-card .text-2xl {
-            font-weight: 500;
-        }
-        
-        .stat-icon-bg {
-            background: #faf7f2;
-            border-radius: 14px;
-        }
-        
-        .data-table th {
-            font-weight: 500;
-            text-transform: uppercase;
-            font-size: 0.65rem;
-            letter-spacing: 0.8px;
-            color: #c2b5a8;
-        }
-        
-        .schedule-row {
-            transition: background 0.2s ease;
-            border-bottom: 1px solid #f5f0ea;
-        }
-        
-        .schedule-row:hover {
-            background-color: #fefcf9;
-        }
-        
-        p, span, div, a {
-            font-weight: 400;
-        }
-        
-        .day-badge {
-            background: #f1f5f9;
-            color: #475569;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 500;
-            display: inline-block;
-        }
     </style>
 </head>
 <body class="bg-subtle">
@@ -270,41 +128,53 @@
 
     <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
         
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-            <div>
-                <h1 class="text-2xl md:text-3xl font-medium text-[#1e293b] mb-1">
-                    <i class="fas fa-calendar-alt text-[#a8c49a] mr-3"></i>Doctor Schedule
-                </h1>
-                <p class="text-[#64748b] text-sm font-normal">Manage doctor availability & timings</p>
+        <!-- Page Header matching theme -->
+        <div class="page-header mb-6">
+            <div class="page-header-left">
+                <div class="page-header-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div>
+                    <h1 class="page-header-title">Doctor Schedule</h1>
+                    <p class="page-header-subtitle">Manage doctor availability & timings</p>
+                </div>
             </div>
-            <button id="addScheduleBtn" class="btn-primary flex items-center gap-2 shadow-sm transition-all">
-                <i class="fas fa-plus text-sm"></i>
-                <span class="text-sm">Add Schedule</span>
-            </button>
+            <div class="page-header-actions">
+                <button id="addScheduleBtn" class="btn-primary">
+                    <i class="fas fa-plus text-sm"></i>
+                    <span>Add Schedule</span>
+                </button>
+            </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-[#f0e8e0] overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-[#faf7f2] border-b border-[#f0e8e0]">
-                        <tr class="text-left data-table">
-                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Doctor</th>
-                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Day</th>
-                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Start Time</th>
-                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">End Time</th>
-                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider">Room</th>
-                            <th class="px-5 py-3 text-xs font-medium text-[#64748b] uppercase tracking-wider text-center">Actions</th>
+        <!-- Schedule Table -->
+        <div class="card-white overflow-hidden">
+            <div class="table-wrapper">
+                <table class="data-table w-full">
+                    <thead>
+                        <tr>
+                            <th class="px-5 py-3">Doctor</th>
+                            <th class="px-5 py-3">Day</th>
+                            <th class="px-5 py-3">Start Time</th>
+                            <th class="px-5 py-3">End Time</th>
+                            <th class="px-5 py-3">Room</th>
+                            <th class="px-5 py-3 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="scheduleTable">
-                        <tr><td colspan="6" class="text-center py-12 text-[#94a3b8]"><i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i><p class="font-normal">Loading schedules...</p> </td></tr>
+                        <tr>
+                            <td colspan="6" class="text-center py-12 text-brown-100">
+                                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
+                                <p class="font-light">Loading schedules...</p>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </main>
 
-    <!-- Add Schedule Modal -->
+    <!-- Add Schedule Modal - Matching theme.css structure -->
     <div id="scheduleModal" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-content">
@@ -317,14 +187,14 @@
                 </div>
                 <form id="scheduleForm">
                     <div class="modal-body">
-                        <div class="mb-4">
-                            <label>Select Doctor *</label>
+                        <div class="form-group">
+                            <label class="form-label">Select Doctor *</label>
                             <select id="doctorId" required class="form-select">
                                 <option value="">-- Select Doctor --</option>
                             </select>
                         </div>
-                        <div class="mb-4">
-                            <label>Day *</label>
+                        <div class="form-group">
+                            <label class="form-label">Day *</label>
                             <select id="day" required class="form-select">
                                 <option value="Monday">Monday</option>
                                 <option value="Tuesday">Tuesday</option>
@@ -335,29 +205,31 @@
                                 <option value="Sunday">Sunday</option>
                             </select>
                         </div>
-                        <div class="mb-4">
-                            <label>Start Time *</label>
+                        <div class="form-group">
+                            <label class="form-label">Start Time *</label>
                             <input type="time" id="startTime" required class="form-input">
                         </div>
-                        <div class="mb-4">
-                            <label>End Time *</label>
+                        <div class="form-group">
+                            <label class="form-label">End Time *</label>
                             <input type="time" id="endTime" required class="form-input">
                         </div>
-                        <div class="mb-4">
-                            <label>Room Number</label>
+                        <div class="form-group">
+                            <label class="form-label">Room Number</label>
                             <input type="text" id="room" class="form-input" placeholder="e.g., Room 101, Clinic A">
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" id="cancelScheduleModalBtn" class="btn-secondary">Cancel</button>
-                        <button type="submit" class="btn-primary">Save Schedule</button>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save mr-1"></i> Save Schedule
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
+    <!-- Delete Confirmation Modal - Matching theme.css structure -->
     <div id="deleteModal" class="modal-overlay">
         <div class="modal-container">
             <div class="modal-content">
@@ -369,21 +241,25 @@
                     <div class="clearfix"></div>
                 </div>
                 <div class="modal-body text-center">
-                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-trash-alt text-red-500 text-2xl"></i>
+                    <div class="w-16 h-16 bg-error-bg rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-trash-alt text-error-text text-2xl"></i>
                     </div>
-                    <h3 class="text-lg font-medium text-[#1e293b] mb-2">Delete Schedule?</h3>
-                    <p class="text-[#64748b] text-sm font-normal">This action cannot be undone. This schedule will be permanently removed.</p>
+                    <h3 class="text-base font-medium text-brown-700 mb-2">Delete Schedule?</h3>
+                    <p class="text-brown-300 text-sm font-light">This action cannot be undone. This schedule will be permanently removed.</p>
                 </div>
                 <div class="modal-footer justify-center gap-3">
                     <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
-                    <button id="confirmDeleteBtn" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg text-sm font-medium transition shadow-sm">Delete</button>
+                    <button id="confirmDeleteBtn" class="btn-danger">
+                        <i class="fas fa-trash-alt mr-1"></i> Delete
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="../../js/core/common.js"></script>
+    <script src="../../js/core/form-validation.js"></script>
     <script src="doctor-schedule.js"></script>
+    
 </body>
 </html>

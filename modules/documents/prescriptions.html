@@ -4,163 +4,149 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Prescriptions | Documents | MedFlow</title>
-    <!-- Google Fonts: Poppins (matching dashboard) -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- ✅ CENTRALIZED THEME CSS -->
+    <link rel="stylesheet" href="../../css/theme.css">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
-            background: #fffdf9;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            font-weight: 400;
-        }
-        
-        /* Subtle background pattern */
-        .bg-subtle {
-            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f0ebe4;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #d4c9bc;
-            border-radius: 10px;
-        }
-        
-        /* Card Styles */
-        .stat-card {
-            transition: all 0.25s ease;
-            border-radius: 16px;
-            background: #ffffff;
-            border: 1px solid #f0e8e0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
-        }
-        
+        /* Additional page-specific styles that align with theme */
         .prescription-card {
-            transition: all 0.25s ease;
-            border-radius: 16px;
-            background: #ffffff;
-            border: 1px solid #f0e8e0;
-            border-left: 4px solid #a8c49a;
+            transition: var(--transition-base);
+            border-radius: var(--radius-md);
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-left: 3px solid var(--color-sage);
         }
         
         .prescription-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
-            border-color: #e8dcd0;
-            border-left-color: #8aae7a;
-        }
-        
-        .filter-card {
-            transition: all 0.25s ease;
-            border-radius: 16px;
-            background: #ffffff;
-            border: 1px solid #f0e8e0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-        }
-        
-        /* Button Styles */
-        .btn-primary {
-            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
-            transition: all 0.2s ease;
-            border-radius: 12px;
-            font-weight: 500;
-            letter-spacing: 0.3px;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
             transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+            border-color: var(--color-sage-pale);
+            border-left-color: var(--color-sage-dark);
         }
         
-        .btn-secondary {
-            border: 1px solid #efe6dc;
-            background: white;
-            transition: all 0.2s ease;
-            border-radius: 12px;
-            font-weight: 500;
+        /* Smaller prescription card content */
+        .prescription-card .patient-name {
+            font-size: 0.8125rem !important;
+            font-weight: var(--font-weight-medium) !important;
         }
         
-        .btn-secondary:hover {
-            background: #fefcf9;
-            border-color: #e0d4c8;
+        .prescription-card .doctor-name {
+            font-size: 0.6875rem !important;
+            color: var(--color-brown-300) !important;
+        }
+        
+        .prescription-card .date-text {
+            font-size: 0.625rem !important;
+            color: var(--color-brown-100) !important;
+        }
+        
+        .prescription-card .diagnosis-text {
+            font-size: 0.6875rem !important;
+            color: var(--color-brown-600) !important;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .prescription-card .medicines-text {
+            font-size: 0.6875rem !important;
+            color: var(--color-sage-dark) !important;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        /* Modal overlay styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-overlay);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition-base);
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-overlay.active .form-card {
+            transform: scale(1);
+        }
+        
+        .form-card {
+            transform: scale(0.96);
+            transition: var(--transition-base);
+            border-radius: var(--radius-lg);
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-top: 4px solid var(--color-sage);
+            width: 100%;
+            max-width: 48rem;
+            margin: 1rem;
+            box-shadow: var(--shadow-lg);
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         .btn-print {
-            background: linear-gradient(135deg, #d4c9bc 0%, #c4b8a8 100%);
-            transition: all 0.2s ease;
-            border-radius: 12px;
-            font-weight: 500;
+            background-color: var(--color-warm-tan);
+            color: white;
+            border: none;
         }
         
         .btn-print:hover {
-            background: linear-gradient(135deg, #c4b8a8 0%, #b8aa9a 100%);
+            background-color: var(--color-warm-tan-dark);
             transform: translateY(-1px);
         }
         
-        /* Modal Overlay */
-        .modal-overlay {
-            background: rgba(120, 100, 80, 0.3);
-            backdrop-filter: blur(3px);
-            transition: opacity 0.25s ease;
+        /* Prescriptions Grid - 5 cards per row */
+        .grid-prescriptions {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 1rem;
         }
         
-        /* Form card - RECTANGULAR shape */
-        .form-card {
-            transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            background: #ffffff;
-            border: 1px solid #efe6dc;
-            border-top: 4px solid #a8c49a;
-            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
-        }
-        
-        /* Filter inputs */
-        .filter-input, .filter-select {
-            border-radius: 12px;
-            border: 1px solid #efe6dc;
-            padding: 0.625rem 1rem;
-            font-size: 0.875rem;
-            font-family: 'Poppins', system-ui, sans-serif;
-            width: 100%;
-        }
-        
-        .filter-input:focus, .filter-select:focus {
-            outline: none;
-            border-color: #b5cfaa;
-            box-shadow: 0 0 0 3px rgba(155, 184, 139, 0.06);
-        }
-        
-        /* Toast animation */
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
+        @media (min-width: 640px) {
+            .grid-prescriptions {
+                grid-template-columns: repeat(2, 1fr);
             }
-            to {
-                transform: translateX(0);
-                opacity: 1;
+        }
+        
+        @media (min-width: 1024px) {
+            .grid-prescriptions {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (min-width: 1280px) {
+            .grid-prescriptions {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (min-width: 1536px) {
+            .grid-prescriptions {
+                grid-template-columns: repeat(5, 1fr);
             }
         }
         
@@ -183,12 +169,6 @@
                 display: none;
             }
         }
-        
-        /* Prescription content styling */
-        .prescription-content {
-            font-family: 'Poppins', monospace;
-            line-height: 1.6;
-        }
     </style>
 </head>
 <body class="bg-subtle">
@@ -197,76 +177,114 @@
     <div id="header-container"></div>
 
     <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
-        <!-- Page Header -->
-        <div class="mb-6">
-            <h1 class="text-xl md:text-2xl font-medium tracking-tight text-[#5a4a3a]">
-                <i class="fas fa-prescription-bottle text-[#a8c49a] mr-2"></i>Prescriptions
-            </h1>
-            <p class="text-[#b8aa9a] text-sm mt-1 font-light">Manage patient prescriptions and medication history</p>
-        </div>
-
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div class="stat-card p-4 border-l-4 border-[#a8c49a]">
-                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">Total Prescriptions</p>
-                <p class="text-2xl font-medium text-[#5a4a3a] mt-1" id="totalPrescriptions">0</p>
-            </div>
-            <div class="stat-card p-4 border-l-4 border-[#8aae7a]">
-                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">This Month</p>
-                <p class="text-2xl font-medium text-[#8aae7a] mt-1" id="monthPrescriptions">0</p>
-            </div>
-            <div class="stat-card p-4 border-l-4 border-[#d4a853]">
-                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">Active Patients</p>
-                <p class="text-2xl font-medium text-[#d4a853] mt-1" id="activePatients">0</p>
-            </div>
-            <div class="stat-card p-4 border-l-4 border-[#b8aa9a]">
-                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">Unique Medicines</p>
-                <p class="text-2xl font-medium text-[#b8aa9a] mt-1" id="uniqueMedicines">0</p>
-            </div>
-        </div>
-
-        <!-- Search & Filter -->
-        <div class="filter-card p-4 mb-6">
-            <div class="flex flex-col md:flex-row gap-3">
-                <div class="flex-1 relative">
-                    <i class="fas fa-search absolute left-3 top-3 text-[#d4c9bc] text-sm"></i>
-                    <input type="text" id="searchInput" placeholder="Search by patient name, doctor or medicine..." class="filter-input pl-10">
+        
+        <!-- Page Header matching theme -->
+        <div class="page-header mb-6">
+            <div class="page-header-left">
+                <div class="page-header-icon">
+                    <i class="fas fa-prescription-bottle"></i>
                 </div>
-                <div class="w-full md:w-56">
-                    <select id="patientFilter" class="filter-select">
-                        <option value="">All Patients</option>
-                    </select>
+                <div>
+                    <h1 class="page-header-title">Prescriptions</h1>
+                    <p class="page-header-subtitle">Manage patient prescriptions and medication history</p>
                 </div>
-                <button id="resetFilter" class="btn-secondary px-5 py-2 rounded-xl text-[#b8aa9a] text-sm font-medium transition whitespace-nowrap">
-                    <i class="fas fa-undo-alt mr-1"></i> Reset
-                </button>
             </div>
         </div>
 
-        <!-- Prescriptions Grid -->
-        <div id="prescriptionsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
-    </main>
-
-    <!-- Prescription Details Modal - RECTANGULAR shape -->
-    <div id="prescriptionModal" class="fixed inset-0 z-50 opacity-0 invisible transition-all duration-200">
-        <div class="modal-overlay fixed inset-0"></div>
-        <div class="relative min-h-screen flex items-center justify-center p-4">
-            <div class="form-card bg-white w-full max-w-2xl mx-4">
-                <div class="flex justify-between items-center p-5 border-b border-[#f0e8e0]">
-                    <h3 class="text-lg font-medium text-[#5a4a3a] flex items-center gap-2">
-                        <i class="fas fa-prescription-bottle text-[#a8c49a]"></i> Prescription Details
-                    </h3>
-                    <div class="flex gap-2">
-                        <button id="printModalBtn" class="btn-print text-white px-3 py-1.5 rounded-xl transition text-xs font-medium">
-                            <i class="fas fa-print mr-1"></i> Print
-                        </button>
-                        <button id="closeModalBtn" class="text-[#d4c9bc] hover:text-[#b8aa9a] transition">
-                            <i class="fas fa-times text-lg"></i>
-                        </button>
+        <!-- Stats Cards - Keeping theme.css size -->
+        <div class="grid-stats mb-8">
+            <div class="stat-card" style="border-left: 4px solid var(--color-sage);">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="stat-label">Total Prescriptions</p>
+                        <p class="stat-value" id="totalPrescriptions">0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-prescription-bottle text-sage text-lg"></i>
                     </div>
                 </div>
-                <div id="prescriptionDetails" class="p-5"></div>
             </div>
+            
+            <div class="stat-card" style="border-left: 4px solid var(--color-sage-dark);">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="stat-label">This Month</p>
+                        <p class="stat-value text-sage-dark" id="monthPrescriptions">0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-calendar-alt text-sage-dark"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card" style="border-left: 4px solid var(--color-gold);">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="stat-label">Active Patients</p>
+                        <p class="stat-value text-gold" id="activePatients">0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-user-check text-gold"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card" style="border-left: 4px solid var(--color-warm-tan);">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="stat-label">Unique Medicines</p>
+                        <p class="stat-value text-tan" id="uniqueMedicines">0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-capsules text-tan"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Bar using theme classes -->
+        <div class="filter-bar">
+            <div class="relative flex-1">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-brown-100 text-sm"></i>
+                <input type="text" id="searchInput" placeholder="Search by patient name, doctor or medicine..." 
+                       class="search-input pl-10">
+            </div>
+            <div class="w-full md:w-56">
+                <select id="patientFilter" class="form-select">
+                    <option value="">All Patients</option>
+                </select>
+            </div>
+            <button id="resetFilter" class="btn-secondary">
+                <i class="fas fa-undo-alt mr-1"></i> Reset
+            </button>
+        </div>
+
+        <!-- Prescriptions Grid - 5 cards per row on 2K screens -->
+        <div id="prescriptionsGrid" class="grid-prescriptions">
+            <div class="col-span-full text-center py-12 text-brown-100">
+                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
+                <p class="font-light">Loading prescriptions...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Prescription Details Modal -->
+    <div id="prescriptionModal" class="modal-overlay">
+        <div class="form-card">
+            <div class="flex justify-between items-center p-5 border-b border-default">
+                <h3 class="modal-title">
+                    <i class="fas fa-prescription-bottle text-sage"></i> Prescription Details
+                </h3>
+                <div class="flex gap-2">
+                    <button id="printModalBtn" class="btn-print px-3 py-1.5 rounded-lg text-sm">
+                        <i class="fas fa-print mr-1"></i> Print
+                    </button>
+                    <button id="closeModalBtn" class="close-btn">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="prescriptionDetails" class="p-5"></div>
         </div>
     </div>
 
@@ -275,5 +293,6 @@
 
     <script src="../../js/core/common.js"></script>
     <script src="prescriptions.js"></script>
+    
 </body>
-</html> 
+</html>

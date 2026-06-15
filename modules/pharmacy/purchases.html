@@ -4,195 +4,106 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Purchases | Pharmacy | MedFlow</title>
-    <!-- Google Fonts: Poppins (matching dashboard) -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- ✅ CENTRALIZED THEME CSS -->
+    <link rel="stylesheet" href="../../css/theme.css">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
-            background: #fffdf9;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            font-weight: 400;
-        }
-        
-        /* Subtle background pattern */
-        .bg-subtle {
-            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f0ebe4;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #d4c9bc;
-            border-radius: 10px;
-        }
-        
-        /* Card Styles */
-        .content-card {
-            transition: all 0.25s ease;
-            border-radius: 16px;
-            background: #ffffff;
-            border: 1px solid #f0e8e0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-        }
-        
-        .content-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
-            border-color: #e8dcd0;
-        }
-        
-        /* Stats Card */
-        .stat-card {
-            transition: all 0.25s ease;
-            border-radius: 16px;
-            background: #ffffff;
-            border: 1px solid #f0e8e0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px -12px rgba(155, 184, 139, 0.08);
-        }
-        
-        /* Button Styles */
-        .btn-primary {
-            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
-            transition: all 0.2s ease;
-            border-radius: 12px;
-            font-weight: 500;
-            letter-spacing: 0.3px;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
-            transform: translateY(-1px);
-        }
-        
-        .btn-secondary {
-            border: 1px solid #efe6dc;
-            background: white;
-            transition: all 0.2s ease;
-            border-radius: 12px;
-            font-weight: 500;
-        }
-        
-        .btn-secondary:hover {
-            background: #fefcf9;
-            border-color: #e0d4c8;
-        }
-        
-        /* Table styles */
-        .data-table th {
-            font-weight: 500;
-            text-transform: uppercase;
-            font-size: 0.65rem;
-            letter-spacing: 0.8px;
-            color: #c2b5a8;
-        }
-        
-        .dashboard-table-row {
-            transition: background 0.2s ease;
-            border-bottom: 1px solid #f5f0ea;
-        }
-        
-        .dashboard-table-row:hover {
-            background-color: #fefcf9;
-        }
-        
-        /* Badge */
+        /* Additional page-specific styles that align with theme */
         .badge-purchase {
-            background: #faf7f2;
-            color: #9a8e82;
+            background: var(--bg-muted);
+            color: var(--color-brown-300);
             padding: 0.2rem 0.85rem;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 500;
+            border-radius: var(--radius-full);
+            font-size: 0.6875rem;
+            font-weight: var(--font-weight-medium);
+            display: inline-block;
         }
         
-        /* Modal Overlay */
+        /* Modal overlay styles matching theme.css */
         .modal-overlay {
-            background: rgba(120, 100, 80, 0.3);
-            backdrop-filter: blur(3px);
-            transition: opacity 0.25s ease;
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-overlay);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition-base);
         }
         
-        /* Form card - RECTANGULAR shape, no border radius */
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-overlay.active .form-card {
+            transform: scale(1);
+        }
+        
         .form-card {
-            transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            background: #ffffff;
-            border: 1px solid #efe6dc;
-            border-top: 4px solid #a8c49a;
-            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
-        }
-        
-        /* Form inputs */
-        .form-input, .form-select {
-            border-radius: 12px;
-            border: 1px solid #efe6dc;
-            transition: all 0.2s ease;
-            background: #ffffff;
-            font-family: 'Poppins', system-ui, sans-serif;
-            font-size: 0.875rem;
-            padding: 0.625rem 1rem;
+            transform: scale(0.96);
+            transition: var(--transition-base);
+            border-radius: var(--radius-lg);
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-top: 4px solid var(--color-sage);
             width: 100%;
+            max-width: 28rem;
+            margin: 1rem;
+            box-shadow: var(--shadow-lg);
         }
         
-        .form-input:focus, .form-select:focus {
-            outline: none;
-            border-color: #b5cfaa;
-            box-shadow: 0 0 0 3px rgba(155, 184, 139, 0.06);
+        .action-delete {
+            color: var(--color-warm-tan);
+            transition: var(--transition-base);
         }
-        
-        .form-input.error, .form-select.error {
-            border-color: #d8b48c;
-            background-color: #fffaf5;
+        .action-delete:hover { 
+            color: var(--color-warm-tan-dark); 
         }
         
         .error-message {
-            color: #d8b48c;
-            font-size: 0.7rem;
+            color: var(--color-error-text);
+            font-size: 0.6875rem;
             margin-top: 0.25rem;
             display: block;
-            font-weight: 400;
+            font-weight: var(--font-weight-light);
         }
         
-        /* Toast animation */
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+        /* Total preview styling */
+        .total-preview {
+            background-color: var(--bg-subtle);
+            border-radius: var(--radius-md);
+            padding: 0.75rem;
+            border: 1px solid var(--border-default);
         }
         
-        /* Action buttons */
-        .action-delete {
-            color: #d8b48c;
-            transition: color 0.2s;
+        .total-label {
+            font-size: 0.6875rem;
+            font-weight: var(--font-weight-light);
+            color: var(--color-brown-200);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
         }
-        .action-delete:hover { color: #c49a6c; }
+        
+        .total-amount {
+            font-size: 1.125rem;
+            font-weight: var(--font-weight-medium);
+            color: var(--color-sage-dark);
+        }
     </style>
 </head>
 <body class="bg-subtle">
@@ -201,42 +112,71 @@
     <div id="header-container"></div>
 
     <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
-        <!-- Page Header -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-            <div>
-                <h1 class="text-xl md:text-2xl font-medium tracking-tight text-[#5a4a3a]">
-                    <i class="fas fa-shopping-cart text-[#a8c49a] mr-2"></i>Purchase Orders
-                </h1>
-                <p class="text-[#b8aa9a] text-sm mt-1 font-light">Track medicine purchases from suppliers</p>
+        
+        <!-- Page Header matching theme -->
+        <div class="page-header mb-6">
+            <div class="page-header-left">
+                <div class="page-header-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div>
+                    <h1 class="page-header-title">Purchase Orders</h1>
+                    <p class="page-header-subtitle">Track medicine purchases from suppliers</p>
+                </div>
             </div>
-            <button id="addPurchaseBtn" class="btn-primary text-white px-5 py-2.5 flex items-center gap-2 shadow-sm mt-3 md:mt-0 transition-all">
-                <i class="fas fa-plus text-sm"></i>
-                <span class="text-xs font-medium">New Purchase</span>
-            </button>
+            <div class="page-header-actions">
+                <button id="addPurchaseBtn" class="btn-primary">
+                    <i class="fas fa-plus text-sm"></i>
+                    <span>New Purchase</span>
+                </button>
+            </div>
         </div>
 
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="stat-card p-4">
-                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">Total Purchases</p>
-                <p class="text-2xl font-medium text-[#5a4a3a] mt-1" id="totalPurchases">0</p>
+        <!-- Stats Cards using theme classes -->
+        <div class="grid-stats mb-6">
+            <div class="stat-card">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="stat-label">Total Purchases</p>
+                        <p class="stat-value" id="totalPurchases">0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-shopping-cart text-sage text-lg"></i>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card p-4">
-                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">Total Quantity Purchased</p>
-                <p class="text-2xl font-medium text-[#5a4a3a] mt-1" id="totalQuantity">0</p>
+            
+            <div class="stat-card">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="stat-label">Total Quantity Purchased</p>
+                        <p class="stat-value" id="totalQuantity">0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-boxes text-sage text-lg"></i>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card p-4">
-                <p class="text-[#b8aa9a] text-xs font-medium uppercase tracking-wide">Total Investment</p>
-                <p class="text-2xl font-medium text-[#5a4a3a] mt-1" id="totalInvestment">₹0</p>
+            
+            <div class="stat-card">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="stat-label">Total Investment</p>
+                        <p class="stat-value" id="totalInvestment">₹0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-rupee-sign text-sage text-lg"></i>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Purchases Table Card -->
-        <div class="content-card overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="border-b border-[#f0e8e0] bg-[#fefcf9]">
-                        <tr class="text-left data-table">
+        <div class="card-white overflow-hidden">
+            <div class="table-wrapper">
+                <table class="data-table w-full">
+                    <thead>
+                        <tr>
                             <th class="px-5 py-4">PO #</th>
                             <th class="px-5 py-4">Date</th>
                             <th class="px-5 py-4">Supplier</th>
@@ -250,7 +190,7 @@
                     </thead>
                     <tbody id="purchasesTable">
                         <tr>
-                            <td colspan="9" class="text-center py-8 text-[#d4c9bc] text-sm">
+                            <td colspan="9" class="text-center py-8 text-brown-100">
                                 <i class="fas fa-spinner fa-pulse mr-2"></i>Loading purchases...
                             </td>
                         </tr>
@@ -260,81 +200,75 @@
         </div>
     </main>
 
-    <!-- Add Purchase Modal - RECTANGULAR shape (no rounded corners) -->
-    <div id="purchaseModal" class="fixed inset-0 z-50 opacity-0 invisible transition-all duration-200">
-        <div class="modal-overlay fixed inset-0"></div>
-        <div class="relative min-h-screen flex items-center justify-center p-4">
-            <div class="form-card bg-white w-full max-w-md mx-4">
-                <!-- Modal Header - RECTANGULAR -->
-                <div class="flex justify-between items-center p-5 border-b border-[#f0e8e0]">
-                    <h3 id="modalTitle" class="text-lg font-medium text-[#5a4a3a] flex items-center gap-2">
-                        <i class="fas fa-shopping-cart text-[#a8c49a]"></i> New Purchase Order
-                    </h3>
-                    <button id="closeModalBtn" class="text-[#d4c9bc] hover:text-[#b8aa9a] transition">
-                        <i class="fas fa-times text-lg"></i>
-                    </button>
-                </div>
-                
-                <!-- Modal Body -->
-                <form id="purchaseForm">
-                    <div class="p-5 space-y-4">
-                        <div>
-                            <label class="block text-xs font-medium text-[#b8aa9a] mb-1">Supplier <span class="text-[#d8b48c]">*</span></label>
-                            <select id="supplierId" class="form-select" required>
-                                <option value="">Select Supplier</option>
-                            </select>
-                            <span class="error-message" id="supplierError"></span>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-[#b8aa9a] mb-1">Medicine <span class="text-[#d8b48c]">*</span></label>
-                            <select id="medicineId" class="form-select" required>
-                                <option value="">Select Medicine</option>
-                            </select>
-                            <span class="error-message" id="medicineError"></span>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-[#b8aa9a] mb-1">Quantity <span class="text-[#d8b48c]">*</span></label>
-                            <input type="number" id="quantity" class="form-input" placeholder="Enter quantity" min="1" step="1">
-                            <span class="error-message" id="quantityError"></span>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-[#b8aa9a] mb-1">Unit Price (₹) <span class="text-[#d8b48c]">*</span></label>
-                            <input type="number" id="unitPrice" class="form-input" placeholder="Enter unit price" min="0.01" step="0.01">
-                            <span class="error-message" id="unitPriceError"></span>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-[#b8aa9a] mb-1">Purchase Date <span class="text-[#d8b48c]">*</span></label>
-                            <input type="date" id="purchaseDate" class="form-input">
-                            <span class="error-message" id="dateError"></span>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-[#b8aa9a] mb-1">Invoice Number</label>
-                            <input type="text" id="invoiceNo" class="form-input" placeholder="e.g., INV-2024-001" autocomplete="off">
-                            <span class="error-message" id="invoiceError"></span>
-                        </div>
-                        
-                        <!-- Total Preview -->
-                        <div class="bg-[#fefcf9] p-3">
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs font-medium text-[#b8aa9a]">Total Amount:</span>
-                                <span class="text-lg font-semibold text-[#8aae7a]" id="totalAmountPreview">₹0.00</span>
-                            </div>
-                        </div>
+    <!-- Add Purchase Modal - Matching theme.css structure -->
+    <div id="purchaseModal" class="modal-overlay">
+        <div class="form-card">
+            <div class="flex justify-between items-center p-5 border-b border-default">
+                <h3 id="modalTitle" class="modal-title">
+                    <i class="fas fa-shopping-cart text-sage"></i> New Purchase Order
+                </h3>
+                <button id="closeModalBtn" class="close-btn">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            <form id="purchaseForm">
+                <div class="p-5 space-y-4">
+                    <div class="form-group">
+                        <label class="form-label">Supplier <span class="text-error-text">*</span></label>
+                        <select id="supplierId" class="form-select" required>
+                            <option value="">Select Supplier</option>
+                        </select>
+                        <span class="error-message" id="supplierError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Medicine <span class="text-error-text">*</span></label>
+                        <select id="medicineId" class="form-select" required>
+                            <option value="">Select Medicine</option>
+                        </select>
+                        <span class="error-message" id="medicineError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Quantity <span class="text-error-text">*</span></label>
+                        <input type="number" id="quantity" class="form-input" placeholder="Enter quantity" min="1" step="1">
+                        <span class="error-message" id="quantityError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Unit Price (₹) <span class="text-error-text">*</span></label>
+                        <input type="number" id="unitPrice" class="form-input" placeholder="Enter unit price" min="0.01" step="0.01">
+                        <span class="error-message" id="unitPriceError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Purchase Date <span class="text-error-text">*</span></label>
+                        <input type="date" id="purchaseDate" class="form-input">
+                        <span class="error-message" id="dateError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Invoice Number</label>
+                        <input type="text" id="invoiceNo" class="form-input" placeholder="e.g., INV-2024-001" autocomplete="off">
+                        <span class="error-message" id="invoiceError"></span>
                     </div>
                     
-                    <!-- Modal Footer - RECTANGULAR -->
-                    <div class="p-5 bg-[#fefcf9] flex justify-end gap-3 border-t border-[#f0e8e0]">
-                        <button type="button" id="cancelModalBtn" class="btn-secondary px-4 py-2 rounded-xl text-[#b8aa9a] text-sm font-medium transition">Cancel</button>
-                        <button type="submit" class="btn-primary px-4 py-2 rounded-xl text-white text-sm font-medium shadow-sm transition">
-                            <i class="fas fa-save mr-2 text-xs"></i>Save Purchase
-                        </button>
+                    <!-- Total Preview -->
+                    <div class="total-preview">
+                        <div class="flex justify-between items-center">
+                            <span class="total-label">Total Amount:</span>
+                            <span class="total-amount" id="totalAmountPreview">₹0.00</span>
+                        </div>
                     </div>
-                </form>
-            </div>
+                </div>
+                <div class="p-5 bg-subtle rounded-b-xl flex justify-end gap-3 border-t border-default">
+                    <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save mr-2 text-xs"></i>Save Purchase
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
     <script src="../../js/core/common.js"></script>
+    <script src="../../js/core/form-validation.js"></script>
     <script src="purchases.js"></script>
+    
 </body>
 </html>
