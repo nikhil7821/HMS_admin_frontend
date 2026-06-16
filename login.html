@@ -514,7 +514,7 @@
                 addAuditLog('LOGIN', `User ${email} logged in as ${role}`);
                 
                 setTimeout(() => {
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'modules/dashboard/dashboard.html';
                 }, 1000);
             } else {
                 setLoading(false);
@@ -560,7 +560,7 @@
     // Check if already logged in
     const token = localStorage.getItem('auth_token');
     if (token && window.location.pathname.includes('login.html')) {
-        window.location.href = 'dashboard.html';
+        window.location.href = 'modules/dashboard/dashboard.html';
     }
     
     // Event listener

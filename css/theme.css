@@ -1359,6 +1359,151 @@ main,
 @media (min-width: 1024px) { .grid-quick-actions { grid-template-columns: repeat(5, 1fr); } }
 
 /* ============================================================
+   31. SIDEBAR COLLAPSE FUNCTIONALITY
+   ============================================================ */
+
+/* --- Sidebar collapse button --- */
+.sidebar .collapse-btn {
+    position: absolute !important;
+    right: 12px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 36px !important;
+    height: 36px !important;
+    background: #f5ede2 !important;
+    border: 2px solid #d4c3ae !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    z-index: 99999 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+    pointer-events: auto !important;
+    flex-shrink: 0 !important;
+    transition: all 0.3s ease !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+}
+
+.sidebar .collapse-btn:hover {
+    background: #e8d9ca !important;
+    border-color: #b8a69b !important;
+    transform: translateY(-50%) scale(1.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.sidebar .collapse-btn:active {
+    transform: translateY(-50%) scale(0.95) !important;
+}
+
+.sidebar .collapse-btn i {
+    color: #7d9b6e !important;
+    font-size: 0.9rem !important;
+    transition: transform 0.3s ease !important;
+    pointer-events: none !important;
+    line-height: 1 !important;
+}
+
+/* --- Sidebar collapsed state --- */
+.sidebar.collapsed {
+    width: 72px !important;
+    transition: width 0.3s ease !important;
+}
+
+.sidebar.collapsed .logo-text,
+.sidebar.collapsed .logo-sub,
+.sidebar.collapsed .sidebar-brand,
+.sidebar.collapsed .sidebar-section-label,
+.sidebar.collapsed .sidebar-nav-item > span,
+.sidebar.collapsed .nav-item > span,
+.sidebar.collapsed .dropdown-left > span,
+.sidebar.collapsed .nav-dropdown-btn > .fa-chevron-down,
+.sidebar.collapsed .dropdown-link span {
+    display: none !important;
+}
+
+.sidebar.collapsed .nav-item,
+.sidebar.collapsed .nav-dropdown-btn,
+.sidebar.collapsed .sidebar-nav-item {
+    justify-content: center !important;
+    padding: 0.625rem 0 !important;
+}
+
+.sidebar.collapsed .nav-item i,
+.sidebar.collapsed .dropdown-left i,
+.sidebar.collapsed .sidebar-nav-item .nav-icon {
+    margin-right: 0 !important;
+    width: auto !important;
+}
+
+.sidebar.collapsed .logo-content {
+    padding-left: 0.5rem !important;
+    justify-content: center !important;
+}
+
+.sidebar.collapsed .collapse-btn {
+    right: 50% !important;
+    transform: translateX(50%) translateY(-50%) !important;
+}
+
+.sidebar.collapsed .collapse-btn i {
+    transform: rotate(180deg) !important;
+}
+
+.sidebar.collapsed .nav-dropdown-content {
+    position: absolute !important;
+    left: 72px !important;
+    top: 0 !important;
+    background: white !important;
+    border: 1px solid var(--border-default) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-lg) !important;
+    padding: 0.5rem 0 !important;
+    margin: 0 !important;
+    min-width: 200px !important;
+    display: none !important;
+}
+
+.sidebar.collapsed .nav-dropdown:hover .nav-dropdown-content {
+    display: block !important;
+}
+
+.sidebar.collapsed .nav-dropdown-content .dropdown-link {
+    padding: 0.5rem 1rem !important;
+    margin: 0 !important;
+}
+
+/* --- Sidebar logo should be relative for button positioning --- */
+.sidebar .sidebar-logo {
+    position: relative !important;
+    z-index: 100 !important;
+}
+
+/* --- Ensure collapse button works on mobile --- */
+@media (max-width: 1024px) {
+    .sidebar .collapse-btn {
+        display: flex !important;
+        right: 12px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        background: #f5ede2 !important;
+        border-radius: 50% !important;
+        border: 2px solid #d4c3ae !important;
+    }
+    
+    .sidebar .collapse-btn:hover {
+        transform: translateY(-50%) scale(1.1) !important;
+    }
+    
+    .sidebar.collapsed .collapse-btn {
+        right: 50% !important;
+        transform: translateX(50%) translateY(-50%) !important;
+    }
+}
+
+/* ============================================================
    30. PRINT STYLESwq
    ============================================================ */
 @media print {
