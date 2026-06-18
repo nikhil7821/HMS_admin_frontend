@@ -5,152 +5,241 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Lab Requests | Laboratory | MedFlow</title>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- ✅ CENTRALIZED THEME CSS -->
+    
+    <!-- ✅ ONLY THEME CSS - NO TAILWIND -->
     <link rel="stylesheet" href="../../css/theme.css">
 
     <style>
-        /* Additional page-specific styles that align with theme */
+        /* 🔥 FIX: Prevent layout shift */
+        .main-content {
+            margin-left: 260px !important;
+            margin-top: 70px !important;
+            padding: 1.75rem !important;
+            transition: margin-left 0.3s ease !important;
+            min-height: 100vh !important;
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
+        }
+        .main-content.loaded {
+            opacity: 1;
+        }
+        #mainSidebar[data-collapsed="true"] ~ .main-content,
+        #mainSidebar[data-collapsed="true"] + .main-content {
+            margin-left: 72px !important;
+        }
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 0 !important;
+                padding: 1.25rem !important;
+            }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .status-pending {
+            background: var(--color-warning-bg);
+            color: var(--color-warning-text);
+            padding: 0.15rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6875rem;
+            font-weight: var(--font-weight-medium);
+            display: inline-block;
+        }
+        .status-progress {
+            background: var(--color-info-bg);
+            color: var(--color-info-text);
+            padding: 0.15rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6875rem;
+            font-weight: var(--font-weight-medium);
+            display: inline-block;
+        }
+        .status-completed {
+            background: var(--color-success-bg);
+            color: var(--color-success-text);
+            padding: 0.15rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6875rem;
+            font-weight: var(--font-weight-medium);
+            display: inline-block;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8125rem;
+        }
+        .data-table thead {
+            background-color: var(--bg-muted);
+            border-bottom: 1px solid var(--border-default);
+        }
+        .data-table th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-300);
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .data-table td {
+            padding: 0.75rem 1rem;
+            color: var(--color-brown-700);
+            vertical-align: middle;
+        }
+
         .request-row {
             transition: var(--transition-base);
             border-bottom: 1px solid var(--border-default);
         }
-        
         .request-row:hover {
             background-color: var(--bg-subtle);
         }
-        
-        .status-pending {
-            background: var(--color-warning-bg);
-            color: var(--color-warning-text);
-            padding: 0.2rem 0.75rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
+        .request-row:last-child {
+            border-bottom: none;
         }
-        
-        .status-progress {
-            background: var(--color-info-bg);
-            color: var(--color-info-text);
-            padding: 0.2rem 0.75rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-        }
-        
-        .status-completed {
-            background: var(--color-success-bg);
-            color: var(--color-success-text);
-            padding: 0.2rem 0.75rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-        }
-        
-        /* Modal overlay styles matching theme.css */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 50;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--bg-overlay);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
-            opacity: 0;
-            visibility: hidden;
+
+        .action-btn {
+            color: var(--color-brown-100);
             transition: var(--transition-base);
-        }
-        
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .modal-overlay.active .modal-content {
-            transform: scale(1);
-        }
-        
-        .modal-container {
-            width: 100%;
-            max-width: 550px;
-            margin: 1rem;
-        }
-        
-        .modal-content {
-            background-color: var(--bg-card);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            border-top: 4px solid var(--color-sage);
-            box-shadow: var(--shadow-lg);
-            transform: scale(0.96);
-            transition: var(--transition-base);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .modal-header {
-            padding: 1.25rem;
-            border-bottom: 1px solid var(--border-default);
-            background-color: var(--bg-card);
-        }
-        
-        .modal-header h2 {
-            font-size: 1.0625rem;
-            font-weight: var(--font-weight-light);
-            color: var(--color-brown-700);
-            margin: 0;
-            display: inline-block;
-        }
-        
-        .modal-body {
-            padding: 1.25rem;
-            max-height: 60vh;
-            overflow-y: auto;
-        }
-        
-        .modal-footer {
-            padding: 1rem 1.25rem;
-            border-top: 1px solid var(--border-default);
-            background-color: var(--bg-subtle);
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
-        }
-        
-        .float-right {
-            float: right;
-        }
-        
-        .clearfix::after {
-            content: "";
-            clear: both;
-            display: table;
-        }
-        
-        .btn-success {
-            background-color: var(--color-sage);
-            color: white;
+            padding: 0.25rem 0.375rem;
+            border-radius: var(--radius-sm);
+            background: none;
             border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
         }
-        
-        .btn-success:hover {
-            background-color: var(--color-sage-dark);
-            transform: translateY(-1px);
+        .action-btn:hover {
+            color: var(--color-sage-dark);
         }
-        
+        .action-btn.upload:hover {
+            color: #10b981;
+        }
+        .action-btn.status:hover {
+            color: #f59e0b;
+        }
+        .action-btn.view:hover {
+            color: var(--color-gold);
+        }
+        .action-btn.delete:hover {
+            color: #dc2626;
+        }
+
+        .patient-name {
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-700);
+            font-size: 0.875rem;
+        }
+        .test-name {
+            color: var(--color-brown-300);
+            font-size: 0.8125rem;
+        }
+
+        .request-id {
+            font-family: monospace;
+            font-size: 0.75rem;
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-600);
+        }
+
+        .result-cell {
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--color-brown-300);
+            font-size: 0.8125rem;
+        }
+        .result-cell.has-result {
+            color: var(--color-sage-dark);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .filter-bar .btn-primary {
+            flex: 0 0 auto !important;
+            padding: 0.4rem 0.85rem !important;
+            font-size: 0.8125rem !important;
+            height: 38px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.35rem !important;
+            border-radius: var(--radius-md) !important;
+            white-space: nowrap !important;
+            background-color: var(--color-sage) !important;
+            color: white !important;
+            border: none !important;
+        }
+        .filter-bar .btn-primary:hover {
+            background-color: var(--color-sage-dark) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.35) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        .filter-bar .form-input {
+            min-width: 140px !important;
+            width: auto !important;
+            padding: 0.4rem 0.75rem !important;
+            font-size: 0.8125rem !important;
+            height: 38px !important;
+            border: 1px solid var(--border-input) !important;
+            border-radius: var(--radius-md) !important;
+            background-color: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
+        }
+        .filter-bar .form-input:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.2) !important;
+            outline: none !important;
+        }
+
+        .filter-bar .search-wrapper {
+            flex: 1 1 200px !important;
+            min-width: 150px !important;
+            max-width: 300px !important;
+        }
+
+        @media (max-width: 768px) {
+            .filter-bar .form-select {
+                min-width: 100px !important;
+                font-size: 0.75rem !important;
+            }
+            .filter-bar .form-input {
+                min-width: 100px !important;
+                font-size: 0.75rem !important;
+            }
+            .filter-bar .btn-primary span {
+                display: none !important;
+            }
+            .filter-bar .search-wrapper {
+                flex: 1 1 120px !important;
+                min-width: 100px !important;
+                max-width: 200px !important;
+            }
+            .filter-bar .search-input {
+                font-size: 0.75rem !important;
+                padding: 0.3rem 0.5rem 0.3rem 1.75rem !important;
+                height: 32px !important;
+            }
+            .data-table th,
+            .data-table td {
+                padding: 0.5rem 0.5rem !important;
+                font-size: 0.6875rem !important;
+            }
+        }
+
+        .form-card {
+            border-top-color: var(--color-sage);
+        }
+
         .error-text {
             color: var(--color-error-text);
             font-size: 0.6875rem;
@@ -158,30 +247,95 @@
             display: none;
             font-weight: var(--font-weight-light);
         }
-        
         .error-text.show {
             display: block;
         }
-        
-        .form-input.error, .form-select.error {
-            border-color: var(--color-error-text) !important;
-            background-color: var(--color-error-bg) !important;
+
+        .form-input.error,
+        .form-select.error {
+            border-color: var(--color-error-text);
         }
-        
-        .border-l-yellow-500 {
-            border-left-color: var(--color-warning-text) !important;
+        .form-input.error:focus,
+        .form-select.error:focus {
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
         }
-        
-        .border-l-blue-500 {
-            border-left-color: #3b82f6 !important;
+
+        .requests-empty {
+            text-align: center;
+            padding: 3rem 1.25rem;
+            color: var(--color-brown-100);
         }
-        
-        .border-l-green-500 {
-            border-left-color: var(--color-success-text) !important;
+        .requests-empty i {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            display: block;
+            opacity: 0.4;
         }
-        
-        .border-l-purple-500 {
-            border-left-color: #9333ea !important;
+        .requests-empty p {
+            font-size: 0.875rem;
+            font-weight: var(--font-weight-light);
+        }
+
+        .stat-card-pending { border-left: 4px solid var(--color-warning-text); }
+        .stat-card-progress { border-left: 4px solid #3b82f6; }
+        .stat-card-completed { border-left: 4px solid var(--color-success-text); }
+        .stat-card-revenue { border-left: 4px solid #9333ea; }
+
+        .text-progress { color: #3b82f6; }
+        .text-revenue { color: #9333ea; }
+
+        .btn-success {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            background-color: var(--color-sage);
+            color: white;
+            font-family: var(--font-family);
+            font-size: 0.8125rem;
+            font-weight: var(--font-weight-light);
+            padding: 0.5rem 1.25rem;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+        .btn-success:hover {
+            background-color: var(--color-sage-dark);
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            background-color: #ef4444;
+            color: white;
+            font-family: var(--font-family);
+            font-size: 0.8125rem;
+            font-weight: var(--font-weight-light);
+            padding: 0.5rem 1.25rem;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+        .btn-danger:hover {
+            background-color: #dc2626;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .delete-icon-circle {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            background-color: #fee2e2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: #dc2626;
+            font-size: 1.25rem;
         }
     </style>
 </head>
@@ -190,116 +344,101 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+    <main class="main-content" id="mainContent">
         
-        <!-- Page Header matching theme -->
-        <div class="page-header mb-6">
-            <div class="page-header-left">
-                <div class="page-header-icon">
-                    <i class="fas fa-flask"></i>
-                </div>
-                <div>
-                    <h1 class="page-header-title">Lab Test Requests</h1>
-                    <p class="page-header-subtitle">Manage patient test requests and upload results</p>
-                </div>
-            </div>
-            <div class="page-header-actions">
-                <button id="newRequestBtn" class="btn-primary">
-                    <i class="fas fa-plus text-sm"></i>
-                    <span>New Request</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Stats Cards using theme classes -->
-        <div class="grid-stats mb-8">
-            <div class="stat-card" style="border-left: 4px solid var(--color-warning-text);">
-                <div class="flex justify-between items-start">
+        <!-- Stats Cards -->
+        <div class="grid-stats" style="margin-bottom: 1.5rem;">
+            <div class="stat-card stat-card-pending">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Pending</p>
                         <p class="stat-value text-warning-text" id="pendingCount">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-clock text-warning-text"></i>
+                        <i class="fas fa-clock" style="color:var(--color-warning-text); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid #3b82f6;">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-progress">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">In Progress</p>
-                        <p class="stat-value" style="color: #3b82f6;" id="inProgressCount">0</p>
+                        <p class="stat-value text-progress" id="inProgressCount">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-spinner" style="color: #3b82f6;"></i>
+                        <i class="fas fa-spinner" style="color:#3b82f6; font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid var(--color-success-text);">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-completed">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Completed</p>
                         <p class="stat-value text-success-text" id="completedCount">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-check-circle text-success-text"></i>
+                        <i class="fas fa-check-circle" style="color:var(--color-success-text); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid #9333ea;">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-revenue">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Total Revenue</p>
-                        <p class="stat-value" style="color: #9333ea;" id="totalRevenue">₹0</p>
+                        <p class="stat-value text-revenue" id="totalRevenue">₹0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-rupee-sign" style="color: #9333ea;"></i>
+                        <i class="fas fa-rupee-sign" style="color:#9333ea; font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Filters -->
+        <!-- Filter Bar -->
         <div class="filter-bar">
-            <div class="relative flex-1">
-                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-brown-100 text-sm"></i>
-                <input type="text" id="searchInput" placeholder="Search by patient or test..." 
-                       class="search-input pl-10">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by patient or test...">
             </div>
-            <select id="statusFilter" class="form-select w-auto min-w-[140px]">
+            <select id="statusFilter" class="form-select">
                 <option value="">All Status</option>
                 <option value="Pending">Pending</option>
                 <option value="In Progress">In Progress</option>
                 <option value="Completed">Completed</option>
             </select>
-            <input type="date" id="dateFrom" class="form-input w-auto min-w-[140px]" placeholder="From Date">
-            <input type="date" id="dateTo" class="form-input w-auto min-w-[140px]" placeholder="To Date">
+            <input type="date" id="dateFrom" class="form-input" placeholder="From Date">
+            <input type="date" id="dateTo" class="form-input" placeholder="To Date">
+            <button id="resetFilter" class="btn-secondary">
+                <i class="fas fa-undo-alt"></i>
+                <span>Reset</span>
+            </button>
+            <button id="newRequestBtn" class="btn-primary">
+                <i class="fas fa-plus"></i>
+                <span>New Request</span>
+            </button>
         </div>
 
         <!-- Requests Table -->
-        <div class="card-white overflow-hidden">
+        <div class="card-white" style="margin-top: 1.5rem; overflow:hidden;">
             <div class="table-wrapper">
-                <table class="data-table w-full">
+                <table class="data-table">
                     <thead>
                         <tr>
-                            <th class="px-5 py-3">Request ID</th>
-                            <th class="px-5 py-3">Patient</th>
-                            <th class="px-5 py-3">Test</th>
-                            <th class="px-5 py-3">Request Date</th>
-                            <th class="px-5 py-3">Status</th>
-                            <th class="px-5 py-3">Result</th>
-                            <th class="px-5 py-3 text-center">Actions</th>
+                            <th>Request ID</th>
+                            <th>Patient</th>
+                            <th>Test</th>
+                            <th>Request Date</th>
+                            <th>Status</th>
+                            <th>Result</th>
+                            <th style="text-align:center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="requestsTable">
                         <tr>
-                            <td colspan="7" class="text-center py-12 text-brown-100">
-                                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
-                                <p class="font-light">Loading requests...</p>
-                            </tr>
+                            <td colspan="7" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
+                                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
+                                <p style="font-weight:var(--font-weight-light);">Loading requests...</p>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -307,123 +446,153 @@
         </div>
     </main>
 
-    <!-- New Request Modal - Matching theme.css structure -->
-    <div id="requestModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>New Lab Request</h2>
-                    <button id="closeRequestModalBtn" class="close-btn float-right">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="clearfix"></div>
-                </div>
-                <form id="requestForm">
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label class="form-label">Select Patient *</label>
-                            <select id="patientId" required class="form-select">
-                                <option value="">-- Select Patient --</option>
-                            </select>
-                            <div class="error-text" id="patientIdError">Please select a patient</div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Select Test *</label>
-                            <select id="testId" required class="form-select">
-                                <option value="">-- Select Test --</option>
-                            </select>
-                            <div class="error-text" id="testIdError">Please select a test</div>
-                        </div>
+    <!-- New Request Modal -->
+    <div id="requestModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="requestModalTitle">
+        <div class="form-card" style="max-width:44rem;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="requestModalTitle">
+                    <i class="fas fa-flask"></i> New Lab Request
+                </h3>
+                <button class="close-btn" id="closeRequestModalBtn" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="requestForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Select Patient <span style="color:var(--color-error-text);">*</span></label>
+                        <select id="patientId" required class="form-select">
+                            <option value="">-- Select Patient --</option>
+                        </select>
+                        <span class="error-text" id="patientIdError">Please select a patient</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Select Test <span style="color:var(--color-error-text);">*</span></label>
+                        <select id="testId" required class="form-select">
+                            <option value="">-- Select Test --</option>
+                        </select>
+                        <span class="error-text" id="testIdError">Please select a test</span>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem 1.5rem;">
                         <div class="form-group">
                             <label class="form-label">Doctor Name</label>
                             <input type="text" id="doctorName" class="form-input" placeholder="Enter referring doctor name">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Notes / Instructions</label>
-                            <textarea id="notes" rows="3" class="form-textarea" placeholder="Any special instructions for the lab technician..."></textarea>
+                            <label class="form-label">Request Date</label>
+                            <input type="date" id="requestDate" class="form-input">
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" id="cancelRequestModalBtn" class="btn-secondary">Cancel</button>
-                        <button type="submit" class="btn-primary">
-                            <i class="fas fa-plus-circle mr-1"></i> Create Request
-                        </button>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label">Notes / Instructions</label>
+                        <textarea id="notes" rows="3" class="form-textarea" placeholder="Any special instructions..."></textarea>
                     </div>
-                </form>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancelRequestModalBtn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-plus-circle"></i> Create Request
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Upload Result Modal - Matching theme.css structure -->
-    <div id="resultModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Upload Test Result</h2>
-                    <button id="closeResultModalBtn" class="close-btn float-right">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="clearfix"></div>
-                </div>
-                <form id="resultForm">
-                    <input type="hidden" id="resultRequestId">
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label class="form-label">Test Result *</label>
-                            <textarea id="resultValue" rows="4" required class="form-textarea" placeholder="Enter test results..."></textarea>
-                            <div class="error-text" id="resultValueError">Please enter test results</div>
-                        </div>
+    <!-- Upload Result Modal -->
+    <div id="resultModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="resultModalTitle">
+        <div class="form-card" style="max-width:44rem;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="resultModalTitle">
+                    <i class="fas fa-upload" style="color:#10b981;"></i> Upload Test Result
+                </h3>
+                <button class="close-btn" id="closeResultModalBtn" aria-label="Close result modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="resultForm">
+                <input type="hidden" id="resultRequestId">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Test Result <span style="color:var(--color-error-text);">*</span></label>
+                        <textarea id="resultValue" rows="4" required class="form-textarea" placeholder="Enter test results..."></textarea>
+                        <span class="error-text" id="resultValueError">Please enter test results</span>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem 1.5rem;">
                         <div class="form-group">
                             <label class="form-label">Normal Range Reference</label>
                             <input type="text" id="normalRangeRef" class="form-input" placeholder="e.g., 4.5-11.0 K/uL">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Remarks</label>
-                            <textarea id="remarks" rows="3" class="form-textarea" placeholder="Any additional remarks..."></textarea>
+                            <label class="form-label">Status</label>
+                            <select id="resultStatus" class="form-select">
+                                <option value="Completed">Completed</option>
+                                <option value="In Progress">In Progress</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" id="cancelResultModalBtn" class="btn-secondary">Cancel</button>
-                        <button type="submit" class="btn-success">
-                            <i class="fas fa-upload mr-1"></i> Upload Result
-                        </button>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label">Remarks</label>
+                        <textarea id="remarks" rows="3" class="form-textarea" placeholder="Any additional remarks..."></textarea>
                     </div>
-                </form>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancelResultModalBtn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-success">
+                        <i class="fas fa-upload"></i> Upload Result
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal - Matching theme.css structure -->
-    <div id="deleteModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Confirm Delete</h2>
-                    <button id="closeDeleteModalBtn" class="close-btn float-right">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="clearfix"></div>
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal-overlay modal-danger" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+        <div class="form-card" style="max-width:26rem; border-top-color:#ef4444;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="deleteModalTitle" style="color:var(--color-brown-700);">
+                    <i class="fas fa-triangle-exclamation" style="color:#ef4444;"></i> Confirm Delete
+                </h3>
+                <button class="close-btn" id="closeDeleteModalBtn" aria-label="Close delete modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="text-align:center; padding:1.75rem 1.25rem;">
+                <div class="delete-icon-circle">
+                    <i class="fas fa-trash-alt"></i>
                 </div>
-                <div class="modal-body text-center">
-                    <div class="w-16 h-16 bg-error-bg rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-trash-alt text-error-text text-2xl"></i>
-                    </div>
-                    <h3 class="text-base font-medium text-brown-700 mb-2">Delete Request?</h3>
-                    <p class="text-brown-300 text-sm font-light">This action cannot be undone. This request will be permanently removed.</p>
-                </div>
-                <div class="modal-footer justify-center gap-3">
-                    <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
-                    <button id="confirmDeleteBtn" class="btn-danger">
-                        <i class="fas fa-trash-alt mr-1"></i> Delete
-                    </button>
-                </div>
+                <p style="font-size:0.9375rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin-bottom:0.5rem;">
+                    Delete Request?
+                </p>
+                <p style="font-size:0.8125rem; color:var(--color-brown-300); font-weight:var(--font-weight-light); line-height:1.6;">
+                    This action cannot be undone. This request will be permanently removed.
+                </p>
+            </div>
+            <div class="modal-footer" style="justify-content:center;">
+                <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
+                <button id="confirmDeleteBtn" class="btn-danger">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
             </div>
         </div>
     </div>
 
     <script src="../../js/core/common.js"></script>
-    <script src="../../js/core/form-validation.js"></script>
     <script src="lab-requests.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkSidebar = setInterval(function() {
+                const sidebar = document.getElementById('mainSidebar');
+                if (sidebar) {
+                    clearInterval(checkSidebar);
+                    document.getElementById('mainContent').classList.add('loaded');
+                }
+            }, 50);
+            setTimeout(function() {
+                document.getElementById('mainContent').classList.add('loaded');
+            }, 1000);
+        });
+    </script>
     
 </body>
 </html>

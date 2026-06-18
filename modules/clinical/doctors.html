@@ -5,157 +5,223 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Doctors | Clinical | MedFlow</title>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- ✅ CENTRALIZED THEME CSS -->
+    
+    <!-- ✅ ONLY THEME CSS - NO TAILWIND -->
     <link rel="stylesheet" href="../../css/theme.css">
 
     <style>
-        /* Additional page-specific styles that align with theme */
+        /* ============================================================
+           DOCTORS MODULE — Page-specific only
+           All base styles come from theme.css
+           ============================================================ */
+
+        /* Doctor card - extends theme's card-white */
         .doctor-card {
-            transition: var(--transition-base);
-            border-radius: var(--radius-lg);
-            background: var(--bg-card);
+            background-color: var(--bg-card);
             border: 1px solid var(--border-default);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+            padding: 1rem;
+            transition: var(--transition-base);
         }
-        
         .doctor-card:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
             border-color: var(--color-sage-pale);
         }
-        
-        .status-badge-active {
-            background: var(--color-success-bg);
-            color: var(--color-success-text);
-            padding: 0.2rem 0.625rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-        }
-        
-        .status-badge-inactive {
-            background: var(--color-error-bg);
-            color: var(--color-error-text);
-            padding: 0.2rem 0.625rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-        }
-        
-        /* Modal overlay styles matching theme.css */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 50;
+
+        /* Doctor avatar - small circle */
+        .doctor-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: var(--bg-overlay);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition-base);
+            color: white;
+            font-size: 0.875rem;
+            font-weight: var(--font-weight-medium);
+            flex-shrink: 0;
         }
-        
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .modal-overlay.active .modal-content {
-            transform: scale(1);
-        }
-        
-        .modal-container {
-            width: 100%;
-            max-width: 650px;
-            margin: 1rem;
-        }
-        
-        .modal-content {
-            background-color: var(--bg-card);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            border-top: 4px solid var(--color-sage);
-            box-shadow: var(--shadow-lg);
-            transform: scale(0.96);
-            transition: var(--transition-base);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .modal-header {
-            padding: 1.25rem;
-            border-bottom: 1px solid var(--border-default);
-            background-color: var(--bg-card);
-        }
-        
-        .modal-header h2 {
-            font-size: 1.0625rem;
-            font-weight: var(--font-weight-light);
+
+        /* Doctor info */
+        .doctor-name {
+            font-size: 0.875rem;
+            font-weight: var(--font-weight-medium);
             color: var(--color-brown-700);
-            margin: 0;
-            display: inline-block;
+            line-height: 1.3;
         }
-        
-        .modal-body {
-            padding: 1.25rem;
-            max-height: 60vh;
-            overflow-y: auto;
+        .doctor-spec {
+            font-size: 0.75rem;
+            color: var(--color-sage);
+            font-weight: var(--font-weight-light);
         }
-        
-        .modal-footer {
-            padding: 1rem 1.25rem;
-            border-top: 1px solid var(--border-default);
-            background-color: var(--bg-subtle);
+
+        /* Doctor meta items */
+        .doctor-meta {
             display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--color-brown-300);
+            font-weight: var(--font-weight-light);
         }
-        
-        .float-right {
-            float: right;
+        .doctor-meta i {
+            width: 1rem;
+            color: var(--color-brown-100);
+            font-size: 0.6875rem;
+            text-align: center;
         }
-        
-        .clearfix::after {
-            content: "";
-            clear: both;
-            display: table;
-        }
-        
-        .grid-cols-doctors {
+
+        /* Grid - matches theme patterns */
+        .doctors-grid {
             display: grid;
-            grid-template-columns: repeat(1, 1fr);
+            grid-template-columns: 1fr;
             gap: 1rem;
         }
-        
-        @media (min-width: 768px) {
-            .grid-cols-doctors {
-                grid-template-columns: repeat(3, 1fr);
+        @media (min-width: 640px)  { .doctors-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .doctors-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 1280px) { .doctors-grid { grid-template-columns: repeat(4, 1fr); } }
+
+        /* Status badges - use theme badge classes */
+        .status-badge-active {
+            background: var(--color-success-bg);
+            color: var(--color-success-text);
+            padding: 0.15rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6875rem;
+            font-weight: var(--font-weight-medium);
+        }
+        .status-badge-inactive {
+            background: var(--color-error-bg);
+            color: var(--color-error-text);
+            padding: 0.15rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6875rem;
+            font-weight: var(--font-weight-medium);
+        }
+
+        /* Empty state */
+        .doctors-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem 1.25rem;
+            color: var(--color-brown-100);
+        }
+        .doctors-empty i {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            display: block;
+            opacity: 0.4;
+        }
+
+        /* Delete modal - danger variant */
+        .modal-danger .modal-content {
+            border-top-color: #ef4444;
+        }
+
+        .delete-icon-circle {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            background-color: #fee2e2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: #dc2626;
+            font-size: 1.25rem;
+        }
+
+        /* Danger button */
+        .btn-danger {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            background-color: #ef4444;
+            color: white;
+            font-family: var(--font-family);
+            font-size: 0.8125rem;
+            font-weight: var(--font-weight-light);
+            padding: 0.5rem 1.25rem;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+        .btn-danger:hover {
+            background-color: #dc2626;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Override: Filter bar select width */
+        .filter-bar .form-select {
+            min-width: 160px !important;
+        }
+
+        /* Override: Add button inside filter bar */
+        .filter-bar .btn-primary {
+            flex: 0 0 auto !important;
+            padding: 0.4rem 0.85rem !important;
+            font-size: 0.8125rem !important;
+            height: 38px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.35rem !important;
+            border-radius: var(--radius-md) !important;
+            white-space: nowrap !important;
+            background-color: var(--color-sage) !important;
+            color: white !important;
+            border: none !important;
+        }
+
+        .filter-bar .btn-primary:hover {
+            background-color: var(--color-sage-dark) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.35) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        @media (max-width: 768px) {
+            .filter-bar .form-select {
+                min-width: 120px !important;
+            }
+            .filter-bar .btn-primary span {
+                display: none !important;
             }
         }
-        
-        @media (min-width: 1024px) {
-            .grid-cols-doctors {
-                grid-template-columns: repeat(4, 1fr);
-            }
+
+        /* Modal overrides - using theme's modal system */
+        .modal-content {
+            border-top: 4px solid var(--color-sage);
         }
-        
-        @media (min-width: 1280px) {
-            .grid-cols-doctors {
-                grid-template-columns: repeat(5, 1fr);
-            }
+
+        /* Icon button */
+        .icon-btn {
+            width: 2rem;
+            height: 2rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-default);
+            background-color: var(--bg-card);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-base);
+            font-size: 0.75rem;
+            color: var(--color-brown-200);
+        }
+        .icon-btn:hover {
+            background-color: var(--bg-hover);
+            color: var(--color-brown-600);
+            border-color: var(--color-brown-100);
+        }
+        .icon-btn.delete:hover {
+            background-color: #fee2e2;
+            color: #dc2626;
+            border-color: #fca5a5;
         }
     </style>
 </head>
@@ -164,189 +230,192 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+    <main class="main-content">
         
-        <!-- Page Header matching theme -->
-        <div class="page-header mb-6">
-            <div class="page-header-left">
-                <div class="page-header-icon">
-                    <i class="fas fa-user-md"></i>
-                </div>
-                <div>
-                    <h1 class="page-header-title">Doctor Management</h1>
-                    <p class="page-header-subtitle">Manage hospital doctors and specialists</p>
-                </div>
-            </div>
-            <div class="page-header-actions">
-                <button id="addDoctorBtn" class="btn-primary">
-                    <i class="fas fa-plus text-sm"></i>
-                    <span>Add Doctor</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Stats Cards using theme classes -->
-        <div class="grid-stats mb-8">
+        <!-- Stats Cards -->
+        <div class="grid-stats" style="margin-bottom: 1.5rem;">
             <div class="stat-card">
-                <div class="flex justify-between items-start">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Total Doctors</p>
                         <p class="stat-value" id="totalDoctors">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-user-md text-sage text-lg"></i>
+                        <i class="fas fa-user-md" style="color:var(--color-sage); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
             
             <div class="stat-card">
-                <div class="flex justify-between items-start">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Specializations</p>
                         <p class="stat-value" id="totalSpecs">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-tag text-sage text-lg"></i>
+                        <i class="fas fa-tag" style="color:var(--color-sage); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
             
             <div class="stat-card">
-                <div class="flex justify-between items-start">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Active Doctors</p>
                         <p class="stat-value" id="activeDoctors">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-check-circle text-sage text-lg"></i>
+                        <i class="fas fa-check-circle" style="color:var(--color-sage); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
             
             <div class="stat-card">
-                <div class="flex justify-between items-start">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Avg Consultation Fee</p>
                         <p class="stat-value" id="avgFees">₹0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-rupee-sign text-sage text-lg"></i>
+                        <i class="fas fa-rupee-sign" style="color:var(--color-sage); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Filter Bar using theme classes -->
+        <!-- Filter Bar with Add Button -->
         <div class="filter-bar">
-            <div class="relative flex-1">
-                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-brown-100 text-sm"></i>
-                <input type="text" id="searchInput" placeholder="Search by name or specialization..." 
-                       class="search-input pl-10">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by name or specialization...">
             </div>
-            <select id="specFilter" class="form-select w-auto min-w-[180px]">
+            <select id="specFilter" class="form-select">
                 <option value="">All Specializations</option>
             </select>
             <button id="resetFilter" class="btn-secondary">
-                <i class="fas fa-undo-alt mr-1"></i> Reset
+                <i class="fas fa-undo-alt"></i>
+                <span>Reset</span>
+            </button>
+            <button id="addDoctorBtn" class="btn-primary">
+                <i class="fas fa-plus"></i>
+                <span>Add Doctor</span>
             </button>
         </div>
 
         <!-- Doctors Grid -->
-        <div id="doctorsGrid" class="grid-cols-doctors">
-            <div class="col-span-full text-center py-12 text-brown-100">
-                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
-                <p class="font-light">Loading doctors...</p>
+        <div class="doctors-grid" id="doctorsGrid" style="margin-top: 1.5rem;">
+            <!-- Loading shimmer -->
+            <div class="doctor-card">
+                <div class="loading-shimmer" style="height:2.5rem; width:2.5rem; border-radius:50%; margin-bottom:0.75rem;"></div>
+                <div class="loading-shimmer" style="height:1rem; width:70%; margin-bottom:0.5rem;"></div>
+                <div class="loading-shimmer" style="height:0.75rem; width:50%;"></div>
+            </div>
+            <div class="doctor-card">
+                <div class="loading-shimmer" style="height:2.5rem; width:2.5rem; border-radius:50%; margin-bottom:0.75rem;"></div>
+                <div class="loading-shimmer" style="height:1rem; width:65%; margin-bottom:0.5rem;"></div>
+                <div class="loading-shimmer" style="height:0.75rem; width:45%;"></div>
+            </div>
+            <div class="doctor-card">
+                <div class="loading-shimmer" style="height:2.5rem; width:2.5rem; border-radius:50%; margin-bottom:0.75rem;"></div>
+                <div class="loading-shimmer" style="height:1rem; width:75%; margin-bottom:0.5rem;"></div>
+                <div class="loading-shimmer" style="height:0.75rem; width:55%;"></div>
             </div>
         </div>
     </main>
 
-    <!-- Add/Edit Doctor Modal - Matching theme.css structure -->
-    <div id="doctorModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 id="modalTitle">Add Doctor</h2>
-                    <button id="closeModalBtn" class="close-btn float-right">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="clearfix"></div>
-                </div>
-                <form id="doctorForm">
-                    <input type="hidden" id="doctorId">
-                    <div class="modal-body">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="form-group">
-                                <label class="form-label">Full Name *</label>
-                                <input type="text" id="name" required class="form-input" placeholder="Dr. Anjali Nair">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Specialization *</label>
-                                <input type="text" id="specialization" required class="form-input" placeholder="Cardiologist">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Qualification *</label>
-                                <input type="text" id="qualification" required class="form-input" placeholder="MD, DM">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Consultation Fee (₹) *</label>
-                                <input type="number" id="fee" required class="form-input" placeholder="1500">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Phone *</label>
-                                <input type="tel" id="phone" required class="form-input" placeholder="+91 98765 43210">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Email *</label>
-                                <input type="email" id="email" required class="form-input" placeholder="doctor@medflow.com">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Experience (years)</label>
-                                <input type="number" id="experience" class="form-input" placeholder="10">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Status</label>
-                                <select id="status" class="form-select">
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
-                                </select>
-                            </div>
+    <!-- Add/Edit Modal - Using theme's modal system -->
+    <div id="doctorModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="form-card" style="max-width:48rem;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">
+                    <i class="fas fa-user-md"></i>
+                    Add Doctor
+                </h3>
+                <button class="close-btn" id="closeModalBtn" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="doctorForm">
+                <input type="hidden" id="doctorId">
+                <div class="modal-body">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem 1.5rem;">
+                        <div class="form-group">
+                            <label class="form-label">Full Name <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="text" id="name" required class="form-input" placeholder="Dr. Anjali Nair">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Specialization <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="text" id="specialization" required class="form-input" placeholder="Cardiologist">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Qualification <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="text" id="qualification" required class="form-input" placeholder="MD, DM">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Consultation Fee (₹) <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="number" id="fee" required class="form-input" placeholder="1500">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="tel" id="phone" required class="form-input" placeholder="+91 98765 43210">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="email" id="email" required class="form-input" placeholder="doctor@medflow.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Experience (years)</label>
+                            <input type="number" id="experience" class="form-input" placeholder="10">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select id="status" class="form-select">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
-                        <button type="submit" class="btn-primary">
-                            <i class="fas fa-save mr-1"></i> Save Doctor
-                        </button>
-                    </div>
-                </form>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i>
+                        Save Doctor
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal - Matching theme.css structure -->
-    <div id="deleteModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Confirm Delete</h2>
-                    <button id="closeDeleteModalBtn" class="close-btn float-right">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="clearfix"></div>
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal-overlay modal-danger" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+        <div class="form-card" style="max-width:26rem; border-top-color:#ef4444;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="deleteModalTitle" style="color:var(--color-brown-700);">
+                    <i class="fas fa-triangle-exclamation" style="color:#ef4444;"></i>
+                    Confirm Delete
+                </h3>
+                <button class="close-btn" id="closeDeleteModalBtn" aria-label="Close delete modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="text-align:center; padding:1.75rem 1.25rem;">
+                <div class="delete-icon-circle">
+                    <i class="fas fa-trash-alt"></i>
                 </div>
-                <div class="modal-body text-center">
-                    <div class="w-16 h-16 bg-error-bg rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-trash-alt text-error-text text-2xl"></i>
-                    </div>
-                    <h3 class="text-base font-medium text-brown-700 mb-2">Delete Doctor?</h3>
-                    <p class="text-brown-300 text-sm font-light">This action cannot be undone. All doctor data will be permanently removed.</p>
-                </div>
-                <div class="modal-footer justify-center gap-3">
-                    <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
-                    <button id="confirmDeleteBtn" class="btn-danger">
-                        <i class="fas fa-trash-alt mr-1"></i> Delete
-                    </button>
-                </div>
+                <p style="font-size:0.9375rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin-bottom:0.5rem;">
+                    Delete Doctor?
+                </p>
+                <p style="font-size:0.8125rem; color:var(--color-brown-300); font-weight:var(--font-weight-light); line-height:1.6;">
+                    This action cannot be undone. All doctor data will be permanently removed.
+                </p>
+            </div>
+            <div class="modal-footer" style="justify-content:center;">
+                <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
+                <button id="confirmDeleteBtn" class="btn-danger">
+                    <i class="fas fa-trash-alt"></i>
+                    Delete
+                </button>
             </div>
         </div>
     </div>

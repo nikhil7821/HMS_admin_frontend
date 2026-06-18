@@ -5,140 +5,231 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>IPD | Clinical | MedFlow</title>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- ✅ CENTRALIZED THEME CSS -->
+    
+    <!-- ✅ ONLY THEME CSS - NO TAILWIND -->
     <link rel="stylesheet" href="../../css/theme.css">
 
     <style>
-        /* Additional page-specific styles that align with theme */
+        /* ============================================================
+           IPD MODULE — Page-specific only
+           All base styles come from theme.css
+           ============================================================ */
+
+        /* IPD table row */
         .ipd-row {
             transition: var(--transition-base);
             border-bottom: 1px solid var(--border-default);
         }
-        
         .ipd-row:hover {
             background-color: var(--bg-subtle);
         }
-        
+        .ipd-row:last-child {
+            border-bottom: none;
+        }
+
+        /* Status badges */
         .status-admitted {
             background: var(--color-success-bg);
             color: var(--color-success-text);
-            padding: 0.2rem 0.75rem;
+            padding: 0.15rem 0.625rem;
             border-radius: var(--radius-full);
             font-size: 0.6875rem;
             font-weight: var(--font-weight-medium);
             display: inline-block;
         }
-        
         .status-discharged {
             background: var(--bg-muted);
             color: var(--color-brown-300);
-            padding: 0.2rem 0.75rem;
+            padding: 0.15rem 0.625rem;
             border-radius: var(--radius-full);
             font-size: 0.6875rem;
             font-weight: var(--font-weight-medium);
             display: inline-block;
         }
-        
-        /* Modal overlay styles matching theme.css */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 50;
+
+        /* Table wrapper */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Data table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8125rem;
+        }
+        .data-table thead {
+            background-color: var(--bg-muted);
+            border-bottom: 1px solid var(--border-default);
+        }
+        .data-table th {
+            text-align: left;
+            padding: 0.75rem 1.25rem;
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-300);
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .data-table td {
+            padding: 0.75rem 1.25rem;
+            color: var(--color-brown-700);
+            vertical-align: middle;
+        }
+
+        /* Action buttons */
+        .action-btn {
+            color: var(--color-brown-100);
+            transition: var(--transition-base);
+            padding: 0.25rem 0.375rem;
+            border-radius: var(--radius-sm);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .action-btn:hover {
+            color: var(--color-sage-dark);
+        }
+        .action-btn.discharge:hover {
+            color: #10b981;
+        }
+        .action-btn.delete:hover {
+            color: #dc2626;
+        }
+
+        /* Delete modal - danger variant */
+        .modal-danger .modal-content {
+            border-top-color: #ef4444;
+        }
+
+        .delete-icon-circle {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            background-color: #fee2e2;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: var(--bg-overlay);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition-base);
+            margin: 0 auto 1rem;
+            color: #dc2626;
+            font-size: 1.25rem;
         }
-        
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .modal-overlay.active .modal-content {
-            transform: scale(1);
-        }
-        
-        .modal-container {
-            width: 100%;
-            max-width: 550px;
-            margin: 1rem;
-        }
-        
-        .modal-content {
-            background-color: var(--bg-card);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            border-top: 4px solid var(--color-sage);
-            box-shadow: var(--shadow-lg);
-            transform: scale(0.96);
-            transition: var(--transition-base);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .modal-header {
-            padding: 1.25rem;
-            border-bottom: 1px solid var(--border-default);
-            background-color: var(--bg-card);
-        }
-        
-        .modal-header h2 {
-            font-size: 1.0625rem;
+
+        /* Danger button */
+        .btn-danger {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            background-color: #ef4444;
+            color: white;
+            font-family: var(--font-family);
+            font-size: 0.8125rem;
             font-weight: var(--font-weight-light);
-            color: var(--color-brown-700);
-            margin: 0;
-            display: inline-block;
+            padding: 0.5rem 1.25rem;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: var(--transition-base);
         }
-        
-        .modal-body {
-            padding: 1.25rem;
-            max-height: 60vh;
-            overflow-y: auto;
+        .btn-danger:hover {
+            background-color: #dc2626;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
         }
-        
-        .modal-footer {
-            padding: 1rem 1.25rem;
-            border-top: 1px solid var(--border-default);
-            background-color: var(--bg-subtle);
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
-        }
-        
-        .float-right {
-            float: right;
-        }
-        
-        .clearfix::after {
-            content: "";
-            clear: both;
-            display: table;
-        }
-        
+
+        /* Success button */
         .btn-success {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            background-color: var(--color-sage);
+            color: white;
+            font-family: var(--font-family);
+            font-size: 0.8125rem;
+            font-weight: var(--font-weight-light);
+            padding: 0.5rem 1.25rem;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+        .btn-success:hover {
+            background-color: var(--color-sage-dark);
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.35);
+            transform: translateY(-1px);
+        }
+
+        /* Override: Add button inside filter bar */
+        .filter-bar .btn-primary {
+            flex: 0 0 auto !important;
+            padding: 0.4rem 0.85rem !important;
+            font-size: 0.8125rem !important;
+            height: 38px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.35rem !important;
+            border-radius: var(--radius-md) !important;
+            white-space: nowrap !important;
             background-color: var(--color-sage) !important;
             color: white !important;
             border: none !important;
         }
-        
-        .btn-success:hover {
+
+        .filter-bar .btn-primary:hover {
             background-color: var(--color-sage-dark) !important;
-            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.35) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* Filter bar select width */
+        .filter-bar .form-select {
+            min-width: 140px !important;
+        }
+
+        @media (max-width: 768px) {
+            .filter-bar .form-select {
+                min-width: 100px !important;
+            }
+            .filter-bar .btn-primary span {
+                display: none !important;
+            }
+            .data-table th,
+            .data-table td {
+                padding: 0.5rem 0.75rem !important;
+                font-size: 0.75rem !important;
+            }
+        }
+
+        /* Modal overrides */
+        .modal-content {
+            border-top: 4px solid var(--color-sage);
+        }
+
+        /* Empty state */
+        .ipd-empty {
+            text-align: center;
+            padding: 3rem 1.25rem;
+            color: var(--color-brown-100);
+        }
+        .ipd-empty i {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            display: block;
+            opacity: 0.4;
+        }
+        .ipd-empty p {
+            font-size: 0.875rem;
+            font-weight: var(--font-weight-light);
+        }
+
+        /* Discharged badge in table */
+        .discharged-label {
+            font-size: 0.6875rem;
+            color: var(--color-brown-100);
+            font-weight: var(--font-weight-light);
         }
     </style>
 </head>
@@ -147,97 +238,99 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+    <main class="main-content">
         
-        <!-- Page Header matching theme -->
-        <div class="page-header mb-6">
-            <div class="page-header-left">
-                <div class="page-header-icon">
-                    <i class="fas fa-procedures"></i>
-                </div>
-                <div>
-                    <h1 class="page-header-title">IPD Management</h1>
-                    <p class="page-header-subtitle">Inpatient admissions & bed allocation</p>
-                </div>
-            </div>
-            <div class="page-header-actions">
-                <button id="admitBtn" class="btn-primary">
-                    <i class="fas fa-plus text-sm"></i>
-                    <span>Admit Patient</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Stats Cards using theme classes -->
-        <div class="grid-stats mb-8">
+        <!-- Stats Cards -->
+        <div class="grid-stats" style="margin-bottom: 1.5rem;">
             <div class="stat-card">
-                <div class="flex justify-between items-start">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Current IPD</p>
                         <p class="stat-value" id="currentIpd">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-procedures text-sage text-lg"></i>
+                        <i class="fas fa-procedures" style="color:var(--color-sage); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
             
             <div class="stat-card">
-                <div class="flex justify-between items-start">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Available Beds</p>
                         <p class="stat-value" id="availableBeds">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-bed text-sage text-lg"></i>
+                        <i class="fas fa-bed" style="color:var(--color-sage); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
             
             <div class="stat-card">
-                <div class="flex justify-between items-start">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Discharged Today</p>
                         <p class="stat-value" id="dischargedToday">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-download text-sage text-lg"></i>
+                        <i class="fas fa-download" style="color:var(--color-sage); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
             
             <div class="stat-card">
-                <div class="flex justify-between items-start">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Average Stay</p>
-                        <p class="stat-value" id="avgStay">0</p>
+                        <p class="stat-value" id="avgStay">0 days</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-clock text-sage text-lg"></i>
+                        <i class="fas fa-clock" style="color:var(--color-sage); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Filter Bar with Add Button -->
+        <div class="filter-bar">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by patient or doctor...">
+            </div>
+            <select id="statusFilter" class="form-select">
+                <option value="">All Status</option>
+                <option value="Admitted">Admitted</option>
+                <option value="Discharged">Discharged</option>
+            </select>
+            <button id="resetFilterBtn" class="btn-secondary">
+                <i class="fas fa-undo-alt"></i>
+                <span>Reset</span>
+            </button>
+            <button id="admitBtn" class="btn-primary">
+                <i class="fas fa-plus"></i>
+                <span>Admit Patient</span>
+            </button>
+        </div>
+
         <!-- IPD Table -->
-        <div class="card-white overflow-hidden">
+        <div class="card-white" style="margin-top: 1.5rem; overflow:hidden;">
             <div class="table-wrapper">
-                <table class="data-table w-full">
+                <table class="data-table">
                     <thead>
                         <tr>
-                            <th class="px-5 py-3">Patient</th>
-                            <th class="px-5 py-3">Doctor</th>
-                            <th class="px-5 py-3">Ward / Bed</th>
-                            <th class="px-5 py-3">Admission Date</th>
-                            <th class="px-5 py-3">Status</th>
-                            <th class="px-5 py-3 text-center">Actions</th>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Ward / Bed</th>
+                            <th>Admission Date</th>
+                            <th>Status</th>
+                            <th style="text-align:center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="ipdTable">
                         <tr>
-                            <td colspan="6" class="text-center py-12 text-brown-100">
-                                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
-                                <p class="font-light">Loading IPD patients...</p>
+                            <td colspan="6" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
+                                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
+                                <p style="font-weight:var(--font-weight-light);">Loading IPD patients...</p>
                             </td>
                         </tr>
                     </tbody>
@@ -246,114 +339,121 @@
         </div>
     </main>
 
-    <!-- Admit Patient Modal - Matching theme.css structure -->
-    <div id="ipdModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Admit Patient</h2>
-                    <button id="closeIpdModalBtn" class="close-btn float-right">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="clearfix"></div>
-                </div>
-                <form id="ipdForm">
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label class="form-label">Select Patient *</label>
-                            <select id="patientId" required class="form-select">
-                                <option value="">-- Select Patient --</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Assign Doctor *</label>
-                            <select id="doctorId" required class="form-select">
-                                <option value="">-- Select Doctor --</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Select Ward *</label>
-                            <select id="wardId" required class="form-select">
-                                <option value="">-- Select Ward --</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Primary Diagnosis</label>
-                            <textarea id="diagnosis" rows="3" class="form-textarea" placeholder="Enter primary diagnosis..."></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" id="cancelIpdModalBtn" class="btn-secondary">Cancel</button>
-                        <button type="submit" class="btn-primary">
-                            <i class="fas fa-procedures mr-1"></i> Admit Patient
-                        </button>
-                    </div>
-                </form>
+    <!-- Admit Patient Modal - Using theme's modal system -->
+    <div id="ipdModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="form-card" style="max-width:44rem;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">
+                    <i class="fas fa-procedures"></i>
+                    Admit Patient
+                </h3>
+                <button class="close-btn" id="closeIpdModalBtn" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
+            <form id="ipdForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Select Patient <span style="color:var(--color-error-text);">*</span></label>
+                        <select id="patientId" required class="form-select">
+                            <option value="">-- Select Patient --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Assign Doctor <span style="color:var(--color-error-text);">*</span></label>
+                        <select id="doctorId" required class="form-select">
+                            <option value="">-- Select Doctor --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Select Ward <span style="color:var(--color-error-text);">*</span></label>
+                        <select id="wardId" required class="form-select">
+                            <option value="">-- Select Ward --</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label">Primary Diagnosis</label>
+                        <textarea id="diagnosis" rows="3" class="form-textarea" placeholder="Enter primary diagnosis..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancelIpdModalBtn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-procedures"></i>
+                        Admit Patient
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Discharge Summary Modal - Matching theme.css structure -->
-    <div id="dischargeModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Discharge Summary</h2>
-                    <button id="closeDischargeModalBtn" class="close-btn float-right">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="clearfix"></div>
-                </div>
-                <form id="dischargeForm">
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label class="form-label">Discharge Summary *</label>
-                            <textarea id="dischargeSummary" rows="3" class="form-textarea" placeholder="Enter discharge summary, follow-up instructions..."></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Medications Prescribed</label>
-                            <textarea id="medications" rows="2" class="form-textarea" placeholder="List medications with dosage..."></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Follow-up Date</label>
-                            <input type="date" id="followUp" class="form-input">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" id="cancelDischargeModalBtn" class="btn-secondary">Cancel</button>
-                        <button type="submit" class="btn-success">
-                            <i class="fas fa-check-circle mr-1"></i> Complete Discharge
-                        </button>
-                    </div>
-                </form>
+    <!-- Discharge Summary Modal -->
+    <div id="dischargeModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="dischargeModalTitle">
+        <div class="form-card" style="max-width:44rem;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="dischargeModalTitle">
+                    <i class="fas fa-download" style="color:#10b981;"></i>
+                    Discharge Summary
+                </h3>
+                <button class="close-btn" id="closeDischargeModalBtn" aria-label="Close discharge modal">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
+            <form id="dischargeForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Discharge Summary <span style="color:var(--color-error-text);">*</span></label>
+                        <textarea id="dischargeSummary" rows="3" class="form-textarea" placeholder="Enter discharge summary, follow-up instructions..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Medications Prescribed</label>
+                        <textarea id="medications" rows="2" class="form-textarea" placeholder="List medications with dosage..."></textarea>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label">Follow-up Date</label>
+                        <input type="date" id="followUp" class="form-input">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancelDischargeModalBtn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-success">
+                        <i class="fas fa-check-circle"></i>
+                        Complete Discharge
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal - Matching theme.css structure -->
-    <div id="deleteModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Confirm Delete</h2>
-                    <button id="closeDeleteModalBtn" class="close-btn float-right">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="clearfix"></div>
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal-overlay modal-danger" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+        <div class="form-card" style="max-width:26rem; border-top-color:#ef4444;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="deleteModalTitle" style="color:var(--color-brown-700);">
+                    <i class="fas fa-triangle-exclamation" style="color:#ef4444;"></i>
+                    Confirm Delete
+                </h3>
+                <button class="close-btn" id="closeDeleteModalBtn" aria-label="Close delete modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="text-align:center; padding:1.75rem 1.25rem;">
+                <div class="delete-icon-circle">
+                    <i class="fas fa-trash-alt"></i>
                 </div>
-                <div class="modal-body text-center">
-                    <div class="w-16 h-16 bg-error-bg rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-trash-alt text-error-text text-2xl"></i>
-                    </div>
-                    <h3 class="text-base font-medium text-brown-700 mb-2">Delete IPD Record?</h3>
-                    <p class="text-brown-300 text-sm font-light">This action cannot be undone. This patient record will be permanently removed.</p>
-                </div>
-                <div class="modal-footer justify-center gap-3">
-                    <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
-                    <button id="confirmDeleteBtn" class="btn-danger">
-                        <i class="fas fa-trash-alt mr-1"></i> Delete
-                    </button>
-                </div>
+                <p style="font-size:0.9375rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin-bottom:0.5rem;">
+                    Delete IPD Record?
+                </p>
+                <p style="font-size:0.8125rem; color:var(--color-brown-300); font-weight:var(--font-weight-light); line-height:1.6;">
+                    This action cannot be undone. This patient record will be permanently removed.
+                </p>
+            </div>
+            <div class="modal-footer" style="justify-content:center;">
+                <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
+                <button id="confirmDeleteBtn" class="btn-danger">
+                    <i class="fas fa-trash-alt"></i>
+                    Delete
+                </button>
             </div>
         </div>
     </div>

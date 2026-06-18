@@ -5,89 +5,188 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Categories | Pharmacy | MedFlow</title>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- ✅ CENTRALIZED THEME CSS -->
+    
+    <!-- ✅ ONLY THEME CSS - NO TAILWIND -->
     <link rel="stylesheet" href="../../css/theme.css">
 
     <style>
-        /* Additional page-specific styles that align with theme */
+        /* ============================================================
+           CATEGORIES MODULE — Page-specific only
+           All base styles come from theme.css
+           ============================================================ */
+
+        /* Category code badge */
         .badge-code {
             background: var(--bg-muted);
             color: var(--color-brown-300);
-            padding: 0.2rem 0.85rem;
+            padding: 0.15rem 0.625rem;
             border-radius: var(--radius-full);
             font-size: 0.6875rem;
             font-weight: var(--font-weight-medium);
             display: inline-block;
+            font-family: monospace;
         }
-        
-        /* Modal overlay styles matching theme.css */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 50;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--bg-overlay);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition-base);
+
+        /* Table wrapper */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
-        
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .modal-overlay.active .form-card {
-            transform: scale(1);
-        }
-        
-        .form-card {
-            transform: scale(0.96);
-            transition: var(--transition-base);
-            border-radius: var(--radius-lg);
-            background: var(--bg-card);
-            border: 1px solid var(--border-default);
-            border-top: 4px solid var(--color-sage);
+
+        /* Data table */
+        .data-table {
             width: 100%;
-            max-width: 28rem;
-            margin: 1rem;
-            box-shadow: var(--shadow-lg);
+            border-collapse: collapse;
+            font-size: 0.8125rem;
         }
-        
-        .action-edit {
+        .data-table thead {
+            background-color: var(--bg-muted);
+            border-bottom: 1px solid var(--border-default);
+        }
+        .data-table th {
+            text-align: left;
+            padding: 0.75rem 1.25rem;
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-300);
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .data-table td {
+            padding: 0.75rem 1.25rem;
+            color: var(--color-brown-700);
+            vertical-align: middle;
+        }
+
+        /* Table row hover */
+        .category-row {
+            transition: var(--transition-base);
+            border-bottom: 1px solid var(--border-default);
+        }
+        .category-row:hover {
+            background-color: var(--bg-subtle);
+        }
+        .category-row:last-child {
+            border-bottom: none;
+        }
+
+        /* Action buttons */
+        .action-btn {
+            color: var(--color-brown-100);
+            transition: var(--transition-base);
+            padding: 0.25rem 0.375rem;
+            border-radius: var(--radius-sm);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .action-btn:hover {
+            color: var(--color-sage-dark);
+        }
+        .action-btn.edit:hover {
             color: var(--color-sage);
-            transition: var(--transition-base);
         }
-        .action-edit:hover { 
-            color: var(--color-sage-dark); 
+        .action-btn.delete:hover {
+            color: #dc2626;
         }
-        .action-delete {
-            color: var(--color-warm-tan);
-            transition: var(--transition-base);
+
+        /* Override: Add button inside filter bar */
+        .filter-bar .btn-primary {
+            flex: 0 0 auto !important;
+            padding: 0.4rem 0.85rem !important;
+            font-size: 0.8125rem !important;
+            height: 38px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.35rem !important;
+            border-radius: var(--radius-md) !important;
+            white-space: nowrap !important;
+            background-color: var(--color-sage) !important;
+            color: white !important;
+            border: none !important;
         }
-        .action-delete:hover { 
-            color: var(--color-warm-tan-dark); 
+        .filter-bar .btn-primary:hover {
+            background-color: var(--color-sage-dark) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.35) !important;
+            transform: translateY(-1px) !important;
         }
-        
+
+        @media (max-width: 768px) {
+            .filter-bar .btn-primary span {
+                display: none !important;
+            }
+            .data-table th,
+            .data-table td {
+                padding: 0.5rem 0.75rem !important;
+                font-size: 0.75rem !important;
+            }
+        }
+
+        /* Modal overrides */
+        .form-card {
+            border-top-color: var(--color-sage);
+        }
+
+        /* Error message */
         .error-message {
             color: var(--color-error-text);
             font-size: 0.6875rem;
             margin-top: 0.25rem;
             display: block;
             font-weight: var(--font-weight-light);
+        }
+
+        .form-input.error,
+        .form-select.error {
+            border-color: var(--color-error-text);
+        }
+        .form-input.error:focus,
+        .form-select.error:focus {
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+        }
+
+        /* Empty state */
+        .categories-empty {
+            text-align: center;
+            padding: 3rem 1.25rem;
+            color: var(--color-brown-100);
+        }
+        .categories-empty i {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            display: block;
+            opacity: 0.4;
+        }
+        .categories-empty p {
+            font-size: 0.875rem;
+            font-weight: var(--font-weight-light);
+        }
+
+        /* Description column truncate */
+        .desc-cell {
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--color-brown-300);
+            font-size: 0.8125rem;
+        }
+
+        /* S.No column */
+        .sno-cell {
+            color: var(--color-brown-100);
+            font-size: 0.8125rem;
+            font-weight: var(--font-weight-light);
+        }
+
+        /* Category name */
+        .cat-name {
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-700);
+            font-size: 0.875rem;
         }
     </style>
 </head>
@@ -96,44 +195,93 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+    <main class="main-content">
         
-        <!-- Page Header matching theme -->
-        <div class="page-header mb-6">
-            <div class="page-header-left">
-                <div class="page-header-icon">
-                    <i class="fas fa-tags"></i>
-                </div>
-                <div>
-                    <h1 class="page-header-title">Medicine Categories</h1>
-                    <p class="page-header-subtitle">Manage medicine categories and classifications</p>
+        <!-- Stats Cards -->
+        <div class="grid-stats" style="margin-bottom: 1.5rem;">
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <p class="stat-label">Total Categories</p>
+                        <p class="stat-value" id="totalCategories">0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-tags" style="color:var(--color-sage); font-size:1.125rem;"></i>
+                    </div>
                 </div>
             </div>
-            <div class="page-header-actions">
-                <button id="addCategoryBtn" class="btn-primary">
-                    <i class="fas fa-plus text-sm"></i>
-                    <span>Add Category</span>
-                </button>
+            
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <p class="stat-label">Active Categories</p>
+                        <p class="stat-value" id="activeCategories">0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-check-circle" style="color:var(--color-sage); font-size:1.125rem;"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <p class="stat-label">With Description</p>
+                        <p class="stat-value" id="withDescCount">0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-file-alt" style="color:var(--color-sage); font-size:1.125rem;"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <p class="stat-label">Last Updated</p>
+                        <p class="stat-value" id="lastUpdated" style="font-size:1.125rem; margin-top:0.375rem;">Today</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-calendar-alt" style="color:var(--color-sage); font-size:1.125rem;"></i>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Categories Table Card -->
-        <div class="card-white overflow-hidden">
+        <!-- Filter Bar with Add Button -->
+        <div class="filter-bar">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search categories...">
+            </div>
+            <button id="resetFilter" class="btn-secondary">
+                <i class="fas fa-undo-alt"></i>
+                <span>Reset</span>
+            </button>
+            <button id="addCategoryBtn" class="btn-primary">
+                <i class="fas fa-plus"></i>
+                <span>Add Category</span>
+            </button>
+        </div>
+
+        <!-- Categories Table -->
+        <div class="card-white" style="margin-top: 1.5rem; overflow:hidden;">
             <div class="table-wrapper">
-                <table class="data-table w-full">
+                <table class="data-table">
                     <thead>
                         <tr>
-                            <th class="px-5 py-4">S.No</th>
-                            <th class="px-5 py-4">Category Name</th>
-                            <th class="px-5 py-4">Code</th>
-                            <th class="px-5 py-4">Description</th>
-                            <th class="px-5 py-4 text-center">Actions</th>
+                            <th style="width:60px;">S.No</th>
+                            <th>Category Name</th>
+                            <th style="width:100px;">Code</th>
+                            <th>Description</th>
+                            <th style="width:100px; text-align:center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="categoriesTable">
                         <tr>
-                            <td colspan="5" class="text-center py-8 text-brown-100">
-                                <i class="fas fa-spinner fa-pulse mr-2"></i>Loading categories...
+                            <td colspan="5" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
+                                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
+                                <p style="font-weight:var(--font-weight-light);">Loading categories...</p>
                             </td>
                         </tr>
                     </tbody>
@@ -142,40 +290,42 @@
         </div>
     </main>
 
-    <!-- Add/Edit Modal - Matching theme.css structure -->
-    <div id="categoryModal" class="modal-overlay">
-        <div class="form-card">
-            <div class="flex justify-between items-center p-5 border-b border-default">
-                <h3 id="modalTitle" class="modal-title">
-                    <i class="fas fa-layer-group text-sage"></i> Add Category
+    <!-- Add/Edit Category Modal -->
+    <div id="categoryModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="form-card" style="max-width:30rem;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">
+                    <i class="fas fa-layer-group"></i>
+                    Add Category
                 </h3>
-                <button id="closeModalBtn" class="close-btn">
-                    <i class="fas fa-times text-lg"></i>
+                <button class="close-btn" id="closeModalBtn" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
             <form id="categoryForm">
                 <input type="hidden" id="categoryId">
-                <div class="p-5 space-y-4">
+                <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Category Name <span class="text-error-text">*</span></label>
+                        <label class="form-label">Category Name <span style="color:var(--color-error-text);">*</span></label>
                         <input type="text" id="catName" class="form-input" placeholder="e.g., Antibiotics, Painkillers" autocomplete="off">
                         <span class="error-message" id="catNameError"></span>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Category Code <span class="text-error-text">*</span></label>
-                        <input type="text" id="catCode" class="form-input" placeholder="e.g., ANT, PAIN" autocomplete="off" maxlength="10">
+                        <label class="form-label">Category Code <span style="color:var(--color-error-text);">*</span></label>
+                        <input type="text" id="catCode" class="form-input" placeholder="e.g., ANT, PAIN" autocomplete="off" maxlength="10" style="text-transform:uppercase;">
                         <span class="error-message" id="catCodeError"></span>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="margin-bottom:0;">
                         <label class="form-label">Description</label>
                         <textarea id="catDesc" rows="3" class="form-textarea" placeholder="Brief description of the category..."></textarea>
                         <span class="error-message" id="catDescError"></span>
                     </div>
                 </div>
-                <div class="p-5 bg-subtle rounded-b-xl flex justify-end gap-3 border-t border-default">
+                <div class="modal-footer">
                     <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
                     <button type="submit" class="btn-primary">
-                        <i class="fas fa-save mr-2 text-xs"></i>Save Category
+                        <i class="fas fa-save"></i>
+                        Save Category
                     </button>
                 </div>
             </form>

@@ -10,34 +10,303 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     
     <!-- ===== THEME.CSS ===== -->
-    <link rel="stylesheet" href="../../assets/css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme.css" />
     
     <style>
         /* ============================================================
-           COMPLETE OVERRIDE - FORCE SIDEBAR TO BE CLICKABLE
+           SIDEBAR SPECIFIC STYLES - Extends theme.css
            ============================================================ */
         
-        /* FORCE: Sidebar above everything */
         #mainSidebar.sidebar {
             z-index: 9999 !important;
             position: fixed !important;
             background: #fef9f0 !important;
             background-image: radial-gradient(circle at 10% 20%, rgba(233, 216, 190, 0.08) 0%, rgba(250, 242, 228, 0) 80%) !important;
             border-right: 1px solid #e8ddce !important;
-            width: 260px !important;
             height: 100vh !important;
             top: 0 !important;
             left: 0 !important;
             pointer-events: auto !important;
+            overflow-y: auto !important;
+            overflow-x: visible !important;
+            display: flex !important;
+            flex-direction: column !important;
+            transition: width 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1) !important;
+            width: 260px !important;
         }
         
-        /* FORCE: All sidebar children clickable */
         #mainSidebar * {
             pointer-events: auto !important;
         }
         
-        /* FORCE: Logout button clickable - ORIGINAL BROWN BORDER */
-        #sidebarLogoutBtn {
+        /* ============================================================
+           LOGO SECTION
+           ============================================================ */
+        #mainSidebar .sidebar-logo {
+            position: relative !important;
+            padding: 0 1rem !important;
+            height: 70px !important;
+            border-bottom: 1px solid #eadbc8 !important;
+            background: linear-gradient(135deg, #fef9f0 0%, #fcf5e8 100%) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+        }
+        
+        #mainSidebar .logo-content {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.625rem !important;
+            width: 100% !important;
+            transition: all 0.3s ease !important;
+            padding-left: 0 !important;
+            justify-content: flex-start !important;
+        }
+        
+        #mainSidebar .logo-icon {
+            background: linear-gradient(135deg, #9bb88b 0%, #7d9b6e 100%) !important;
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 10px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        #mainSidebar .logo-icon i {
+            font-size: 1rem !important;
+            color: white !important;
+        }
+        
+        #mainSidebar .logo-text {
+            color: #5c4b3a !important;
+            white-space: nowrap !important;
+            font-size: 1rem !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        #mainSidebar .logo-sub {
+            color: #b8a69b !important;
+            white-space: nowrap !important;
+            font-size: 0.7rem !important;
+            font-weight: 400 !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        /* ============================================================
+           COLLAPSE BUTTON
+           ============================================================ */
+        #mainSidebar #collapseBtn {
+            position: absolute !important;
+            right: 12px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            width: 28px !important;
+            height: 28px !important;
+            background: transparent !important;
+            border: none !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            z-index: 99999 !important;
+            box-shadow: none !important;
+            pointer-events: auto !important;
+            transition: all 0.3s ease !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            color: #9bb88b !important;
+            line-height: 1 !important;
+        }
+        
+        #mainSidebar #collapseBtn:hover {
+            background: rgba(155, 184, 139, 0.1) !important;
+            transform: translateY(-50%) scale(1.1) !important;
+            box-shadow: none !important;
+        }
+        
+        #mainSidebar #collapseBtn i {
+            color: #9bb88b !important;
+            font-size: 0.85rem !important;
+            transition: transform 0.3s ease !important;
+            pointer-events: none !important;
+            line-height: 1 !important;
+        }
+        
+        /* ============================================================
+           SIDEBAR WRAPPER
+           ============================================================ */
+        #mainSidebar .sidebar-wrapper {
+            position: relative !important;
+            height: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            min-height: 100vh !important;
+            pointer-events: auto !important;
+        }
+        
+        #mainSidebar .sidebar-nav-wrapper {
+            flex: 1 !important;
+            overflow-y: auto !important;
+            padding-bottom: 20px !important;
+            min-height: 0 !important;
+            pointer-events: auto !important;
+        }
+        
+        /* ============================================================
+           NAVIGATION ITEMS
+           ============================================================ */
+        #mainSidebar .nav-item {
+            display: flex !important;
+            align-items: center !important;
+            padding: 0.5625rem 1rem !important;
+            margin: 0.25rem 0.75rem !important;
+            border-radius: 10px !important;
+            color: #6b5b4e !important;
+            font-weight: 450 !important;
+            font-size: 0.85rem !important;
+            transition: all 0.25s ease !important;
+            text-decoration: none !important;
+            cursor: pointer !important;
+            white-space: nowrap !important;
+        }
+        
+        #mainSidebar .nav-item i {
+            width: 1.5rem !important;
+            font-size: 1rem !important;
+            margin-right: 0.75rem !important;
+            color: #c9b69a !important;
+            transition: all 0.25s ease !important;
+            flex-shrink: 0 !important;
+            pointer-events: none !important;
+        }
+        
+        #mainSidebar .nav-item:hover {
+            background: #f5ede2 !important;
+            color: #8b7a6b !important;
+        }
+        
+        #mainSidebar .nav-item:hover i {
+            color: #9bb88b !important;
+            transform: translateX(2px) !important;
+        }
+        
+        #mainSidebar .nav-item.active {
+            background: linear-gradient(135deg, #f0eae0 0%, #ebe1d4 100%) !important;
+            color: #7d6b5a !important;
+            border-left: 3px solid #9bb88b !important;
+        }
+        
+        #mainSidebar .nav-item.active i {
+            color: #9bb88b !important;
+        }
+        
+        /* ============================================================
+           DROPDOWN STYLES
+           ============================================================ */
+        #mainSidebar .nav-dropdown {
+            margin: 0.125rem 0 !important;
+            position: relative !important;
+        }
+        
+        #mainSidebar .nav-dropdown-btn {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            padding: 0.5625rem 1rem !important;
+            margin: 0.25rem 0.75rem !important;
+            border-radius: 10px !important;
+            color: #6b5b4e !important;
+            font-weight: 450 !important;
+            font-size: 0.85rem !important;
+            cursor: pointer !important;
+            transition: all 0.25s ease !important;
+            white-space: nowrap !important;
+        }
+        
+        #mainSidebar .nav-dropdown-btn .dropdown-left {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.75rem !important;
+        }
+        
+        #mainSidebar .nav-dropdown-btn i:first-child {
+            width: 1.5rem !important;
+            font-size: 1rem !important;
+            color: #c9b69a !important;
+            transition: all 0.25s ease !important;
+            flex-shrink: 0 !important;
+            pointer-events: none !important;
+        }
+        
+        #mainSidebar .nav-dropdown-btn .fa-chevron-down {
+            font-size: 0.7rem !important;
+            color: #c9b69a !important;
+            transition: transform 0.25s ease !important;
+            flex-shrink: 0 !important;
+            pointer-events: none !important;
+        }
+        
+        #mainSidebar .nav-dropdown-btn:hover {
+            background: #f5ede2 !important;
+            color: #8b7a6b !important;
+        }
+        
+        #mainSidebar .nav-dropdown-btn:hover i:first-child {
+            color: #9bb88b !important;
+        }
+        
+        #mainSidebar .nav-dropdown-content {
+            margin-left: 1.5rem !important;
+            padding-left: 0.5rem !important;
+            border-left: 1.5px solid #e8d9ca !important;
+            margin-top: 0.25rem !important;
+            margin-bottom: 0.25rem !important;
+            transition: all 0.2s ease !important;
+        }
+        
+        #mainSidebar .dropdown-link {
+            display: flex !important;
+            align-items: center !important;
+            padding: 0.4375rem 1rem !important;
+            margin: 0.125rem 0 !important;
+            border-radius: 8px !important;
+            color: #8a7a6b !important;
+            font-weight: 400 !important;
+            font-size: 0.8rem !important;
+            transition: all 0.2s ease !important;
+            text-decoration: none !important;
+            cursor: pointer !important;
+            white-space: nowrap !important;
+        }
+        
+        #mainSidebar .dropdown-link i {
+            width: 1.5rem !important;
+            font-size: 0.85rem !important;
+            margin-right: 0.5rem !important;
+            color: #d4c3ae !important;
+            flex-shrink: 0 !important;
+            pointer-events: none !important;
+        }
+        
+        #mainSidebar .dropdown-link:hover {
+            background: #f5ede2 !important;
+            color: #9bb88b !important;
+        }
+        
+        #mainSidebar .dropdown-link:hover i {
+            color: #9bb88b !important;
+        }
+        
+        /* ============================================================
+           LOGOUT BUTTON
+           ============================================================ */
+        #mainSidebar #sidebarLogoutBtn {
             pointer-events: auto !important;
             cursor: pointer !important;
             z-index: 99999 !important;
@@ -52,11 +321,10 @@
             transition: all 0.25s ease !important;
             flex-shrink: 0 !important;
             user-select: none !important;
-            height: auto !important;
             min-height: 50px !important;
         }
         
-        #sidebarLogoutBtn i {
+        #mainSidebar #sidebarLogoutBtn i {
             pointer-events: none !important;
             width: 1.5rem !important;
             font-size: 1rem !important;
@@ -64,306 +332,157 @@
             color: #d8b48c !important;
         }
         
-        #sidebarLogoutBtn span {
+        #mainSidebar #sidebarLogoutBtn span {
             pointer-events: none !important;
             color: #c9a47c !important;
             font-weight: 500 !important;
             font-size: 1rem !important;
         }
         
-        #sidebarLogoutBtn:hover {
+        #mainSidebar #sidebarLogoutBtn:hover {
             background: #fde8d4 !important;
             transform: translateY(-1px) !important;
             border-color: #c9a47c !important;
         }
         
-        #sidebarLogoutBtn:hover i {
-            color: #c49a6c !important;
-        }
-        
-        #sidebarLogoutBtn:hover span {
-            color: #b8946c !important;
-        }
-        
-        /* FORCE: Modal overlay */
-        #sidebarLogoutModal.sidebar-logout-modal-overlay {
-            z-index: 999999 !important;
-            pointer-events: auto !important;
-        }
-        
-        /* Sidebar wrapper */
-        .sidebar-wrapper {
-            position: relative !important;
-            height: 100% !important;
-            display: flex !important;
-            flex-direction: column !important;
-            min-height: 100vh !important;
-            pointer-events: auto !important;
-        }
-        
-        .sidebar-nav-wrapper {
-            flex: 1 !important;
-            overflow-y: auto !important;
-            padding-bottom: 20px !important;
-            min-height: 0 !important;
-            pointer-events: auto !important;
-        }
-        
-        /* Collapsed state */
-        #mainSidebar.sidebar.collapsed {
+        /* ============================================================
+           COLLAPSED STATE - Using data attribute
+           ============================================================ */
+        #mainSidebar[data-collapsed="true"] {
             width: 72px !important;
         }
         
-        #mainSidebar.sidebar.collapsed .logo-text,
-        #mainSidebar.sidebar.collapsed .logo-sub,
-        #mainSidebar.sidebar.collapsed .nav-item > span,
-        #mainSidebar.sidebar.collapsed .dropdown-left > span,
-        #mainSidebar.sidebar.collapsed .nav-dropdown-btn > .fa-chevron-down,
-        #mainSidebar.sidebar.collapsed .dropdown-link span {
+        /* Hide text when collapsed */
+        #mainSidebar[data-collapsed="true"] .logo-text,
+        #mainSidebar[data-collapsed="true"] .logo-sub,
+        #mainSidebar[data-collapsed="true"] .nav-item > span,
+        #mainSidebar[data-collapsed="true"] .dropdown-left > span,
+        #mainSidebar[data-collapsed="true"] .nav-dropdown-btn > .fa-chevron-down,
+        #mainSidebar[data-collapsed="true"] #sidebarLogoutBtn span {
             display: none !important;
         }
         
-        #mainSidebar.sidebar.collapsed .nav-item,
-        #mainSidebar.sidebar.collapsed .nav-dropdown-btn {
+        /* Center items when collapsed */
+        #mainSidebar[data-collapsed="true"] .logo-content {
+            justify-content: center !important;
+            padding: 0 !important;
+        }
+        
+        #mainSidebar[data-collapsed="true"] .logo-icon {
+            width: 32px !important;
+            height: 32px !important;
+        }
+        
+        #mainSidebar[data-collapsed="true"] .nav-item,
+        #mainSidebar[data-collapsed="true"] .nav-dropdown-btn {
             justify-content: center !important;
             padding: 0.625rem 0 !important;
+            margin: 0.25rem 0.5rem !important;
         }
         
-        #mainSidebar.sidebar.collapsed .nav-item i,
-        #mainSidebar.sidebar.collapsed .dropdown-left i {
+        #mainSidebar[data-collapsed="true"] .nav-item i,
+        #mainSidebar[data-collapsed="true"] .dropdown-left i {
             margin-right: 0 !important;
             width: auto !important;
+            font-size: 1.1rem !important;
         }
         
-        /* Logo Section */
-        .sidebar-logo {
-            padding: 0 !important;
-            height: 70px !important;
-            border-bottom: 1px solid #eadbc8 !important;
-            background: linear-gradient(135deg, #fef9f0 0%, #fcf5e8 100%) !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-            position: relative !important;
-            flex-shrink: 0 !important;
-            pointer-events: auto !important;
+        #mainSidebar[data-collapsed="true"] .dropdown-left {
+            gap: 0 !important;
         }
         
-        .logo-content {
-            display: flex !important;
-            align-items: center !important;
-            gap: 0.625rem !important;
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
-            width: 100% !important;
+        /* Collapse button in collapsed state */
+        #mainSidebar[data-collapsed="true"] #collapseBtn {
+            position: fixed !important;
+            left: 72px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            right: auto !important;
+            background: #fef9f0 !important;
+            border: 1px solid #e8ddce !important;
+            border-left: none !important;
+            border-radius: 0 50% 50% 0 !important;
+            width: 32px !important;
+            height: 32px !important;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06) !important;
+            z-index: 99999 !important;
         }
         
-        .logo-icon {
-            background: linear-gradient(135deg, #9bb88b 0%, #7d9b6e 100%) !important;
-            width: 36px !important;
-            height: 36px !important;
-            border-radius: 10px !important;
-            display: flex !important;
-            align-items: center !important;
+        #mainSidebar[data-collapsed="true"] #collapseBtn i {
+            transform: rotate(180deg) !important;
+        }
+        
+        /* Logout in collapsed state */
+        #mainSidebar[data-collapsed="true"] #sidebarLogoutBtn {
             justify-content: center !important;
-            flex-shrink: 0 !important;
+            padding: 0.5rem !important;
+            min-height: 40px !important;
+            width: 40px !important;
+            margin: 0.5rem auto !important;
+            border-radius: 50% !important;
         }
         
-        .logo-icon i {
-            font-size: 1rem !important;
-            color: white !important;
+        #mainSidebar[data-collapsed="true"] #sidebarLogoutBtn i {
+            margin-right: 0 !important;
+            font-size: 1.1rem !important;
         }
         
-        .logo-text {
-            color: #5c4b3a !important;
+        /* Dropdown in collapsed state - show on hover */
+        #mainSidebar[data-collapsed="true"] .nav-dropdown-content {
+            position: fixed !important;
+            left: 72px !important;
+            top: auto !important;
+            background: #fef9f0 !important;
+            border: 1px solid #e8ddce !important;
+            border-radius: 12px !important;
+            min-width: 220px !important;
+            padding: 8px 0 !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+            z-index: 1001 !important;
+            display: none !important;
+            margin: 0 !important;
+            border-left: none !important;
+        }
+        
+        #mainSidebar[data-collapsed="true"] .nav-dropdown:hover .nav-dropdown-content {
+            display: block !important;
+            animation: dropdownFadeIn 0.2s ease !important;
+        }
+        
+        @keyframes dropdownFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        #mainSidebar[data-collapsed="true"] .nav-dropdown-content .dropdown-link {
+            padding: 8px 16px !important;
             white-space: nowrap !important;
-            font-size: 1rem !important;
-            font-weight: 600 !important;
+            margin: 0 !important;
+            border-radius: 0 !important;
         }
         
-        .logo-sub {
-            color: #b8a69b !important;
-            white-space: nowrap !important;
-            font-size: 0.7rem !important;
-            font-weight: 400 !important;
+        #mainSidebar[data-collapsed="true"] .nav-dropdown-content .dropdown-link span {
+            display: inline !important;
         }
         
-        .collapse-btn {
-            position: absolute !important;
-            right: 12px !important;
-            top: 17px !important;
-            width: 36px !important;
-            height: 36px !important;
-            background: #f5ede2 !important;
-            border: 1px solid #e8d9ca !important;
-            border-radius: 36px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            cursor: pointer !important;
-            z-index: 1000 !important;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
-            pointer-events: auto !important;
-            flex-shrink: 0 !important;
-        }
-        
-        .collapse-btn:hover {
-            background: #e8d9ca !important;
-            border-color: #d4c3ae !important;
-            transform: scale(1.05) !important;
-        }
-        
-        .collapse-btn i {
-            color: #9bb88b !important;
-            font-size: 0.9rem !important;
-            transition: transform 0.3s ease !important;
-        }
-        
-        /* Navigation Items */
-        .nav-item {
-            display: flex !important;
-            align-items: center !important;
-            padding: 0.5625rem 1rem !important;
-            margin: 0.25rem 0.75rem !important;
-            border-radius: 10px !important;
-            color: #6b5b4e !important;
-            font-weight: 450 !important;
-            font-size: 0.85rem !important;
-            transition: all 0.25s ease !important;
-            text-decoration: none !important;
-            cursor: pointer !important;
-            white-space: nowrap !important;
-            pointer-events: auto !important;
-        }
-        
-        .nav-item i {
-            width: 1.5rem !important;
-            font-size: 1rem !important;
+        #mainSidebar[data-collapsed="true"] .nav-dropdown-content .dropdown-link i {
             margin-right: 0.75rem !important;
-            color: #c9b69a !important;
-            transition: all 0.25s ease !important;
-            flex-shrink: 0 !important;
-            pointer-events: none !important;
-        }
-        
-        .nav-item:hover {
-            background: #f5ede2 !important;
-            color: #8b7a6b !important;
-        }
-        
-        .nav-item:hover i {
-            color: #9bb88b !important;
-            transform: translateX(2px) !important;
-        }
-        
-        .nav-item.active {
-            background: linear-gradient(135deg, #f0eae0 0%, #ebe1d4 100%) !important;
-            color: #7d6b5a !important;
-            border-left: 3px solid #9bb88b !important;
-        }
-        
-        .nav-item.active i {
-            color: #9bb88b !important;
-        }
-        
-        /* Dropdown Styles */
-        .nav-dropdown {
-            margin: 0.125rem 0 !important;
-            pointer-events: auto !important;
-        }
-        
-        .nav-dropdown-btn {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-            padding: 0.5625rem 1rem !important;
-            margin: 0.25rem 0.75rem !important;
-            border-radius: 10px !important;
-            color: #6b5b4e !important;
-            font-weight: 450 !important;
-            font-size: 0.85rem !important;
-            cursor: pointer !important;
-            transition: all 0.25s ease !important;
-            white-space: nowrap !important;
-            pointer-events: auto !important;
-        }
-        
-        .nav-dropdown-btn .dropdown-left {
-            display: flex !important;
-            align-items: center !important;
-            gap: 0.75rem !important;
-        }
-        
-        .nav-dropdown-btn i:first-child {
             width: 1.5rem !important;
-            font-size: 1rem !important;
-            color: #c9b69a !important;
-            transition: all 0.25s ease !important;
-            flex-shrink: 0 !important;
-            pointer-events: none !important;
         }
         
-        .nav-dropdown-btn .fa-chevron-down {
-            font-size: 0.7rem !important;
-            color: #c9b69a !important;
-            transition: transform 0.25s ease !important;
-            flex-shrink: 0 !important;
-            pointer-events: none !important;
-        }
-        
-        .nav-dropdown-btn:hover {
+        #mainSidebar[data-collapsed="true"] .nav-dropdown-content .dropdown-link:hover {
             background: #f5ede2 !important;
-            color: #8b7a6b !important;
         }
         
-        .nav-dropdown-btn:hover i:first-child {
-            color: #9bb88b !important;
-        }
-        
-        .nav-dropdown-content {
-            margin-left: 1.5rem !important;
-            padding-left: 0.5rem !important;
-            border-left: 1.5px solid #e8d9ca !important;
-            margin-top: 0.25rem !important;
-            margin-bottom: 0.25rem !important;
-            transition: all 0.2s ease !important;
-        }
-        
-        .dropdown-link {
-            display: flex !important;
-            align-items: center !important;
-            padding: 0.4375rem 1rem !important;
-            margin: 0.125rem 0 !important;
-            border-radius: 8px !important;
-            color: #8a7a6b !important;
-            font-weight: 400 !important;
-            font-size: 0.8rem !important;
-            transition: all 0.2s ease !important;
-            text-decoration: none !important;
-            cursor: pointer !important;
-            white-space: nowrap !important;
-            pointer-events: auto !important;
-        }
-        
-        .dropdown-link i {
-            width: 1.5rem !important;
-            font-size: 0.85rem !important;
-            margin-right: 0.5rem !important;
-            color: #d4c3ae !important;
-            flex-shrink: 0 !important;
-            pointer-events: none !important;
-        }
-        
-        .dropdown-link:hover {
-            background: #f5ede2 !important;
-            color: #9bb88b !important;
-        }
-        
-        .dropdown-link:hover i {
-            color: #9bb88b !important;
-        }
-        
-        /* Sidebar Logout Confirmation Modal */
+        /* ============================================================
+           MODAL
+           ============================================================ */
         .sidebar-logout-modal-overlay {
             position: fixed !important;
             inset: 0 !important;
@@ -479,7 +598,20 @@
             transform: translateY(-1px) !important;
         }
         
-        /* Mobile responsive */
+        /* ============================================================
+           UTILITY CLASSES
+           ============================================================ */
+        .hidden {
+            display: none !important;
+        }
+        
+        .block {
+            display: block !important;
+        }
+        
+        /* ============================================================
+           MOBILE RESPONSIVE
+           ============================================================ */
         @media (max-width: 1024px) {
             #mainSidebar.sidebar {
                 transform: translateX(-100%) !important;
@@ -490,57 +622,112 @@
             #mainSidebar.sidebar.mobile-open {
                 transform: translateX(0) !important;
             }
-            #mainSidebar.sidebar.collapsed {
+            
+            #mainSidebar[data-collapsed="true"] {
                 width: 260px !important;
             }
-            #mainSidebar.sidebar.collapsed .logo-text,
-            #mainSidebar.sidebar.collapsed .logo-sub,
-            #mainSidebar.sidebar.collapsed .nav-item > span,
-            #mainSidebar.sidebar.collapsed .dropdown-left > span {
+            
+            #mainSidebar[data-collapsed="true"] .logo-text,
+            #mainSidebar[data-collapsed="true"] .logo-sub,
+            #mainSidebar[data-collapsed="true"] .nav-item > span,
+            #mainSidebar[data-collapsed="true"] .dropdown-left > span,
+            #mainSidebar[data-collapsed="true"] .nav-dropdown-btn > .fa-chevron-down {
                 display: inline-block !important;
             }
-            #mainSidebar.sidebar.collapsed .nav-item,
-            #mainSidebar.sidebar.collapsed .nav-dropdown-btn {
+            
+            #mainSidebar[data-collapsed="true"] .nav-item,
+            #mainSidebar[data-collapsed="true"] .nav-dropdown-btn {
                 justify-content: flex-start !important;
                 padding: 0.5625rem 1rem !important;
+                margin: 0.25rem 0.75rem !important;
             }
-            #mainSidebar.sidebar.collapsed .nav-item i,
-            #mainSidebar.sidebar.collapsed .dropdown-left i {
+            
+            #mainSidebar[data-collapsed="true"] .nav-item i,
+            #mainSidebar[data-collapsed="true"] .dropdown-left i {
                 margin-right: 0.75rem !important;
+                font-size: 1rem !important;
             }
-            #mainSidebar.sidebar.collapsed .dropdown-left {
+            
+            #mainSidebar[data-collapsed="true"] .dropdown-left {
                 gap: 0.75rem !important;
             }
-            #mainSidebar.sidebar.collapsed .nav-dropdown-content {
+            
+            #mainSidebar[data-collapsed="true"] .logo-content {
+                justify-content: flex-start !important;
+                padding-left: 1rem !important;
+            }
+            
+            #mainSidebar[data-collapsed="true"] .nav-dropdown-content {
                 position: static !important;
                 background: transparent !important;
                 border: none !important;
                 box-shadow: none !important;
+                display: none !important;
+                left: auto !important;
+                min-width: auto !important;
+                padding: 0 !important;
+                margin-left: 1.5rem !important;
+                border-left: 1.5px solid #e8d9ca !important;
             }
-            .collapse-btn {
-                display: flex !important;
+            
+            #mainSidebar[data-collapsed="true"] .nav-dropdown:hover .nav-dropdown-content {
+                display: none !important;
+            }
+            
+            #mainSidebar[data-collapsed="true"] .nav-dropdown-content.show {
+                display: block !important;
+            }
+            
+            #mainSidebar[data-collapsed="true"] #sidebarLogoutBtn {
+                width: auto !important;
+                border-radius: 10px !important;
+                padding: 0.875rem 1rem !important;
+                margin: 0.5rem 0.75rem 1rem 0.75rem !important;
+            }
+            
+            #mainSidebar[data-collapsed="true"] #sidebarLogoutBtn span {
+                display: inline !important;
+            }
+            
+            #mainSidebar[data-collapsed="true"] #sidebarLogoutBtn i {
+                margin-right: 0.75rem !important;
+                font-size: 1rem !important;
+            }
+            
+            #mainSidebar[data-collapsed="true"] #collapseBtn {
+                position: absolute !important;
+                left: auto !important;
                 right: 12px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
                 background: #f5ede2 !important;
-                border-radius: 36px !important;
                 border: 1px solid #e8d9ca !important;
+                border-radius: 50% !important;
+                width: 28px !important;
+                height: 28px !important;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
             }
-            #sidebarLogoutBtn {
-                margin-bottom: 20px !important;
+            
+            #mainSidebar[data-collapsed="true"] #collapseBtn i {
+                transform: rotate(180deg) !important;
             }
         }
         
-        .hidden {
-            display: none !important;
+        /* ============================================================
+           SMOOTH TRANSITIONS
+           ============================================================ */
+        main, .main-content {
+            transition: margin-left 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1) !important;
         }
         
-        .block {
-            display: block !important;
+        #mainHeader {
+            transition: left 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1) !important;
         }
     </style>
 </head>
 <body>
 
-<aside class="sidebar" id="mainSidebar">
+<aside class="sidebar" id="mainSidebar" data-collapsed="false">
     <div class="sidebar-wrapper">
         <div class="sidebar-logo">
             <div class="logo-content">
@@ -559,13 +746,11 @@
         
         <div class="sidebar-nav-wrapper">
             <nav>
-                <!-- Dashboard -->
                 <a href="../../modules/dashboard/dashboard.html" class="nav-item" data-page="dashboard">
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
                 
-                <!-- User Management -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -581,7 +766,6 @@
                     </div>
                 </div>
                 
-                <!-- Clinical -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -602,7 +786,6 @@
                     </div>
                 </div>
                 
-                <!-- Emergency -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -618,7 +801,6 @@
                     </div>
                 </div>
                 
-                <!-- Ward Management -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -634,7 +816,6 @@
                     </div>
                 </div>
                 
-                <!-- Pharmacy -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -654,7 +835,6 @@
                     </div>
                 </div>
                 
-                <!-- Laboratory -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -670,7 +850,6 @@
                     </div>
                 </div>
                 
-                <!-- Radiology -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -686,7 +865,6 @@
                     </div>
                 </div>
                 
-                <!-- Billing & Finance -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -702,7 +880,6 @@
                     </div>
                 </div>
                 
-                <!-- Documents -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -718,7 +895,6 @@
                     </div>
                 </div>
                 
-                <!-- Staff Management -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -734,7 +910,6 @@
                     </div>
                 </div>
                 
-                <!-- Reports & Analytics -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -752,7 +927,6 @@
                     </div>
                 </div>
                 
-                <!-- Settings -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -770,7 +944,6 @@
             </nav>
         </div>
         
-        <!-- Logout Button - ORIGINAL BROWN BORDER -->
         <div class="logout-item" id="sidebarLogoutBtn" 
              onclick="document.getElementById('sidebarLogoutModal').classList.add('active'); return false;">
             <i class="fas fa-sign-out-alt"></i>
@@ -779,7 +952,7 @@
     </div>
 </aside>
 
-<!-- Sidebar Logout Confirmation Modal -->
+<!-- Modal -->
 <div id="sidebarLogoutModal" class="sidebar-logout-modal-overlay">
     <div class="sidebar-logout-modal">
         <div class="sidebar-logout-modal-header">
@@ -795,53 +968,6 @@
         </div>
     </div>
 </div>
-
-<script>
-    // Simple backup with console logs
-    (function() {
-        console.log('🔵 SIDEBAR: Loaded successfully!');
-        console.log('🔵 Logout button has inline onclick - should work!');
-        
-        var logoutBtn = document.getElementById('sidebarLogoutBtn');
-        var logoutModal = document.getElementById('sidebarLogoutModal');
-        
-        if (logoutBtn) {
-            console.log('✅ Logout button found!');
-            console.log('✅ Click the logout button - it will work!');
-            
-            // Extra click listener as backup
-            logoutBtn.addEventListener('click', function(e) {
-                console.log('🔵 CLICK detected!');
-                // Already handled by onclick
-            });
-        }
-        
-        // Close modal on overlay click
-        if (logoutModal) {
-            logoutModal.addEventListener('click', function(e) {
-                if (e.target === logoutModal) {
-                    logoutModal.classList.remove('active');
-                    console.log('🔵 Modal closed via overlay click');
-                }
-            });
-        }
-        
-        // Close on Escape
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                var modal = document.getElementById('sidebarLogoutModal');
-                if (modal && modal.classList.contains('active')) {
-                    modal.classList.remove('active');
-                    console.log('🔵 Modal closed via Escape key');
-                }
-            }
-        });
-        
-        console.log('✅ SIDEBAR: All setup complete!');
-        console.log('✅ The logout button has the original brown border!');
-        console.log('✅ Click it - it WILL work!');
-    })();
-</script>
 
 </body>
 </html>

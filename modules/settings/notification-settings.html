@@ -4,235 +4,380 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Notification Settings | Settings | MedFlow</title>
-    <!-- Google Fonts: Poppins Light + Regular + Medium -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Theme CSS -->
+    <link rel="stylesheet" href="../../css/theme.css">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
-            background: #fffdf9;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            font-weight: 400;
-        }
-        
-        .bg-subtle {
-            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
-        }
-        
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f0ebe4;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #d4c9bc;
-            border-radius: 10px;
-        }
-        
-        .card-white {
-            background: #ffffff;
-            border: 1px solid #f0e8e0;
-            border-radius: 20px;
-            transition: all 0.25s ease;
-        }
-        
-        .card-white:hover {
-            box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.06);
-        }
-        
-        h1 {
-            font-size: 1.5rem;
-            font-weight: 500;
-            color: #1e293b;
-            letter-spacing: -0.3px;
-        }
-        
-        h2 {
-            font-size: 1rem;
-            font-weight: 500;
-            color: #1e293b;
-        }
-        
-        .form-label {
-            font-size: 12px;
-            font-weight: 500;
-            color: #334155;
-            margin-bottom: 6px;
-            display: block;
-            letter-spacing: 0.3px;
-        }
-        
-        .form-input, .form-select {
-            border-radius: 8px;
-            border: 1px solid #cbd5e1;
-            transition: all 0.2s ease;
-            background: #ffffff;
-            padding: 10px 14px;
-            width: 100%;
-            font-size: 13px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 400;
-        }
-        
-        .form-input:focus, .form-select:focus {
-            outline: none;
-            border-color: #a8c49a;
-            box-shadow: 0 0 0 3px rgba(168, 196, 154, 0.2);
-        }
-        
-        .form-input.error, .form-select.error {
-            border-color: #ef4444;
-            background-color: #fef2f2;
-        }
-        
-        .error-text {
-            color: #ef4444;
-            font-size: 11px;
-            margin-top: 4px;
-            display: none;
-        }
-        
-        .error-text.show {
-            display: block;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
-            transition: all 0.2s ease;
-            border: none;
-            cursor: pointer;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 13px;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
-            transform: translateY(-1px);
-        }
-        
-        .btn-secondary {
-            border: 1px solid #cbd5e1;
-            background: white;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 13px;
-            color: #334155;
-        }
-        
-        .btn-secondary:hover {
-            background: #f8fafc;
-            border-color: #94a3b8;
-        }
-        
-        .btn-outline {
-            background: transparent;
-            border: 1px solid #cbd5e1;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 13px;
-            color: #334155;
-        }
-        
-        .btn-outline:hover {
-            background: #f8fafc;
-            border-color: #a8c49a;
-            color: #a8c49a;
-        }
-        
-        .section-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 10px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        /* Toggle Switch */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 24px;
-        }
-        
-        .toggle-switch input {
+        /* ============================================================
+           NOTIFICATION SETTINGS MODULE — Page-specific only
+           ============================================================ */
+
+        /* 🔥 FIX: Prevent layout shift */
+        .main-content {
+            margin-left: 260px !important;
+            margin-top: 70px !important;
+            padding: 1.25rem 1.5rem !important;
+            transition: margin-left 0.3s ease !important;
+            min-height: 100vh !important;
             opacity: 0;
-            width: 0;
-            height: 0;
+            animation: fadeIn 0.3s ease forwards;
         }
-        
+        .main-content.loaded {
+            opacity: 1;
+        }
+        #mainSidebar[data-collapsed="true"] ~ .main-content,
+        #mainSidebar[data-collapsed="true"] + .main-content {
+            margin-left: 72px !important;
+        }
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 0 !important;
+                padding: 1rem !important;
+            }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 🔥 Page Header - Hidden */
+        .page-header {
+            display: none !important;
+        }
+
+        /* 🔥 Cards */
+        .card-white {
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-lg) !important;
+            padding: 1.25rem !important;
+            transition: all 0.25s ease !important;
+        }
+        .card-white:hover {
+            box-shadow: var(--shadow-md) !important;
+        }
+
+        /* 🔥 Form Elements */
+        .form-label {
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-200) !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
+            margin-bottom: 0.25rem !important;
+            display: block !important;
+        }
+        .form-input, .form-select {
+            border-radius: var(--radius-md) !important;
+            border: 1px solid var(--border-input) !important;
+            transition: all 0.2s ease !important;
+            background: var(--bg-card) !important;
+            padding: 0.5rem 0.75rem !important;
+            width: 100% !important;
+            font-size: 0.8125rem !important;
+            font-family: var(--font-family) !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-700) !important;
+        }
+        .form-input:focus, .form-select:focus {
+            outline: none !important;
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+        }
+        .form-input.error, .form-select.error {
+            border-color: var(--color-error-text) !important;
+            background-color: var(--color-error-bg) !important;
+        }
+
+        /* 🔥 Error Text */
+        .error-text {
+            color: var(--color-error-text) !important;
+            font-size: 0.6875rem !important;
+            margin-top: 0.25rem !important;
+            display: none !important;
+            font-weight: var(--font-weight-light) !important;
+        }
+        .error-text.show {
+            display: block !important;
+        }
+
+        /* 🔥 Buttons */
+        .btn-primary {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            padding: 0.5rem 1.25rem !important;
+            font-size: 0.8125rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            border-radius: var(--radius-md) !important;
+            border: none !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            font-family: var(--font-family) !important;
+            background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%) !important;
+            color: white !important;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+        }
+        .btn-secondary {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            padding: 0.5rem 1.25rem !important;
+            font-size: 0.8125rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            border-radius: var(--radius-md) !important;
+            border: 1px solid var(--border-input) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            font-family: var(--font-family) !important;
+            background: transparent !important;
+            color: var(--color-brown-200) !important;
+        }
+        .btn-secondary:hover {
+            background: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+            border-color: var(--color-brown-100) !important;
+        }
+        .btn-outline {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            padding: 0.5rem 1.25rem !important;
+            font-size: 0.8125rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            border-radius: var(--radius-md) !important;
+            border: 1px solid var(--border-input) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            font-family: var(--font-family) !important;
+            background: transparent !important;
+            color: var(--color-brown-300) !important;
+            width: 100% !important;
+            justify-content: center !important;
+        }
+        .btn-outline:hover {
+            background: var(--bg-hover) !important;
+            border-color: var(--color-sage) !important;
+            color: var(--color-sage) !important;
+        }
+
+        /* 🔥 Section Icon */
+        .section-icon {
+            width: 2rem !important;
+            height: 2rem !important;
+            border-radius: var(--radius-md) !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+        }
+        .section-icon.bg-blue { background: #dbeafe !important; color: #2563eb !important; }
+        .section-icon.bg-green { background: #d1fae5 !important; color: #059669 !important; }
+        .section-icon.bg-purple { background: #e9d5ff !important; color: #7c3aed !important; }
+
+        /* 🔥 Section Header */
+        .section-header {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.75rem !important;
+            padding-bottom: 0.5rem !important;
+            border-bottom: 1px solid var(--border-default) !important;
+            margin-bottom: 0.75rem !important;
+        }
+        .section-header h2 {
+            font-size: 0.875rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            margin: 0 !important;
+        }
+
+        /* 🔥 Toggle Switch */
+        .toggle-switch {
+            position: relative !important;
+            display: inline-block !important;
+            width: 44px !important;
+            height: 24px !important;
+            flex-shrink: 0 !important;
+        }
+        .toggle-switch input {
+            opacity: 0 !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
         .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #cbd5e1;
-            transition: 0.3s;
-            border-radius: 34px;
+            position: absolute !important;
+            cursor: pointer !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            background-color: var(--border-input) !important;
+            transition: 0.3s !important;
+            border-radius: 34px !important;
         }
-        
         .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: 0.3s;
-            border-radius: 50%;
+            position: absolute !important;
+            content: "" !important;
+            height: 18px !important;
+            width: 18px !important;
+            left: 3px !important;
+            bottom: 3px !important;
+            background-color: white !important;
+            transition: 0.3s !important;
+            border-radius: 50% !important;
         }
-        
         input:checked + .toggle-slider {
-            background-color: #a8c49a;
+            background-color: var(--color-sage) !important;
         }
-        
         input:checked + .toggle-slider:before {
-            transform: translateX(20px);
+            transform: translateX(20px) !important;
         }
-        
+
+        /* 🔥 Toggle Row */
+        .toggle-row {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 0.25rem 0 !important;
+        }
+        .toggle-row .label {
+            font-size: 0.8125rem !important;
+            color: var(--color-brown-300) !important;
+        }
+
+        /* 🔥 Event Item */
         .event-item {
-            transition: background 0.2s ease;
-            border-radius: 12px;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 0.625rem 0.75rem !important;
+            border-radius: var(--radius-md) !important;
+            cursor: pointer !important;
+            transition: background 0.2s ease !important;
+            border: 1px solid transparent !important;
         }
-        
         .event-item:hover {
-            background: #f8fafc;
+            background: var(--bg-subtle) !important;
+            border-color: var(--border-default) !important;
         }
-        
-        p, span, div, a {
-            font-weight: 400;
+        .event-item .label {
+            font-size: 0.8125rem !important;
+            color: var(--color-brown-300) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
         }
-        
-        .info-text {
-            font-size: 11px;
-            color: #94a3b8;
-            margin-top: 4px;
+        .event-item .label i {
+            width: 1.5rem !important;
+            color: var(--color-sage) !important;
+            font-size: 0.875rem !important;
+        }
+
+        /* 🔥 Info Box */
+        .info-box {
+            padding: 0.75rem !important;
+            background: var(--bg-subtle) !important;
+            border-radius: var(--radius-md) !important;
+            border: 1px solid var(--border-default) !important;
+            margin-top: 0.75rem !important;
+        }
+        .info-box p {
+            font-size: 0.6875rem !important;
+            color: var(--color-brown-300) !important;
+            margin: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+        .info-box p i {
+            color: var(--color-sage) !important;
+        }
+
+        /* 🔥 Grid */
+        .settings-grid {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 1.25rem !important;
+            margin-bottom: 1.5rem !important;
+        }
+        @media (min-width: 1024px) {
+            .settings-grid {
+                grid-template-columns: 1fr 1fr !important;
+            }
+        }
+
+        /* 🔥 Form Group */
+        .form-group {
+            margin-bottom: 0.75rem !important;
+        }
+        .form-group:last-child {
+            margin-bottom: 0 !important;
+        }
+
+        /* 🔥 Actions */
+        .actions-bar {
+            display: flex !important;
+            justify-content: flex-end !important;
+            gap: 0.75rem !important;
+            margin-top: 1.5rem !important;
+            padding-top: 1rem !important;
+            border-top: 1px solid var(--border-default) !important;
+        }
+
+        /* 🔥 Events Grid */
+        .events-grid {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 0.25rem !important;
+        }
+        @media (min-width: 768px) {
+            .events-grid {
+                grid-template-columns: 1fr 1fr !important;
+            }
+        }
+
+        /* 🔥 Toast override */
+        .toast-notification {
+            position: fixed !important;
+            bottom: 1.5rem !important;
+            right: 1.5rem !important;
+            z-index: 9999 !important;
+            padding: 0.75rem 1.25rem !important;
+            border-radius: var(--radius-lg) !important;
+            background: var(--color-sage) !important;
+            color: white !important;
+            font-family: var(--font-family) !important;
+            font-size: 0.8125rem !important;
+            font-weight: var(--font-weight-light) !important;
+            box-shadow: var(--shadow-md) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+            animation: slideInRight 0.25s ease-out !important;
+        }
+        .toast-notification i {
+            font-size: 1rem !important;
+        }
+        .toast-notification.error {
+            background: var(--color-error-text) !important;
+        }
+        .toast-notification.success {
+            background: var(--color-sage) !important;
+        }
+        .toast-notification.info {
+            background: var(--color-info-text) !important;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
     </style>
 </head>
@@ -241,72 +386,65 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+    <main class="main-content" id="mainContent">
         
-        <div class="mb-6">
-            <h1 class="text-2xl md:text-3xl font-medium text-[#1e293b] mb-1">
-                <i class="fas fa-bell text-[#a8c49a] mr-3"></i>Notification Settings
-            </h1>
-            <p class="text-[#64748b] text-sm font-normal">Configure email, SMS, and in-app notifications</p>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="settings-grid">
             
-            <!-- Email Settings Card -->
-            <div class="card-white p-6">
-                <div class="flex items-center gap-3 mb-4 pb-2 border-b border-[#f0e8e0]">
-                    <div class="section-icon bg-blue-50">
-                        <i class="fas fa-envelope text-blue-500"></i>
+            <!-- Email Settings -->
+            <div class="card-white">
+                <div class="section-header">
+                    <div class="section-icon bg-blue">
+                        <i class="fas fa-envelope"></i>
                     </div>
-                    <h2 class="text-base font-medium">Email Settings</h2>
+                    <h2>Email Settings</h2>
                 </div>
-                <div class="space-y-4">
-                    <div>
+                <div>
+                    <div class="form-group">
                         <label class="form-label">SMTP Server</label>
                         <input type="text" id="smtpServer" class="form-input" placeholder="smtp.gmail.com">
-                        <div class="error-text" id="smtpServerError">SMTP server is required</div>
+                        <span class="error-text" id="smtpServerError">SMTP server is required</span>
                     </div>
-                    <div>
+                    <div class="form-group">
                         <label class="form-label">SMTP Port</label>
                         <input type="text" id="smtpPort" class="form-input" placeholder="587">
-                        <div class="error-text" id="smtpPortError">SMTP port is required</div>
+                        <span class="error-text" id="smtpPortError">SMTP port is required</span>
                     </div>
-                    <div>
+                    <div class="form-group">
                         <label class="form-label">Sender Email</label>
                         <input type="email" id="senderEmail" class="form-input" placeholder="noreply@medflow.com">
-                        <div class="error-text" id="senderEmailError">Valid sender email is required</div>
+                        <span class="error-text" id="senderEmailError">Valid sender email is required</span>
                     </div>
-                    <div>
+                    <div class="form-group">
                         <label class="form-label">Sender Name</label>
                         <input type="text" id="senderName" class="form-input" placeholder="MedFlow Hospital">
                     </div>
-                    <div>
+                    <div class="form-group" style="margin-bottom:0.5rem;">
                         <label class="form-label">SMTP Password / App Password</label>
                         <input type="password" id="smtpPassword" class="form-input" placeholder="••••••••">
                     </div>
-                    <div class="flex items-center justify-between pt-2">
-                        <span class="text-sm text-[#475569]">Enable Email Notifications</span>
+                    <div class="toggle-row">
+                        <span class="label">Enable Email Notifications</span>
                         <label class="toggle-switch">
                             <input type="checkbox" id="enableEmail">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-                    <button id="testEmailBtn" class="btn-outline w-full flex items-center justify-center gap-2">
+                    <button id="testEmailBtn" class="btn-outline" style="margin-top:0.75rem;">
                         <i class="fas fa-paper-plane"></i> Send Test Email
                     </button>
                 </div>
             </div>
 
-            <!-- SMS Settings Card -->
-            <div class="card-white p-6">
-                <div class="flex items-center gap-3 mb-4 pb-2 border-b border-[#f0e8e0]">
-                    <div class="section-icon bg-green-50">
-                        <i class="fas fa-sms text-green-500"></i>
+            <!-- SMS Settings -->
+            <div class="card-white">
+                <div class="section-header">
+                    <div class="section-icon bg-green">
+                        <i class="fas fa-sms"></i>
                     </div>
-                    <h2 class="text-base font-medium">SMS Settings</h2>
+                    <h2>SMS Settings</h2>
                 </div>
-                <div class="space-y-4">
-                    <div>
+                <div>
+                    <div class="form-group">
                         <label class="form-label">SMS Gateway</label>
                         <select id="smsGateway" class="form-select">
                             <option value="Twilio">Twilio</option>
@@ -315,112 +453,135 @@
                             <option value="Custom">Custom Gateway</option>
                         </select>
                     </div>
-                    <div>
+                    <div class="form-group">
                         <label class="form-label">API Key / Account SID</label>
                         <input type="text" id="smsApiKey" class="form-input" placeholder="Enter API key">
-                        <div class="error-text" id="smsApiKeyError">API key is required when SMS is enabled</div>
+                        <span class="error-text" id="smsApiKeyError">API key is required when SMS is enabled</span>
                     </div>
-                    <div>
+                    <div class="form-group" style="margin-bottom:0.5rem;">
                         <label class="form-label">Sender ID</label>
                         <input type="text" id="smsSenderId" class="form-input" placeholder="MEDFLOW">
                     </div>
-                    <div class="flex items-center justify-between pt-2">
-                        <span class="text-sm text-[#475569]">Enable SMS Notifications</span>
+                    <div class="toggle-row">
+                        <span class="label">Enable SMS Notifications</span>
                         <label class="toggle-switch">
                             <input type="checkbox" id="enableSms">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-                    <button id="testSmsBtn" class="btn-outline w-full flex items-center justify-center gap-2">
+                    <button id="testSmsBtn" class="btn-outline" style="margin-top:0.75rem;">
                         <i class="fas fa-mobile-alt"></i> Send Test SMS
                     </button>
                 </div>
             </div>
 
-            <!-- Notification Events Card -->
-            <div class="card-white p-6 lg:col-span-2">
-                <div class="flex items-center gap-3 mb-4 pb-2 border-b border-[#f0e8e0]">
-                    <div class="section-icon bg-purple-50">
-                        <i class="fas fa-calendar-alt text-purple-500"></i>
+            <!-- Notification Events -->
+            <div class="card-white" style="grid-column:1 / -1;">
+                <div class="section-header">
+                    <div class="section-icon bg-purple">
+                        <i class="fas fa-calendar-alt"></i>
                     </div>
-                    <h2 class="text-base font-medium">Notification Events</h2>
+                    <h2>Notification Events</h2>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    <div class="space-y-1">
-                        <label class="event-item flex items-center justify-between p-3 rounded-lg cursor-pointer">
-                            <span class="text-sm text-[#475569]"><i class="fas fa-calendar-check w-6 text-[#a8c49a]"></i> Appointment Reminders</span>
+                <div class="events-grid">
+                    <div>
+                        <div class="event-item">
+                            <span class="label"><i class="fas fa-calendar-check"></i> Appointment Reminders</span>
                             <label class="toggle-switch">
                                 <input type="checkbox" id="notifyAppointment" checked>
                                 <span class="toggle-slider"></span>
                             </label>
-                        </label>
-                        <label class="event-item flex items-center justify-between p-3 rounded-lg cursor-pointer">
-                            <span class="text-sm text-[#475569]"><i class="fas fa-flask w-6 text-[#a8c49a]"></i> Lab Results Ready</span>
+                        </div>
+                        <div class="event-item">
+                            <span class="label"><i class="fas fa-flask"></i> Lab Results Ready</span>
                             <label class="toggle-switch">
                                 <input type="checkbox" id="notifyLabResults" checked>
                                 <span class="toggle-slider"></span>
                             </label>
-                        </label>
-                        <label class="event-item flex items-center justify-between p-3 rounded-lg cursor-pointer">
-                            <span class="text-sm text-[#475569]"><i class="fas fa-file-invoice w-6 text-[#a8c49a]"></i> Invoice Generation</span>
+                        </div>
+                        <div class="event-item">
+                            <span class="label"><i class="fas fa-file-invoice"></i> Invoice Generation</span>
                             <label class="toggle-switch">
                                 <input type="checkbox" id="notifyInvoice" checked>
                                 <span class="toggle-slider"></span>
                             </label>
-                        </label>
-                        <label class="event-item flex items-center justify-between p-3 rounded-lg cursor-pointer">
-                            <span class="text-sm text-[#475569]"><i class="fas fa-credit-card w-6 text-[#a8c49a]"></i> Payment Confirmation</span>
+                        </div>
+                        <div class="event-item">
+                            <span class="label"><i class="fas fa-credit-card"></i> Payment Confirmation</span>
                             <label class="toggle-switch">
                                 <input type="checkbox" id="notifyPayment" checked>
                                 <span class="toggle-slider"></span>
                             </label>
-                        </label>
+                        </div>
                     </div>
-                    <div class="space-y-1">
-                        <label class="event-item flex items-center justify-between p-3 rounded-lg cursor-pointer">
-                            <span class="text-sm text-[#475569]"><i class="fas fa-download w-6 text-[#a8c49a]"></i> Discharge Summary Ready</span>
+                    <div>
+                        <div class="event-item">
+                            <span class="label"><i class="fas fa-download"></i> Discharge Summary Ready</span>
                             <label class="toggle-switch">
                                 <input type="checkbox" id="notifyDischarge" checked>
                                 <span class="toggle-slider"></span>
                             </label>
-                        </label>
-                        <label class="event-item flex items-center justify-between p-3 rounded-lg cursor-pointer">
-                            <span class="text-sm text-[#475569]"><i class="fas fa-capsules w-6 text-[#a8c49a]"></i> Low Stock Alert</span>
+                        </div>
+                        <div class="event-item">
+                            <span class="label"><i class="fas fa-capsules"></i> Low Stock Alert</span>
                             <label class="toggle-switch">
                                 <input type="checkbox" id="notifyLowStock" checked>
                                 <span class="toggle-slider"></span>
                             </label>
-                        </label>
-                        <label class="event-item flex items-center justify-between p-3 rounded-lg cursor-pointer">
-                            <span class="text-sm text-[#475569]"><i class="fas fa-ambulance w-6 text-[#a8c49a]"></i> Emergency Case</span>
+                        </div>
+                        <div class="event-item">
+                            <span class="label"><i class="fas fa-ambulance"></i> Emergency Case</span>
                             <label class="toggle-switch">
                                 <input type="checkbox" id="notifyEmergency" checked>
                                 <span class="toggle-slider"></span>
                             </label>
-                        </label>
-                        <label class="event-item flex items-center justify-between p-3 rounded-lg cursor-pointer">
-                            <span class="text-sm text-[#475569]"><i class="fas fa-birthday-cake w-6 text-[#a8c49a]"></i> Birthday Wishes</span>
+                        </div>
+                        <div class="event-item">
+                            <span class="label"><i class="fas fa-birthday-cake"></i> Birthday Wishes</span>
                             <label class="toggle-switch">
                                 <input type="checkbox" id="notifyBirthday">
                                 <span class="toggle-slider"></span>
                             </label>
-                        </label>
+                        </div>
                     </div>
                 </div>
-                <div class="mt-4 p-3 bg-[#f8fafc] rounded-lg">
-                    <p class="text-xs text-[#64748b]"><i class="fas fa-info-circle mr-1 text-[#a8c49a]"></i> Note: Email and SMS must be enabled for these notifications to work.</p>
+                <div class="info-box">
+                    <p>
+                        <i class="fas fa-info-circle"></i>
+                        Note: Email and SMS must be enabled for these notifications to work.
+                    </p>
                 </div>
             </div>
         </div>
 
         <!-- Action Buttons -->
-        <div class="mt-6 flex justify-end gap-3">
-            <button id="resetNotifBtn" class="btn-secondary">Reset to Default</button>
-            <button id="saveNotifBtn" class="btn-primary">Save Settings</button>
+        <div class="actions-bar">
+            <button id="resetNotifBtn" class="btn-secondary">
+                <i class="fas fa-undo-alt"></i> Reset to Default
+            </button>
+            <button id="saveNotifBtn" class="btn-primary">
+                <i class="fas fa-save"></i> Save Settings
+            </button>
         </div>
     </main>
 
     <script src="../../js/core/common.js"></script>
     <script src="notification-settings.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var checkSidebar = setInterval(function() {
+                var sidebar = document.getElementById('mainSidebar');
+                if (sidebar) {
+                    clearInterval(checkSidebar);
+                    document.getElementById('mainContent').classList.add('loaded');
+                }
+            }, 50);
+            setTimeout(function() {
+                document.getElementById('mainContent').classList.add('loaded');
+            }, 1000);
+        });
+    </script>
+    
 </body>
-</html> 
+</html>

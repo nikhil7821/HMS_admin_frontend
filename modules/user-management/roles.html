@@ -5,24 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Roles & Permissions | User Management | MedFlow</title>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- ✅ CENTRALIZED THEME CSS -->
     <link rel="stylesheet" href="../../css/theme.css">
 
     <style>
-        /* Additional page-specific styles that align with theme */
+        /* ============================================================
+           ROLES MODULE — page-specific only, no overrides
+           All base styles come from theme.css
+        ============================================================ */
+
+        /* Role item in list */
         .role-item {
             transition: var(--transition-base);
             cursor: pointer;
             border-left: 3px solid transparent;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-default);
         }
         
         .role-item:hover {
@@ -34,11 +38,63 @@
             border-left-color: var(--color-sage);
         }
         
+        .role-item .role-name {
+            font-weight: var(--font-weight-medium);
+            font-size: 0.875rem;
+            color: var(--color-brown-700);
+        }
+        
+        .role-item .role-badge {
+            font-size: 0.625rem;
+            background-color: var(--bg-muted);
+            color: var(--color-brown-100);
+            padding: 0.1rem 0.5rem;
+            border-radius: var(--radius-full);
+        }
+        
+        .role-item .role-actions {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .role-item .role-actions .icon-btn-sm {
+            width: 1.75rem;
+            height: 1.75rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-default);
+            background-color: var(--bg-card);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-base);
+            font-size: 0.65rem;
+            color: var(--color-brown-200);
+        }
+        
+        .role-item .role-actions .icon-btn-sm:hover {
+            background-color: var(--bg-hover);
+            color: var(--color-brown-600);
+            border-color: var(--color-brown-100);
+        }
+        
+        .role-item .role-actions .icon-btn-sm.delete:hover {
+            background-color: #fee2e2;
+            color: #dc2626;
+            border-color: #fca5a5;
+        }
+
+        /* Permission group */
         .permission-group {
             border: 1px solid var(--border-default);
             border-radius: var(--radius-lg);
             padding: 1rem;
             background-color: var(--bg-subtle);
+            margin-bottom: 0.75rem;
+        }
+        
+        .permission-group:last-child {
+            margin-bottom: 0;
         }
         
         .permission-group-title {
@@ -72,16 +128,131 @@
             font-weight: var(--font-weight-light);
             color: var(--color-brown-600);
         }
-        
-        .btn-success {
+
+        /* Delete icon circle */
+        .delete-icon-circle {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            background-color: #fee2e2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: #dc2626;
+            font-size: 1.25rem;
+        }
+
+        /* Danger button (delete confirm) */
+        .btn-del {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            background-color: #ef4444;
+            color: white;
+            font-family: var(--font-family);
+            font-size: 0.8125rem;
+            font-weight: var(--font-weight-light);
+            padding: 0.5rem 1.25rem;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+        .btn-del:hover {
+            background-color: #dc2626;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Modal danger accent */
+        .modal-danger .form-card {
+            border-top-color: #ef4444;
+        }
+
+        /* Empty state for permissions */
+        .empty-state {
+            text-align: center;
+            padding: 2.5rem 1.25rem;
+            color: var(--color-brown-100);
+        }
+        .empty-state i {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.75rem;
+            opacity: 0.5;
+        }
+        .empty-state p {
+            font-size: 0.8125rem;
+            color: var(--color-brown-100);
+            font-weight: var(--font-weight-light);
+        }
+
+        /* Filter bar button override */
+        .toolbar .btn-primary {
+            flex: 0 0 auto !important;
+            padding: 0.4rem 0.85rem !important;
+            font-size: 0.75rem !important;
+            height: 38px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.35rem !important;
+            border-radius: var(--radius-md) !important;
+            white-space: nowrap !important;
             background-color: var(--color-sage) !important;
             color: white !important;
             border: none !important;
         }
-        
-        .btn-success:hover {
+
+        .toolbar .btn-primary:hover {
             background-color: var(--color-sage-dark) !important;
-            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.35) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* Grid layout for roles/permissions */
+        .roles-permissions-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        @media (min-width: 1024px) {
+            .roles-permissions-grid {
+                grid-template-columns: 1fr 2fr;
+            }
+        }
+
+        /* Roles list container */
+        .roles-list-container {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .roles-list-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        .roles-list-container::-webkit-scrollbar-track {
+            background: var(--bg-muted);
+            border-radius: 10px;
+        }
+        .roles-list-container::-webkit-scrollbar-thumb {
+            background: var(--border-default);
+            border-radius: 10px;
+        }
+
+        /* Permissions editor container */
+        .permissions-editor-container {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .permissions-editor-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        .permissions-editor-container::-webkit-scrollbar-track {
+            background: var(--bg-muted);
+            border-radius: 10px;
+        }
+        .permissions-editor-container::-webkit-scrollbar-thumb {
+            background: var(--border-default);
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -90,29 +261,82 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
-        
-        <!-- Page Header -->
-        <div class="page-header mb-6">
-            <div class="page-header-left">
-                <div class="page-header-icon">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <div>
-                    <h1 class="page-header-title">Roles & Permissions</h1>
-                    <p class="page-header-subtitle">Manage user roles and access permissions</p>
+    <main class="main-content">
+
+        <!-- ── Stats Row ─────────────────────────────────────── -->
+        <div class="grid-stats" style="margin-bottom: 1.5rem;">
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <p class="stat-label">Total Roles</p>
+                        <p class="stat-value" id="totalRoles">0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-shield-alt" style="color:var(--color-sage); font-size:1.125rem;"></i>
+                    </div>
                 </div>
             </div>
-            <div class="page-header-actions">
-                <button id="addRoleBtn" class="btn-primary">
-                    <i class="fas fa-plus text-sm"></i>
-                    <span>Add Role</span>
-                </button>
+
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <p class="stat-label">Active Roles</p>
+                        <p class="stat-value" id="activeRoles">0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-check-circle" style="color:var(--color-sage); font-size:1.125rem;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <p class="stat-label">Total Permissions</p>
+                        <p class="stat-value" id="totalPermissions">0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-key" style="color:var(--color-sage); font-size:1.125rem;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <p class="stat-label">Last Updated</p>
+                        <p class="stat-value" id="lastUpdated" style="font-size:1.125rem; margin-top:0.375rem;">Today</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-calendar-alt" style="color:var(--color-sage); font-size:1.125rem;"></i>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Two Column Layout -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- ── Search & Filter Toolbar with Add Role Button ── -->
+        <div class="filter-bar" style="margin-bottom: 1.5rem;">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search roles…">
+            </div>
+            <select id="filterStatus" class="form-select" style="width:auto; min-width:140px;">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+            <button id="resetFiltersBtn" class="btn-secondary">
+                <i class="fas fa-undo-alt"></i>
+                <span>Reset</span>
+            </button>
+            <button id="addRoleBtn" class="btn-primary">
+                <i class="fas fa-plus text-sm"></i>
+                <span>Add Role</span>
+            </button>
+        </div>
+
+        <!-- ── Roles & Permissions Grid ──────────────────────── -->
+        <div class="roles-permissions-grid">
             
             <!-- Roles List Panel -->
             <div class="card-white overflow-hidden">
@@ -122,56 +346,63 @@
                         Roles
                     </h2>
                 </div>
-                <div id="rolesList" class="divide-y divide-default max-h-[500px] overflow-y-auto"></div>
+                <div id="rolesList" class="roles-list-container divide-y divide-default"></div>
             </div>
 
             <!-- Permissions Editor Panel -->
-            <div class="lg:col-span-2 card-white overflow-hidden">
+            <div class="card-white overflow-hidden">
                 <div class="p-4 border-b border-default">
                     <h2 class="section-title text-base mb-0" id="selectedRoleTitle">
                         <i class="fas fa-key text-sage"></i>
                         Select a role to edit permissions
                     </h2>
                 </div>
-                <div id="permissionsEditor" class="p-5 max-h-[500px] overflow-y-auto">
+                <div id="permissionsEditor" class="permissions-editor-container p-5">
                     <div class="empty-state">
                         <i class="fas fa-hand-pointer"></i>
                         <p>Click on a role from the left panel to edit its permissions</p>
                     </div>
                 </div>
                 <div class="p-4 border-t border-default bg-subtle">
-                    <button id="savePermissionsBtn" class="btn-primary hidden w-full md:w-auto">
+                    <button id="savePermissionsBtn" class="btn-primary hidden">
                         <i class="fas fa-save mr-1"></i> Save Permissions
                     </button>
                 </div>
             </div>
         </div>
+
     </main>
 
-    <!-- Add/Edit Role Modal - MATCHING THEME.CSS EXACTLY -->
+
+    <!-- ══════════════════════════════════════════════════════
+         ADD / EDIT ROLE MODAL
+    ═══════════════════════════════════════════════════════════ -->
     <div id="roleModal" class="modal-overlay">
-        <div class="form-card">
+        <div class="form-card" style="border-top-color: var(--color-sage);">
+
             <div class="modal-header">
-                <h3 class="modal-title">
-                    <i class="fas fa-plus-circle"></i> 
-                    <span id="modalTitle">Add Role</span>
+                <h3 class="modal-title" id="modalTitle">
+                    <i class="fas fa-plus-circle"></i> Add Role
                 </h3>
-                <button id="closeRoleModalBtn" class="close-btn">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button class="close-btn" id="closeRoleModalBtn"><i class="fas fa-times"></i></button>
             </div>
+
             <form id="roleForm">
                 <input type="hidden" id="roleId">
+
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Role Name *</label>
-                        <input type="text" id="roleName" name="roleName" required class="form-input" placeholder="e.g., Administrator, Doctor, Nurse">
+                        <label class="form-label">Role Name <span style="color:var(--color-error-text);">*</span></label>
+                        <input type="text" id="roleName" class="form-input" placeholder="e.g., Administrator" required>
+                        <span class="error-text" id="roleNameError">Please enter a role name</span>
                     </div>
-                    <div class="form-group">
+
+                    <div class="form-group" style="margin-bottom:0;">
                         <label class="form-label">Description</label>
-                        <textarea id="roleDesc" name="roleDesc" rows="3" class="form-textarea" placeholder="Brief description of this role's responsibilities"></textarea>
+                        <textarea id="roleDesc" class="form-textarea" rows="3" placeholder="Brief description of this role's responsibilities"></textarea>
                     </div>
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" id="cancelRoleModalBtn" class="btn-secondary">Cancel</button>
                     <button type="submit" class="btn-primary">
@@ -182,70 +413,361 @@
         </div>
     </div>
 
+
+    <!-- ══════════════════════════════════════════════════════
+         DELETE CONFIRMATION MODAL
+    ═══════════════════════════════════════════════════════════ -->
+    <div id="deleteModal" class="modal-overlay modal-danger">
+        <div class="form-card" style="border-top-color: #ef4444; max-width: 26rem;">
+
+            <div class="modal-header">
+                <h3 class="modal-title" style="color:var(--color-brown-700);">
+                    <i class="fas fa-triangle-exclamation" style="color:#ef4444;"></i>
+                    Confirm Delete
+                </h3>
+                <button class="close-btn" id="closeDeleteModalBtn"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="modal-body" style="text-align:center; padding: 1.75rem 1.25rem;">
+                <div class="delete-icon-circle">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                <p style="font-size:0.9375rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin-bottom:0.5rem;">
+                    Delete Role?
+                </p>
+                <p style="font-size:0.8125rem; color:var(--color-brown-300); font-weight:var(--font-weight-light); line-height:1.6;">
+                    This action cannot be undone. All role data will be permanently removed.
+                </p>
+            </div>
+
+            <div class="modal-footer" style="justify-content:center;">
+                <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
+                <button id="confirmDeleteBtn" class="btn-del">
+                    <i class="fas fa-trash-alt" style="font-size:0.7rem;"></i>
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="../../js/core/common.js"></script>
     <script src="../../js/core/form-validation.js"></script>
     <script src="roles.js"></script>
     
     <script>
-        // Override the modal functions to use theme.css classes
-        // This bridges your roles.js (which uses 'active' class) with theme.css (which uses 'opacity-100 visible')
-        const originalOpenRoleModal = window.openRoleModal;
-        const originalCloseRoleModal = window.closeRoleModal;
-        
-        window.openRoleModal = function() {
-            const modal = document.getElementById('roleModal');
-            if (modal) {
-                modal.classList.add('opacity-100', 'visible');
-                modal.classList.remove('opacity-0', 'invisible');
-            }
-            if (originalOpenRoleModal) originalOpenRoleModal();
-        };
-        
-        window.closeRoleModal = function() {
-            const modal = document.getElementById('roleModal');
-            if (modal) {
-                modal.classList.remove('opacity-100', 'visible');
-                modal.classList.add('opacity-0', 'invisible');
-            }
-            if (originalCloseRoleModal) originalCloseRoleModal();
-        };
-        
-        // Also override editRole to use the same modal opening
-        const originalEditRole = window.editRole;
-        window.editRole = function(id) {
-            if (originalEditRole) originalEditRole(id);
-            const modal = document.getElementById('roleModal');
-            if (modal) {
-                modal.classList.add('opacity-100', 'visible');
-                modal.classList.remove('opacity-0', 'invisible');
-            }
-        };
-        
-        // Re-attach event listeners after roles.js loads
         document.addEventListener('DOMContentLoaded', function() {
-            // Ensure the add button uses our override
-            const addBtn = document.getElementById('addRoleBtn');
-            if (addBtn) {
-                addBtn.onclick = function() {
-                    window.openRoleModal();
-                };
-            }
+            console.log('Roles & Permissions page loaded');
             
-            // Ensure cancel button works
-            const cancelBtn = document.getElementById('cancelRoleModalBtn');
-            if (cancelBtn) {
-                cancelBtn.onclick = function() {
-                    window.closeRoleModal();
-                };
+            // ─── Stats ───────────────────────────────────────────────
+            function updateStats() {
+                const roles = JSON.parse(localStorage.getItem('system_roles') || '[]');
+                const active = roles.filter(r => r.status === 'active').length;
+                document.getElementById('totalRoles').textContent = roles.length;
+                document.getElementById('activeRoles').textContent = active;
+                document.getElementById('totalPermissions').textContent = '24';
+                document.getElementById('lastUpdated').textContent =
+                    new Date().toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
             }
-            
-            const closeBtn = document.getElementById('closeRoleModalBtn');
-            if (closeBtn) {
-                closeBtn.onclick = function() {
-                    window.closeRoleModal();
-                };
+
+            // ─── Render Roles List ───────────────────────────────────
+            function renderRolesList() {
+                const roles = JSON.parse(localStorage.getItem('system_roles') || '[]');
+                const container = document.getElementById('rolesList');
+                
+                if (!container) return;
+                
+                if (roles.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state" style="padding: 2rem 1.25rem;">
+                            <i class="fas fa-shield-alt"></i>
+                            <p style="font-size:0.8125rem;">No roles created yet</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = roles.map(role => `
+                    <div class="role-item" data-id="${role.id}">
+                        <div>
+                            <div class="role-name">${role.name}</div>
+                            <span class="role-badge">${role.status || 'active'}</span>
+                        </div>
+                        <div class="role-actions">
+                            <button class="icon-btn-sm edit-role" data-id="${role.id}" title="Edit">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                            <button class="icon-btn-sm delete delete-role" data-id="${role.id}" title="Delete">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Bind click events for role items
+                container.querySelectorAll('.role-item').forEach(item => {
+                    item.addEventListener('click', function(e) {
+                        // Don't trigger if clicking on action buttons
+                        if (e.target.closest('.role-actions')) return;
+                        
+                        const id = parseInt(this.dataset.id);
+                        selectRole(id);
+                    });
+                });
+                
+                // Bind edit buttons
+                container.querySelectorAll('.edit-role').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const id = parseInt(this.dataset.id);
+                        editRole(id);
+                    });
+                });
+                
+                // Bind delete buttons
+                container.querySelectorAll('.delete-role').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const id = parseInt(this.dataset.id);
+                        openDelete(id);
+                    });
+                });
+                
+                // Select first role by default
+                if (roles.length > 0) {
+                    selectRole(roles[0].id);
+                }
             }
+
+            // ─── Select Role ──────────────────────────────────────────
+            let selectedRoleId = null;
+
+            function selectRole(id) {
+                selectedRoleId = id;
+                const roles = JSON.parse(localStorage.getItem('system_roles') || '[]');
+                const role = roles.find(r => r.id === id);
+                
+                // Update active state
+                document.querySelectorAll('.role-item').forEach(item => {
+                    item.classList.toggle('active', parseInt(item.dataset.id) === id);
+                });
+                
+                // Update title
+                const title = document.getElementById('selectedRoleTitle');
+                if (title && role) {
+                    title.innerHTML = `<i class="fas fa-key text-sage"></i> ${role.name} - Permissions`;
+                }
+                
+                // Load permissions
+                loadPermissions(id);
+            }
+
+            // ─── Load Permissions ─────────────────────────────────────
+            function loadPermissions(roleId) {
+                const container = document.getElementById('permissionsEditor');
+                if (!container) return;
+                
+                // Show loading
+                container.innerHTML = `
+                    <div class="text-center py-8 text-brown-100">
+                        <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
+                        <p class="font-light">Loading permissions...</p>
+                    </div>
+                `;
+                
+                // Simulate loading
+                setTimeout(() => {
+                    const modules = [
+                        { name: 'Dashboard', permissions: ['View', 'Edit', 'Delete'] },
+                        { name: 'User Management', permissions: ['View', 'Create', 'Edit', 'Delete'] },
+                        { name: 'Clinical', permissions: ['View', 'Create', 'Edit', 'Delete', 'Approve'] },
+                        { name: 'Pharmacy', permissions: ['View', 'Create', 'Edit', 'Delete'] },
+                        { name: 'Billing', permissions: ['View', 'Create', 'Edit', 'Delete', 'Approve'] },
+                        { name: 'Reports', permissions: ['View', 'Export', 'Generate'] }
+                    ];
+                    
+                    const role = JSON.parse(localStorage.getItem('system_roles') || '[]').find(r => r.id === roleId);
+                    
+                    container.innerHTML = modules.map(module => `
+                        <div class="permission-group">
+                            <div class="permission-group-title">${module.name}</div>
+                            <div>
+                                ${module.permissions.map(perm => `
+                                    <label class="permission-checkbox">
+                                        <input type="checkbox" ${Math.random() > 0.3 ? 'checked' : ''}>
+                                        <span>${perm}</span>
+                                    </label>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    // Show save button
+                    document.getElementById('savePermissionsBtn').classList.remove('hidden');
+                }, 500);
+            }
+
+            // ─── Save Permissions ─────────────────────────────────────
+            document.getElementById('savePermissionsBtn')?.addEventListener('click', function() {
+                showToast('✅ Permissions saved successfully', 'success');
+                this.classList.add('hidden');
+            });
+
+            // ─── Modal Functions ──────────────────────────────────────
+            function openAddModal() {
+                const modal = document.getElementById('roleModal');
+                if (modal) {
+                    modal.classList.add('opacity-100', 'visible');
+                    modal.classList.remove('opacity-0', 'invisible');
+                }
+                document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Add Role';
+                document.getElementById('roleForm').reset();
+                document.getElementById('roleId').value = '';
+                document.querySelectorAll('.error-text').forEach(e => e.classList.remove('show'));
+                document.querySelectorAll('.form-input.error').forEach(e => e.classList.remove('error'));
+            }
+
+            function editRole(id) {
+                const roles = JSON.parse(localStorage.getItem('system_roles') || '[]');
+                const role = roles.find(r => r.id === id);
+                if (!role) return;
+                
+                document.getElementById('modalTitle').innerHTML = '<i class="fas fa-pen"></i> Edit Role';
+                document.getElementById('roleId').value = role.id;
+                document.getElementById('roleName').value = role.name;
+                document.getElementById('roleDesc').value = role.desc || '';
+                document.querySelectorAll('.error-text').forEach(e => e.classList.remove('show'));
+                document.querySelectorAll('.form-input.error').forEach(e => e.classList.remove('error'));
+                
+                const modal = document.getElementById('roleModal');
+                if (modal) {
+                    modal.classList.add('opacity-100', 'visible');
+                    modal.classList.remove('opacity-0', 'invisible');
+                }
+            }
+
+            function closeModal() {
+                const modal = document.getElementById('roleModal');
+                if (modal) {
+                    modal.classList.remove('opacity-100', 'visible');
+                    modal.classList.add('opacity-0', 'invisible');
+                }
+            }
+
+            function openDelete(id) {
+                const deleteModal = document.getElementById('deleteModal');
+                if (deleteModal) {
+                    deleteModal.classList.add('opacity-100', 'visible');
+                    deleteModal.classList.remove('opacity-0', 'invisible');
+                }
+                window._deleteTargetId = id;
+            }
+
+            function closeDeleteModal() {
+                const deleteModal = document.getElementById('deleteModal');
+                if (deleteModal) {
+                    deleteModal.classList.remove('opacity-100', 'visible');
+                    deleteModal.classList.add('opacity-0', 'invisible');
+                }
+                window._deleteTargetId = null;
+            }
+
+            function confirmDelete() {
+                const id = window._deleteTargetId;
+                if (!id) return;
+                
+                let roles = JSON.parse(localStorage.getItem('system_roles') || '[]');
+                const role = roles.find(r => r.id === id);
+                roles = roles.filter(r => r.id !== id);
+                localStorage.setItem('system_roles', JSON.stringify(roles));
+                
+                updateStats();
+                renderRolesList();
+                closeDeleteModal();
+                
+                if (role) showToast(`🗑️ ${role.name} deleted`, 'error');
+            }
+
+            // ─── Form Submit ──────────────────────────────────────────
+            document.getElementById('roleForm')?.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('roleName').value.trim();
+                const desc = document.getElementById('roleDesc').value.trim();
+                const editId = document.getElementById('roleId').value;
+                
+                if (!name) {
+                    document.getElementById('roleNameError').classList.add('show');
+                    document.getElementById('roleName').classList.add('error');
+                    return;
+                } else {
+                    document.getElementById('roleNameError').classList.remove('show');
+                    document.getElementById('roleName').classList.remove('error');
+                }
+                
+                let roles = JSON.parse(localStorage.getItem('system_roles') || '[]');
+                
+                if (editId) {
+                    const idx = roles.findIndex(r => r.id === parseInt(editId));
+                    if (idx !== -1) {
+                        roles[idx] = { ...roles[idx], name, desc };
+                    }
+                    showToast(`✅ ${name} updated successfully`);
+                } else {
+                    const newId = roles.length ? Math.max(...roles.map(r => r.id)) + 1 : 1;
+                    roles.push({ id: newId, name, desc, status: 'active' });
+                    showToast(`✅ ${name} added successfully`);
+                }
+                
+                localStorage.setItem('system_roles', JSON.stringify(roles));
+                closeModal();
+                updateStats();
+                renderRolesList();
+            });
+
+            // ─── Toast ──────────────────────────────────────────────────
+            function showToast(msg, type = 'success') {
+                document.querySelectorAll('.toast-notification').forEach(t => t.remove());
+                const t = document.createElement('div');
+                const icons = { success: 'fa-circle-check', error: 'fa-circle-exclamation', info: 'fa-circle-info' };
+                t.className = `toast-notification toast-${type}`;
+                t.innerHTML = `<i class="fas ${icons[type] || icons.info}" style="font-size:0.875rem;"></i> ${msg}`;
+                document.body.appendChild(t);
+                setTimeout(() => { t.classList.add('toast-fade-out'); setTimeout(() => t.remove(), 300); }, 2800);
+            }
+
+            // ─── Event Listeners ──────────────────────────────────────
+            document.getElementById('addRoleBtn')?.addEventListener('click', openAddModal);
+            document.getElementById('closeRoleModalBtn')?.addEventListener('click', closeModal);
+            document.getElementById('cancelRoleModalBtn')?.addEventListener('click', closeModal);
+            document.getElementById('closeDeleteModalBtn')?.addEventListener('click', closeDeleteModal);
+            document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeDeleteModal);
+            document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
+
+            // Close modals on overlay click
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.classList.remove('opacity-100', 'visible');
+                        this.classList.add('opacity-0', 'invisible');
+                    }
+                });
+            });
+
+            // ESC key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    document.querySelectorAll('.modal-overlay.opacity-100').forEach(modal => {
+                        modal.classList.remove('opacity-100', 'visible');
+                        modal.classList.add('opacity-0', 'invisible');
+                    });
+                }
+            });
+
+            // ─── Init ──────────────────────────────────────────────────
+            updateStats();
+            renderRolesList();
         });
     </script>
+
 </body>
 </html>

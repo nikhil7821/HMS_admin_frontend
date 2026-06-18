@@ -1,512 +1,423 @@
 /**
  * Prescriptions Management Module
  * MedFlow - Patient Prescriptions History
- * Matching Executive Dashboard UI/UX - Indian Context
+ * Uses theme.css for styling, clean event handling
  */
 
-// Data Stores
-let prescriptions = [];
-let patients = [];
+var prescriptions = [];
+var patients = [];
+var searchTerm = '';
+var patientFilter = '';
+var isInitialized = false;
+var currentPrescriptionId = null;
 
-// Helper: Escape HTML
-function escapeHtml(str) {
+// ─── Utility Functions ──────────────────────────────
+
+function esc(str) {
     if (!str) return '';
-    const div = document.createElement('div');
+    var div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
 }
 
-// Toast notification
-function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    const icons = { success: 'fa-check-circle', error: 'fa-exclamation-triangle', info: 'fa-info-circle' };
-    const colors = { success: '#8aae7a', error: '#d8b48c', info: '#a8c49a' };
-    
-    toast.style.cssText = `
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px 20px;
-        border-radius: 12px;
-        background: ${colors[type]};
-        color: white;
-        font-weight: 500;
-        font-size: 0.75rem;
-        backdrop-filter: blur(8px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        animation: slideInRight 0.25s ease-out;
-        font-family: 'Poppins', system-ui, sans-serif;
-    `;
-    toast.innerHTML = `<i class="fas ${icons[type]} text-sm"></i><span>${escapeHtml(message)}</span>`;
+// ─── Toast Notification ──────────────────────────────
+
+function showToast(message, type) {
+    type = type || 'success';
+    var toast = document.createElement('div');
+    var colors = { success: '#8aae7a', error: '#d8b48c', info: '#a8c49a' };
+    toast.style.cssText = 'position:fixed; bottom:24px; right:24px; z-index:9999; display:flex; align-items:center; gap:8px; padding:10px 20px; border-radius:12px; background:' + colors[type] + '; color:white; font-weight:500; font-size:0.75rem; backdrop-filter:blur(8px); box-shadow:0 4px 12px rgba(0,0,0,0.08); animation:slideInRight 0.25s ease-out; font-family:Poppins, sans-serif;';
+    toast.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle') + '"></i><span>' + esc(message) + '</span>';
     document.body.appendChild(toast);
-    
-    setTimeout(() => {
+    setTimeout(function() {
         toast.style.opacity = '0';
         toast.style.transform = 'translateX(100%)';
-        setTimeout(() => toast.remove(), 250);
+        setTimeout(function() { toast.remove(); }, 250);
     }, 3000);
 }
 
-// Update statistics
-function updateStats() {
-    const total = prescriptions.length;
-    
-    const currentMonth = new Date().toISOString().substring(0, 7);
-    const monthCount = prescriptions.filter(p => p.date && p.date.startsWith(currentMonth)).length;
-    
-    const uniquePatients = new Set(prescriptions.map(p => p.patientId)).size;
-    
-    // Extract unique medicine names from prescriptions
-    const allMedicines = [];
-    prescriptions.forEach(p => {
-        if (p.prescription) {
-            const medicines = p.prescription.match(/\b[A-Za-z]+(?:cin|micin|zole|pam|statin|pril|olol|prazole|idine|cycline|mycin|floxacin|dipine|sartan)\b/gi) || [];
-            allMedicines.push(...medicines);
+// ─── Data Management ──────────────────────────────
+
+function loadData() {
+    try {
+        // Load patients
+        var storedPatients = localStorage.getItem('hms_patients');
+        if (storedPatients) {
+            patients = JSON.parse(storedPatients);
+        } else {
+            patients = [
+                { id: 1, fullName: 'Rajesh Kumar', phone: '9876543210', age: 45 },
+                { id: 2, fullName: 'Priya Sharma', phone: '9876543211', age: 32 },
+                { id: 3, fullName: 'Amit Patel', phone: '9876543212', age: 28 },
+                { id: 4, fullName: 'Sunita Verma', phone: '9876543213', age: 55 },
+                { id: 5, fullName: 'Vikram Singh', phone: '9876543214', age: 38 }
+            ];
+            localStorage.setItem('hms_patients', JSON.stringify(patients));
         }
-    });
-    const uniqueMedicines = new Set(allMedicines).size;
-    
-    const totalEl = document.getElementById('totalPrescriptions');
-    const monthEl = document.getElementById('monthPrescriptions');
-    const activeEl = document.getElementById('activePatients');
-    const uniqueEl = document.getElementById('uniqueMedicines');
-    
-    if (totalEl) totalEl.innerText = total;
-    if (monthEl) monthEl.innerText = monthCount;
-    if (activeEl) activeEl.innerText = uniquePatients;
-    if (uniqueEl) uniqueEl.innerText = uniqueMedicines;
+        
+        // Load prescriptions from consultations
+        var storedConsultations = localStorage.getItem('hms_consultations');
+        if (storedConsultations) {
+            var consultations = JSON.parse(storedConsultations);
+            prescriptions = [];
+            for (var i = 0; i < consultations.length; i++) {
+                if (consultations[i].prescription && consultations[i].prescription.trim() !== '') {
+                    prescriptions.push({
+                        id: consultations[i].id,
+                        patientId: consultations[i].patientId,
+                        patientName: consultations[i].patientName,
+                        doctorName: consultations[i].doctorName,
+                        date: consultations[i].date,
+                        prescription: consultations[i].prescription,
+                        diagnosis: consultations[i].diagnosis,
+                        followUp: consultations[i].followUp || null
+                    });
+                }
+            }
+        } else {
+            // Sample Indian prescriptions
+            var today = new Date().toISOString().split('T')[0];
+            var lastMonth = new Date();
+            lastMonth.setMonth(lastMonth.getMonth() - 1);
+            var lastMonthStr = lastMonth.toISOString().split('T')[0];
+            
+            prescriptions = [
+                { 
+                    id: 1, patientId: 1, patientName: 'Rajesh Kumar', doctorName: 'Dr. Anjali Nair', 
+                    date: today, 
+                    diagnosis: 'Type 2 Diabetes with Hypertension',
+                    prescription: 'Tab. Metformin 500mg - 1 tablet twice daily after meals\nTab. Telmisartan 40mg - 1 tablet once daily\nTab. Atorvastatin 10mg - 1 tablet at night',
+                    followUp: '15 days'
+                },
+                { 
+                    id: 2, patientId: 2, patientName: 'Priya Sharma', doctorName: 'Dr. Vikram Singh', 
+                    date: lastMonthStr, 
+                    diagnosis: 'Upper Respiratory Tract Infection',
+                    prescription: 'Tab. Azithromycin 500mg - 1 tablet once daily for 3 days\nTab. Levocetirizine 5mg - 1 tablet at night for 5 days\nSyrup. Ascoril - 10ml thrice daily for 5 days',
+                    followUp: '5 days'
+                },
+                { 
+                    id: 3, patientId: 3, patientName: 'Amit Patel', doctorName: 'Dr. Sneha Joshi', 
+                    date: lastMonthStr, 
+                    diagnosis: 'Acute Gastritis',
+                    prescription: 'Tab. Pantoprazole 40mg - 1 tablet before breakfast\nTab. Domperidone 10mg - 1 tablet before meals\nSyp. Digene - 2 tsp thrice daily after meals',
+                    followUp: '7 days'
+                },
+                { 
+                    id: 4, patientId: 4, patientName: 'Sunita Verma', doctorName: 'Dr. Rajiv Menon', 
+                    date: lastMonthStr, 
+                    diagnosis: 'Osteoarthritis - Right Knee',
+                    prescription: 'Tab. Aceclofenac 100mg - 1 tablet twice daily after meals\nTab. Serratiopeptidase 10mg - 1 tablet twice daily\nGel. Volini - Apply locally twice daily',
+                    followUp: '1 month'
+                },
+                { 
+                    id: 5, patientId: 5, patientName: 'Vikram Singh', doctorName: 'Dr. Neha Gupta', 
+                    date: lastMonthStr, 
+                    diagnosis: 'Allergic Rhinitis',
+                    prescription: 'Tab. Montelukast 10mg + Levocetirizine 5mg - 1 tablet at night\nNasal spray. Fluticasone - 2 sprays in each nostril twice daily',
+                    followUp: '15 days'
+                }
+            ];
+        }
+        refreshUI();
+        populateFilters();
+    } catch (error) {
+        console.error('Error loading data:', error);
+        showToast('Error loading prescription data', 'error');
+    }
 }
 
-// Load data from localStorage
-function loadData() {
-    // Load patients from HMS
-    const storedPatients = localStorage.getItem('hms_patients');
-    if (storedPatients) {
-        patients = JSON.parse(storedPatients);
-    } else {
-        // Sample Indian patients
-        patients = [
-            { id: 1, fullName: 'Rajesh Kumar', phone: '9876543210', age: 45 },
-            { id: 2, fullName: 'Priya Sharma', phone: '9876543211', age: 32 },
-            { id: 3, fullName: 'Amit Patel', phone: '9876543212', age: 28 },
-            { id: 4, fullName: 'Sunita Verma', phone: '9876543213', age: 55 },
-            { id: 5, fullName: 'Vikram Singh', phone: '9876543214', age: 38 }
-        ];
-        localStorage.setItem('hms_patients', JSON.stringify(patients));
-    }
+// ─── Stats ──────────────────────────────────────────
+
+function updateStats() {
+    var total = prescriptions.length;
+    var currentMonth = new Date().toISOString().substring(0, 7);
+    var monthCount = 0;
+    var patientIds = {};
+    var allMedicines = [];
     
-    // Load consultations and extract prescriptions
-    const storedConsultations = localStorage.getItem('hms_consultations');
-    if (storedConsultations) {
-        const consultations = JSON.parse(storedConsultations);
-        prescriptions = consultations
-            .filter(c => c.prescription && c.prescription.trim() !== '')
-            .map(c => ({
-                id: c.id,
-                patientId: c.patientId,
-                patientName: c.patientName,
-                doctorName: c.doctorName,
-                date: c.date,
-                prescription: c.prescription,
-                diagnosis: c.diagnosis,
-                followUp: c.followUp || null
-            }));
-    } else {
-        // Sample Indian prescriptions
-        prescriptions = [
-            { 
-                id: 1, patientId: 1, patientName: 'Rajesh Kumar', doctorName: 'Anjali Nair', 
-                date: '2026-06-10', 
-                diagnosis: 'Type 2 Diabetes with Hypertension',
-                prescription: `Tab. Metformin 500mg - 1 tablet twice daily after meals\nTab. Telmisartan 40mg - 1 tablet once daily\nTab. Atorvastatin 10mg - 1 tablet at night`,
-                followUp: '15 days'
-            },
-            { 
-                id: 2, patientId: 2, patientName: 'Priya Sharma', doctorName: 'Vikram Singh', 
-                date: '2026-06-08', 
-                diagnosis: 'Upper Respiratory Tract Infection',
-                prescription: `Tab. Azithromycin 500mg - 1 tablet once daily for 3 days\nTab. Levocetirizine 5mg - 1 tablet at night for 5 days\nSyrup. Ascoril - 10ml thrice daily for 5 days`,
-                followUp: '5 days'
-            },
-            { 
-                id: 3, patientId: 3, patientName: 'Amit Patel', doctorName: 'Sneha Joshi', 
-                date: '2026-06-05', 
-                diagnosis: 'Acute Gastritis',
-                prescription: `Tab. Pantoprazole 40mg - 1 tablet before breakfast\nTab. Domperidone 10mg - 1 tablet before meals\nSyp. Digene - 2 tsp thrice daily after meals`,
-                followUp: '7 days'
-            },
-            { 
-                id: 4, patientId: 4, patientName: 'Sunita Verma', doctorName: 'Rajiv Menon', 
-                date: '2026-06-03', 
-                diagnosis: 'Osteoarthritis - Right Knee',
-                prescription: `Tab. Aceclofenac 100mg - 1 tablet twice daily after meals\nTab. Serratiopeptidase 10mg - 1 tablet twice daily\nGel. Volini - Apply locally twice daily`,
-                followUp: '1 month'
-            },
-            { 
-                id: 5, patientId: 5, patientName: 'Vikram Singh', doctorName: 'Neha Gupta', 
-                date: '2026-06-01', 
-                diagnosis: 'Allergic Rhinitis',
-                prescription: `Tab. Montelukast 10mg + Levocetirizine 5mg - 1 tablet at night\nNasal spray. Fluticasone - 2 sprays in each nostril twice daily`,
-                followUp: '15 days'
+    for (var i = 0; i < prescriptions.length; i++) {
+        if (prescriptions[i].date && prescriptions[i].date.startsWith(currentMonth)) {
+            monthCount++;
+        }
+        if (prescriptions[i].patientId) {
+            patientIds[prescriptions[i].patientId] = true;
+        }
+        if (prescriptions[i].prescription) {
+            var medicines = prescriptions[i].prescription.match(/\b[A-Za-z]+(?:cin|micin|zole|pam|statin|pril|olol|prazole|idine|cycline|mycin|floxacin|dipine|sartan)\b/gi) || [];
+            for (var j = 0; j < medicines.length; j++) {
+                allMedicines.push(medicines[j]);
             }
-        ];
-        localStorage.setItem('hms_consultations', JSON.stringify(
-            prescriptions.map(p => ({
-                id: p.id,
-                patientId: p.patientId,
-                patientName: p.patientName,
-                doctorName: p.doctorName,
-                date: p.date,
-                diagnosis: p.diagnosis,
-                prescription: p.prescription,
-                followUp: p.followUp
-            }))
-        ));
+        }
     }
     
+    var uniquePatients = Object.keys(patientIds).length;
+    var uniqueMedicines = new Set(allMedicines).size;
+    
+    document.getElementById('totalPrescriptions').textContent = total;
+    document.getElementById('monthPrescriptions').textContent = monthCount;
+    document.getElementById('activePatients').textContent = uniquePatients;
+    document.getElementById('uniqueMedicines').textContent = uniqueMedicines;
+}
+
+// ─── Populate Filters ──────────────────────────────
+
+function populateFilters() {
+    var filterSelect = document.getElementById('patientFilter');
+    if (filterSelect) {
+        var html = '<option value="">All Patients</option>';
+        for (var i = 0; i < patients.length; i++) {
+            html += '<option value="' + patients[i].id + '">' + esc(patients[i].fullName) + '</option>';
+        }
+        filterSelect.innerHTML = html;
+    }
+}
+
+// ─── Filter ──────────────────────────────────────────
+
+function getFilteredPrescriptions() {
+    return prescriptions.filter(function(p) {
+        var matchesSearch = searchTerm === '' || 
+            p.patientName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+            p.doctorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.diagnosis.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.prescription.toLowerCase().includes(searchTerm.toLowerCase());
+        var matchesPatient = patientFilter === '' || p.patientId.toString() === patientFilter;
+        return matchesSearch && matchesPatient;
+    });
+}
+
+// ─── Extract Medicines ──────────────────────────────
+
+function extractMedicines(prescriptionText) {
+    if (!prescriptionText) return [];
+    var medicines = prescriptionText.match(/\b[A-Za-z]+(?:cin|micin|zole|pam|statin|pril|olol|prazole|idine|cycline|mycin|floxacin|dipine|sartan)\b/gi) || [];
+    var unique = [];
+    for (var i = 0; i < medicines.length; i++) {
+        if (unique.indexOf(medicines[i]) === -1) {
+            unique.push(medicines[i]);
+        }
+    }
+    return unique.slice(0, 5);
+}
+
+// ─── Render ──────────────────────────────────────────
+
+function renderPrescriptions() {
+    var grid = document.getElementById('prescriptionsGrid');
+    if (!grid) return;
+    
+    var filtered = getFilteredPrescriptions();
+    filtered.sort(function(a, b) {
+        return new Date(b.date) - new Date(a.date);
+    });
+    
+    if (filtered.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);"><i class="fas fa-folder-open" style="font-size:2rem; margin-bottom:0.75rem; display:block; opacity:0.4;"></i><p style="font-size:0.875rem; font-weight:var(--font-weight-light);">No prescriptions found</p></div>';
+        return;
+    }
+    
+    var html = '';
+    for (var i = 0; i < filtered.length; i++) {
+        var p = filtered[i];
+        var medicines = extractMedicines(p.prescription);
+        var preview = p.prescription.substring(0, 80) + (p.prescription.length > 80 ? '...' : '');
+        
+        html += '<div class="prescription-card">';
+        html += '<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.5rem;">';
+        html += '<div><h3 class="patient-name" style="font-size:0.8125rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin:0;">' + esc(p.patientName) + '</h3>';
+        html += '<p class="doctor-name" style="font-size:0.6875rem; color:var(--color-brown-300); margin:0;">' + esc(p.doctorName) + '</p>';
+        html += '<div style="display:flex; align-items:center; gap:0.375rem; margin-top:0.25rem;"><i class="fas fa-calendar-alt" style="color:var(--color-brown-100); font-size:0.625rem;"></i><span class="date-text" style="font-size:0.625rem; color:var(--color-brown-100);">' + p.date + '</span></div>';
+        html += '</div>';
+        html += '<button class="view-btn" data-id="' + p.id + '" style="background:none; border:none; color:var(--color-sage); cursor:pointer; font-size:1rem;"><i class="fas fa-eye"></i></button>';
+        html += '</div>';
+        
+        html += '<div style="margin-top:0.5rem;"><p style="font-size:0.625rem; font-weight:var(--font-weight-medium); color:var(--color-brown-100); text-transform:uppercase; letter-spacing:0.04em; margin:0;">Diagnosis</p><p class="diagnosis-text" style="font-size:0.6875rem; color:var(--color-brown-600); margin:0;">' + esc(p.diagnosis) + '</p></div>';
+        
+        html += '<div style="margin-top:0.375rem;"><p style="font-size:0.625rem; font-weight:var(--font-weight-medium); color:var(--color-brown-100); text-transform:uppercase; letter-spacing:0.04em; margin:0;">Medicines</p><div style="display:flex; flex-wrap:wrap; gap:0.25rem; margin-top:0.25rem;">';
+        for (var j = 0; j < medicines.length; j++) {
+            html += '<span class="medicine-tag">' + esc(medicines[j]) + '</span>';
+        }
+        if (medicines.length === 0) {
+            html += '<span style="font-size:0.625rem; color:var(--color-brown-100);">No medicines listed</span>';
+        }
+        html += '</div>';
+        html += '<p style="font-size:0.625rem; color:var(--color-brown-100); margin-top:0.25rem; font-style:italic;">"' + esc(preview) + '"</p></div>';
+        
+        html += '<div style="margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid var(--border-default);">';
+        html += '<button class="card-btn-print print-btn" data-id="' + p.id + '"><i class="fas fa-print"></i> Print Prescription</button>';
+        html += '</div></div>';
+    }
+    grid.innerHTML = html;
+    
+    // Bind events
+    grid.querySelectorAll('.view-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() { viewPrescription(parseInt(this.dataset.id)); });
+    });
+    grid.querySelectorAll('.print-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() { printPrescription(parseInt(this.dataset.id)); });
+    });
+}
+
+function refreshUI() {
     updateStats();
-    populateFilters();
     renderPrescriptions();
 }
 
-// Populate patient filter
-function populateFilters() {
-    const filterSelect = document.getElementById('patientFilter');
-    if (filterSelect) {
-        filterSelect.innerHTML = '<option value="">All Patients</option>' + 
-            patients.map(p => `<option value="${p.id}">${escapeHtml(p.fullName)}</option>`).join('');
+// ─── Modals ──────────────────────────────────────────
+
+function openModal(id) {
+    var el = document.getElementById(id);
+    if (el) { el.classList.add('active'); }
+}
+
+function closeModal(id) {
+    var el = document.getElementById(id);
+    if (el) { el.classList.remove('active'); }
+}
+
+// ─── View Prescription ──────────────────────────────────
+
+function viewPrescription(id) {
+    var prescription = null;
+    for (var i = 0; i < prescriptions.length; i++) {
+        if (prescriptions[i].id === id) { prescription = prescriptions[i]; break; }
     }
-}
-
-// Extract medicine names from prescription text
-function extractMedicines(prescriptionText) {
-    const medicines = prescriptionText.match(/\b[A-Za-z]+(?:cin|micin|zole|pam|statin|pril|olol|prazole|idine|cycline|mycin|floxacin|dipine|sartan)\b/gi) || [];
-    return [...new Set(medicines)].slice(0, 5);
-}
-
-// Render prescriptions grid
-function renderPrescriptions() {
-    const searchValue = document.getElementById('searchInput')?.value.toLowerCase() || '';
-    const patientFilter = document.getElementById('patientFilter')?.value || '';
-    
-    let filtered = prescriptions.filter(p => {
-        const matchesSearch = searchValue === '' || 
-            p.patientName.toLowerCase().includes(searchValue) || 
-            p.doctorName.toLowerCase().includes(searchValue) ||
-            p.diagnosis.toLowerCase().includes(searchValue) ||
-            p.prescription.toLowerCase().includes(searchValue);
-        const matchesPatient = patientFilter === '' || p.patientId.toString() === patientFilter;
-        return matchesSearch && matchesPatient;
-    });
-    
-    // Sort by date descending (newest first)
-    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-    
-    const grid = document.getElementById('prescriptionsGrid');
-    if (!grid) return;
-    
-    if (filtered.length === 0) {
-        grid.innerHTML = `<div class="col-span-2 text-center py-12 text-[#d4c9bc] text-sm"><i class="fas fa-folder-open mr-2"></i>No prescriptions found</div>`;
-        return;
-    }
-    
-    grid.innerHTML = filtered.map(p => {
-        const medicines = extractMedicines(p.prescription);
-        const preview = p.prescription.substring(0, 80) + (p.prescription.length > 80 ? '...' : '');
-        
-        return `
-            <div class="prescription-card p-5">
-                <div class="flex justify-between items-start mb-3">
-                    <div>
-                        <h3 class="font-medium text-[#5a4a3a] text-base">${escapeHtml(p.patientName)}</h3>
-                        <p class="text-xs text-[#b8aa9a]">Dr. ${escapeHtml(p.doctorName)}</p>
-                        <div class="flex items-center gap-2 mt-1">
-                            <i class="fas fa-calendar-alt text-[#d4c9bc] text-xs"></i>
-                            <span class="text-xs text-[#9a8e82]">${p.date}</span>
-                        </div>
-                    </div>
-                    <button onclick="window.viewPrescriptionHandler(${p.id})" class="text-[#a8c49a] hover:text-[#8aae7a] transition">
-                        <i class="fas fa-eye text-base"></i>
-                    </button>
-                </div>
-                
-                <div class="mt-3">
-                    <p class="text-xs font-medium text-[#b8aa9a] uppercase tracking-wide">Diagnosis</p>
-                    <p class="text-sm text-[#5a4a3a] mt-0.5">${escapeHtml(p.diagnosis)}</p>
-                </div>
-                
-                <div class="mt-2">
-                    <p class="text-xs font-medium text-[#b8aa9a] uppercase tracking-wide">Medicines</p>
-                    <div class="flex flex-wrap gap-1 mt-1">
-                        ${medicines.map(m => `<span class="badge-report text-xs">${escapeHtml(m)}</span>`).join('')}
-                    </div>
-                    <p class="text-xs text-[#9a8e82] mt-2 italic">"${escapeHtml(preview)}"</p>
-                </div>
-                
-                <button onclick="window.printPrescriptionHandler(${p.id})" class="mt-4 w-full btn-print text-white py-2 rounded-xl text-xs font-medium transition">
-                    <i class="fas fa-print mr-1"></i> Print Prescription
-                </button>
-            </div>
-        `;
-    }).join('');
-}
-
-// Modal management
-const modal = document.getElementById('prescriptionModal');
-
-function openModal() {
-    if (!modal) return;
-    modal.classList.remove('opacity-0', 'invisible');
-    modal.classList.add('opacity-100', 'visible');
-}
-
-function closeModal() {
-    if (!modal) return;
-    modal.classList.add('opacity-0', 'invisible');
-    modal.classList.remove('opacity-100', 'visible');
-}
-
-// View prescription handler
-window.viewPrescriptionHandler = function(id) {
-    const prescription = prescriptions.find(p => p.id === id);
     if (!prescription) {
         showToast('Prescription not found', 'error');
         return;
     }
     
-    const detailsDiv = document.getElementById('prescriptionDetails');
+    currentPrescriptionId = id;
+    var detailsDiv = document.getElementById('prescriptionDetails');
     if (detailsDiv) {
-        detailsDiv.innerHTML = `
-            <div class="border-b border-[#f0e8e0] pb-4 mb-4">
-                <h3 class="font-semibold text-[#5a4a3a] text-lg">${escapeHtml(prescription.patientName)}</h3>
-                <div class="grid grid-cols-2 gap-2 mt-2">
-                    <div>
-                        <p class="text-xs text-[#b8aa9a]">Date</p>
-                        <p class="text-sm text-[#5a4a3a]">${prescription.date}</p>
-                    </div>
-                    <div>
-                        <p class="text-xs text-[#b8aa9a]">Doctor</p>
-                        <p class="text-sm text-[#5a4a3a]">Dr. ${escapeHtml(prescription.doctorName)}</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="mb-4">
-                <p class="text-xs font-medium text-[#b8aa9a] uppercase tracking-wide mb-1">Diagnosis</p>
-                <p class="text-sm text-[#5a4a3a] bg-[#fefcf9] p-3 rounded-xl border border-[#f0e8e0]">${escapeHtml(prescription.diagnosis)}</p>
-            </div>
-            
-            <div class="mb-4">
-                <p class="text-xs font-medium text-[#b8aa9a] uppercase tracking-wide mb-1">Prescription / Medicines</p>
-                <div class="bg-[#fefcf9] p-3 rounded-xl border border-[#f0e8e0]">
-                    <pre class="whitespace-pre-wrap text-sm text-[#5a4a3a] font-mono prescription-content">${escapeHtml(prescription.prescription)}</pre>
-                </div>
-            </div>
-            
-            ${prescription.followUp ? `
-            <div class="mb-4">
-                <p class="text-xs font-medium text-[#b8aa9a] uppercase tracking-wide mb-1">Follow-up</p>
-                <p class="text-sm text-[#d4a853] bg-[#fef5e8] p-2 rounded-xl inline-block">Follow up after ${escapeHtml(prescription.followUp)}</p>
-            </div>
-            ` : ''}
-            
-            <div class="mt-4 pt-3 border-t border-[#f0e8e0] text-center">
-                <p class="text-xs text-[#b8aa9a]">MedFlow Hospital - Digital Prescription</p>
-                <p class="text-xs text-[#d4c9bc]">www.medflow.com</p>
-            </div>
-        `;
+        detailsDiv.innerHTML = '';
+        
+        detailsDiv.innerHTML += '<div style="border-bottom:1px solid var(--border-default); padding-bottom:1rem; margin-bottom:1rem;">';
+        detailsDiv.innerHTML += '<h3 style="font-weight:var(--font-weight-semibold); color:var(--color-brown-700); font-size:1rem; margin:0;">' + esc(prescription.patientName) + '</h3>';
+        detailsDiv.innerHTML += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-top:0.5rem;">';
+        detailsDiv.innerHTML += '<div><p style="font-size:0.6875rem; color:var(--color-brown-100); margin:0;">Date</p><p style="font-size:0.8125rem; color:var(--color-brown-700); margin:0;">' + prescription.date + '</p></div>';
+        detailsDiv.innerHTML += '<div><p style="font-size:0.6875rem; color:var(--color-brown-100); margin:0;">Doctor</p><p style="font-size:0.8125rem; color:var(--color-brown-700); margin:0;">' + esc(prescription.doctorName) + '</p></div>';
+        detailsDiv.innerHTML += '</div></div>';
+        
+        detailsDiv.innerHTML += '<div style="margin-bottom:1rem;"><p style="font-size:0.6875rem; font-weight:var(--font-weight-medium); color:var(--color-brown-100); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.25rem;">Diagnosis</p><div style="background:var(--bg-subtle); padding:0.75rem; border-radius:var(--radius-md); border:1px solid var(--border-default);"><p style="font-size:0.8125rem; color:var(--color-brown-700); margin:0;">' + esc(prescription.diagnosis) + '</p></div></div>';
+        
+        detailsDiv.innerHTML += '<div style="margin-bottom:1rem;"><p style="font-size:0.6875rem; font-weight:var(--font-weight-medium); color:var(--color-brown-100); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.25rem;">Prescription / Medicines</p><div style="background:var(--bg-subtle); padding:0.75rem; border-radius:var(--radius-md); border:1px solid var(--border-default);"><pre class="prescription-content">' + esc(prescription.prescription) + '</pre></div></div>';
+        
+        if (prescription.followUp) {
+            detailsDiv.innerHTML += '<div style="margin-bottom:1rem;"><p style="font-size:0.6875rem; font-weight:var(--font-weight-medium); color:var(--color-brown-100); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.25rem;">Follow-up</p><div style="background:#fef5e8; padding:0.5rem 0.75rem; border-radius:var(--radius-md); display:inline-block;"><p style="font-size:0.8125rem; color:var(--color-warning-text); margin:0;">Follow up after ' + esc(prescription.followUp) + '</p></div></div>';
+        }
+        
+        detailsDiv.innerHTML += '<div style="margin-top:0.5rem; padding-top:0.75rem; border-top:1px solid var(--border-default); text-align:center;"><p style="font-size:0.6875rem; color:var(--color-brown-100); margin:0;">MedFlow Hospital - Digital Prescription</p><p style="font-size:0.625rem; color:var(--color-brown-100); margin:0;">www.medflow.com</p></div>';
     }
     
-    openModal();
-};
+    openModal('prescriptionModal');
+}
 
-// Print single prescription handler
-window.printPrescriptionHandler = function(id) {
-    const prescription = prescriptions.find(p => p.id === id);
+// ─── Print Prescription ──────────────────────────────────
+
+function printPrescription(id) {
+    var prescription = null;
+    for (var i = 0; i < prescriptions.length; i++) {
+        if (prescriptions[i].id === id) { prescription = prescriptions[i]; break; }
+    }
     if (!prescription) {
         showToast('Prescription not found', 'error');
         return;
     }
     
-    const printContent = `
-        <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 40px; background: white;">
-            <div style="text-align: center; border-bottom: 2px solid #a8c49a; padding-bottom: 20px; margin-bottom: 30px;">
-                <h1 style="color: #5a4a3a; margin: 0;">MedFlow Hospital</h1>
-                <p style="color: #9a8e82; margin: 5px 0;">Digital Prescription</p>
-            </div>
-            
-            <div style="margin-bottom: 30px;">
-                <h3 style="color: #5a4a3a; margin: 0 0 10px 0;">Patient Information</h3>
-                <table style="width: 100%; border-collapse: collapse;">
-                    <tr><td style="padding: 8px 0;"><strong>Name:</strong></td><td>${escapeHtml(prescription.patientName)}</td></tr>
-                    <tr><td style="padding: 8px 0;"><strong>Date:</strong></td><td>${prescription.date}</td></tr>
-                    <tr><td style="padding: 8px 0;"><strong>Doctor:</strong></td><td>Dr. ${escapeHtml(prescription.doctorName)}</td></tr>
-                </table>
-            </div>
-            
-            <div style="margin-bottom: 30px;">
-                <h3 style="color: #5a4a3a; margin: 0 0 10px 0;">Diagnosis</h3>
-                <div style="background: #fefcf9; padding: 15px; border-radius: 8px; border: 1px solid #f0e8e0;">
-                    <p style="margin: 0;">${escapeHtml(prescription.diagnosis)}</p>
-                </div>
-            </div>
-            
-            <div style="margin-bottom: 30px;">
-                <h3 style="color: #5a4a3a; margin: 0 0 10px 0;">Prescription</h3>
-                <div style="background: #fefcf9; padding: 15px; border-radius: 8px; border: 1px solid #f0e8e0;">
-                    <pre style="white-space: pre-wrap; font-family: monospace; margin: 0; font-size: 14px;">${escapeHtml(prescription.prescription)}</pre>
-                </div>
-            </div>
-            
-            ${prescription.followUp ? `
-            <div style="margin-bottom: 30px;">
-                <h3 style="color: #5a4a3a; margin: 0 0 10px 0;">Follow-up</h3>
-                <p style="color: #d4a853; background: #fef5e8; padding: 10px; border-radius: 8px; display: inline-block;">Follow up after ${escapeHtml(prescription.followUp)}</p>
-            </div>
-            ` : ''}
-            
-            <div style="text-align: center; margin-top: 50px; padding-top: 20px; border-top: 1px solid #f0e8e0; color: #b8aa9a; font-size: 12px;">
-                <p>This is a computer-generated prescription. Valid with doctor's signature.</p>
-                <p>MedFlow Hospital - www.medflow.com</p>
-            </div>
-        </div>
-    `;
+    var printContent = '';
+    printContent += '<div style="font-family:Poppins, Arial, sans-serif; max-width:800px; margin:0 auto; padding:40px; background:white;">';
+    printContent += '<div style="text-align:center; border-bottom:2px solid #a8c49a; padding-bottom:20px; margin-bottom:30px;">';
+    printContent += '<h1 style="color:#5a4a3a; margin:0;">MedFlow Hospital</h1>';
+    printContent += '<p style="color:#9a8e82; margin:5px 0;">Digital Prescription</p></div>';
     
-    const printWindow = window.open('', '_blank');
+    printContent += '<div style="margin-bottom:30px;"><h3 style="color:#5a4a3a; margin:0 0 10px 0;">Patient Information</h3><table style="width:100%; border-collapse:collapse;"><tr><td style="padding:8px 0;"><strong>Name:</strong></td><td>' + esc(prescription.patientName) + '</td></tr><tr><td style="padding:8px 0;"><strong>Date:</strong></td><td>' + prescription.date + '</td></tr><tr><td style="padding:8px 0;"><strong>Doctor:</strong></td><td>' + esc(prescription.doctorName) + '</td></tr></table></div>';
+    
+    printContent += '<div style="margin-bottom:30px;"><h3 style="color:#5a4a3a; margin:0 0 10px 0;">Diagnosis</h3><div style="background:#fefcf9; padding:15px; border-radius:8px; border:1px solid #f0e8e0;"><p style="margin:0;">' + esc(prescription.diagnosis) + '</p></div></div>';
+    
+    printContent += '<div style="margin-bottom:30px;"><h3 style="color:#5a4a3a; margin:0 0 10px 0;">Prescription</h3><div style="background:#fefcf9; padding:15px; border-radius:8px; border:1px solid #f0e8e0;"><pre style="white-space:pre-wrap; font-family:monospace; margin:0; font-size:14px; line-height:1.8;">' + esc(prescription.prescription) + '</pre></div></div>';
+    
+    if (prescription.followUp) {
+        printContent += '<div style="margin-bottom:30px;"><h3 style="color:#5a4a3a; margin:0 0 10px 0;">Follow-up</h3><p style="color:#d4a853; background:#fef5e8; padding:10px; border-radius:8px; display:inline-block;">Follow up after ' + esc(prescription.followUp) + '</p></div>';
+    }
+    
+    printContent += '<div style="text-align:center; margin-top:50px; padding-top:20px; border-top:1px solid #f0e8e0; color:#b8aa9a; font-size:12px;"><p>This is a computer-generated prescription. Valid with doctor\'s signature.</p><p>MedFlow Hospital - www.medflow.com</p></div></div>';
+    
+    var printWindow = window.open('', '_blank');
     if (printWindow) {
-        printWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head><title>Prescription - ${escapeHtml(prescription.patientName)}</title>
-            <style>
-                @media print {
-                    body { margin: 0; padding: 0; }
-                    .no-print { display: none; }
-                }
-            </style>
-            </head>
-            <body>${printContent}</body>
-            </html>
-        `);
+        printWindow.document.write('<!DOCTYPE html><html><head><title>Prescription - ' + esc(prescription.patientName) + '</title><style>*{margin:0;padding:0;box-sizing:border-box;}@media print{body{margin:0;padding:0;}}.no-print{display:none;}body{font-family:Poppins, Arial, sans-serif;background:white;}</style></head><body>' + printContent + '</body></html>');
         printWindow.document.close();
         printWindow.print();
         showToast('Opening print dialog...', 'success');
     } else {
         showToast('Please allow popups to print', 'error');
     }
-};
-
-// Global print all prescriptions (from header button)
-function printAllPrescriptions() {
-    if (prescriptions.length === 0) {
-        showToast('No prescriptions to print', 'error');
-        return;
-    }
-    
-    let allPrescriptionsHtml = `
-        <div style="font-family: 'Poppins', Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 40px;">
-            <div style="text-align: center; border-bottom: 2px solid #a8c49a; padding-bottom: 20px; margin-bottom: 30px;">
-                <h1 style="color: #5a4a3a; margin: 0;">MedFlow Hospital</h1>
-                <p style="color: #9a8e82; margin: 5px 0;">All Prescriptions Report</p>
-                <p style="color: #9a8e82; font-size: 12px;">Generated on ${new Date().toLocaleDateString('en-IN')}</p>
-            </div>
-    `;
-    
-    prescriptions.forEach((p, index) => {
-        allPrescriptionsHtml += `
-            <div style="margin-bottom: 40px; page-break-inside: avoid; border: 1px solid #f0e8e0; padding: 20px; border-radius: 8px;">
-                <div style="background: #fefcf9; padding: 10px; margin-bottom: 15px;">
-                    <h3 style="color: #5a4a3a; margin: 0;">#${index + 1} - ${escapeHtml(p.patientName)}</h3>
-                    <p style="color: #9a8e82; margin: 5px 0 0;">Date: ${p.date} | Doctor: Dr. ${escapeHtml(p.doctorName)}</p>
-                </div>
-                <div><strong>Diagnosis:</strong> ${escapeHtml(p.diagnosis)}</div>
-                <div style="margin-top: 10px;"><strong>Prescription:</strong></div>
-                <pre style="white-space: pre-wrap; font-family: monospace; background: #fefcf9; padding: 10px; border-radius: 8px;">${escapeHtml(p.prescription)}</pre>
-            </div>
-        `;
-    });
-    
-    allPrescriptionsHtml += `</div>`;
-    
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-        printWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head><title>All Prescriptions - MedFlow</title>
-            <style>
-                @media print {
-                    body { margin: 0; padding: 20px; }
-                }
-                body { font-family: 'Poppins', Arial, sans-serif; }
-            </style>
-            </head>
-            <body>${allPrescriptionsHtml}</body>
-            </html>
-        `);
-        printWindow.document.close();
-        printWindow.print();
-        showToast('Opening print dialog for all prescriptions...', 'success');
-    } else {
-        showToast('Please allow popups to print', 'error');
-    }
 }
 
-// Event listeners
-document.addEventListener('DOMContentLoaded', () => {
+// ─── Init ────────────────────────────────────────────
+
+function initPrescriptionsModule() {
+    if (isInitialized) return;
+    isInitialized = true;
     loadData();
     
-    const searchInput = document.getElementById('searchInput');
-    const patientFilter = document.getElementById('patientFilter');
-    const resetFilter = document.getElementById('resetFilter');
-    const printBtn = document.getElementById('printBtn');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const printModalBtn = document.getElementById('printModalBtn');
-    const modalOverlay = modal?.querySelector('.modal-overlay');
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        searchTerm = e.target.value;
+        renderPrescriptions();
+    });
     
-    if (searchInput) searchInput.addEventListener('input', () => renderPrescriptions());
-    if (patientFilter) patientFilter.addEventListener('change', () => renderPrescriptions());
-    if (resetFilter) {
-        resetFilter.addEventListener('click', () => {
-            if (searchInput) searchInput.value = '';
-            if (patientFilter) patientFilter.value = '';
-            renderPrescriptions();
-        });
-    }
-    if (printBtn) printBtn.addEventListener('click', () => printAllPrescriptions());
-    if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
-    if (printModalBtn) printModalBtn.addEventListener('click', () => {
-        const prescriptionContent = document.getElementById('prescriptionDetails')?.innerHTML;
-        if (prescriptionContent) {
-            const printWindow = window.open('', '_blank');
-            if (printWindow) {
-                printWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head><title>Prescription - MedFlow</title>
-                    <style>
-                        body { font-family: 'Poppins', Arial, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }
-                        @media print { body { padding: 20px; } }
-                    </style>
-                    </head>
-                    <body>${prescriptionContent}</body>
-                    </html>
-                `);
-                printWindow.document.close();
-                printWindow.print();
-            }
+    document.getElementById('patientFilter').addEventListener('change', function(e) {
+        patientFilter = e.target.value;
+        renderPrescriptions();
+    });
+    
+    document.getElementById('resetFilter').addEventListener('click', function() {
+        searchTerm = '';
+        patientFilter = '';
+        document.getElementById('searchInput').value = '';
+        document.getElementById('patientFilter').value = '';
+        renderPrescriptions();
+    });
+    
+    document.getElementById('closeModalBtn').addEventListener('click', function() { closeModal('prescriptionModal'); });
+    document.getElementById('closeFooterBtn').addEventListener('click', function() { closeModal('prescriptionModal'); });
+    document.getElementById('printModalBtn').addEventListener('click', function() {
+        if (currentPrescriptionId) {
+            printPrescription(currentPrescriptionId);
+        } else {
+            showToast('No prescription selected', 'error');
         }
     });
-    if (modalOverlay) modalOverlay.addEventListener('click', closeModal);
     
-    // Close on Escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal && !modal.classList.contains('invisible')) {
-            closeModal();
+    document.getElementById('prescriptionModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal('prescriptionModal');
+    });
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModal('prescriptionModal');
         }
     });
+}
+
+// ─── Wait for DOM and Common.js ──────────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
+    var checkInterval = setInterval(function() {
+        var sidebar = document.getElementById('mainSidebar');
+        if (sidebar) {
+            clearInterval(checkInterval);
+            setTimeout(initPrescriptionsModule, 100);
+        }
+    }, 50);
+    setTimeout(function() {
+        clearInterval(checkInterval);
+        initPrescriptionsModule();
+    }, 3000);
 });
+
+// ─── Expose ────────────────────────────────────────────
+
+window.viewPrescription = viewPrescription;
+window.printPrescription = printPrescription;

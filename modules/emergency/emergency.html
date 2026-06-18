@@ -5,256 +5,307 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Emergency | Emergency | MedFlow</title>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- ✅ CENTRALIZED THEME CSS -->
+    
+    <!-- ✅ ONLY THEME CSS - NO TAILWIND -->
     <link rel="stylesheet" href="../../css/theme.css">
 
     <style>
-        /* Additional page-specific styles that align with theme */
+        /* ============================================================
+           EMERGENCY MODULE — Page-specific only
+           All base styles come from theme.css
+           ============================================================ */
+
+        /* Emergency table row */
         .emergency-row {
             transition: var(--transition-base);
             border-bottom: 1px solid var(--border-default);
         }
-        
         .emergency-row:hover {
             background-color: var(--bg-subtle);
         }
-        
+        .emergency-row:last-child {
+            border-bottom: none;
+        }
+
         /* Priority Badges */
         .priority-critical {
             background: var(--color-error-bg);
             color: var(--color-error-text);
-            padding: 0.2rem 0.75rem;
+            padding: 0.15rem 0.625rem;
             border-radius: var(--radius-full);
             font-size: 0.6875rem;
             font-weight: var(--font-weight-medium);
             display: inline-block;
         }
-        
         .priority-high {
             background: var(--color-warning-bg);
             color: var(--color-warning-text);
-            padding: 0.2rem 0.75rem;
+            padding: 0.15rem 0.625rem;
             border-radius: var(--radius-full);
             font-size: 0.6875rem;
             font-weight: var(--font-weight-medium);
             display: inline-block;
         }
-        
         .priority-medium {
             background: #fefce8;
             color: #ca8a04;
-            padding: 0.2rem 0.75rem;
+            padding: 0.15rem 0.625rem;
             border-radius: var(--radius-full);
             font-size: 0.6875rem;
             font-weight: var(--font-weight-medium);
             display: inline-block;
         }
-        
         .priority-low {
             background: var(--color-success-bg);
             color: var(--color-success-text);
-            padding: 0.2rem 0.75rem;
+            padding: 0.15rem 0.625rem;
             border-radius: var(--radius-full);
             font-size: 0.6875rem;
             font-weight: var(--font-weight-medium);
             display: inline-block;
         }
-        
+
         /* Status Badges */
         .status-waiting {
             background: var(--color-warning-bg);
             color: var(--color-warning-text);
         }
-        
         .status-treatment {
             background: var(--color-info-bg);
             color: var(--color-info-text);
         }
-        
         .status-admitted {
             background: var(--color-success-bg);
             color: var(--color-success-text);
         }
-        
         .status-discharged {
             background: var(--bg-muted);
             color: var(--color-brown-300);
         }
-        
+
         .status-badge {
             display: inline-flex;
             align-items: center;
             gap: 0.375rem;
-            padding: 0.2rem 0.75rem;
+            padding: 0.15rem 0.625rem;
             border-radius: var(--radius-full);
             font-size: 0.6875rem;
             font-weight: var(--font-weight-medium);
         }
-        
+
+        /* Pulse animation for emergency button */
         .pulse {
             animation: pulse 1.5s ease-in-out infinite;
         }
-        
         @keyframes pulse {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.85; transform: scale(0.98); }
         }
-        
-        /* Modal overlay styles matching theme.css */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 50;
+
+        /* Danger button - Emergency style */
+        .btn-danger {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            background-color: var(--color-warm-tan);
+            color: white;
+            font-family: var(--font-family);
+            font-size: 0.8125rem;
+            font-weight: var(--font-weight-light);
+            padding: 0.5rem 1.25rem;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+        .btn-danger:hover {
+            background-color: var(--color-warm-tan-dark);
+            box-shadow: 0 4px 12px rgba(216, 180, 140, 0.35);
+            transform: translateY(-1px);
+        }
+
+        /* Success button */
+        .btn-success {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            background-color: var(--color-sage);
+            color: white;
+            font-family: var(--font-family);
+            font-size: 0.8125rem;
+            font-weight: var(--font-weight-light);
+            padding: 0.5rem 1.25rem;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+        .btn-success:hover {
+            background-color: var(--color-sage-dark);
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.35);
+            transform: translateY(-1px);
+        }
+
+        /* Table wrapper */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Data table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8125rem;
+        }
+        .data-table thead {
+            background-color: var(--bg-muted);
+            border-bottom: 1px solid var(--border-default);
+        }
+        .data-table th {
+            text-align: left;
+            padding: 0.75rem 1.25rem;
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-300);
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .data-table td {
+            padding: 0.75rem 1.25rem;
+            color: var(--color-brown-700);
+            vertical-align: middle;
+        }
+
+        /* Action buttons */
+        .action-btn {
+            color: var(--color-brown-100);
+            transition: var(--transition-base);
+            padding: 0.25rem 0.375rem;
+            border-radius: var(--radius-sm);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .action-btn:hover {
+            color: var(--color-sage-dark);
+        }
+        .action-btn.view:hover {
+            color: var(--color-gold);
+        }
+        .action-btn.assign:hover {
+            color: #3b82f6;
+        }
+        .action-btn.status:hover {
+            color: #f59e0b;
+        }
+        .action-btn.delete:hover {
+            color: #dc2626;
+        }
+
+        /* Delete modal - danger variant */
+        .modal-danger .form-card {
+            border-top-color: #ef4444;
+        }
+
+        .delete-icon-circle {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            background-color: #fee2e2;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: var(--bg-overlay);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition-base);
+            margin: 0 auto 1rem;
+            color: #dc2626;
+            font-size: 1.25rem;
         }
-        
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
+
+        /* Override: Add button inside filter bar */
+        .filter-bar .btn-danger {
+            flex: 0 0 auto !important;
+            padding: 0.4rem 0.85rem !important;
+            font-size: 0.8125rem !important;
+            height: 38px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.35rem !important;
+            border-radius: var(--radius-md) !important;
+            white-space: nowrap !important;
+            background-color: var(--color-warm-tan) !important;
+            color: white !important;
+            border: none !important;
         }
-        
-        .modal-overlay.active .modal-content {
-            transform: scale(1);
+        .filter-bar .btn-danger:hover {
+            background-color: var(--color-warm-tan-dark) !important;
+            box-shadow: 0 4px 12px rgba(216, 180, 140, 0.35) !important;
+            transform: translateY(-1px) !important;
         }
-        
-        .modal-container {
-            width: 100%;
-            max-width: 720px;
-            margin: 1rem;
+
+        /* Filter bar select width */
+        .filter-bar .form-select {
+            min-width: 140px !important;
         }
-        
-        .modal-content {
-            background-color: var(--bg-card);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            border-top: 4px solid var(--color-warm-tan);
-            box-shadow: var(--shadow-lg);
-            transform: scale(0.96);
-            transition: var(--transition-base);
-            max-height: 90vh;
-            overflow-y: auto;
+
+        @media (max-width: 768px) {
+            .filter-bar .form-select {
+                min-width: 100px !important;
+            }
+            .filter-bar .btn-danger span {
+                display: none !important;
+            }
+            .data-table th,
+            .data-table td {
+                padding: 0.5rem 0.75rem !important;
+                font-size: 0.75rem !important;
+            }
         }
-        
-        .modal-header {
-            padding: 1.25rem;
-            border-bottom: 1px solid var(--border-default);
-            background-color: var(--bg-card);
+
+        /* Modal overrides */
+        .form-card {
+            border-top-color: var(--color-warm-tan);
         }
-        
-        .modal-header h2 {
-            font-size: 1.0625rem;
+
+        /* Empty state */
+        .emergency-empty {
+            text-align: center;
+            padding: 3rem 1.25rem;
+            color: var(--color-brown-100);
+        }
+        .emergency-empty i {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            display: block;
+            opacity: 0.4;
+        }
+        .emergency-empty p {
+            font-size: 0.875rem;
             font-weight: var(--font-weight-light);
-            color: var(--color-brown-700);
-            margin: 0;
-            display: inline-block;
         }
-        
-        .modal-body {
-            padding: 1.25rem;
-            max-height: 60vh;
-            overflow-y: auto;
-        }
-        
-        .modal-footer {
-            padding: 1rem 1.25rem;
-            border-top: 1px solid var(--border-default);
-            background-color: var(--bg-subtle);
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
-        }
-        
-        .float-right {
-            float: right;
-        }
-        
-        .clearfix::after {
-            content: "";
-            clear: both;
-            display: table;
-        }
-        
-        .btn-danger {
-            background-color: var(--color-warm-tan);
-            color: white;
-            border: none;
-        }
-        
-        .btn-danger:hover {
-            background-color: var(--color-warm-tan-dark);
-            transform: translateY(-1px);
-        }
-        
-        .btn-success {
-            background-color: var(--color-sage);
-            color: white;
-            border: none;
-        }
-        
-        .btn-success:hover {
-            background-color: var(--color-sage-dark);
-            transform: translateY(-1px);
-        }
-        
+
+        /* Section headers in modal */
         .section-header {
             font-size: 0.6875rem;
             font-weight: var(--font-weight-medium);
             letter-spacing: 0.03em;
+            margin: 0;
         }
-        
-        .border-l-red-500 {
-            border-left-color: var(--color-error-text) !important;
-        }
-        
-        .border-l-yellow-500 {
-            border-left-color: var(--color-warning-text) !important;
-        }
-        
-        .border-l-green-500 {
-            border-left-color: var(--color-success-text) !important;
-        }
-        
-        .border-l-purple-500 {
-            border-left-color: #9333ea !important;
-        }
-        
-        .bg-red-50 {
-            background-color: var(--color-error-bg);
-        }
-        
-        .bg-yellow-50 {
-            background-color: var(--color-warning-bg);
-        }
-        
+
+        /* View modal styles */
         .detail-section {
             margin-bottom: 1rem;
             padding-bottom: 0.75rem;
             border-bottom: 1px solid var(--border-default);
         }
-        
         .detail-section:last-child {
             border-bottom: none;
             margin-bottom: 0;
             padding-bottom: 0;
         }
-        
+
         .detail-label {
             font-size: 0.6875rem;
             font-weight: var(--font-weight-light);
@@ -263,11 +314,123 @@
             letter-spacing: 0.06em;
             margin-bottom: 0.25rem;
         }
-        
         .detail-value {
             font-size: 0.8125rem;
             font-weight: var(--font-weight-regular);
             color: var(--color-brown-700);
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem 1.5rem;
+        }
+        @media (max-width: 640px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Patient avatar in table */
+        .patient-avatar-sm {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6875rem;
+            font-weight: var(--font-weight-bold);
+            flex-shrink: 0;
+        }
+        .patient-avatar-sm.critical {
+            background: var(--color-error-bg);
+            color: var(--color-error-text);
+        }
+        .patient-avatar-sm.high {
+            background: var(--color-warning-bg);
+            color: var(--color-warning-text);
+        }
+        .patient-avatar-sm.medium {
+            background: #fefce8;
+            color: #ca8a04;
+        }
+        .patient-avatar-sm.low {
+            background: var(--color-success-bg);
+            color: var(--color-success-text);
+        }
+
+        /* Status icon */
+        .status-icon {
+            font-size: 0.5rem;
+        }
+
+        /* Radio group inline */
+        .radio-group {
+            display: flex;
+            gap: 1.25rem;
+            margin-top: 0.25rem;
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.8125rem;
+            color: var(--color-brown-300);
+            cursor: pointer;
+        }
+        .radio-group input[type="radio"] {
+            accent-color: var(--color-sage);
+            width: 1rem;
+            height: 1rem;
+            cursor: pointer;
+        }
+
+        /* Stat card border colors */
+        .stat-card-critical {
+            border-left: 4px solid var(--color-error-text);
+        }
+        .stat-card-high {
+            border-left: 4px solid var(--color-warning-text);
+        }
+        .stat-card-stable {
+            border-left: 4px solid var(--color-success-text);
+        }
+        .stat-card-waiting {
+            border-left: 4px solid #9333ea;
+        }
+
+        /* Color text helpers */
+        .text-critical {
+            color: var(--color-error-text);
+        }
+        .text-warning {
+            color: var(--color-warning-text);
+        }
+        .text-success {
+            color: var(--color-success-text);
+        }
+        .text-purple {
+            color: #9333ea;
+        }
+
+        .bg-critical {
+            background: var(--color-error-bg);
+        }
+        .bg-warning {
+            background: var(--color-warning-bg);
+        }
+        .bg-success {
+            background: var(--color-success-bg);
+        }
+        .bg-purple {
+            background: #f3e8ff;
+        }
+
+        /* Not assigned text */
+        .not-assigned {
+            color: var(--color-brown-100);
+            font-style: italic;
         }
     </style>
 </head>
@@ -276,93 +439,73 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+    <main class="main-content">
         
-        <!-- Page Header matching theme with emergency styling -->
-        <div class="page-header mb-6" style="border-left: 4px solid var(--color-warm-tan);">
-            <div class="page-header-left">
-                <div class="page-header-icon" style="background-color: var(--color-error-bg); color: var(--color-warm-tan);">
-                    <i class="fas fa-ambulance"></i>
-                </div>
-                <div>
-                    <h1 class="page-header-title">Emergency Registration</h1>
-                    <p class="page-header-subtitle">Fast-track emergency patient registration and triage</p>
-                </div>
-            </div>
-            <div class="page-header-actions">
-                <button id="newEmergencyBtn" class="btn-danger pulse">
-                    <i class="fas fa-plus-circle text-sm"></i>
-                    <span>New Emergency Case</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Stats Cards using theme classes -->
-        <div class="grid-stats mb-8">
-            <div class="stat-card" style="border-left: 4px solid var(--color-error-text);">
-                <div class="flex justify-between items-start">
+        <!-- Stats Cards -->
+        <div class="grid-stats" style="margin-bottom: 1.5rem;">
+            <div class="stat-card stat-card-critical">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Critical</p>
-                        <p class="stat-value text-error-text" id="criticalCount">0</p>
+                        <p class="stat-value text-critical" id="criticalCount">0</p>
                     </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-exclamation-triangle text-error-text"></i>
+                    <div class="stat-icon-bg bg-critical">
+                        <i class="fas fa-exclamation-triangle text-critical"></i>
                     </div>
                 </div>
             </div>
             
-            <div class="stat-card" style="border-left: 4px solid var(--color-warning-text);">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-high">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">High Priority</p>
-                        <p class="stat-value text-warning-text" id="highCount">0</p>
+                        <p class="stat-value text-warning" id="highCount">0</p>
                     </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-arrow-up text-warning-text"></i>
+                    <div class="stat-icon-bg bg-warning">
+                        <i class="fas fa-arrow-up text-warning"></i>
                     </div>
                 </div>
             </div>
             
-            <div class="stat-card" style="border-left: 4px solid var(--color-success-text);">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-stable">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Stable</p>
-                        <p class="stat-value text-success-text" id="stableCount">0</p>
+                        <p class="stat-value text-success" id="stableCount">0</p>
                     </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-smile text-success-text"></i>
+                    <div class="stat-icon-bg bg-success">
+                        <i class="fas fa-smile text-success"></i>
                     </div>
                 </div>
             </div>
             
-            <div class="stat-card" style="border-left: 4px solid #9333ea;">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-waiting">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Waiting</p>
-                        <p class="stat-value" style="color: #9333ea;" id="waitingCount">0</p>
+                        <p class="stat-value text-purple" id="waitingCount">0</p>
                     </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-clock" style="color: #9333ea;"></i>
+                    <div class="stat-icon-bg bg-purple">
+                        <i class="fas fa-clock text-purple"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Filter Bar using theme classes -->
+        <!-- Filter Bar with Add Button -->
         <div class="filter-bar">
-            <div class="relative flex-1">
-                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-brown-100 text-sm"></i>
-                <input type="text" id="searchInput" placeholder="Search by patient name, case ID, or phone..." 
-                       class="search-input pl-10">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by patient name, case ID, or phone...">
             </div>
-            <select id="priorityFilter" class="form-select w-auto min-w-[140px]">
+            <select id="priorityFilter" class="form-select">
                 <option value="">All Priorities</option>
                 <option value="Critical">Critical (Red)</option>
                 <option value="High">High (Yellow)</option>
                 <option value="Medium">Medium (Green)</option>
                 <option value="Low">Low (Blue)</option>
             </select>
-            <select id="statusFilter" class="form-select w-auto min-w-[140px]">
+            <select id="statusFilter" class="form-select">
                 <option value="">All Status</option>
                 <option value="Waiting">Waiting</option>
                 <option value="In Treatment">In Treatment</option>
@@ -370,232 +513,244 @@
                 <option value="Discharged">Discharged</option>
             </select>
             <button id="resetFilter" class="btn-secondary">
-                <i class="fas fa-undo-alt mr-1"></i> Reset
+                <i class="fas fa-undo-alt"></i>
+                <span>Reset</span>
+            </button>
+            <button id="newEmergencyBtn" class="btn-danger pulse">
+                <i class="fas fa-plus-circle"></i>
+                <span>New Emergency</span>
             </button>
         </div>
 
         <!-- Emergency Cases Table -->
-        <div class="card-white overflow-hidden">
+        <div class="card-white" style="margin-top: 1.5rem; overflow:hidden;">
             <div class="table-wrapper">
-                <table class="data-table w-full">
+                <table class="data-table">
                     <thead>
                         <tr>
-                            <th class="px-5 py-3">Case ID</th>
-                            <th class="px-5 py-3">Patient</th>
-                            <th class="px-5 py-3">Priority</th>
-                            <th class="px-5 py-3">Condition</th>
-                            <th class="px-5 py-3">Arrival</th>
-                            <th class="px-5 py-3">Status</th>
-                            <th class="px-5 py-3">Doctor</th>
-                            <th class="px-5 py-3 text-center">Actions</th>
+                            <th>Case ID</th>
+                            <th>Patient</th>
+                            <th>Priority</th>
+                            <th>Condition</th>
+                            <th>Arrival</th>
+                            <th>Status</th>
+                            <th>Doctor</th>
+                            <th style="text-align:center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="emergencyTable">
                         <tr>
-                            <td colspan="8" class="text-center py-12 text-brown-100">
-                                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
-                                <p class="font-light">Loading emergency cases...</p>
-                             </td>
-                         </tr>
+                            <td colspan="8" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
+                                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
+                                <p style="font-weight:var(--font-weight-light);">Loading emergency cases...</p>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </main>
 
-    <!-- New Emergency Case Modal - Matching theme.css structure -->
-    <div id="emergencyModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2><i class="fas fa-ambulance text-warm-tan mr-2"></i>Emergency Registration</h2>
-                    <button id="closeEmergencyModalBtn" class="close-btn float-right">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="clearfix"></div>
-                </div>
-                <form id="emergencyForm">
-                    <div class="modal-body">
-                        <!-- Patient Information Section -->
-                        <div class="p-3 rounded-lg mb-4" style="background: var(--color-error-bg);">
-                            <p class="section-header" style="color: var(--color-error-text);"><i class="fas fa-user-injured mr-1"></i> Patient Information</p>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div class="form-group">
-                                <label class="form-label">Full Name *</label>
-                                <input type="text" id="fullName" required class="form-input" placeholder="Rajesh Kumar">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Phone Number *</label>
-                                <input type="tel" id="phone" required class="form-input" placeholder="+91 98765 43210">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Age</label>
-                                <input type="number" id="age" class="form-input" placeholder="45">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Gender</label>
-                                <select id="gender" class="form-select">
-                                    <option value="">Select</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                            <div class="md:col-span-2 form-group">
-                                <label class="form-label">Address</label>
-                                <textarea id="address" rows="1" class="form-textarea" placeholder="Enter address..."></textarea>
-                            </div>
-                        </div>
-                        
-                        <!-- Emergency Details Section -->
-                        <div class="p-3 rounded-lg mb-4" style="background: var(--color-warning-bg);">
-                            <p class="section-header" style="color: var(--color-warning-text);"><i class="fas fa-chart-line mr-1"></i> Emergency Details</p>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div class="form-group">
-                                <label class="form-label">Priority / Triage *</label>
-                                <select id="priority" required class="form-select">
-                                    <option value="Critical">🔴 Critical (Immediate)</option>
-                                    <option value="High">🟡 High (10 minutes)</option>
-                                    <option value="Medium">🟢 Medium (30 minutes)</option>
-                                    <option value="Low">🔵 Low (1 hour)</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Assign Doctor</label>
-                                <select id="doctorId" class="form-select">
-                                    <option value="">Auto Assign</option>
-                                </select>
-                            </div>
-                            <div class="md:col-span-2 form-group">
-                                <label class="form-label">Chief Complaints *</label>
-                                <textarea id="complaints" rows="2" required class="form-textarea" placeholder="Describe the emergency condition, symptoms..."></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Blood Pressure</label>
-                                <input type="text" id="bp" class="form-input" placeholder="e.g., 120/80">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Heart Rate</label>
-                                <input type="text" id="heartRate" class="form-input" placeholder="e.g., 72 bpm">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Temperature</label>
-                                <input type="text" id="temperature" class="form-input" placeholder="e.g., 98.6°F">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Oxygen Saturation</label>
-                                <input type="text" id="oxygen" class="form-input" placeholder="e.g., 98%">
-                            </div>
-                            <div class="md:col-span-2 form-group">
-                                <label class="form-label">Ambulance Required?</label>
-                                <div class="flex gap-4 mt-1">
-                                    <label class="flex items-center"><input type="radio" name="ambulance" value="yes"> <span class="ml-2 text-sm text-brown-600">Yes</span></label>
-                                    <label class="flex items-center"><input type="radio" name="ambulance" value="no" checked> <span class="ml-2 text-sm text-brown-600">No</span></label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" id="cancelEmergencyModalBtn" class="btn-secondary">Cancel</button>
-                        <button type="submit" class="btn-danger">
-                            <i class="fas fa-ambulance mr-1"></i> Register Emergency
-                        </button>
-                    </div>
-                </form>
+    <!-- New Emergency Case Modal -->
+    <div id="emergencyModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="form-card" style="max-width:48rem; border-top-color:var(--color-warm-tan);">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">
+                    <i class="fas fa-ambulance" style="color:var(--color-warm-tan);"></i>
+                    Emergency Registration
+                </h3>
+                <button class="close-btn" id="closeEmergencyModalBtn" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
+            <form id="emergencyForm">
+                <div class="modal-body">
+                    <!-- Patient Information Section -->
+                    <div style="background:var(--color-error-bg); padding:0.5rem 0.75rem; border-radius:var(--radius-md); margin-bottom:1rem;">
+                        <p class="section-header" style="color:var(--color-error-text);">
+                            <i class="fas fa-user-injured"></i> Patient Information
+                        </p>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem 1.5rem;">
+                        <div class="form-group">
+                            <label class="form-label">Full Name <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="text" id="fullName" required class="form-input" placeholder="Rajesh Kumar">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="tel" id="phone" required class="form-input" placeholder="+91 98765 43210">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Age</label>
+                            <input type="number" id="age" class="form-input" placeholder="45">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Gender</label>
+                            <select id="gender" class="form-select">
+                                <option value="">Select</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column:1 / -1;">
+                            <label class="form-label">Address</label>
+                            <textarea id="address" rows="1" class="form-textarea" placeholder="Enter address..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Emergency Details Section -->
+                    <div style="background:var(--color-warning-bg); padding:0.5rem 0.75rem; border-radius:var(--radius-md); margin-top:1rem; margin-bottom:1rem;">
+                        <p class="section-header" style="color:var(--color-warning-text);">
+                            <i class="fas fa-chart-line"></i> Emergency Details
+                        </p>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem 1.5rem;">
+                        <div class="form-group">
+                            <label class="form-label">Priority / Triage <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="priority" required class="form-select">
+                                <option value="Critical">🔴 Critical (Immediate)</option>
+                                <option value="High">🟡 High (10 minutes)</option>
+                                <option value="Medium">🟢 Medium (30 minutes)</option>
+                                <option value="Low">🔵 Low (1 hour)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Assign Doctor</label>
+                            <select id="doctorId" class="form-select">
+                                <option value="">Auto Assign</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column:1 / -1;">
+                            <label class="form-label">Chief Complaints <span style="color:var(--color-error-text);">*</span></label>
+                            <textarea id="complaints" rows="2" required class="form-textarea" placeholder="Describe the emergency condition, symptoms..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Blood Pressure</label>
+                            <input type="text" id="bp" class="form-input" placeholder="e.g., 120/80">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Heart Rate</label>
+                            <input type="text" id="heartRate" class="form-input" placeholder="e.g., 72 bpm">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Temperature</label>
+                            <input type="text" id="temperature" class="form-input" placeholder="e.g., 98.6°F">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Oxygen Saturation</label>
+                            <input type="text" id="oxygen" class="form-input" placeholder="e.g., 98%">
+                        </div>
+                        <div class="form-group" style="grid-column:1 / -1; margin-bottom:0;">
+                            <label class="form-label">Ambulance Required?</label>
+                            <div class="radio-group">
+                                <label><input type="radio" name="ambulance" value="yes"> Yes</label>
+                                <label><input type="radio" name="ambulance" value="no" checked> No</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancelEmergencyModalBtn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-danger">
+                        <i class="fas fa-ambulance"></i>
+                        Register Emergency
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
     <!-- Assign Doctor Modal -->
-    <div id="assignModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Assign Doctor</h2>
-                    <button id="closeAssignModalBtn" class="close-btn float-right">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="clearfix"></div>
-                </div>
-                <form id="assignForm">
-                    <input type="hidden" id="assignCaseId">
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label class="form-label">Select Doctor *</label>
-                            <select id="assignDoctorId" required class="form-select">
-                                <option value="">-- Select Doctor --</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" id="cancelAssignModalBtn" class="btn-secondary">Cancel</button>
-                        <button type="submit" class="btn-primary">
-                            <i class="fas fa-user-md mr-1"></i> Assign Doctor
-                        </button>
-                    </div>
-                </form>
+    <div id="assignModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="assignModalTitle">
+        <div class="form-card" style="max-width:30rem;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="assignModalTitle">
+                    <i class="fas fa-user-md"></i>
+                    Assign Doctor
+                </h3>
+                <button class="close-btn" id="closeAssignModalBtn" aria-label="Close assign modal">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
+            <form id="assignForm">
+                <input type="hidden" id="assignCaseId">
+                <div class="modal-body">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label">Select Doctor <span style="color:var(--color-error-text);">*</span></label>
+                        <select id="assignDoctorId" required class="form-select">
+                            <option value="">-- Select Doctor --</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancelAssignModalBtn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-user-md"></i>
+                        Assign Doctor
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
     <!-- Update Status Modal -->
-    <div id="statusModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Update Status</h2>
-                    <button id="closeStatusModalBtn" class="close-btn float-right">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="clearfix"></div>
-                </div>
-                <form id="statusForm">
-                    <input type="hidden" id="statusCaseId">
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label class="form-label">Status *</label>
-                            <select id="newStatus" required class="form-select">
-                                <option value="Waiting">Waiting</option>
-                                <option value="In Treatment">In Treatment</option>
-                                <option value="Admitted">Admitted</option>
-                                <option value="Discharged">Discharged</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Notes</label>
-                            <textarea id="statusNotes" rows="2" class="form-textarea" placeholder="Additional notes..."></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" id="cancelUpdateModalBtn" class="btn-secondary">Cancel</button>
-                        <button type="submit" class="btn-success">
-                            <i class="fas fa-check-circle mr-1"></i> Update Status
-                        </button>
-                    </div>
-                </form>
+    <div id="statusModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="statusModalTitle">
+        <div class="form-card" style="max-width:30rem;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="statusModalTitle">
+                    <i class="fas fa-exchange-alt"></i>
+                    Update Status
+                </h3>
+                <button class="close-btn" id="closeStatusModalBtn" aria-label="Close status modal">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
+            <form id="statusForm">
+                <input type="hidden" id="statusCaseId">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Status <span style="color:var(--color-error-text);">*</span></label>
+                        <select id="newStatus" required class="form-select">
+                            <option value="Waiting">Waiting</option>
+                            <option value="In Treatment">In Treatment</option>
+                            <option value="Admitted">Admitted</option>
+                            <option value="Discharged">Discharged</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label">Notes</label>
+                        <textarea id="statusNotes" rows="2" class="form-textarea" placeholder="Additional notes..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancelUpdateModalBtn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-success">
+                        <i class="fas fa-check-circle"></i>
+                        Update Status
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
     <!-- View Emergency Case Modal -->
-    <div id="viewEmergencyModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2><i class="fas fa-eye text-sage mr-2"></i>Emergency Case Details</h2>
-                    <button id="closeViewModalBtn" class="close-btn float-right">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="modal-body" id="viewEmergencyContent">
-                    <!-- Content will be loaded dynamically -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="closeViewFooterBtn" class="btn-secondary">Close</button>
-                </div>
+    <div id="viewEmergencyModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="viewModalTitle">
+        <div class="form-card" style="max-width:40rem;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="viewModalTitle">
+                    <i class="fas fa-eye"></i>
+                    Emergency Case Details
+                </h3>
+                <button class="close-btn" id="closeViewModalBtn" aria-label="Close view modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="viewEmergencyContent">
+                <!-- Content loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="closeViewFooterBtn" class="btn-secondary">Close</button>
             </div>
         </div>
     </div>

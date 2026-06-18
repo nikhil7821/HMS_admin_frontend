@@ -5,106 +5,189 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Medicines | Pharmacy | MedFlow</title>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- ✅ CENTRALIZED THEME CSS -->
+    
+    <!-- ✅ ONLY THEME CSS - NO TAILWIND -->
     <link rel="stylesheet" href="../../css/theme.css">
 
     <style>
-        /* Additional page-specific styles that align with theme */
+        /* ============================================================
+           MEDICINES MODULE — Page-specific only
+           All base styles come from theme.css
+           ============================================================ */
+
+        /* Stock badges */
         .badge-stock-low {
             background: var(--color-warning-bg);
             color: var(--color-warning-text);
-            padding: 0.2rem 0.75rem;
+            padding: 0.1rem 0.625rem;
             border-radius: var(--radius-full);
-            font-size: 0.6875rem;
+            font-size: 0.625rem;
             font-weight: var(--font-weight-medium);
             display: inline-block;
         }
-        
         .badge-stock-normal {
             background: var(--color-success-bg);
             color: var(--color-success-text);
-            padding: 0.2rem 0.75rem;
+            padding: 0.1rem 0.625rem;
             border-radius: var(--radius-full);
-            font-size: 0.6875rem;
+            font-size: 0.625rem;
             font-weight: var(--font-weight-medium);
             display: inline-block;
         }
-        
-        .badge-expired {
+        .badge-stock-expired {
             background: var(--color-error-bg);
             color: var(--color-error-text);
-            padding: 0.2rem 0.75rem;
+            padding: 0.1rem 0.625rem;
             border-radius: var(--radius-full);
-            font-size: 0.6875rem;
+            font-size: 0.625rem;
             font-weight: var(--font-weight-medium);
             display: inline-block;
         }
-        
-        /* Modal overlay styles matching theme.css */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 50;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--bg-overlay);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition-base);
-            overflow-y: auto;
+
+        /* Unit badge */
+        .badge-unit {
+            background: var(--bg-muted);
+            color: var(--color-brown-300);
+            padding: 0.1rem 0.5rem;
+            border-radius: var(--radius-full);
+            font-size: 0.625rem;
+            font-weight: var(--font-weight-medium);
+            display: inline-block;
+            font-family: monospace;
         }
-        
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
+
+        /* Table wrapper */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
-        
-        .modal-overlay.active .form-card {
-            transform: scale(1);
-        }
-        
-        .form-card {
-            transform: scale(0.96);
-            transition: var(--transition-base);
-            border-radius: var(--radius-lg);
-            background: var(--bg-card);
-            border: 1px solid var(--border-default);
-            border-top: 4px solid var(--color-sage);
+
+        /* Data table */
+        .data-table {
             width: 100%;
-            max-width: 48rem;
-            margin: 1rem;
-            box-shadow: var(--shadow-lg);
+            border-collapse: collapse;
+            font-size: 0.8125rem;
+        }
+        .data-table thead {
+            background-color: var(--bg-muted);
+            border-bottom: 1px solid var(--border-default);
+        }
+        .data-table th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-300);
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .data-table td {
+            padding: 0.75rem 1rem;
+            color: var(--color-brown-700);
+            vertical-align: middle;
+        }
+
+        /* Table row hover */
+        .medicine-row {
+            transition: var(--transition-base);
+            border-bottom: 1px solid var(--border-default);
+        }
+        .medicine-row:hover {
+            background-color: var(--bg-subtle);
+        }
+        .medicine-row:last-child {
+            border-bottom: none;
+        }
+
+        /* Action buttons */
+        .action-btn {
+            color: var(--color-brown-100);
+            transition: var(--transition-base);
+            padding: 0.25rem 0.375rem;
+            border-radius: var(--radius-sm);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .action-btn:hover {
+            color: var(--color-sage-dark);
+        }
+        .action-btn.edit:hover {
+            color: var(--color-sage);
+        }
+        .action-btn.delete:hover {
+            color: #dc2626;
+        }
+
+        /* Override: Add button inside filter bar */
+        .filter-bar .btn-primary {
+            flex: 0 0 auto !important;
+            padding: 0.4rem 0.85rem !important;
+            font-size: 0.8125rem !important;
+            height: 38px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.35rem !important;
+            border-radius: var(--radius-md) !important;
+            white-space: nowrap !important;
+            background-color: var(--color-sage) !important;
+            color: white !important;
+            border: none !important;
+        }
+        .filter-bar .btn-primary:hover {
+            background-color: var(--color-sage-dark) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.35) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* Filter bar select width */
+        .filter-bar .form-select {
+            min-width: 150px !important;
+        }
+
+        /* Search wrapper inside filter bar */
+        .filter-bar .search-wrapper {
+            flex: 1 1 200px !important;
+            min-width: 150px !important;
+            max-width: 350px !important;
+        }
+
+        @media (max-width: 768px) {
+            .filter-bar .form-select {
+                min-width: 100px !important;
+                font-size: 0.75rem !important;
+            }
+            .filter-bar .btn-primary span {
+                display: none !important;
+            }
+            .filter-bar .search-wrapper {
+                flex: 1 1 120px !important;
+                min-width: 100px !important;
+                max-width: 200px !important;
+            }
+            .filter-bar .search-input {
+                font-size: 0.75rem !important;
+                padding: 0.3rem 0.5rem 0.3rem 1.75rem !important;
+                height: 32px !important;
+            }
+            .data-table th,
+            .data-table td {
+                padding: 0.5rem 0.5rem !important;
+                font-size: 0.6875rem !important;
+            }
+        }
+
+        /* Modal overrides */
+        .form-card {
+            border-top-color: var(--color-sage);
             max-height: 90vh;
             overflow-y: auto;
         }
-        
-        .action-edit {
-            color: var(--color-sage);
-            transition: var(--transition-base);
-        }
-        .action-edit:hover { 
-            color: var(--color-sage-dark); 
-        }
-        .action-delete {
-            color: var(--color-warm-tan);
-            transition: var(--transition-base);
-        }
-        .action-delete:hover { 
-            color: var(--color-warm-tan-dark); 
-        }
-        
+
+        /* Error message */
         .error-message {
             color: var(--color-error-text);
             font-size: 0.6875rem;
@@ -112,20 +195,89 @@
             display: block;
             font-weight: var(--font-weight-light);
         }
-        
-        .filter-input {
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-input);
-            padding: 0.5rem 1rem;
-            font-size: 0.8125rem;
-            font-family: var(--font-family);
-            width: 100%;
+
+        .form-input.error,
+        .form-select.error {
+            border-color: var(--color-error-text);
         }
-        
-        .filter-input:focus {
-            outline: none;
-            border-color: var(--border-focus);
-            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.2);
+        .form-input.error:focus,
+        .form-select.error:focus {
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+        }
+
+        /* Empty state */
+        .medicines-empty {
+            text-align: center;
+            padding: 3rem 1.25rem;
+            color: var(--color-brown-100);
+        }
+        .medicines-empty i {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            display: block;
+            opacity: 0.4;
+        }
+        .medicines-empty p {
+            font-size: 0.875rem;
+            font-weight: var(--font-weight-light);
+        }
+
+        /* Medicine name and brand */
+        .med-name {
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-700);
+            font-size: 0.875rem;
+        }
+        .med-brand {
+            font-size: 0.6875rem;
+            color: var(--color-brown-100);
+        }
+
+        /* Stock number */
+        .stock-number {
+            font-weight: var(--font-weight-semibold);
+        }
+        .stock-low {
+            color: var(--color-warning-text);
+        }
+        .stock-normal {
+            color: var(--color-success-text);
+        }
+
+        /* Expiry date */
+        .expiry-expired {
+            color: var(--color-error-text);
+            font-weight: var(--font-weight-medium);
+        }
+        .expiry-soon {
+            color: var(--color-warning-text);
+        }
+
+        /* Modal grid */
+        .modal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem 1.5rem;
+        }
+        .modal-grid .full-width {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 640px) {
+            .modal-grid {
+                grid-template-columns: 1fr;
+            }
+            .modal-grid .full-width {
+                grid-column: 1;
+            }
+        }
+
+        /* Stat card text colors */
+        .text-warning {
+            color: var(--color-warning-text);
+        }
+        .text-tan {
+            color: var(--color-warm-tan);
         }
     </style>
 </head>
@@ -134,113 +286,99 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+    <main class="main-content">
         
-        <!-- Page Header matching theme -->
-        <div class="page-header mb-6">
-            <div class="page-header-left">
-                <div class="page-header-icon">
-                    <i class="fas fa-capsules"></i>
-                </div>
-                <div>
-                    <h1 class="page-header-title">Medicine Inventory</h1>
-                    <p class="page-header-subtitle">Manage all medicines, stock, and pricing</p>
-                </div>
-            </div>
-            <div class="page-header-actions">
-                <button id="addMedicineBtn" class="btn-primary">
-                    <i class="fas fa-plus text-sm"></i>
-                    <span>Add Medicine</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Stats Cards using theme classes -->
-        <div class="grid-stats mb-6">
+        <!-- Stats Cards -->
+        <div class="grid-stats" style="margin-bottom: 1.5rem;">
             <div class="stat-card">
-                <div class="flex justify-between items-start">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Total Medicines</p>
                         <p class="stat-value" id="totalMedicines">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-capsules text-sage text-lg"></i>
+                        <i class="fas fa-capsules" style="color:var(--color-sage); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
             
             <div class="stat-card">
-                <div class="flex justify-between items-start">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Low Stock</p>
-                        <p class="stat-value text-warning-text" id="lowStock">0</p>
+                        <p class="stat-value text-warning" id="lowStock">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-exclamation-triangle text-warning-text"></i>
+                        <i class="fas fa-exclamation-triangle" style="color:var(--color-warning-text); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
             
             <div class="stat-card">
-                <div class="flex justify-between items-start">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Expiring Soon</p>
                         <p class="stat-value text-tan" id="expiringSoon">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-calendar-times text-tan"></i>
+                        <i class="fas fa-calendar-times" style="color:var(--color-warm-tan); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
             
             <div class="stat-card">
-                <div class="flex justify-between items-start">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Total Value</p>
                         <p class="stat-value" id="totalValue">₹0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-rupee-sign text-sage"></i>
+                        <i class="fas fa-rupee-sign" style="color:var(--color-sage); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Filter Bar using theme classes -->
+        <!-- Filter Bar with Add Button -->
         <div class="filter-bar">
-            <div class="flex-1">
-                <input type="text" id="searchInput" placeholder="🔍 Search by medicine name or brand..." class="filter-input">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by name or brand...">
             </div>
-            <div class="w-full md:w-48">
-                <select id="categoryFilter" class="form-select">
-                    <option value="">All Categories</option>
-                </select>
-            </div>
+            <select id="categoryFilter" class="form-select">
+                <option value="">All Categories</option>
+            </select>
             <button id="resetFilter" class="btn-secondary">
-                <i class="fas fa-undo-alt mr-1"></i> Reset
+                <i class="fas fa-undo-alt"></i>
+                <span>Reset</span>
+            </button>
+            <button id="addMedicineBtn" class="btn-primary">
+                <i class="fas fa-plus"></i>
+                <span>Add Medicine</span>
             </button>
         </div>
 
         <!-- Medicines Table -->
-        <div class="card-white overflow-hidden">
+        <div class="card-white" style="margin-top: 1.5rem; overflow:hidden;">
             <div class="table-wrapper">
-                <table class="data-table w-full">
+                <table class="data-table">
                     <thead>
                         <tr>
-                            <th class="px-4 py-3">Medicine</th>
-                            <th class="px-4 py-3">Category</th>
-                            <th class="px-4 py-3">Stock</th>
-                            <th class="px-4 py-3">Unit</th>
-                            <th class="px-4 py-3">Price</th>
-                            <th class="px-4 py-3">Expiry</th>
-                            <th class="px-4 py-3">Status</th>
-                            <th class="px-4 py-3 text-center">Actions</th>
+                            <th>Medicine</th>
+                            <th>Category</th>
+                            <th style="text-align:center;">Stock</th>
+                            <th>Unit</th>
+                            <th style="text-align:center;">Price</th>
+                            <th>Expiry</th>
+                            <th>Status</th>
+                            <th style="text-align:center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="medicinesTable">
                         <tr>
-                            <td colspan="8" class="text-center py-8 text-brown-100">
-                                <i class="fas fa-spinner fa-pulse mr-2"></i>Loading medicines...
+                            <td colspan="8" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
+                                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
+                                <p style="font-weight:var(--font-weight-light);">Loading medicines...</p>
                             </td>
                         </tr>
                     </tbody>
@@ -249,23 +387,24 @@
         </div>
     </main>
 
-    <!-- Add/Edit Medicine Modal - Matching theme.css structure -->
-    <div id="medicineModal" class="modal-overlay">
-        <div class="form-card">
-            <div class="flex justify-between items-center p-5 border-b border-default">
-                <h3 id="modalTitle" class="modal-title">
-                    <i class="fas fa-capsules text-sage"></i> Add Medicine
+    <!-- Add/Edit Medicine Modal -->
+    <div id="medicineModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="form-card" style="max-width:48rem;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">
+                    <i class="fas fa-capsules"></i>
+                    Add Medicine
                 </h3>
-                <button id="closeModalBtn" class="close-btn">
-                    <i class="fas fa-times text-lg"></i>
+                <button class="close-btn" id="closeModalBtn" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
             <form id="medicineForm">
                 <input type="hidden" id="medicineId">
-                <div class="p-5">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="modal-body">
+                    <div class="modal-grid">
                         <div class="form-group">
-                            <label class="form-label">Medicine Name <span class="text-error-text">*</span></label>
+                            <label class="form-label">Medicine Name <span style="color:var(--color-error-text);">*</span></label>
                             <input type="text" id="medName" class="form-input" placeholder="e.g., Paracetamol, Amoxicillin" autocomplete="off">
                             <span class="error-message" id="medNameError"></span>
                         </div>
@@ -275,31 +414,31 @@
                             <span class="error-message" id="brandError"></span>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Category <span class="text-error-text">*</span></label>
+                            <label class="form-label">Category <span style="color:var(--color-error-text);">*</span></label>
                             <select id="category" class="form-select" required>
                                 <option value="">Select Category</option>
                             </select>
                             <span class="error-message" id="categoryError"></span>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Unit <span class="text-error-text">*</span></label>
+                            <label class="form-label">Unit <span style="color:var(--color-error-text);">*</span></label>
                             <select id="unit" class="form-select" required>
                                 <option value="">Select Unit</option>
                             </select>
                             <span class="error-message" id="unitError"></span>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Stock Quantity <span class="text-error-text">*</span></label>
+                            <label class="form-label">Stock Quantity <span style="color:var(--color-error-text);">*</span></label>
                             <input type="number" id="stock" class="form-input" placeholder="0" min="0" step="1">
                             <span class="error-message" id="stockError"></span>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Unit Price (₹) <span class="text-error-text">*</span></label>
+                            <label class="form-label">Unit Price (₹) <span style="color:var(--color-error-text);">*</span></label>
                             <input type="number" id="price" class="form-input" placeholder="0.00" min="0" step="0.01">
                             <span class="error-message" id="priceError"></span>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Expiry Date <span class="text-error-text">*</span></label>
+                            <label class="form-label">Expiry Date <span style="color:var(--color-error-text);">*</span></label>
                             <input type="date" id="expiry" class="form-input">
                             <span class="error-message" id="expiryError"></span>
                         </div>
@@ -310,10 +449,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="p-5 bg-subtle rounded-b-xl flex justify-end gap-3 border-t border-default">
+                <div class="modal-footer">
                     <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
                     <button type="submit" class="btn-primary">
-                        <i class="fas fa-save mr-2 text-xs"></i>Save Medicine
+                        <i class="fas fa-save"></i>
+                        Save Medicine
                     </button>
                 </div>
             </form>

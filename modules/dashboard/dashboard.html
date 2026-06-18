@@ -5,467 +5,672 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>MedFlow | Executive Dashboard</title>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- ✅ CENTRALIZED THEME CSS -->
     <link rel="stylesheet" href="../../css/theme.css">
     
     <style>
-        /* Additional dashboard-specific overrides if needed */
-        .task-action-btn {
-            transition: all 0.2s ease;
+        /* ============================================================
+           DASHBOARD — Page-specific only
+           All base styles come from theme.css
+           ============================================================ */
+
+        /* 🔥 FIX: Prevent layout shift */
+        .main-content {
+            margin-left: 260px !important;
+            margin-top: 70px !important;
+            padding: 1.25rem 1.5rem !important;
+            transition: margin-left 0.3s ease !important;
+            min-height: 100vh !important;
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
         }
-        .task-action-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        .main-content.loaded {
+            opacity: 1;
         }
+        #mainSidebar[data-collapsed="true"] ~ .main-content,
+        #mainSidebar[data-collapsed="true"] + .main-content {
+            margin-left: 72px !important;
+        }
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 0 !important;
+                padding: 1rem !important;
+            }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 🔥 Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, #7aaa6e 0%, #9cc48c 50%, #b5d4a8 100%) !important;
+            padding: 1.5rem !important;
+            border-radius: var(--radius-lg) !important;
+            margin-bottom: 1.5rem !important;
+            position: relative !important;
+            overflow: hidden !important;
+            box-shadow: var(--shadow-md) !important;
+        }
+        .welcome-banner .bg-icon {
+            position: absolute !important;
+            top: -1rem !important;
+            right: -1rem !important;
+            opacity: 0.08 !important;
+            font-size: 6rem !important;
+            color: white !important;
+        }
+        .welcome-banner .greeting {
+            font-size: 1.25rem !important;
+            font-weight: var(--font-weight-light) !important;
+            color: white !important;
+            margin: 0 !important;
+        }
+        .welcome-banner .greeting span {
+            font-weight: var(--font-weight-medium) !important;
+        }
+        .welcome-banner .datetime {
+            font-size: 0.75rem !important;
+            color: rgba(255,255,255,0.8) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+            margin-top: 0.25rem !important;
+        }
+        .welcome-banner .live-badge {
+            background: rgba(255,255,255,0.15) !important;
+            backdrop-filter: blur(4px) !important;
+            padding: 0.25rem 0.75rem !important;
+            border-radius: var(--radius-md) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            font-size: 0.6875rem !important;
+            color: rgba(255,255,255,0.9) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+        }
+
+        /* 🔥 Quick Actions */
+        .quick-actions-container {
+            background-color: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-lg) !important;
+            box-shadow: var(--shadow-card) !important;
+            padding: 1rem 1.25rem !important;
+            margin-bottom: 1.25rem !important;
+        }
+        .quick-actions-container .section-title {
+            font-size: 0.875rem !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-700) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+            margin-bottom: 0.75rem !important;
+        }
+        .quick-actions-container .section-title i {
+            color: var(--color-brown-100) !important;
+        }
+
+        /* 🔥 Quick Action Button Override */
+        .quick-action-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 0.5rem !important;
+            padding: 0.5rem 0.75rem !important;
+            border-radius: var(--radius-md) !important;
+            font-size: 0.75rem !important;
+            font-weight: var(--font-weight-light) !important;
+            border: none !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            font-family: var(--font-family) !important;
+            background-color: var(--color-sage) !important;
+            color: white !important;
+            box-shadow: var(--shadow-sm) !important;
+            white-space: nowrap !important;
+            width: 100% !important;
+        }
+        .quick-action-btn:hover {
+            background-color: var(--color-sage-dark) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: var(--shadow-md) !important;
+        }
+        .quick-action-btn.emergency {
+            background-color: var(--color-warm-tan) !important;
+        }
+        .quick-action-btn.emergency:hover {
+            background-color: var(--color-warm-tan-dark) !important;
+        }
+
+        /* 🔥 Grids */
+        .grid-2col {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 1.25rem !important;
+            margin-bottom: 1.25rem !important;
+        }
+        @media (min-width: 1024px) {
+            .grid-2col {
+                grid-template-columns: 1fr 1fr !important;
+            }
+        }
+
+        .grid-4col {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 0.75rem !important;
+        }
+        @media (min-width: 768px) {
+            .grid-4col {
+                grid-template-columns: repeat(4, 1fr) !important;
+            }
+        }
+
+        /* 🔥 Schedule Item */
         .schedule-item {
-            transition: all 0.2s ease;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            padding: 0.625rem !important;
+            background: var(--bg-card) !important;
+            border-radius: var(--radius-md) !important;
+            border: 1px solid var(--border-default) !important;
+            transition: all 0.2s ease !important;
         }
+        .schedule-item:hover {
+            background: var(--bg-subtle) !important;
+        }
+        .schedule-item .doc-info {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+        .schedule-item .doc-avatar {
+            width: 2.25rem !important;
+            height: 2.25rem !important;
+            background: var(--bg-muted) !important;
+            border-radius: var(--radius-md) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        .schedule-item .doc-avatar i {
+            color: var(--color-sage) !important;
+            font-size: 0.875rem !important;
+        }
+        .schedule-item .doc-name {
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            font-size: 0.8125rem !important;
+        }
+        .schedule-item .doc-dept {
+            font-size: 0.6875rem !important;
+            color: var(--color-brown-100) !important;
+        }
+        .schedule-item .schedule-time {
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-600) !important;
+            font-size: 0.8125rem !important;
+        }
+        .schedule-item .schedule-patients {
+            font-size: 0.6875rem !important;
+            color: var(--color-sage) !important;
+            font-weight: var(--font-weight-medium) !important;
+        }
+
+        /* 🔥 Task Card */
+        .task-card {
+            padding: 0.75rem !important;
+            border-radius: var(--radius-md) !important;
+            border: 1px solid var(--border-default) !important;
+            transition: all 0.2s ease !important;
+        }
+        .task-card:hover {
+            box-shadow: var(--shadow-sm) !important;
+        }
+        .task-card .task-header {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: flex-start !important;
+            margin-bottom: 0.5rem !important;
+        }
+        .task-card .task-icon {
+            width: 1.75rem !important;
+            height: 1.75rem !important;
+            background: var(--bg-card) !important;
+            border-radius: var(--radius-md) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: var(--shadow-sm) !important;
+        }
+        .task-card .task-title {
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            font-size: 0.8125rem !important;
+        }
+        .task-card .task-count {
+            font-size: 1.25rem !important;
+            font-weight: var(--font-weight-medium) !important;
+        }
+        .task-card .task-action-btn {
+            width: 100% !important;
+            padding: 0.25rem !important;
+            border-radius: var(--radius-sm) !important;
+            font-size: 0.6875rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            border: 1px solid var(--border-default) !important;
+            background: var(--bg-card) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 0.25rem !important;
+            font-family: var(--font-family) !important;
+        }
+        .task-card .task-action-btn:hover {
+            transform: translateY(-1px) !important;
+            box-shadow: var(--shadow-sm) !important;
+        }
+
+        /* 🔥 Table overrides */
         .dashboard-table-row td {
-            padding: 10px 0;
+            padding: 0.5rem 1rem 0.5rem 0 !important;
         }
-        
-        /* Error styling for form fields */
-        .form-input.error, .form-select.error {
-            border-color: #ef4444 !important;
-            background-color: #fee2e2 !important;
+        .dashboard-table-row td:first-child {
+            padding-left: 0 !important;
         }
-        
+
+        /* 🔥 Section Header */
+        .section-header {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 0.75rem !important;
+        }
+        .section-header .title {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+            font-size: 0.875rem !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-700) !important;
+        }
+        .section-header .title i {
+            color: var(--color-sage) !important;
+        }
+        .section-header .view-all {
+            font-size: 0.6875rem !important;
+            color: var(--color-sage) !important;
+            text-decoration: none !important;
+            transition: color 0.2s ease !important;
+            font-weight: var(--font-weight-light) !important;
+        }
+        .section-header .view-all:hover {
+            color: var(--color-sage-dark) !important;
+        }
+
+        /* 🔥 Alert Badge */
+        .alert-badge {
+            background: var(--bg-page) !important;
+            color: var(--color-gold) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-light) !important;
+            padding: 0.1rem 0.5rem !important;
+            border-radius: var(--radius-full) !important;
+            margin-left: 0.5rem !important;
+        }
+
+        /* 🔥 Today Date Badge */
+        .today-badge {
+            font-size: 0.625rem !important;
+            color: var(--color-sage) !important;
+            background: var(--bg-muted) !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-weight: var(--font-weight-light) !important;
+        }
+
+        /* 🔥 Schedule Container Scroll */
+        .schedule-container {
+            max-height: 340px !important;
+            overflow-y: auto !important;
+            padding-right: 0.25rem !important;
+        }
+        .schedule-container::-webkit-scrollbar {
+            width: 3px !important;
+        }
+        .schedule-container::-webkit-scrollbar-thumb {
+            background: var(--border-default) !important;
+            border-radius: var(--radius-full) !important;
+        }
+
+        /* 🔥 Stat Trend */
+        .stat-trend {
+            font-size: 0.6875rem !important;
+            color: var(--color-sage-dark) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.25rem !important;
+            margin-top: 0.25rem !important;
+        }
+        .stat-trend i {
+            font-size: 0.625rem !important;
+        }
+        .stat-trend .vs-text {
+            color: var(--color-brown-100) !important;
+            margin-left: 0.25rem !important;
+            font-weight: var(--font-weight-light) !important;
+        }
+
+        /* 🔥 Modal Form Grid Override */
+        .modal-body .form-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 1rem 1.5rem !important;
+        }
+        .modal-body .form-grid .full-width {
+            grid-column: 1 / -1 !important;
+        }
+        @media (max-width: 640px) {
+            .modal-body .form-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        /* 🔥 Error Text */
         .error-text {
-            color: #ef4444;
-            font-size: 0.65rem;
-            margin-top: 4px;
-            display: none;
+            color: var(--color-error-text) !important;
+            font-size: 0.6875rem !important;
+            margin-top: 0.25rem !important;
+            display: none !important;
+            font-weight: var(--font-weight-light) !important;
         }
-        
         .error-text.show {
-            display: block;
+            display: block !important;
+        }
+        .form-input.error,
+        .form-select.error {
+            border-color: var(--color-error-text) !important;
+            background-color: var(--color-error-bg) !important;
         }
     </style>
 </head>
 <body class="bg-subtle">
 
-    <!-- Sidebar & Header Containers -->
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+    <main class="main-content" id="mainContent">
         
         <!-- Welcome Banner -->
-        <div class="welcome-banner relative p-6 mb-8 shadow-sm overflow-hidden">
-            <div class="absolute top-0 right-0 opacity-5">
-                <i class="fas fa-leaf text-7xl -mr-4 -mt-4 text-white"></i>
+        <div class="welcome-banner">
+            <div class="bg-icon">
+                <i class="fas fa-leaf"></i>
             </div>
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center relative z-10">
+            <div style="display:flex; flex-direction:column; justify-content:space-between; position:relative; z-index:1;">
                 <div>
-                    <h1 class="text-xl md:text-2xl font-light tracking-tight text-white mb-1" id="welcomeMessage">
-                        <i class="fas fa-spinner fa-pulse mr-2"></i> Loading...
+                    <h1 class="greeting" id="welcomeMessage">
+                        <i class="fas fa-spinner fa-pulse" style="margin-right:0.5rem;"></i> Loading...
                     </h1>
-                    <div class="flex items-center gap-2 text-white/80 text-xs font-light">
+                    <div class="datetime">
                         <i class="fas fa-calendar-week"></i>
                         <span id="currentDateTime"></span>
                     </div>
                 </div>
-                <div class="mt-4 md:mt-0 bg-white/12 backdrop-blur-sm rounded-xl px-4 py-1.5 border border-white/15">
-                    <div class="flex items-center gap-2">
-                        <i class="fas fa-chart-line text-white/80 text-sm"></i>
-                        <span class="text-xs font-light text-white/90">Live · <span id="liveTimestamp">Just now</span></span>
-                    </div>
+                <div class="live-badge" style="margin-top:0.5rem;">
+                    <i class="fas fa-chart-line"></i>
+                    Live · <span id="liveTimestamp">Just now</span>
                 </div>
             </div>
         </div>
 
         <!-- Stats Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-            <!-- OPD Card -->
-            <div class="stat-card p-5">
-                <div class="flex justify-between items-start">
+        <div class="grid-stats" style="margin-bottom:1.25rem;">
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
-                        <p class="text-[#b8aa9a] text-xs font-light uppercase tracking-wide">OPD Patients</p>
-                        <p class="text-3xl font-light text-[#5a4a3a] mt-1" id="opdCount">0</p>
-                        <div class="flex items-center gap-1 mt-2 text-[#8aae7a] text-[11px] font-light">
-                            <i class="fas fa-arrow-up text-[10px]"></i>
+                        <p class="stat-label">OPD Patients</p>
+                        <p class="stat-value" id="opdCount">0</p>
+                        <div class="stat-trend">
+                            <i class="fas fa-arrow-up"></i>
                             <span id="opdTrend">+8.2%</span>
-                            <span class="text-[#d4c9bc] ml-1 font-light">vs yesterday</span>
+                            <span class="vs-text">vs yesterday</span>
                         </div>
                     </div>
-                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
-                        <i class="fas fa-walking text-[#a8c49a] text-lg"></i>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-walking" style="color:var(--color-sage);"></i>
                     </div>
                 </div>
             </div>
             
-            <!-- IPD Card -->
-            <div class="stat-card p-5">
-                <div class="flex justify-between items-start">
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
-                        <p class="text-[#b8aa9a] text-xs font-light uppercase tracking-wide">IPD Admissions</p>
-                        <p class="text-3xl font-light text-[#5a4a3a] mt-1" id="ipdCount">0</p>
-                        <div class="mt-2 text-[#d4a853] text-[11px] font-light flex items-center gap-1">
-                            <i class="fas fa-bed text-xs"></i> <span>Current occupancy</span>
+                        <p class="stat-label">IPD Admissions</p>
+                        <p class="stat-value" id="ipdCount">0</p>
+                        <div style="margin-top:0.25rem; color:var(--color-gold); font-size:0.6875rem; font-weight:var(--font-weight-light); display:flex; align-items:center; gap:0.25rem;">
+                            <i class="fas fa-bed" style="font-size:0.625rem;"></i> Current occupancy
                         </div>
                     </div>
-                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
-                        <i class="fas fa-procedures text-[#a8c49a] text-lg"></i>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-procedures" style="color:var(--color-sage);"></i>
                     </div>
                 </div>
             </div>
             
-            <!-- Revenue Card -->
-            <div class="stat-card p-5">
-                <div class="flex justify-between items-start">
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
-                        <p class="text-[#b8aa9a] text-xs font-light uppercase tracking-wide">Today's Revenue</p>
-                        <p class="text-3xl font-light text-[#5a4a3a] mt-1" id="revenueCount">₹0</p>
-                        <div class="flex items-center gap-1 mt-2 text-[#8aae7a] text-[11px] font-light">
-                            <i class="fas fa-trend-up text-[10px]"></i>
+                        <p class="stat-label">Today's Revenue</p>
+                        <p class="stat-value" id="revenueCount">₹0</p>
+                        <div class="stat-trend">
+                            <i class="fas fa-trend-up"></i>
                             <span id="revenueTrend">+12.5%</span>
-                            <span class="text-[#d4c9bc] ml-1 font-light">from yesterday</span>
+                            <span class="vs-text">from yesterday</span>
                         </div>
                     </div>
-                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
-                        <i class="fas fa-rupee-sign text-[#a8c49a] text-lg"></i>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-rupee-sign" style="color:var(--color-sage);"></i>
                     </div>
                 </div>
             </div>
             
-            <!-- Bed Occupancy Card -->
-            <div class="stat-card p-5">
-                <div class="flex justify-between items-start">
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
-                        <p class="text-[#b8aa9a] text-xs font-light uppercase tracking-wide">Bed Occupancy</p>
-                        <p class="text-3xl font-light text-[#5a4a3a] mt-1" id="bedOccupancy">0%</p>
-                        <div class="mt-2 text-[#d4c9bc] text-[11px] font-light">
+                        <p class="stat-label">Bed Occupancy</p>
+                        <p class="stat-value" id="bedOccupancy">0%</p>
+                        <div style="margin-top:0.25rem; color:var(--color-brown-100); font-size:0.6875rem; font-weight:var(--font-weight-light);">
                             <span id="availableBeds">0</span> beds available
                         </div>
                     </div>
-                    <div class="stat-icon-bg w-10 h-10 flex items-center justify-center">
-                        <i class="fas fa-bed-pulse text-[#a8c49a] text-lg"></i>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-bed-pulse" style="color:var(--color-sage);"></i>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Quick Actions -->
-        <div class="quick-actions-container p-5 mb-8">
-            <div class="flex items-center gap-2 mb-4">
-                <i class="fas fa-bolt text-[#d4c9bc] text-base"></i>
-                <h2 class="text-base font-light text-[#5a4a3a]">Quick Actions</h2>
+        <div class="quick-actions-container">
+            <div class="section-title">
+                <i class="fas fa-bolt"></i> Quick Actions
             </div>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                <button data-action="add-patient" class="quick-action-btn btn-primary text-white px-4 py-2.5 flex items-center justify-center gap-2 shadow-sm">
-                    <i class="fas fa-user-plus text-sm"></i>
-                    <span class="text-xs font-light">Add Patient</span>
+            <div class="grid-quick-actions">
+                <button data-action="add-patient" class="quick-action-btn">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Add Patient</span>
                 </button>
-                <button data-action="book-appointment" class="quick-action-btn btn-primary text-white px-4 py-2.5 flex items-center justify-center gap-2 shadow-sm">
-                    <i class="fas fa-calendar-plus text-sm"></i>
-                    <span class="text-xs font-light">Book Appointment</span>
+                <button data-action="book-appointment" class="quick-action-btn">
+                    <i class="fas fa-calendar-plus"></i>
+                    <span>Book Appointment</span>
                 </button>
-                <button data-action="admit-patient" class="quick-action-btn btn-primary text-white px-4 py-2.5 flex items-center justify-center gap-2 shadow-sm">
-                    <i class="fas fa-procedures text-sm"></i>
-                    <span class="text-xs font-light">Admit Patient</span>
+                <button data-action="admit-patient" class="quick-action-btn">
+                    <i class="fas fa-procedures"></i>
+                    <span>Admit Patient</span>
                 </button>
-                <button data-action="create-bill" class="quick-action-btn btn-primary text-white px-4 py-2.5 flex items-center justify-center gap-2 shadow-sm">
-                    <i class="fas fa-file-invoice-dollar text-sm"></i>
-                    <span class="text-xs font-light">Create Bill</span>
+                <button data-action="create-bill" class="quick-action-btn">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Create Bill</span>
                 </button>
-                <button data-action="emergency" class="quick-action-btn bg-[#d8b48c] hover:bg-[#c9a47c] text-white px-4 py-2.5 flex items-center justify-center gap-2 shadow-sm transition-all rounded-xl">
-                    <i class="fas fa-truck-medical text-sm"></i>
-                    <span class="text-xs font-light">Emergency</span>
+                <button data-action="emergency" class="quick-action-btn emergency">
+                    <i class="fas fa-truck-medical"></i>
+                    <span>Emergency</span>
                 </button>
             </div>
         </div>
 
         <!-- Two Column Layout -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="grid-2col">
             <!-- Recent Appointments -->
-            <div class="card-white p-5">
-                <div class="flex justify-between items-center mb-4">
-                    <div class="flex items-center gap-2">
-                        <i class="fas fa-calendar-check text-[#a8c49a] text-base"></i>
-                        <h3 class="font-light text-[#5a4a3a] text-base">Recent Appointments</h3>
+            <div class="card-white" style="padding:1.25rem;">
+                <div class="section-header">
+                    <div class="title">
+                        <i class="fas fa-calendar-check"></i>
+                        Recent Appointments
                     </div>
-                    <a href="#" class="text-xs text-[#a8c49a] hover:text-[#8aae7a] font-light transition">View all →</a>
+                    <a href="#" class="view-all">View all →</a>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full min-w-[360px]">
-                        <thead class="border-b border-[#f0e8e0]">
-                            <tr class="text-left data-table">
-                                <th class="pb-2 font-light">Patient</th>
-                                <th class="pb-2 font-light">Doctor</th>
-                                <th class="pb-2 font-light">Time</th>
-                                <th class="pb-2 font-light">Status</th>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Doctor</th>
+                                <th>Time</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody id="recentAppointments">
-                            <tr><td colspan="4" class="py-6 text-center text-[#d4c9bc] text-sm"><i class="fas fa-spinner fa-pulse mr-2"></i>Loading...</td></tr>
+                            <tr>
+                                <td colspan="4" style="text-align:center; padding:2rem 0; color:var(--color-brown-100);">
+                                    <i class="fas fa-spinner fa-pulse" style="margin-right:0.5rem;"></i>
+                                    Loading...
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
             
             <!-- Today's Schedule -->
-            <div class="card-white p-5">
-                <div class="flex justify-between items-center mb-4">
-                    <div class="flex items-center gap-2">
-                        <i class="fas fa-stethoscope text-[#a8c49a] text-base"></i>
-                        <h3 class="font-light text-[#5a4a3a] text-base">Doctor's Schedule</h3>
+            <div class="card-white" style="padding:1.25rem;">
+                <div class="section-header">
+                    <div class="title">
+                        <i class="fas fa-stethoscope"></i>
+                        Doctor's Schedule
                     </div>
-                    <span class="text-[11px] text-[#a8c49a] bg-[#faf7f2] px-2.5 py-1 rounded-full font-light" id="todayDate"></span>
+                    <span class="today-badge" id="todayDate"></span>
                 </div>
-                <div class="space-y-2 max-h-[340px] overflow-y-auto pr-1" id="todaySchedule">
-                    <div class="loading-shimmer h-14 w-full"></div>
+                <div class="schedule-container" id="todaySchedule">
+                    <div class="loading-shimmer" style="height:3.5rem; width:100%;"></div>
+                    <div class="loading-shimmer" style="height:3.5rem; width:100%; margin-top:0.5rem;"></div>
+                    <div class="loading-shimmer" style="height:3.5rem; width:100%; margin-top:0.5rem;"></div>
                 </div>
             </div>
         </div>
 
         <!-- Pending Tasks -->
-        <div class="card-white p-5">
-            <div class="flex items-center gap-2 mb-4">
-                <i class="fas fa-bell text-[#d8b48c] text-base"></i>
-                <h2 class="text-base font-light text-[#5a4a3a]">Pending Tasks & Alerts</h2>
-                <span class="bg-[#f8f4ef] text-[#d4a853] text-[10px] font-light px-2 py-0.5 rounded-full ml-2" id="alertCount">0</span>
+        <div class="card-white" style="padding:1.25rem;">
+            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.75rem;">
+                <i class="fas fa-bell" style="color:var(--color-warm-tan);"></i>
+                <span style="font-size:0.875rem; font-weight:var(--font-weight-light); color:var(--color-brown-700);">Pending Tasks & Alerts</span>
+                <span class="alert-badge" id="alertCount">0</span>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="pendingTasks"></div>
+            <div class="grid-4col" id="pendingTasks">
+                <div class="loading-shimmer" style="height:6rem; width:100%;"></div>
+                <div class="loading-shimmer" style="height:6rem; width:100%;"></div>
+                <div class="loading-shimmer" style="height:6rem; width:100%;"></div>
+                <div class="loading-shimmer" style="height:6rem; width:100%;"></div>
+            </div>
         </div>
     </main>
 
-    <!-- Modal Overlay for Add Patient - WITH PROPER VALIDATIONS -->
-    <div id="modalOverlay" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center opacity-0 invisible transition-all duration-200">
-        <div class="form-card bg-white w-full max-w-lg mx-4 shadow-xl border-t-4 border-t-[#a8c49a]">
-            <div class="flex justify-between items-center p-5 border-b border-[#f0e8e0]">
-                <h3 class="text-lg font-light text-[#5a4a3a] flex items-center gap-2">
-                    <i class="fas fa-user-plus text-[#a8c49a]"></i> Quick Registration
+    <!-- Modal Overlay for Add Patient -->
+    <div id="modalOverlay" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="form-card">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-user-plus"></i> Quick Registration
                 </h3>
-                <button id="closeModalBtn" class="close-btn text-[#d4c9bc] hover:text-[#b8aa9a] transition"><i class="fas fa-times text-lg"></i></button>
+                <button id="closeModalBtn" class="close-btn" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             <form id="patientRegistrationForm">
-                <div class="p-5 space-y-4">
-                    <!-- Full Name Field - Only Alphabets -->
-                    <div>
-                        <label class="block text-xs font-light text-[#b8aa9a] mb-1">Full name *</label>
-                        <input type="text" 
-                               id="patientName" 
-                               name="patientName"
-                               class="form-input w-full border border-[#efe6dc] rounded-xl px-4 py-2.5 text-sm focus:border-[#b5cfaa] transition" 
-                               placeholder="Enter full name (e.g., Priya Sharma)"
-                               required
-                               data-validation-type="alphabets"
-                               maxlength="100">
-                        <span id="patientNameError" class="error-text"></span>
-                    </div>
-                    
-                    <!-- Phone Field - Only Numbers -->
-                    <div>
-                        <label class="block text-xs font-light text-[#b8aa9a] mb-1">Phone / Contact *</label>
-                        <input type="tel" 
-                               id="patientPhone" 
-                               name="patientPhone"
-                               class="form-input w-full border border-[#efe6dc] rounded-xl px-4 py-2.5 text-sm focus:border-[#b5cfaa] transition" 
-                               placeholder="Enter 10-digit mobile number (e.g., 9876543210)"
-                               required
-                               data-validation-type="phone"
-                               maxlength="10">
-                        <span id="patientPhoneError" class="error-text"></span>
-                        <small class="text-gray-400 text-xs mt-1 block">Must be 10 digits, starting with 6-9</small>
-                    </div>
-                    
-                    <!-- Department Field -->
-                    <div>
-                        <label class="block text-xs font-light text-[#b8aa9a] mb-1">Department *</label>
-                        <select id="patientDept" name="patientDept" class="form-select w-full border border-[#efe6dc] rounded-xl px-4 py-2.5 text-sm bg-white focus:border-[#b5cfaa] transition" required>
-                            <option value="">Select Department</option>
-                            <option value="Cardiology">Cardiology</option>
-                            <option value="Neurology">Neurology</option>
-                            <option value="Orthopedics">Orthopedics</option>
-                            <option value="General Medicine">General Medicine</option>
-                            <option value="Pediatrics">Pediatrics</option>
-                        </select>
-                        <span id="patientDeptError" class="error-text"></span>
-                    </div>
-                    
-                    <!-- Email Field - Optional but validate if entered -->
-                    <div>
-                        <label class="block text-xs font-light text-[#b8aa9a] mb-1">Email Address (Optional)</label>
-                        <input type="email" 
-                               id="patientEmail" 
-                               name="patientEmail"
-                               class="form-input w-full border border-[#efe6dc] rounded-xl px-4 py-2.5 text-sm focus:border-[#b5cfaa] transition" 
-                               placeholder="Enter email address (e.g., priya@example.com)"
-                               data-validation-type="email">
-                        <span id="patientEmailError" class="error-text"></span>
-                    </div>
-                    
-                    <!-- Age Field - Only Numbers -->
-                    <div>
-                        <label class="block text-xs font-light text-[#b8aa9a] mb-1">Age (Optional)</label>
-                        <input type="number" 
-                               id="patientAge" 
-                               name="patientAge"
-                               class="form-input w-full border border-[#efe6dc] rounded-xl px-4 py-2.5 text-sm focus:border-[#b5cfaa] transition" 
-                               placeholder="Enter age (1-100 years)"
-                               min="1"
-                               max="100"
-                               data-validation-type="numbers">
-                        <span id="patientAgeError" class="error-text"></span>
+                <div class="modal-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Full name <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="text" id="patientName" class="form-input" placeholder="e.g., Priya Sharma" required>
+                            <span class="error-text" id="patientNameError"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone / Contact <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="tel" id="patientPhone" class="form-input" placeholder="9876543210" required maxlength="10">
+                            <span class="error-text" id="patientPhoneError"></span>
+                            <small style="color:var(--color-brown-100); font-size:0.625rem; margin-top:0.125rem; display:block; font-weight:var(--font-weight-light);">Must be 10 digits, starting with 6-9</small>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">Department <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="patientDept" class="form-select" required>
+                                <option value="">Select Department</option>
+                                <option value="Cardiology">Cardiology</option>
+                                <option value="Neurology">Neurology</option>
+                                <option value="Orthopedics">Orthopedics</option>
+                                <option value="General Medicine">General Medicine</option>
+                                <option value="Pediatrics">Pediatrics</option>
+                            </select>
+                            <span class="error-text" id="patientDeptError"></span>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">Email Address (Optional)</label>
+                            <input type="email" id="patientEmail" class="form-input" placeholder="priya@example.com">
+                            <span class="error-text" id="patientEmailError"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Age (Optional)</label>
+                            <input type="number" id="patientAge" class="form-input" placeholder="Enter age" min="1" max="100">
+                            <span class="error-text" id="patientAgeError"></span>
+                        </div>
                     </div>
                 </div>
-                <div class="p-5 bg-[#fefcf9] rounded-b-xl flex justify-end gap-3">
-                    <button type="button" id="cancelModalBtn" class="btn-secondary px-4 py-2 rounded-xl text-[#b8aa9a] text-sm font-light transition">Cancel</button>
-                    <button type="submit" class="btn-primary px-4 py-2 rounded-xl text-white text-sm font-light shadow-sm transition"><i class="fas fa-save mr-2 text-xs"></i>Register</button>
+                <div class="modal-footer">
+                    <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Register
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <script src="dashboard.js"></script>
     <script src="../../js/core/common.js"></script>
     <script src="../../js/core/form-validation.js"></script>
-    
+    <script src="dashboard.js"></script>
+
     <script>
-        // Initialize dashboard and form validations when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize dashboard (from dashboard.js)
-            if (typeof initDashboard === 'function') {
-                initDashboard();
-            }
-            
-            // Setup form validations for the patient registration form
-            if (typeof setupFormValidations !== 'undefined' && typeof PatientValidationMapping !== 'undefined') {
-                setupFormValidations('patientRegistrationForm', PatientValidationMapping);
-            }
-            
-            // Handle form submission with validation
-            const patientForm = document.getElementById('patientRegistrationForm');
-            if (patientForm) {
-                patientForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    // Validate the form
-                    if (typeof validateForm !== 'undefined' && typeof PatientValidationMapping !== 'undefined') {
-                        if (validateForm('patientRegistrationForm', PatientValidationMapping)) {
-                            // Get form values
-                            const patientName = document.getElementById('patientName').value.trim();
-                            const patientPhone = document.getElementById('patientPhone').value.trim();
-                            const patientDept = document.getElementById('patientDept').value;
-                            const patientEmail = document.getElementById('patientEmail')?.value.trim() || '';
-                            const patientAge = document.getElementById('patientAge')?.value || '';
-                            
-                            // Get existing patients from localStorage
-                            let existingPatients = JSON.parse(localStorage.getItem('hms_patients') || '[]');
-                            
-                            // Calculate next ID
-                            const newId = existingPatients.length > 0 ? Math.max(...existingPatients.map(p => p.id)) + 1 : 1001;
-                            
-                            // Create new patient object
-                            const newPatient = {
-                                id: newId,
-                                fullName: patientName,
-                                phone: patientPhone,
-                                department: patientDept,
-                                email: patientEmail,
-                                age: patientAge,
-                                dob: '',
-                                gender: '',
-                                bloodGroup: '',
-                                address: '',
-                                createdAt: new Date().toISOString(),
-                                updatedAt: new Date().toISOString()
-                            };
-                            
-                            // Add to existing patients array
-                            existingPatients.push(newPatient);
-                            
-                            // Save back to localStorage
-                            localStorage.setItem('hms_patients', JSON.stringify(existingPatients));
-                            
-                            // Show success message
-                            if (typeof showToast === 'function') {
-                                showToast(`✅ ${patientName} registered successfully!`, 'success');
-                            } else {
-                                alert(`✅ ${patientName} registered successfully!`);
-                            }
-                            
-                            // Close modal
-                            if (typeof ModalManager !== 'undefined' && ModalManager.close) {
-                                ModalManager.close();
-                            } else {
-                                const modal = document.getElementById('modalOverlay');
-                                if (modal) {
-                                    modal.classList.remove('opacity-100', 'visible');
-                                    modal.classList.add('opacity-0', 'invisible');
-                                }
-                            }
-                            
-                            // Reset form
-                            patientForm.reset();
-                            
-                            // Update OPD count if function exists
-                            if (typeof updateDashboardStats === 'function') {
-                                updateDashboardStats();
-                            }
-                        } else {
-                            if (typeof showToast === 'function') {
-                                showToast('Please fix the errors in the form', 'error');
-                            }
-                        }
-                    } else {
-                        // Fallback if validation script not loaded
-                        const patientName = document.getElementById('patientName').value.trim();
-                        if (!patientName) {
-                            alert('Please enter patient name');
-                            return;
-                        }
-                        
-                        const patientPhone = document.getElementById('patientPhone').value.trim();
-                        if (!patientPhone || patientPhone.length !== 10) {
-                            alert('Please enter valid 10-digit phone number');
-                            return;
-                        }
-                        
-                        const patientDept = document.getElementById('patientDept').value;
-                        if (!patientDept) {
-                            alert('Please select department');
-                            return;
-                        }
-                        
-                        // Rest of the save logic...
-                        let existingPatients = JSON.parse(localStorage.getItem('hms_patients') || '[]');
-                        const newId = existingPatients.length > 0 ? Math.max(...existingPatients.map(p => p.id)) + 1 : 1001;
-                        
-                        const newPatient = {
-                            id: newId,
-                            fullName: patientName,
-                            phone: patientPhone,
-                            department: patientDept,
-                            email: document.getElementById('patientEmail')?.value.trim() || '',
-                            age: document.getElementById('patientAge')?.value || '',
-                            createdAt: new Date().toISOString()
-                        };
-                        
-                        existingPatients.push(newPatient);
-                        localStorage.setItem('hms_patients', JSON.stringify(existingPatients));
-                        
-                        alert(`✅ ${patientName} registered successfully!`);
-                        
-                        const modal = document.getElementById('modalOverlay');
-                        if (modal) {
-                            modal.classList.remove('opacity-100', 'visible');
-                            modal.classList.add('opacity-0', 'invisible');
-                        }
-                        patientForm.reset();
-                    }
-                });
-            }
+            // Check sidebar loaded
+            var checkSidebar = setInterval(function() {
+                var sidebar = document.getElementById('mainSidebar');
+                if (sidebar) {
+                    clearInterval(checkSidebar);
+                    document.getElementById('mainContent').classList.add('loaded');
+                }
+            }, 50);
+            setTimeout(function() {
+                document.getElementById('mainContent').classList.add('loaded');
+            }, 1000);
         });
     </script>
+    
 </body>
 </html>

@@ -5,53 +5,202 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Payments | Billing | MedFlow</title>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- ✅ CENTRALIZED THEME CSS -->
+    
+    <!-- Theme CSS -->
     <link rel="stylesheet" href="../../css/theme.css">
 
     <style>
-        /* Additional page-specific styles that align with theme */
+        /* ============================================================
+           PAYMENTS MODULE — Page-specific only
+           ============================================================ */
+
+        /* 🔥 FIX: Prevent layout shift */
+        .main-content {
+            margin-left: 260px !important;
+            margin-top: 70px !important;
+            padding: 1.25rem 1.5rem !important;
+            transition: margin-left 0.3s ease !important;
+            min-height: 100vh !important;
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
+        }
+        .main-content.loaded {
+            opacity: 1;
+        }
+        #mainSidebar[data-collapsed="true"] ~ .main-content,
+        #mainSidebar[data-collapsed="true"] + .main-content {
+            margin-left: 72px !important;
+        }
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 0 !important;
+                padding: 1rem !important;
+            }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 🔥 Page Header - Hidden */
+        .page-header {
+            display: none !important;
+        }
+
+        /* 🔥 Stats Cards - Perfect Spacing */
+        .grid-stats {
+            gap: 1rem !important;
+            margin-bottom: 1.25rem !important;
+        }
+        .stat-card {
+            padding: 1rem 1.25rem !important;
+            border-radius: var(--radius-lg) !important;
+        }
+        .stat-card .stat-value {
+            font-size: 1.5rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            margin-top: 0.125rem !important;
+        }
+        .stat-card .stat-label {
+            font-size: 0.625rem !important;
+            letter-spacing: 0.06em !important;
+            text-transform: uppercase !important;
+            color: var(--color-brown-200) !important;
+        }
+        .stat-card .stat-icon-bg {
+            width: 2.5rem !important;
+            height: 2.5rem !important;
+            border-radius: var(--radius-md) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: var(--bg-muted) !important;
+        }
+        .stat-card .stat-icon-bg i {
+            font-size: 1rem !important;
+        }
+
+        /* 🔥 Table - Perfect Alignment */
+        .card-white {
+            border-radius: var(--radius-lg) !important;
+            border: 1px solid var(--border-default) !important;
+            overflow: hidden !important;
+            margin-top: 0 !important;
+        }
+        .table-wrapper {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+        .data-table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            font-size: 0.8125rem !important;
+        }
+        .data-table thead {
+            background-color: var(--bg-muted) !important;
+            border-bottom: 1px solid var(--border-default) !important;
+        }
+        .data-table th {
+            padding: 0.625rem 1rem !important;
+            text-align: left !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-300) !important;
+            font-size: 0.625rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
+        }
+        .data-table td {
+            padding: 0.625rem 1rem !important;
+            color: var(--color-brown-700) !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid var(--border-default) !important;
+        }
+        .data-table tbody tr:last-child td {
+            border-bottom: none !important;
+        }
+
+        /* 🔥 Table Row */
         .payment-row {
-            transition: var(--transition-base);
-            border-bottom: 1px solid var(--border-default);
+            transition: var(--transition-base) !important;
         }
-        
         .payment-row:hover {
-            background-color: var(--bg-subtle);
+            background-color: var(--bg-subtle) !important;
         }
-        
+
+        /* 🔥 Payment Method Badge */
         .payment-method-badge {
-            background: var(--color-info-bg);
-            color: var(--color-info-text);
-            padding: 0.2rem 0.75rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
         }
-        
-        .border-l-blue-500 {
-            border-left-color: #3b82f6 !important;
+        .payment-method-badge.cash {
+            background: var(--color-success-bg) !important;
+            color: var(--color-success-text) !important;
         }
-        
-        .border-l-green-500 {
-            border-left-color: var(--color-success-text) !important;
+        .payment-method-badge.card {
+            background: var(--color-info-bg) !important;
+            color: var(--color-info-text) !important;
         }
-        
-        .border-l-yellow-500 {
-            border-left-color: var(--color-warning-text) !important;
+        .payment-method-badge.upi {
+            background: #f3e8ff !important;
+            color: #7c3aed !important;
         }
-        
-        .border-l-purple-500 {
-            border-left-color: #9333ea !important;
+        .payment-method-badge.insurance {
+            background: var(--color-warning-bg) !important;
+            color: var(--color-warning-text) !important;
+        }
+        .payment-method-badge.bank-transfer {
+            background: #e0e7ff !important;
+            color: #4338ca !important;
+        }
+        .payment-method-badge.other {
+            background: var(--bg-muted) !important;
+            color: var(--color-brown-300) !important;
+        }
+
+        /* 🔥 Cell Styles */
+        .payment-date {
+            color: var(--color-brown-300) !important;
+            font-size: 0.8125rem !important;
+        }
+        .payment-patient {
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            font-size: 0.875rem !important;
+        }
+        .payment-invoice {
+            font-family: 'Courier New', monospace !important;
+            font-size: 0.75rem !important;
+            color: var(--color-brown-600) !important;
+        }
+        .payment-amount {
+            font-weight: var(--font-weight-semibold) !important;
+            color: var(--color-sage-dark) !important;
+            font-size: 0.875rem !important;
+        }
+        .payment-transaction {
+            font-family: 'Courier New', monospace !important;
+            font-size: 0.6875rem !important;
+            color: var(--color-brown-100) !important;
+        }
+
+        /* 🔥 Stat Card Border Colors */
+        .stat-card-blue { border-left: 4px solid #3b82f6 !important; }
+        .stat-card-green { border-left: 4px solid var(--color-success-text) !important; }
+        .stat-card-orange { border-left: 4px solid var(--color-warning-text) !important; }
+        .stat-card-purple { border-left: 4px solid #9333ea !important; }
+
+        /* 🔥 Responsive */
+        @media (max-width: 768px) {
+            .data-table th,
+            .data-table td {
+                padding: 0.5rem 0.5rem !important;
+                font-size: 0.6875rem !important;
+            }
         }
     </style>
 </head>
@@ -60,91 +209,75 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+    <main class="main-content" id="mainContent">
         
-        <!-- Page Header matching theme -->
-        <div class="page-header mb-6">
-            <div class="page-header-left">
-                <div class="page-header-icon">
-                    <i class="fas fa-credit-card"></i>
-                </div>
-                <div>
-                    <h1 class="page-header-title">Payment History</h1>
-                    <p class="page-header-subtitle">Track all patient payments and transactions</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Stats Cards using theme classes -->
-        <div class="grid-stats mb-8">
-            <div class="stat-card" style="border-left: 4px solid #3b82f6;">
-                <div class="flex justify-between items-start">
+        <!-- Stats Cards -->
+        <div class="grid-stats">
+            <div class="stat-card stat-card-blue">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Total Collected</p>
                         <p class="stat-value" id="totalCollected">₹0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-rupee-sign text-sage text-lg"></i>
+                        <i class="fas fa-rupee-sign" style="color:#3b82f6;"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid var(--color-success-text);">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-green">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">This Month</p>
                         <p class="stat-value" id="monthCollected">₹0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-calendar-alt text-sage text-lg"></i>
+                        <i class="fas fa-calendar-alt" style="color:var(--color-success-text);"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid var(--color-warning-text);">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-orange">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Today</p>
-                        <p class="stat-value" id="todayCollected">₹0</p>
+                        <p class="stat-value text-warning-text" id="todayCollected">₹0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-sun text-sage text-lg"></i>
+                        <i class="fas fa-sun" style="color:var(--color-warning-text);"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid #9333ea;">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-purple">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Transactions</p>
-                        <p class="stat-value" id="totalTransactions">0</p>
+                        <p class="stat-value" style="color:#9333ea;" id="totalTransactions">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-receipt text-sage text-lg"></i>
+                        <i class="fas fa-receipt" style="color:#9333ea;"></i>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Payments Table -->
-        <div class="card-white overflow-hidden">
+        <div class="card-white">
             <div class="table-wrapper">
-                <table class="data-table w-full">
+                <table class="data-table">
                     <thead>
                         <tr>
-                            <th class="px-5 py-3">Date</th>
-                            <th class="px-5 py-3">Patient</th>
-                            <th class="px-5 py-3">Invoice #</th>
-                            <th class="px-5 py-3">Amount</th>
-                            <th class="px-5 py-3">Method</th>
-                            <th class="px-5 py-3">Transaction ID</th>
+                            <th style="width:110px;">Date</th>
+                            <th style="min-width:140px;">Patient</th>
+                            <th style="width:110px;">Invoice #</th>
+                            <th style="width:110px; text-align:center;">Amount</th>
+                            <th style="width:120px;">Method</th>
+                            <th>Transaction ID</th>
                         </tr>
                     </thead>
                     <tbody id="paymentsTable">
                         <tr>
-                            <td colspan="6" class="text-center py-12 text-brown-100">
-                                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
-                                <p class="font-light">Loading payments...</p>
+                            <td colspan="6" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
+                                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
+                                <p style="font-weight:var(--font-weight-light);">Loading payments...</p>
                             </td>
                         </tr>
                     </tbody>
@@ -155,6 +288,21 @@
 
     <script src="../../js/core/common.js"></script>
     <script src="payments.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var checkSidebar = setInterval(function() {
+                var sidebar = document.getElementById('mainSidebar');
+                if (sidebar) {
+                    clearInterval(checkSidebar);
+                    document.getElementById('mainContent').classList.add('loaded');
+                }
+            }, 50);
+            setTimeout(function() {
+                document.getElementById('mainContent').classList.add('loaded');
+            }, 1000);
+        });
+    </script>
     
 </body>
 </html>

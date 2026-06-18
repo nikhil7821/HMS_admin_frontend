@@ -4,204 +4,341 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Hospital Profile | Settings | MedFlow</title>
-    <!-- Google Fonts: Poppins Light + Regular + Medium -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Theme CSS -->
+    <link rel="stylesheet" href="../../css/theme.css">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* ============================================================
+           HOSPITAL PROFILE MODULE — Page-specific only
+           ============================================================ */
+
+        /* 🔥 FIX: Prevent layout shift */
+        .main-content {
+            margin-left: 260px !important;
+            margin-top: 70px !important;
+            padding: 1.25rem 1.5rem !important;
+            transition: margin-left 0.3s ease !important;
+            min-height: 100vh !important;
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
         }
-        
-        body {
-            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
-            background: #fffdf9;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            font-weight: 400;
+        .main-content.loaded {
+            opacity: 1;
         }
-        
-        .bg-subtle {
-            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
+        #mainSidebar[data-collapsed="true"] ~ .main-content,
+        #mainSidebar[data-collapsed="true"] + .main-content {
+            margin-left: 72px !important;
         }
-        
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f0ebe4;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #d4c9bc;
-            border-radius: 10px;
-        }
-        
-        .card-white {
-            background: #ffffff;
-            border: 1px solid #f0e8e0;
-            border-radius: 20px;
-            transition: all 0.25s ease;
-        }
-        
-        .card-white:hover {
-            box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.06);
-        }
-        
-        h1, h2, h3 {
-            color: #1e293b;
-        }
-        
-        h1 {
-            font-size: 1.5rem;
-            font-weight: 500;
-            letter-spacing: -0.3px;
-        }
-        
-        h2 {
-            font-size: 1rem;
-            font-weight: 500;
-        }
-        
-        .form-label {
-            font-size: 12px;
-            font-weight: 500;
-            color: #334155;
-            margin-bottom: 6px;
-            display: block;
-            letter-spacing: 0.3px;
-        }
-        
-        .form-input {
-            border-radius: 8px;
-            border: 1px solid #cbd5e1;
-            transition: all 0.2s ease;
-            background: #ffffff;
-            padding: 10px 14px;
-            width: 100%;
-            font-size: 13px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 400;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: #a8c49a;
-            box-shadow: 0 0 0 3px rgba(168, 196, 154, 0.2);
-        }
-        
-        .form-input.error {
-            border-color: #ef4444;
-            background-color: #fef2f2;
-        }
-        
-        .error-text {
-            color: #ef4444;
-            font-size: 11px;
-            margin-top: 4px;
-            display: none;
-        }
-        
-        .error-text.show {
-            display: block;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
-            transition: all 0.2s ease;
-            border: none;
-            cursor: pointer;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 13px;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
-            transform: translateY(-1px);
-        }
-        
-        .btn-secondary {
-            border: 1px solid #cbd5e1;
-            background: white;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 13px;
-            color: #334155;
-        }
-        
-        .btn-secondary:hover {
-            background: #f8fafc;
-            border-color: #94a3b8;
-        }
-        
-        .logo-preview {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
-            font-size: 2rem;
-            font-weight: 600;
-            color: white;
-            background-size: cover;
-            background-position: center;
-        }
-        
-        .upload-btn {
-            background: #f1f5f9;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 500;
-            color: #334155;
-            cursor: pointer;
-        }
-        
-        .upload-btn:hover {
-            background: #e2e8f0;
-        }
-        
-        .working-hours-input {
-            width: 140px;
-            padding: 6px 10px;
-            border-radius: 8px;
-            border: 1px solid #cbd5e1;
-            font-size: 12px;
-            font-family: 'Poppins', sans-serif;
-        }
-        
-        .working-hours-input:focus {
-            outline: none;
-            border-color: #a8c49a;
-            box-shadow: 0 0 0 2px rgba(168, 196, 154, 0.2);
-        }
-        
-        p, span, div, a {
-            font-weight: 400;
-        }
-        
-        @media (max-width: 768px) {
-            .working-hours-input {
-                width: 110px;
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 0 !important;
+                padding: 1rem !important;
             }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 🔥 Page Header - Hidden */
+        .page-header {
+            display: none !important;
+        }
+
+        /* 🔥 Cards */
+        .card-white {
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-lg) !important;
+            padding: 1.25rem !important;
+            transition: all 0.25s ease !important;
+        }
+        .card-white:hover {
+            box-shadow: var(--shadow-md) !important;
+        }
+
+        /* 🔥 Form Elements */
+        .form-label {
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-200) !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
+            margin-bottom: 0.25rem !important;
+            display: block !important;
+        }
+        .form-input {
+            border-radius: var(--radius-md) !important;
+            border: 1px solid var(--border-input) !important;
+            transition: all 0.2s ease !important;
+            background: var(--bg-card) !important;
+            padding: 0.5rem 0.75rem !important;
+            width: 100% !important;
+            font-size: 0.8125rem !important;
+            font-family: var(--font-family) !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-700) !important;
+        }
+        .form-input:focus {
+            outline: none !important;
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+        }
+        .form-input.error {
+            border-color: var(--color-error-text) !important;
+            background-color: var(--color-error-bg) !important;
+        }
+        .form-textarea {
+            border-radius: var(--radius-md) !important;
+            border: 1px solid var(--border-input) !important;
+            transition: all 0.2s ease !important;
+            background: var(--bg-card) !important;
+            padding: 0.5rem 0.75rem !important;
+            width: 100% !important;
+            font-size: 0.8125rem !important;
+            font-family: var(--font-family) !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-700) !important;
+            resize: vertical !important;
+            min-height: 60px !important;
+        }
+        .form-textarea:focus {
+            outline: none !important;
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+        }
+
+        /* 🔥 Error Text */
+        .error-text {
+            color: var(--color-error-text) !important;
+            font-size: 0.6875rem !important;
+            margin-top: 0.25rem !important;
+            display: none !important;
+            font-weight: var(--font-weight-light) !important;
+        }
+        .error-text.show {
+            display: block !important;
+        }
+
+        /* 🔥 Buttons */
+        .btn-primary {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            padding: 0.5rem 1.25rem !important;
+            font-size: 0.8125rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            border-radius: var(--radius-md) !important;
+            border: none !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            font-family: var(--font-family) !important;
+            background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%) !important;
+            color: white !important;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+        }
+        .btn-secondary {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            padding: 0.5rem 1.25rem !important;
+            font-size: 0.8125rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            border-radius: var(--radius-md) !important;
+            border: 1px solid var(--border-input) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            font-family: var(--font-family) !important;
+            background: transparent !important;
+            color: var(--color-brown-200) !important;
+        }
+        .btn-secondary:hover {
+            background: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+            border-color: var(--color-brown-100) !important;
+        }
+
+        /* 🔥 Logo Preview */
+        .logo-preview {
+            width: 100px !important;
+            height: 100px !important;
+            background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%) !important;
+            border-radius: var(--radius-lg) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 auto 1rem !important;
+            font-size: 2rem !important;
+            font-weight: var(--font-weight-semibold) !important;
+            color: white !important;
+            background-size: cover !important;
+            background-position: center !important;
+        }
+
+        /* 🔥 Upload Button */
+        .upload-btn {
+            background: var(--bg-muted) !important;
+            transition: all 0.2s ease !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+            padding: 0.5rem 1rem !important;
+            border-radius: var(--radius-md) !important;
+            font-size: 0.75rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-300) !important;
+            cursor: pointer !important;
+            font-family: var(--font-family) !important;
+            border: 1px solid var(--border-input) !important;
+        }
+        .upload-btn:hover {
+            background: var(--bg-hover) !important;
+            border-color: var(--color-brown-100) !important;
+        }
+
+        /* 🔥 Working Hours Input */
+        .working-hours-input {
+            width: 140px !important;
+            padding: 0.375rem 0.625rem !important;
+            border-radius: var(--radius-sm) !important;
+            border: 1px solid var(--border-input) !important;
+            font-size: 0.75rem !important;
+            font-family: var(--font-family) !important;
+            background: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
+        }
+        .working-hours-input:focus {
+            outline: none !important;
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+        }
+
+        /* 🔥 Section Title */
+        .section-title {
+            font-size: 0.875rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            padding-bottom: 0.5rem !important;
+            border-bottom: 1px solid var(--border-default) !important;
+            margin-bottom: 0.75rem !important;
+        }
+        .section-title i {
+            color: var(--color-sage) !important;
+            margin-right: 0.5rem !important;
+        }
+
+        /* 🔥 Sub Title */
+        .sub-title {
+            font-size: 0.75rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            margin-bottom: 0.5rem !important;
+        }
+        .sub-title i {
+            color: var(--color-sage) !important;
+            margin-right: 0.375rem !important;
+        }
+
+        /* 🔥 Working Hours Row */
+        .working-hours-row {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 0.375rem 0 !important;
+            border-bottom: 1px solid var(--border-default) !important;
+        }
+        .working-hours-row:last-child {
+            border-bottom: none !important;
+        }
+        .working-hours-row .label {
+            font-size: 0.8125rem !important;
+            color: var(--color-brown-300) !important;
+        }
+        .working-hours-row .label.emergency {
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-sage) !important;
+        }
+
+        /* 🔥 Grid */
+        .profile-grid {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 1.5rem !important;
+        }
+        @media (min-width: 1024px) {
+            .profile-grid {
+                grid-template-columns: 2fr 1fr !important;
+            }
+        }
+
+        .form-grid-2 {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 0.75rem !important;
+        }
+        @media (min-width: 768px) {
+            .form-grid-2 {
+                grid-template-columns: 1fr 1fr !important;
+            }
+        }
+
+        /* 🔥 Footer actions */
+        .form-actions {
+            display: flex !important;
+            justify-content: flex-end !important;
+            gap: 0.75rem !important;
+            margin-top: 1.5rem !important;
+            padding-top: 1rem !important;
+            border-top: 1px solid var(--border-default) !important;
+        }
+
+        /* 🔥 Full width */
+        .full-width {
+            grid-column: 1 / -1 !important;
+        }
+
+        /* 🔥 Toast override */
+        .toast-notification {
+            position: fixed !important;
+            bottom: 1.5rem !important;
+            right: 1.5rem !important;
+            z-index: 9999 !important;
+            padding: 0.75rem 1.25rem !important;
+            border-radius: var(--radius-lg) !important;
+            background: var(--color-sage) !important;
+            color: white !important;
+            font-family: var(--font-family) !important;
+            font-size: 0.8125rem !important;
+            font-weight: var(--font-weight-light) !important;
+            box-shadow: var(--shadow-md) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+            animation: slideInRight 0.25s ease-out !important;
+        }
+        .toast-notification i {
+            font-size: 1rem !important;
+        }
+        .toast-notification.error {
+            background: var(--color-error-text) !important;
+        }
+        .toast-notification.success {
+            background: var(--color-sage) !important;
+        }
+        .toast-notification.info {
+            background: var(--color-info-text) !important;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
     </style>
 </head>
@@ -210,34 +347,29 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+    <main class="main-content" id="mainContent">
         
-        <div class="mb-6">
-            <h1 class="text-2xl md:text-3xl font-medium text-[#1e293b] mb-1">
-                <i class="fas fa-hospital text-[#a8c49a] mr-3"></i>Hospital Profile
-            </h1>
-            <p class="text-[#64748b] text-sm font-normal">Manage hospital information, contact details, and branding</p>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Stats Cards (Hidden - no stats needed for settings) -->
+        <!-- Profile Grid -->
+        <div class="profile-grid">
             
             <!-- Main Form -->
-            <div class="lg:col-span-2">
-                <div class="card-white p-6">
-                    <h2 class="text-base font-medium text-[#1e293b] mb-4 pb-2 border-b border-[#f0e8e0]">
-                        <i class="fas fa-building text-[#a8c49a] mr-2"></i>Basic Information
-                    </h2>
+            <div>
+                <div class="card-white">
+                    <div class="section-title">
+                        <i class="fas fa-building"></i> Basic Information
+                    </div>
                     <form id="profileForm">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="md:col-span-2">
-                                <label class="form-label">Hospital Name *</label>
-                                <input type="text" id="hospitalName" required class="form-input" placeholder="MedFlow Hospital">
-                                <div class="error-text" id="hospitalNameError">Hospital name is required</div>
+                        <div class="form-grid-2">
+                            <div class="full-width">
+                                <label class="form-label">Hospital Name <span style="color:var(--color-error-text);">*</span></label>
+                                <input type="text" id="hospitalName" required class="form-input" placeholder="MedFlow Multi-Speciality Hospital">
+                                <span class="error-text" id="hospitalNameError">Hospital name is required</span>
                             </div>
-                            <div class="md:col-span-2">
-                                <label class="form-label">Address *</label>
-                                <textarea id="address" rows="2" required class="form-input" placeholder="123 Healthcare Ave, Medical District"></textarea>
-                                <div class="error-text" id="addressError">Address is required</div>
+                            <div class="full-width">
+                                <label class="form-label">Address <span style="color:var(--color-error-text);">*</span></label>
+                                <textarea id="address" rows="2" required class="form-textarea" placeholder="123 Healthcare Avenue, Andheri East, Mumbai - 400001"></textarea>
+                                <span class="error-text" id="addressError">Address is required</span>
                             </div>
                             <div>
                                 <label class="form-label">City</label>
@@ -256,14 +388,14 @@
                                 <input type="text" id="country" class="form-input" placeholder="India">
                             </div>
                             <div>
-                                <label class="form-label">Phone Number *</label>
+                                <label class="form-label">Phone Number <span style="color:var(--color-error-text);">*</span></label>
                                 <input type="tel" id="phone" required class="form-input" placeholder="+91 22 1234 5678">
-                                <div class="error-text" id="phoneError">Phone number is required</div>
+                                <span class="error-text" id="phoneError">Phone number is required</span>
                             </div>
                             <div>
-                                <label class="form-label">Email *</label>
+                                <label class="form-label">Email <span style="color:var(--color-error-text);">*</span></label>
                                 <input type="email" id="email" required class="form-input" placeholder="info@medflow.com">
-                                <div class="error-text" id="emailError">Valid email is required</div>
+                                <span class="error-text" id="emailError">Valid email is required</span>
                             </div>
                             <div>
                                 <label class="form-label">Emergency Hotline</label>
@@ -275,11 +407,11 @@
                             </div>
                         </div>
                         
-                        <div class="mt-6 pt-4 border-t border-[#f0e8e0]">
-                            <h3 class="font-medium text-[#1e293b] text-sm mb-3">
-                                <i class="fas fa-file-invoice text-[#a8c49a] mr-2"></i>Registration & Tax Info
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div style="margin-top:1.5rem; padding-top:0.75rem; border-top:1px solid var(--border-default);">
+                            <div class="sub-title">
+                                <i class="fas fa-file-invoice"></i> Registration &amp; Tax Info
+                            </div>
+                            <div class="form-grid-2" style="margin-top:0.75rem;">
                                 <div>
                                     <label class="form-label">Registration Number</label>
                                     <input type="text" id="regNumber" class="form-input" placeholder="HOSP-2024-001">
@@ -299,9 +431,13 @@
                             </div>
                         </div>
                         
-                        <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-[#f0e8e0]">
-                            <button type="button" id="resetProfileBtn" class="btn-secondary">Reset</button>
-                            <button type="submit" class="btn-primary">Save Changes</button>
+                        <div class="form-actions">
+                            <button type="button" id="resetProfileBtn" class="btn-secondary">
+                                <i class="fas fa-undo-alt"></i> Reset
+                            </button>
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -310,42 +446,42 @@
             <!-- Right Column -->
             <div>
                 <!-- Logo Section -->
-                <div class="card-white p-6 mb-6">
-                    <h2 class="text-base font-medium text-[#1e293b] mb-4 pb-2 border-b border-[#f0e8e0]">
-                        <i class="fas fa-image text-[#a8c49a] mr-2"></i>Hospital Logo
-                    </h2>
-                    <div class="text-center">
+                <div class="card-white" style="margin-bottom:1.25rem;">
+                    <div class="section-title">
+                        <i class="fas fa-image"></i> Hospital Logo
+                    </div>
+                    <div style="text-align:center;">
                         <div id="logoPreview" class="logo-preview">H</div>
-                        <div class="mt-3">
+                        <div style="margin-top:0.5rem;">
                             <label class="upload-btn">
                                 <i class="fas fa-upload"></i> Upload Logo
-                                <input type="file" id="logoUpload" class="hidden" accept="image/*">
+                                <input type="file" id="logoUpload" class="hidden" accept="image/*" style="display:none;">
                             </label>
                         </div>
-                        <p class="text-xs text-[#94a3b8] mt-3">Recommended size: 200x200px<br>PNG, JPG or JPEG</p>
+                        <p style="font-size:0.625rem; color:var(--color-brown-100); margin-top:0.5rem;">Recommended: 200x200px<br>PNG, JPG or JPEG</p>
                     </div>
                 </div>
 
                 <!-- Working Hours Section -->
-                <div class="card-white p-6">
-                    <h2 class="text-base font-medium text-[#1e293b] mb-4 pb-2 border-b border-[#f0e8e0]">
-                        <i class="fas fa-clock text-[#a8c49a] mr-2"></i>Working Hours
-                    </h2>
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-[#475569]">Monday - Friday</span>
+                <div class="card-white">
+                    <div class="section-title">
+                        <i class="fas fa-clock"></i> Working Hours
+                    </div>
+                    <div>
+                        <div class="working-hours-row">
+                            <span class="label">Monday - Friday</span>
                             <input type="text" id="weekdayHours" class="working-hours-input" placeholder="9:00 AM - 8:00 PM">
                         </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-[#475569]">Saturday</span>
+                        <div class="working-hours-row">
+                            <span class="label">Saturday</span>
                             <input type="text" id="saturdayHours" class="working-hours-input" placeholder="9:00 AM - 5:00 PM">
                         </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-[#475569]">Sunday</span>
+                        <div class="working-hours-row">
+                            <span class="label">Sunday</span>
                             <input type="text" id="sundayHours" class="working-hours-input" placeholder="10:00 AM - 2:00 PM">
                         </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm font-medium text-[#a8c49a]">Emergency</span>
+                        <div class="working-hours-row">
+                            <span class="label emergency">Emergency</span>
                             <input type="text" id="emergencyHours" class="working-hours-input" value="24/7">
                         </div>
                     </div>
@@ -356,5 +492,21 @@
 
     <script src="../../js/core/common.js"></script>
     <script src="hospital-profile.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var checkSidebar = setInterval(function() {
+                var sidebar = document.getElementById('mainSidebar');
+                if (sidebar) {
+                    clearInterval(checkSidebar);
+                    document.getElementById('mainContent').classList.add('loaded');
+                }
+            }, 50);
+            setTimeout(function() {
+                document.getElementById('mainContent').classList.add('loaded');
+            }, 1000);
+        });
+    </script>
+    
 </body>
 </html>

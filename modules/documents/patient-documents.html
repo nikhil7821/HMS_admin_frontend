@@ -5,193 +5,378 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Patient Documents | Documents | MedFlow</title>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- ✅ CENTRALIZED THEME CSS -->
+    
+    <!-- Theme CSS -->
     <link rel="stylesheet" href="../../css/theme.css">
 
     <style>
-        /* Additional page-specific styles that align with theme */
-        .doc-card {
-            transition: var(--transition-base);
-            border-radius: var(--radius-lg);
-            background: var(--bg-card);
-            border: 1px solid var(--border-default);
-            overflow: hidden;
-        }
-        
-        .doc-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-            border-color: var(--color-sage-pale);
-        }
-        
-        /* Document Type Badges */
-        .badge-report {
-            background: var(--color-success-bg);
-            color: var(--color-success-text);
-            padding: 0.2rem 0.75rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-        }
-        
-        .badge-prescription {
-            background: var(--color-warning-bg);
-            color: var(--color-warning-text);
-            padding: 0.2rem 0.75rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-        }
-        
-        .badge-discharge {
-            background: var(--bg-muted);
-            color: var(--color-brown-400);
-            padding: 0.2rem 0.75rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-        }
-        
-        .badge-insurance {
-            background: var(--color-info-bg);
-            color: var(--color-info-text);
-            padding: 0.2rem 0.75rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-        }
-        
-        .badge-other {
-            background: var(--bg-hover);
-            color: var(--color-brown-300);
-            padding: 0.2rem 0.75rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-        }
-        
-        /* Modal overlay styles matching theme.css */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 50;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--bg-overlay);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
+        /* ============================================================
+           PATIENT DOCUMENTS MODULE — Page-specific only
+           ============================================================ */
+
+        /* 🔥 FIX: Prevent layout shift */
+        .main-content {
+            margin-left: 260px !important;
+            margin-top: 70px !important;
+            padding: 1.25rem 1.5rem !important;
+            transition: margin-left 0.3s ease !important;
+            min-height: 100vh !important;
             opacity: 0;
-            visibility: hidden;
-            transition: var(--transition-base);
-            overflow-y: auto;
+            animation: fadeIn 0.3s ease forwards;
         }
-        
-        .modal-overlay.active {
+        .main-content.loaded {
             opacity: 1;
-            visibility: visible;
         }
-        
-        .modal-overlay.active .form-card {
-            transform: scale(1);
+        #mainSidebar[data-collapsed="true"] ~ .main-content,
+        #mainSidebar[data-collapsed="true"] + .main-content {
+            margin-left: 72px !important;
         }
-        
-        .form-card {
-            transform: scale(0.96);
-            transition: var(--transition-base);
-            border-radius: var(--radius-lg);
-            background: var(--bg-card);
-            border: 1px solid var(--border-default);
-            border-top: 4px solid var(--color-sage);
-            width: 100%;
-            max-width: 32rem;
-            margin: 1rem;
-            box-shadow: var(--shadow-lg);
-            max-height: 90vh;
-            overflow-y: auto;
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 0 !important;
+                padding: 1rem !important;
+            }
         }
-        
-        .form-card-max-w-2xl {
-            max-width: 48rem;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        
-        .form-card-max-w-md {
-            max-width: 28rem;
+
+        /* 🔥 Page Header - Hidden */
+        .page-header {
+            display: none !important;
         }
-        
-        .error-message {
-            color: var(--color-error-text);
-            font-size: 0.6875rem;
-            margin-top: 0.25rem;
-            display: block;
-            font-weight: var(--font-weight-light);
+
+        /* 🔥 Stats Cards - Perfect Spacing */
+        .grid-stats {
+            gap: 1rem !important;
+            margin-bottom: 1.25rem !important;
         }
-        
-        .dropzone {
-            transition: var(--transition-base);
-            border: 2px dashed var(--border-input);
-            border-radius: var(--radius-lg);
-            cursor: pointer;
-            background: var(--bg-subtle);
+        .stat-card {
+            padding: 1rem 1.25rem !important;
+            border-radius: var(--radius-lg) !important;
         }
-        
-        .dropzone:hover {
-            border-color: var(--color-sage);
-            background-color: var(--bg-muted);
+        .stat-card .stat-value {
+            font-size: 1.5rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            margin-top: 0.125rem !important;
         }
-        
-        .dropzone-active {
-            border-color: var(--color-sage);
-            background-color: var(--bg-muted);
+        .stat-card .stat-label {
+            font-size: 0.625rem !important;
+            letter-spacing: 0.06em !important;
+            text-transform: uppercase !important;
+            color: var(--color-brown-200) !important;
         }
-        
-        .border-l-sage {
-            border-left-color: var(--color-sage) !important;
+        .stat-card .stat-icon-bg {
+            width: 2.5rem !important;
+            height: 2.5rem !important;
+            border-radius: var(--radius-md) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: var(--bg-muted) !important;
         }
-        
-        .border-l-sage-dark {
-            border-left-color: var(--color-sage-dark) !important;
+        .stat-card .stat-icon-bg i {
+            font-size: 1rem !important;
         }
-        
-        .border-l-gold {
-            border-left-color: var(--color-gold) !important;
+
+        /* 🔥 Filter Bar - Perfect Alignment */
+        .filter-bar {
+            padding: 0.625rem 1rem !important;
+            gap: 0.625rem !important;
+            margin-bottom: 1.25rem !important;
+            border-radius: var(--radius-lg) !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            display: flex !important;
+            align-items: center !important;
+            flex-wrap: nowrap !important;
         }
-        
-        .border-l-tan {
-            border-left-color: var(--color-warm-tan) !important;
+        .filter-bar .search-wrapper {
+            flex: 1 1 220px !important;
+            min-width: 160px !important;
+            max-width: 320px !important;
+            position: relative !important;
         }
-        
-        .grid-documents {
+        .filter-bar .search-wrapper i {
+            position: absolute !important;
+            left: 0.75rem !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            color: var(--color-brown-100);
+            font-size: 0.8125rem !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
+        }
+        .filter-bar .search-input {
+            width: 100% !important;
+            padding: 0.375rem 0.75rem 0.375rem 2.25rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            border-radius: var(--radius-md) !important;
+            border: 1px solid var(--border-input) !important;
+            background-color: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
+            font-family: var(--font-family) !important;
+        }
+        .filter-bar .search-input:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+            outline: none !important;
+        }
+        .filter-bar .form-select {
+            min-width: 130px !important;
+            max-width: 180px !important;
+            padding: 0.375rem 1.75rem 0.375rem 0.75rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            border: 1px solid var(--border-input) !important;
+            border-radius: var(--radius-md) !important;
+            background-color: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
+            cursor: pointer !important;
+            font-family: var(--font-family) !important;
+        }
+        .filter-bar .form-select:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+            outline: none !important;
+        }
+        .filter-bar .btn-primary,
+        .filter-bar .btn-secondary {
+            flex: 0 0 auto !important;
+            padding: 0.375rem 0.875rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            border-radius: var(--radius-md) !important;
+            white-space: nowrap !important;
+            font-family: var(--font-family) !important;
+            cursor: pointer !important;
+        }
+        .filter-bar .btn-primary {
+            background-color: var(--color-sage) !important;
+            color: white !important;
+            border: none !important;
+        }
+        .filter-bar .btn-primary:hover {
+            background-color: var(--color-sage-dark) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+            transform: translateY(-1px) !important;
+        }
+        .filter-bar .btn-secondary {
+            background-color: transparent !important;
+            color: var(--color-brown-200) !important;
+            border: 1px solid var(--border-input) !important;
+        }
+        .filter-bar .btn-secondary:hover {
+            background-color: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+            border-color: var(--color-brown-100) !important;
+        }
+
+        @media (max-width: 768px) {
+            .filter-bar {
+                flex-wrap: wrap !important;
+                gap: 0.5rem !important;
+                padding: 0.5rem 0.75rem !important;
+            }
+            .filter-bar .search-wrapper {
+                flex: 1 1 100% !important;
+                min-width: 100px !important;
+                max-width: 100% !important;
+            }
+            .filter-bar .form-select {
+                min-width: 90px !important;
+                max-width: 140px !important;
+                font-size: 0.75rem !important;
+                height: 32px !important;
+            }
+            .filter-bar .btn-primary span,
+            .filter-bar .btn-secondary span {
+                display: none !important;
+            }
+            .filter-bar .btn-primary,
+            .filter-bar .btn-secondary {
+                padding: 0.3rem 0.6rem !important;
+                font-size: 0.75rem !important;
+                height: 32px !important;
+            }
+        }
+
+        /* 🔥 Document Card */
+        .doc-card {
+            transition: all 0.25s ease !important;
+            border-radius: var(--radius-lg) !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            padding: 1rem 1.25rem !important;
+            box-shadow: var(--shadow-card) !important;
+        }
+        .doc-card:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: var(--shadow-md) !important;
+            border-color: var(--color-sage-pale) !important;
+        }
+
+        /* 🔥 Document Type Badges */
+        .badge-report {
+            background: var(--color-success-bg) !important;
+            color: var(--color-success-text) !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
+        .badge-prescription {
+            background: var(--color-warning-bg) !important;
+            color: var(--color-warning-text) !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
+        .badge-discharge {
+            background: var(--bg-muted) !important;
+            color: var(--color-brown-400) !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
+        .badge-insurance {
+            background: var(--color-info-bg) !important;
+            color: var(--color-info-text) !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
+        .badge-other {
+            background: var(--bg-hover) !important;
+            color: var(--color-brown-300) !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
+
+        /* 🔥 Card Button */
+        .card-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 0.375rem !important;
+            padding: 0.375rem 0.75rem !important;
+            border-radius: var(--radius-md) !important;
+            font-size: 0.6875rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            border: none !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            font-family: var(--font-family) !important;
+        }
+        .card-btn-primary {
+            background-color: var(--color-sage) !important;
+            color: white !important;
+        }
+        .card-btn-primary:hover {
+            background-color: var(--color-sage-dark) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+        }
+        .card-btn-danger {
+            background-color: var(--color-warm-tan) !important;
+            color: white !important;
+        }
+        .card-btn-danger:hover {
+            background-color: var(--color-warm-tan-dark) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* 🔥 Documents Grid */
+        .docs-grid {
             display: grid;
-            grid-template-columns: repeat(1, 1fr);
-            gap: 1.25rem;
+            grid-template-columns: 1fr;
+            gap: 1rem !important;
         }
-        
-        @media (min-width: 768px) {
-            .grid-documents {
+        @media (min-width: 640px) {
+            .docs-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
-        
         @media (min-width: 1024px) {
-            .grid-documents {
+            .docs-grid {
                 grid-template-columns: repeat(3, 1fr);
             }
         }
+
+        /* 🔥 Dropzone */
+        .dropzone {
+            transition: all 0.2s ease !important;
+            border: 2px dashed var(--border-input) !important;
+            border-radius: var(--radius-lg) !important;
+            cursor: pointer !important;
+            background: var(--bg-subtle) !important;
+            padding: 1.5rem !important;
+            text-align: center !important;
+        }
+        .dropzone:hover {
+            border-color: var(--color-sage) !important;
+            background-color: var(--bg-muted) !important;
+        }
+        .dropzone-active {
+            border-color: var(--color-sage) !important;
+            background-color: var(--bg-muted) !important;
+        }
+        .dropzone i {
+            font-size: 2rem !important;
+            color: var(--color-brown-100) !important;
+            margin-bottom: 0.5rem !important;
+            display: block !important;
+        }
+        .dropzone p {
+            font-size: 0.8125rem !important;
+            color: var(--color-brown-200) !important;
+        }
+        .dropzone .sub-text {
+            font-size: 0.6875rem !important;
+            color: var(--color-brown-100) !important;
+            margin-top: 0.25rem !important;
+        }
+
+        /* 🔥 Modal - Error message */
+        .error-message {
+            color: var(--color-error-text) !important;
+            font-size: 0.6875rem !important;
+            margin-top: 0.25rem !important;
+            display: block !important;
+            font-weight: var(--font-weight-light) !important;
+        }
+        .form-input.error,
+        .form-select.error {
+            border-color: var(--color-error-text) !important;
+        }
+
+        /* 🔥 Stat Card Border Colors */
+        .stat-card-sage { border-left: 4px solid var(--color-sage) !important; }
+        .stat-card-sage-dark { border-left: 4px solid var(--color-sage-dark) !important; }
+        .stat-card-gold { border-left: 4px solid var(--color-gold) !important; }
+        .stat-card-tan { border-left: 4px solid var(--color-warm-tan) !important; }
+
+        /* 🔥 Color helpers */
+        .text-sage-dark { color: var(--color-sage-dark) !important; }
+        .text-gold { color: var(--color-gold) !important; }
+        .text-tan { color: var(--color-warm-tan) !important; }
     </style>
 </head>
 <body class="bg-subtle">
@@ -199,138 +384,115 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+    <main class="main-content" id="mainContent">
         
-        <!-- Page Header matching theme -->
-        <div class="page-header mb-6">
-            <div class="page-header-left">
-                <div class="page-header-icon">
-                    <i class="fas fa-folder-open"></i>
-                </div>
-                <div>
-                    <h1 class="page-header-title">Patient Documents</h1>
-                    <p class="page-header-subtitle">Manage patient medical records, reports, and documents</p>
-                </div>
-            </div>
-            <div class="page-header-actions">
-                <button id="uploadDocBtn" class="btn-primary">
-                    <i class="fas fa-upload text-sm"></i>
-                    <span>Upload Document</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Stats Cards using theme classes -->
-        <div class="grid-stats mb-8">
-            <div class="stat-card" style="border-left: 4px solid var(--color-sage);">
-                <div class="flex justify-between items-start">
+        <!-- Stats Cards -->
+        <div class="grid-stats">
+            <div class="stat-card stat-card-sage">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Total Documents</p>
                         <p class="stat-value" id="totalDocs">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-folder-open text-sage text-lg"></i>
+                        <i class="fas fa-folder-open" style="color:var(--color-sage);"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid var(--color-sage-dark);">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-sage-dark">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Reports</p>
                         <p class="stat-value text-sage-dark" id="reportCount">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-file-alt text-sage-dark"></i>
+                        <i class="fas fa-file-alt" style="color:var(--color-sage-dark);"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid var(--color-gold);">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-gold">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Prescriptions</p>
                         <p class="stat-value text-gold" id="prescriptionCount">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-prescription-bottle text-gold"></i>
+                        <i class="fas fa-prescription-bottle" style="color:var(--color-gold);"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid var(--color-warm-tan);">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-tan">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Other Files</p>
                         <p class="stat-value text-tan" id="otherCount">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-file text-tan"></i>
+                        <i class="fas fa-file" style="color:var(--color-warm-tan);"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Filter Bar using theme classes -->
+        <!-- Filter Bar -->
         <div class="filter-bar">
-            <div class="relative flex-1">
-                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-brown-100 text-sm"></i>
-                <input type="text" id="searchInput" placeholder="Search by patient name or document title..." 
-                       class="search-input pl-10">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by patient or document title...">
             </div>
-            <div class="w-full md:w-56">
-                <select id="patientFilter" class="form-select">
-                    <option value="">All Patients</option>
-                </select>
-            </div>
-            <div class="w-full md:w-48">
-                <select id="typeFilter" class="form-select">
-                    <option value="">All Types</option>
-                    <option value="Report">Medical Report</option>
-                    <option value="Prescription">Prescription</option>
-                    <option value="Discharge Summary">Discharge Summary</option>
-                    <option value="Insurance">Insurance</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
+            <select id="patientFilter" class="form-select">
+                <option value="">All Patients</option>
+            </select>
+            <select id="typeFilter" class="form-select">
+                <option value="">All Types</option>
+                <option value="Report">Medical Report</option>
+                <option value="Prescription">Prescription</option>
+                <option value="Discharge Summary">Discharge Summary</option>
+                <option value="Insurance">Insurance</option>
+                <option value="Other">Other</option>
+            </select>
             <button id="resetFilter" class="btn-secondary">
-                <i class="fas fa-undo-alt mr-1"></i> Reset
+                <i class="fas fa-undo-alt"></i>
+                <span>Reset</span>
+            </button>
+            <button id="uploadDocBtn" class="btn-primary">
+                <i class="fas fa-upload"></i>
+                <span>Upload</span>
             </button>
         </div>
 
         <!-- Documents Grid -->
-        <div id="documentsGrid" class="grid-documents">
-            <div class="col-span-full text-center py-12 text-brown-100">
-                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
-                <p class="font-light">Loading documents...</p>
+        <div class="docs-grid" id="documentsGrid">
+            <div style="grid-column:1/-1; text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
+                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
+                <p style="font-weight:var(--font-weight-light);">Loading documents...</p>
             </div>
         </div>
     </main>
 
-    <!-- Upload Document Modal - Matching theme.css structure -->
-    <div id="uploadModal" class="modal-overlay">
-        <div class="form-card">
-            <div class="flex justify-between items-center p-5 border-b border-default">
+    <!-- Upload Document Modal -->
+    <div id="uploadModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="form-card" style="max-width:32rem;">
+            <div class="modal-header">
                 <h3 class="modal-title">
-                    <i class="fas fa-upload text-sage"></i> Upload Document
+                    <i class="fas fa-upload"></i> Upload Document
                 </h3>
-                <button id="closeUploadModalBtn" class="close-btn">
-                    <i class="fas fa-times text-lg"></i>
+                <button class="close-btn" id="closeUploadModalBtn" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
             <form id="uploadForm">
                 <input type="hidden" id="docId">
-                <div class="p-5 space-y-4">
+                <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Select Patient <span class="text-error-text">*</span></label>
+                        <label class="form-label">Select Patient <span style="color:var(--color-error-text);">*</span></label>
                         <select id="patientId" class="form-select" required>
                             <option value="">-- Select Patient --</option>
                         </select>
                         <span class="error-message" id="patientError"></span>
                     </div>
-                    
                     <div class="form-group">
-                        <label class="form-label">Document Type <span class="text-error-text">*</span></label>
+                        <label class="form-label">Document Type <span style="color:var(--color-error-text);">*</span></label>
                         <select id="docType" class="form-select" required>
                             <option value="">-- Select Type --</option>
                             <option value="Report">Medical Report</option>
@@ -341,78 +503,91 @@
                         </select>
                         <span class="error-message" id="docTypeError"></span>
                     </div>
-                    
                     <div class="form-group">
-                        <label class="form-label">Document Title <span class="text-error-text">*</span></label>
+                        <label class="form-label">Document Title <span style="color:var(--color-error-text);">*</span></label>
                         <input type="text" id="docTitle" class="form-input" placeholder="e.g., Blood Test Report - June 2024" autocomplete="off">
                         <span class="error-message" id="titleError"></span>
                     </div>
-                    
                     <div class="form-group">
                         <label class="form-label">Description</label>
-                        <textarea id="docDesc" rows="3" class="form-textarea" placeholder="Brief description of the document..."></textarea>
+                        <textarea id="docDesc" rows="2" class="form-textarea" placeholder="Brief description of the document..."></textarea>
                     </div>
-                    
                     <div class="form-group">
                         <label class="form-label">Upload File</label>
-                        <div id="dropZone" class="dropzone p-6 text-center">
-                            <i class="fas fa-cloud-upload-alt text-2xl text-brown-100 mb-2 block"></i>
-                            <p class="text-brown-200 text-sm">Click or drag file to upload</p>
-                            <p class="text-brown-100 text-xs mt-1">PDF, JPG, PNG, DOC (Max 10MB)</p>
+                        <div id="dropZone" class="dropzone">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Click or drag file to upload</p>
+                            <p class="sub-text">PDF, JPG, PNG, DOC (Max 10MB)</p>
                             <input type="file" id="fileInput" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
                         </div>
-                        <div id="fileNameDisplay" class="mt-2 text-xs text-sage hidden"></div>
+                        <div id="fileNameDisplay" class="hidden" style="margin-top:0.5rem; font-size:0.75rem; color:var(--color-sage);"></div>
                     </div>
-                    
-                    <div class="form-group">
+                    <div class="form-group" style="margin-bottom:0;">
                         <label class="form-label">Upload Date</label>
                         <input type="date" id="uploadDate" class="form-input">
                         <span class="error-message" id="dateError"></span>
                     </div>
                 </div>
-                <div class="p-5 bg-subtle flex justify-end gap-3 border-t border-default">
+                <div class="modal-footer">
                     <button type="button" id="cancelUploadBtn" class="btn-secondary">Cancel</button>
                     <button type="submit" class="btn-primary">
-                        <i class="fas fa-save mr-2 text-xs"></i>Upload Document
+                        <i class="fas fa-save"></i> Upload Document
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- View Document Modal - Matching theme.css structure -->
-    <div id="viewModal" class="modal-overlay">
-        <div class="form-card form-card-max-w-2xl">
-            <div class="flex justify-between items-center p-5 border-b border-default">
-                <h3 id="viewTitle" class="modal-title">
-                    <i class="fas fa-file-alt text-sage"></i> Document Details
+    <!-- View Document Modal -->
+    <div id="viewModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="form-card" style="max-width:44rem;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="viewTitle">
+                    <i class="fas fa-file-alt"></i> Document Details
                 </h3>
-                <div class="flex gap-2">
-                    <button id="downloadDocBtn" class="btn-primary text-sm px-3 py-1.5">
-                        <i class="fas fa-download mr-1"></i> Download
+                <div style="display:flex; gap:0.5rem;">
+                    <button id="downloadDocBtn" class="btn-secondary" style="padding:0.3rem 0.75rem; font-size:0.75rem;">
+                        <i class="fas fa-download"></i> Download
                     </button>
-                    <button id="closeViewModalBtn" class="close-btn">
-                        <i class="fas fa-times text-lg"></i>
+                    <button class="close-btn" id="closeViewModalBtn" aria-label="Close view modal">
+                        <i class="fas fa-times"></i>
                     </button>
                 </div>
             </div>
-            <div id="viewContent" class="p-5"></div>
+            <div id="viewContent" class="modal-body"></div>
+            <div class="modal-footer">
+                <button type="button" id="closeViewFooterBtn" class="btn-secondary">Close</button>
+            </div>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal - Matching theme.css structure -->
-    <div id="deleteModal" class="modal-overlay">
-        <div class="form-card form-card-max-w-md text-center">
-            <div class="p-6">
-                <div class="w-14 h-14 bg-error-bg rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-trash-alt text-error-text text-xl"></i>
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal-overlay modal-danger" role="dialog" aria-modal="true">
+        <div class="form-card" style="max-width:26rem; border-top-color:#ef4444;">
+            <div class="modal-header">
+                <h3 class="modal-title" style="color:var(--color-brown-700);">
+                    <i class="fas fa-triangle-exclamation" style="color:#ef4444;"></i> Confirm Delete
+                </h3>
+                <button class="close-btn" id="closeDeleteModalBtn" aria-label="Close delete modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="text-align:center; padding:1.75rem 1.25rem;">
+                <div style="width:3.5rem; height:3.5rem; border-radius:50%; background-color:#fee2e2; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; color:#dc2626; font-size:1.25rem;">
+                    <i class="fas fa-trash-alt"></i>
                 </div>
-                <h3 class="text-base font-medium text-brown-700 mb-2">Delete Document?</h3>
-                <p class="text-brown-300 text-sm mb-6">This action cannot be undone.</p>
-                <div class="flex gap-3 justify-center">
-                    <button id="cancelDeleteBtn" class="btn-secondary px-4 py-2">Cancel</button>
-                    <button id="confirmDeleteBtn" class="btn-danger px-4 py-2">Delete</button>
-                </div>
+                <p style="font-size:0.9375rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin-bottom:0.5rem;">
+                    Delete Document?
+                </p>
+                <p style="font-size:0.8125rem; color:var(--color-brown-300); font-weight:var(--font-weight-light); line-height:1.6;">
+                    This action cannot be undone. This document will be permanently removed.
+                </p>
+            </div>
+            <div class="modal-footer" style="justify-content:center;">
+                <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
+                <button id="confirmDeleteBtn" class="btn-danger">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
             </div>
         </div>
     </div>
@@ -420,6 +595,21 @@
     <script src="../../js/core/common.js"></script>
     <script src="../../js/core/form-validation.js"></script>
     <script src="patient-documents.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var checkSidebar = setInterval(function() {
+                var sidebar = document.getElementById('mainSidebar');
+                if (sidebar) {
+                    clearInterval(checkSidebar);
+                    document.getElementById('mainContent').classList.add('loaded');
+                }
+            }, 50);
+            setTimeout(function() {
+                document.getElementById('mainContent').classList.add('loaded');
+            }, 1000);
+        });
+    </script>
     
 </body>
 </html>

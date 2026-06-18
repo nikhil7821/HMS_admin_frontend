@@ -1,46 +1,100 @@
 /**
  * Lab Requests Management JS - Laboratory Module
- * Professional UI, Fully Working, Indian Names, Rupee Symbol
+ * Uses theme.css for styling, clean event handling
  */
 
 let labRequests = [];
 let patients = [];
 let labTests = [];
-let deleteId = null;
+let deleteTargetId = null;
+let searchTerm = '';
+let statusFilter = '';
+let dateFrom = '';
+let dateTo = '';
+let isInitialized = false;
 
-function loadData() {
-    patients = JSON.parse(localStorage.getItem('hms_patients') || '[]');
-    labTests = JSON.parse(localStorage.getItem('lab_tests') || '[]');
-    
-    const stored = localStorage.getItem('lab_requests');
-    if(stored) {
-        labRequests = JSON.parse(stored);
-        // Check and reset if foreign names exist
-        if (labRequests[0] && (labRequests[0].patientName === 'John Doe' || labRequests[0].patientName === 'Jane Smith')) {
-            setIndianRequests();
-        }
-    } else {
-        setIndianRequests();
-    }
-    updateStats();
-    renderTable();
-    populateSelects();
+// ─── Utility Functions ──────────────────────────────
+
+function esc(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
 }
 
-function setIndianRequests() {
-    const today = new Date().toISOString().split('T')[0];
-    labRequests = [
-        {id: 1, requestNo: 'LAB-20260001', patientId: 1, patientName: 'Rajesh Kumar', testId: 1, testName: 'Complete Blood Count', testPrice: 500, requestDate: today, doctorName: 'Dr. Anjali Nair', status: 'Completed', result: 'All values normal', normalRange: '4.5-11.0', remarks: '', notes: 'Routine checkup'},
-        {id: 2, requestNo: 'LAB-20260002', patientId: 2, patientName: 'Priya Sharma', testId: 2, testName: 'Blood Sugar Fasting', testPrice: 200, requestDate: today, doctorName: 'Dr. Vikram Singh', status: 'Pending', result: '', normalRange: '', remarks: '', notes: ''},
-        {id: 3, requestNo: 'LAB-20260003', patientId: 3, patientName: 'Amit Patel', testId: 3, testName: 'Lipid Profile', testPrice: 800, requestDate: today, doctorName: 'Dr. Sneha Joshi', status: 'In Progress', result: '', normalRange: '', remarks: '', notes: ''},
-        {id: 4, requestNo: 'LAB-20260004', patientId: 4, patientName: 'Neha Gupta', testId: 4, testName: 'Urine Culture', testPrice: 600, requestDate: today, doctorName: 'Dr. Rajiv Menon', status: 'Pending', result: '', normalRange: '', remarks: '', notes: ''}
-    ];
-    saveRequests();
+// ─── Toast Notification ──────────────────────────────
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    const icons = { success: 'fa-check-circle', error: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+    const colors = { success: '#8aae7a', error: '#d8b48c', info: '#a8c49a' };
+    
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border-radius: 12px;
+        background: ${colors[type]};
+        color: white;
+        font-weight: 500;
+        font-size: 0.75rem;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        animation: slideInRight 0.25s ease-out;
+        font-family: 'Poppins', system-ui, sans-serif;
+    `;
+    toast.innerHTML = `<i class="fas ${icons[type]}"></i><span>${esc(message)}</span>`;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 250);
+    }, 3000);
+}
+
+// ─── Data Management ──────────────────────────────
+
+function loadData() {
+    try {
+        patients = JSON.parse(localStorage.getItem('hms_patients') || '[]');
+        labTests = JSON.parse(localStorage.getItem('lab_tests') || '[]');
+        
+        const stored = localStorage.getItem('lab_requests');
+        if (stored) {
+            labRequests = JSON.parse(stored);
+        } else {
+            const today = new Date().toISOString().split('T')[0];
+            labRequests = [
+                {id: 1, requestNo: 'LAB-20260001', patientId: 1, patientName: 'Rajesh Kumar', testId: 1, testName: 'Complete Blood Count', testPrice: 500, requestDate: today, doctorName: 'Dr. Anjali Nair', status: 'Completed', result: 'All values normal', normalRange: '4.5-11.0', remarks: '', notes: 'Routine checkup'},
+                {id: 2, requestNo: 'LAB-20260002', patientId: 2, patientName: 'Priya Sharma', testId: 2, testName: 'Blood Sugar Fasting', testPrice: 200, requestDate: today, doctorName: 'Dr. Vikram Singh', status: 'Pending', result: '', normalRange: '', remarks: '', notes: ''},
+                {id: 3, requestNo: 'LAB-20260003', patientId: 3, patientName: 'Amit Patel', testId: 3, testName: 'Lipid Profile', testPrice: 800, requestDate: today, doctorName: 'Dr. Sneha Joshi', status: 'In Progress', result: '', normalRange: '', remarks: '', notes: ''},
+                {id: 4, requestNo: 'LAB-20260004', patientId: 4, patientName: 'Neha Gupta', testId: 4, testName: 'Urine Culture', testPrice: 600, requestDate: today, doctorName: 'Dr. Rajiv Menon', status: 'Pending', result: '', normalRange: '', remarks: '', notes: ''}
+            ];
+            saveRequests();
+        }
+        refreshUI();
+        populateSelects();
+    } catch (error) {
+        console.error('Error loading data:', error);
+        showToast('Error loading request data', 'error');
+    }
 }
 
 function saveRequests() {
-    localStorage.setItem('lab_requests', JSON.stringify(labRequests));
+    try {
+        localStorage.setItem('lab_requests', JSON.stringify(labRequests));
+    } catch (error) {
+        console.error('Error saving requests:', error);
+    }
 }
+
+// ─── Stats ──────────────────────────────────────────
 
 function updateStats() {
     const pending = labRequests.filter(r => r.status === 'Pending').length;
@@ -48,11 +102,129 @@ function updateStats() {
     const completed = labRequests.filter(r => r.status === 'Completed').length;
     const revenue = labRequests.filter(r => r.status === 'Completed').reduce((sum, r) => sum + (r.testPrice || 0), 0);
     
-    document.getElementById('pendingCount').innerText = pending;
-    document.getElementById('inProgressCount').innerText = inProgress;
-    document.getElementById('completedCount').innerText = completed;
-    document.getElementById('totalRevenue').innerText = '₹' + revenue.toLocaleString('en-IN');
+    document.getElementById('pendingCount').textContent = pending;
+    document.getElementById('inProgressCount').textContent = inProgress;
+    document.getElementById('completedCount').textContent = completed;
+    document.getElementById('totalRevenue').textContent = '₹' + revenue.toLocaleString('en-IN');
 }
+
+// ─── Filter ──────────────────────────────────────────
+
+function getFilteredRequests() {
+    return labRequests.filter(req => {
+        const matchesSearch = searchTerm === '' || 
+            req.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            req.testName.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        const matchesStatus = statusFilter === '' || req.status === statusFilter;
+        const matchesDateFrom = dateFrom === '' || req.requestDate >= dateFrom;
+        const matchesDateTo = dateTo === '' || req.requestDate <= dateTo;
+        
+        return matchesSearch && matchesStatus && matchesDateFrom && matchesDateTo;
+    });
+}
+
+// ─── Render ──────────────────────────────────────────
+
+function renderTable() {
+    const tbody = document.getElementById('requestsTable');
+    if (!tbody) return;
+    
+    const filtered = getFilteredRequests();
+    
+    if (filtered.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="requests-empty">
+                    <i class="fas fa-flask"></i>
+                    <p>No requests found</p>
+                    <p style="font-size:0.75rem; margin-top:0.25rem;">Create a new request to get started.</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    // Sort by date descending (newest first)
+    const sorted = [...filtered].sort((a, b) => new Date(b.requestDate) - new Date(a.requestDate));
+    
+    tbody.innerHTML = sorted.map(req => {
+        const statusClass = req.status === 'Pending' ? 'pending' : 
+                           req.status === 'In Progress' ? 'progress' : 
+                           'completed';
+        const hasResult = req.result && req.result.trim();
+        const resultClass = hasResult ? 'result-cell has-result' : 'result-cell';
+        
+        return `
+            <tr class="request-row" data-id="${req.id}">
+                <td class="request-id">${req.requestNo}</td>
+                <td class="patient-name">${esc(req.patientName)}</td>
+                <td class="test-name">${esc(req.testName)}</td>
+                <td style="color:var(--color-brown-300); font-size:0.8125rem;">${req.requestDate}</td>
+                <td><span class="status-${statusClass}">${req.status}</span></td>
+                <td class="${resultClass}">${hasResult ? esc(req.result.substring(0, 40)) + (req.result.length > 40 ? '...' : '') : '-'}</td>
+                <td style="text-align:center;">
+                    <div style="display:flex; gap:0.25rem; justify-content:center;">
+                        ${req.status !== 'Completed' ? `
+                            <button class="action-btn upload upload-btn" data-id="${req.id}" title="Upload Result">
+                                <i class="fas fa-upload"></i>
+                            </button>
+                        ` : `
+                            <button class="action-btn view view-btn" data-id="${req.id}" title="View Result">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        `}
+                        <button class="action-btn status status-btn" data-id="${req.id}" title="Update Status">
+                            <i class="fas fa-exchange-alt"></i>
+                        </button>
+                        <button class="action-btn delete delete-btn" data-id="${req.id}" title="Delete">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+    
+    // Bind events
+    tbody.querySelectorAll('.upload-btn').forEach(btn => {
+        btn.addEventListener('click', () => openUploadModal(parseInt(btn.dataset.id)));
+    });
+    tbody.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', () => viewResult(parseInt(btn.dataset.id)));
+    });
+    tbody.querySelectorAll('.status-btn').forEach(btn => {
+        btn.addEventListener('click', () => updateStatus(parseInt(btn.dataset.id)));
+    });
+    tbody.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => openDeleteModal(parseInt(btn.dataset.id)));
+    });
+}
+
+function refreshUI() {
+    updateStats();
+    renderTable();
+}
+
+// ─── Populate Selects ──────────────────────────────
+
+function populateSelects() {
+    // Patient select
+    const patientSelect = document.getElementById('patientId');
+    if (patientSelect) {
+        patientSelect.innerHTML = '<option value="">-- Select Patient --</option>' + 
+            patients.map(p => `<option value="${p.id}">${esc(p.fullName)} (${p.phone})</option>`).join('');
+    }
+    
+    // Test select
+    const testSelect = document.getElementById('testId');
+    if (testSelect) {
+        testSelect.innerHTML = '<option value="">-- Select Test --</option>' + 
+            labTests.map(t => `<option value="${t.id}" data-price="${t.price}">${esc(t.name)} - ₹${t.price.toLocaleString('en-IN')}</option>`).join('');
+    }
+}
+
+// ─── Validation ──────────────────────────────────────
 
 function validateRequestForm() {
     let isValid = true;
@@ -60,22 +232,19 @@ function validateRequestForm() {
     const patientId = document.getElementById('patientId').value;
     const testId = document.getElementById('testId').value;
     
+    document.querySelectorAll('.error-text').forEach(el => el.classList.remove('show'));
+    document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
+    
     if (!patientId) {
         document.getElementById('patientIdError').classList.add('show');
         document.getElementById('patientId').classList.add('error');
         isValid = false;
-    } else {
-        document.getElementById('patientIdError').classList.remove('show');
-        document.getElementById('patientId').classList.remove('error');
     }
     
     if (!testId) {
         document.getElementById('testIdError').classList.add('show');
         document.getElementById('testId').classList.add('error');
         isValid = false;
-    } else {
-        document.getElementById('testIdError').classList.remove('show');
-        document.getElementById('testId').classList.remove('error');
     }
     
     return isValid;
@@ -85,104 +254,74 @@ function validateResultForm() {
     let isValid = true;
     const resultValue = document.getElementById('resultValue').value.trim();
     
+    document.getElementById('resultValueError').classList.remove('show');
+    document.getElementById('resultValue').classList.remove('error');
+    
     if (!resultValue) {
         document.getElementById('resultValueError').classList.add('show');
         document.getElementById('resultValue').classList.add('error');
         isValid = false;
-    } else {
-        document.getElementById('resultValueError').classList.remove('show');
-        document.getElementById('resultValue').classList.remove('error');
     }
     
     return isValid;
 }
 
-function renderTable() {
-    const search = document.getElementById('searchInput')?.value.toLowerCase() || '';
-    const status = document.getElementById('statusFilter')?.value || '';
-    const dateFrom = document.getElementById('dateFrom')?.value || '';
-    const dateTo = document.getElementById('dateTo')?.value || '';
-    
-    let filtered = labRequests.filter(req => {
-        const matchesSearch = search === '' || 
-            req.patientName.toLowerCase().includes(search) || 
-            req.testName.toLowerCase().includes(search);
-        const matchesStatus = status === '' || req.status === status;
-        const matchesDateFrom = dateFrom === '' || req.requestDate >= dateFrom;
-        const matchesDateTo = dateTo === '' || req.requestDate <= dateTo;
-        return matchesSearch && matchesStatus && matchesDateFrom && matchesDateTo;
-    });
-    
-    const tbody = document.getElementById('requestsTable');
-    if(filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-[#94a3b8]"><i class="fas fa-flask text-3xl mb-2 block"></i><p class="font-normal">No requests found</p> </td></tr>';
-        return;
-    }
-    
-    tbody.innerHTML = filtered.map(req => `
-        <tr class="request-row">
-            <td class="px-5 py-3 text-sm font-mono font-medium text-[#1e293b]">${req.requestNo}</td>
-            <td class="px-5 py-3 font-medium text-[#1e293b] text-sm">${escapeHtml(req.patientName)}</td>
-            <td class="px-5 py-3 text-[#475569] text-sm">${escapeHtml(req.testName)}</td>
-            <td class="px-5 py-3 text-sm text-[#475569]">${req.requestDate}</td>
-            <td class="px-5 py-3">
-                <span class="status-${req.status === 'Pending' ? 'pending' : req.status === 'In Progress' ? 'progress' : 'completed'}">
-                    ${req.status}
-                </span>
-            </td>
-            <td class="px-5 py-3 text-sm text-[#475569] max-w-[150px] truncate">
-                ${req.result ? escapeHtml(req.result.substring(0, 40)) + (req.result.length > 40 ? '...' : '') : '-'}
-            </td>
-            <td class="px-5 py-3 text-center">
-                <div class="flex gap-2 justify-center">
-                    ${req.status !== 'Completed' ? `
-                        <button onclick="uploadResult(${req.id})" class="text-[#10b981] hover:text-[#059669] transition" title="Upload Result">
-                            <i class="fas fa-upload"></i>
-                        </button>
-                    ` : `
-                        <button onclick="viewResult(${req.id})" class="text-[#a8c49a] hover:text-[#7a9a68] transition" title="View Result">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    `}
-                    <button onclick="updateStatus(${req.id})" class="text-[#f59e0b] hover:text-[#d97706] transition" title="Update Status">
-                        <i class="fas fa-exchange-alt"></i>
-                    </button>
-                    <button onclick="deleteRequest(${req.id})" class="text-[#d8b48c] hover:text-[#c49a6c] transition" title="Delete">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </div>
-            </td>
-          </tr>
-    `).join('');
-}
+// ─── Modals ──────────────────────────────────────────
 
-function populateSelects() {
-    const patientSelect = document.getElementById('patientId');
-    if(patientSelect) {
-        patientSelect.innerHTML = '<option value="">-- Select Patient --</option>' + 
-            patients.map(p => `<option value="${p.id}">${escapeHtml(p.fullName)} (${p.phone})</option>`).join('');
-    }
-    
-    const testSelect = document.getElementById('testId');
-    if(testSelect) {
-        testSelect.innerHTML = '<option value="">-- Select Test --</option>' + 
-            labTests.map(t => `<option value="${t.id}" data-price="${t.price}">${escapeHtml(t.name)} - ₹${t.price.toLocaleString('en-IN')}</option>`).join('');
+function openModal(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.add('opacity-100', 'visible');
     }
 }
 
-function openRequestModal() {
+function closeModal(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.remove('opacity-100', 'visible');
+    }
+}
+
+function openAddModal() {
     document.getElementById('requestForm').reset();
-    document.getElementById('requestModal').classList.add('active');
-    populateSelects();
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-flask"></i> New Lab Request';
+    
+    // Set default date to today
+    const today = new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById('requestDate');
+    if (dateInput) dateInput.value = today;
     
     document.querySelectorAll('.error-text').forEach(el => el.classList.remove('show'));
     document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
+    populateSelects();
+    openModal('requestModal');
 }
+
+function openUploadModal(id) {
+    const request = labRequests.find(r => r.id === id);
+    if (request) {
+        document.getElementById('resultRequestId').value = id;
+        document.getElementById('resultValue').value = request.result || '';
+        document.getElementById('normalRangeRef').value = request.normalRange || '';
+        document.getElementById('remarks').value = request.remarks || '';
+        document.getElementById('resultStatus').value = request.status || 'Completed';
+        document.querySelectorAll('.error-text').forEach(el => el.classList.remove('show'));
+        document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
+        openModal('resultModal');
+    }
+}
+
+function openDeleteModal(id) {
+    deleteTargetId = id;
+    openModal('deleteModal');
+}
+
+// ─── Form Submit - Request ──────────────────────────
 
 function createRequest(e) {
     e.preventDefault();
     
-    if(!validateRequestForm()) {
+    if (!validateRequestForm()) {
         showToast('Please select both patient and test', 'error');
         return;
     }
@@ -191,6 +330,7 @@ function createRequest(e) {
     const testId = parseInt(document.getElementById('testId').value);
     const patient = patients.find(p => p.id === patientId);
     const test = labTests.find(t => t.id === testId);
+    const requestDate = document.getElementById('requestDate').value || new Date().toISOString().split('T')[0];
     
     if (!patient || !test) {
         showToast('Invalid patient or test selection', 'error');
@@ -208,9 +348,9 @@ function createRequest(e) {
         testId: testId,
         testName: test.name,
         testPrice: test.price,
-        requestDate: new Date().toISOString().split('T')[0],
-        doctorName: document.getElementById('doctorName').value,
-        notes: document.getElementById('notes').value,
+        requestDate: requestDate,
+        doctorName: document.getElementById('doctorName').value.trim(),
+        notes: document.getElementById('notes').value.trim(),
         status: 'Pending',
         result: '',
         normalRange: '',
@@ -218,30 +358,17 @@ function createRequest(e) {
     });
     
     saveRequests();
-    updateStats();
-    renderTable();
-    closeRequestModal();
-    showToast(`Lab request created! Request ID: ${requestNo}`, 'success');
+    refreshUI();
+    closeModal('requestModal');
+    showToast(`✅ Lab request created! Request ID: ${requestNo}`, 'success');
 }
 
-function uploadResult(requestId) {
-    const request = labRequests.find(r => r.id === requestId);
-    if(request) {
-        document.getElementById('resultRequestId').value = requestId;
-        document.getElementById('resultValue').value = request.result || '';
-        document.getElementById('normalRangeRef').value = request.normalRange || '';
-        document.getElementById('remarks').value = request.remarks || '';
-        document.getElementById('resultModal').classList.add('active');
-        
-        document.querySelectorAll('.error-text').forEach(el => el.classList.remove('show'));
-        document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
-    }
-}
+// ─── Form Submit - Result ──────────────────────────
 
 function saveResult(e) {
     e.preventDefault();
     
-    if(!validateResultForm()) {
+    if (!validateResultForm()) {
         showToast('Please enter test results', 'error');
         return;
     }
@@ -249,175 +376,209 @@ function saveResult(e) {
     const requestId = parseInt(document.getElementById('resultRequestId').value);
     const request = labRequests.find(r => r.id === requestId);
     
-    if(request) {
-        request.result = document.getElementById('resultValue').value;
-        request.normalRange = document.getElementById('normalRangeRef').value;
-        request.remarks = document.getElementById('remarks').value;
-        request.status = 'Completed';
+    if (request) {
+        request.result = document.getElementById('resultValue').value.trim();
+        request.normalRange = document.getElementById('normalRangeRef').value.trim();
+        request.remarks = document.getElementById('remarks').value.trim();
+        request.status = document.getElementById('resultStatus').value;
         
         saveRequests();
-        updateStats();
-        renderTable();
-        closeResultModal();
-        showToast('Result uploaded successfully!', 'success');
+        refreshUI();
+        closeModal('resultModal');
+        showToast('✅ Result uploaded successfully!', 'success');
         
-        // Create invoice for this lab test
-        createLabInvoice(request);
+        // Create invoice if completed
+        if (request.status === 'Completed') {
+            createLabInvoice(request);
+        }
     }
 }
 
 function createLabInvoice(request) {
-    let invoices = JSON.parse(localStorage.getItem('hms_invoices') || '[]');
-    const newId = invoices.length > 0 ? Math.max(...invoices.map(i => i.id)) + 1 : 1;
-    const invoiceNo = 'INV-' + new Date().getFullYear() + String(newId).padStart(5, '0');
-    
-    invoices.push({
-        id: newId,
-        invoiceNo: invoiceNo,
-        patientId: request.patientId,
-        patientName: request.patientName,
-        type: 'Laboratory',
-        description: `Lab Test: ${request.testName}`,
-        amount: request.testPrice,
-        tax: 5,
-        discount: 0,
-        total: request.testPrice * 1.05,
-        date: new Date().toISOString().split('T')[0],
-        status: 'Pending'
-    });
-    
-    localStorage.setItem('hms_invoices', JSON.stringify(invoices));
+    try {
+        let invoices = JSON.parse(localStorage.getItem('hms_invoices') || '[]');
+        const newId = invoices.length > 0 ? Math.max(...invoices.map(i => i.id)) + 1 : 1;
+        const invoiceNo = 'INV-' + new Date().getFullYear() + String(newId).padStart(5, '0');
+        const total = request.testPrice * 1.05; // 5% tax
+        
+        invoices.push({
+            id: newId,
+            invoiceNo: invoiceNo,
+            patientId: request.patientId,
+            patientName: request.patientName,
+            type: 'Laboratory',
+            description: `Lab Test: ${request.testName}`,
+            amount: request.testPrice,
+            tax: 5,
+            discount: 0,
+            total: total,
+            date: new Date().toISOString().split('T')[0],
+            status: 'Pending'
+        });
+        
+        localStorage.setItem('hms_invoices', JSON.stringify(invoices));
+    } catch (error) {
+        console.error('Error creating invoice:', error);
+    }
 }
 
-function updateStatus(requestId) {
-    const request = labRequests.find(r => r.id === requestId);
-    if(request) {
+// ─── Actions ─────────────────────────────────────────
+
+function updateStatus(id) {
+    const request = labRequests.find(r => r.id === id);
+    if (request) {
         const statuses = ['Pending', 'In Progress', 'Completed'];
         let currentIndex = statuses.indexOf(request.status);
         let nextIndex = (currentIndex + 1) % statuses.length;
         request.status = statuses[nextIndex];
         saveRequests();
-        updateStats();
-        renderTable();
-        showToast(`Status updated to ${request.status}`, 'success');
+        refreshUI();
+        showToast(`✅ Status updated to ${request.status}`, 'success');
     }
 }
 
-function viewResult(requestId) {
-    const request = labRequests.find(r => r.id === requestId);
-    if(request && request.result) {
-        alert(`📋 TEST RESULT DETAILS 📋\n\n` +
+function viewResult(id) {
+    const request = labRequests.find(r => r.id === id);
+    if (request && request.result) {
+        const resultMsg = `📋 TEST RESULT DETAILS 📋\n\n` +
             `Request ID: ${request.requestNo}\n` +
             `Patient: ${request.patientName}\n` +
             `Test: ${request.testName}\n` +
             `Request Date: ${request.requestDate}\n\n` +
             `🔬 Result:\n${request.result}\n\n` +
             `📊 Normal Range: ${request.normalRange || 'N/A'}\n` +
-            `📝 Remarks: ${request.remarks || 'N/A'}`);
+            `📝 Remarks: ${request.remarks || 'N/A'}`;
+        alert(resultMsg);
     } else {
         showToast('No result available yet', 'error');
     }
 }
 
-function deleteRequest(id) {
-    deleteId = id;
-    document.getElementById('deleteModal').classList.add('active');
-}
+// ─── Delete ──────────────────────────────────────────
 
-function confirmDelete() {
-    if(deleteId) {
-        labRequests = labRequests.filter(r => r.id !== deleteId);
-        saveRequests();
-        updateStats();
-        renderTable();
-        showToast('Request deleted successfully', 'success');
-        deleteId = null;
-        document.getElementById('deleteModal').classList.remove('active');
+function handleConfirmDelete() {
+    if (!deleteTargetId) return;
+    
+    const request = labRequests.find(r => r.id === deleteTargetId);
+    labRequests = labRequests.filter(r => r.id !== deleteTargetId);
+    saveRequests();
+    refreshUI();
+    closeModal('deleteModal');
+    
+    if (request) {
+        showToast(`🗑️ Request ${request.requestNo} deleted successfully`, 'success');
     }
+    deleteTargetId = null;
 }
 
-function closeRequestModal() {
-    document.getElementById('requestModal').classList.remove('active');
-    document.getElementById('requestForm').reset();
-    document.querySelectorAll('.error-text').forEach(el => el.classList.remove('show'));
-    document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
-}
+// ─── Init ────────────────────────────────────────────
 
-function closeResultModal() {
-    document.getElementById('resultModal').classList.remove('active');
-    document.getElementById('resultForm').reset();
-    document.querySelectorAll('.error-text').forEach(el => el.classList.remove('show'));
-    document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
-}
-
-function closeDeleteModal() {
-    document.getElementById('deleteModal').classList.remove('active');
-    deleteId = null;
-}
-
-function showToast(message, type) {
-    const toast = document.createElement('div');
-    const colors = { success: '#10b981', error: '#ef4444', info: '#a8c49a' };
-    toast.className = `fixed bottom-6 right-6 z-50 px-5 py-3 rounded-lg shadow-lg text-white text-sm font-medium transition-all duration-300`;
-    toast.style.backgroundColor = colors[type] || colors.info;
-    toast.innerHTML = `<div class="flex items-center gap-2"><i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i><span>${message}</span></div>`;
-    document.body.appendChild(toast);
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
-function escapeHtml(str) {
-    if(!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-}
-
-document.addEventListener('DOMContentLoaded', () => {
+function initLabRequestsModule() {
+    if (isInitialized) return;
+    isInitialized = true;
+    
     loadData();
     
-    document.getElementById('newRequestBtn')?.addEventListener('click', openRequestModal);
-    document.getElementById('closeRequestModalBtn')?.addEventListener('click', closeRequestModal);
-    document.getElementById('cancelRequestModalBtn')?.addEventListener('click', closeRequestModal);
-    document.getElementById('closeResultModalBtn')?.addEventListener('click', closeResultModal);
-    document.getElementById('cancelResultModalBtn')?.addEventListener('click', closeResultModal);
-    document.getElementById('closeDeleteModalBtn')?.addEventListener('click', closeDeleteModal);
-    document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeDeleteModal);
-    document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
+    // Event Listeners
+    document.getElementById('newRequestBtn')?.addEventListener('click', openAddModal);
+    document.getElementById('closeRequestModalBtn')?.addEventListener('click', () => closeModal('requestModal'));
+    document.getElementById('cancelRequestModalBtn')?.addEventListener('click', () => closeModal('requestModal'));
+    document.getElementById('closeResultModalBtn')?.addEventListener('click', () => closeModal('resultModal'));
+    document.getElementById('cancelResultModalBtn')?.addEventListener('click', () => closeModal('resultModal'));
+    document.getElementById('closeDeleteModalBtn')?.addEventListener('click', () => closeModal('deleteModal'));
+    document.getElementById('cancelDeleteBtn')?.addEventListener('click', () => closeModal('deleteModal'));
+    document.getElementById('confirmDeleteBtn')?.addEventListener('click', handleConfirmDelete);
     document.getElementById('requestForm')?.addEventListener('submit', createRequest);
     document.getElementById('resultForm')?.addEventListener('submit', saveResult);
-    document.getElementById('searchInput')?.addEventListener('input', () => renderTable());
-    document.getElementById('statusFilter')?.addEventListener('change', () => renderTable());
-    document.getElementById('dateFrom')?.addEventListener('change', () => renderTable());
-    document.getElementById('dateTo')?.addEventListener('change', () => renderTable());
+    
+    document.getElementById('resetFilter')?.addEventListener('click', () => {
+        searchTerm = '';
+        statusFilter = '';
+        dateFrom = '';
+        dateTo = '';
+        document.getElementById('searchInput').value = '';
+        document.getElementById('statusFilter').value = '';
+        document.getElementById('dateFrom').value = '';
+        document.getElementById('dateTo').value = '';
+        renderTable();
+    });
+    
+    document.getElementById('searchInput')?.addEventListener('input', (e) => {
+        searchTerm = e.target.value;
+        renderTable();
+    });
+    
+    document.getElementById('statusFilter')?.addEventListener('change', (e) => {
+        statusFilter = e.target.value;
+        renderTable();
+    });
+    
+    document.getElementById('dateFrom')?.addEventListener('change', (e) => {
+        dateFrom = e.target.value;
+        renderTable();
+    });
+    
+    document.getElementById('dateTo')?.addEventListener('change', (e) => {
+        dateTo = e.target.value;
+        renderTable();
+    });
     
     // Real-time validation
     document.getElementById('patientId')?.addEventListener('change', function() {
-        if(this.value) {
+        if (this.value) {
             document.getElementById('patientIdError')?.classList.remove('show');
             this.classList.remove('error');
         }
     });
     
     document.getElementById('testId')?.addEventListener('change', function() {
-        if(this.value) {
+        if (this.value) {
             document.getElementById('testIdError')?.classList.remove('show');
             this.classList.remove('error');
         }
     });
     
     document.getElementById('resultValue')?.addEventListener('input', function() {
-        if(this.value.trim()) {
+        if (this.value.trim()) {
             document.getElementById('resultValueError')?.classList.remove('show');
             this.classList.remove('error');
         }
     });
-});
+    
+    // Close modals on overlay click
+    document.getElementById('requestModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeModal('requestModal');
+    });
+    document.getElementById('resultModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeModal('resultModal');
+    });
+    document.getElementById('deleteModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeModal('deleteModal');
+    });
+    
+    // ESC key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeModal('requestModal');
+            closeModal('resultModal');
+            closeModal('deleteModal');
+        }
+    });
+}
 
-window.uploadResult = uploadResult;
-window.updateStatus = updateStatus;
-window.viewResult = viewResult;
-window.deleteRequest = deleteRequest;
+// ─── Wait for DOM and Common.js ──────────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
+    const checkInterval = setInterval(() => {
+        const sidebar = document.getElementById('mainSidebar');
+        if (sidebar) {
+            clearInterval(checkInterval);
+            setTimeout(initLabRequestsModule, 100);
+        }
+    }, 50);
+    
+    setTimeout(() => {
+        clearInterval(checkInterval);
+        initLabRequestsModule();
+    }, 3000);
+}); 

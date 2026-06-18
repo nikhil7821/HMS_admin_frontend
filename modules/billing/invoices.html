@@ -5,216 +5,524 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Invoices | Billing | MedFlow</title>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- ✅ CENTRALIZED THEME CSS -->
+    
+    <!-- Theme CSS -->
     <link rel="stylesheet" href="../../css/theme.css">
 
     <style>
-        /* Additional page-specific styles that align with theme */
-        .invoice-row {
-            transition: var(--transition-base);
-            border-bottom: 1px solid var(--border-default);
-        }
-        
-        .invoice-row:hover {
-            background-color: var(--bg-subtle);
-        }
-        
-        .status-paid {
-            background: var(--color-success-bg);
-            color: var(--color-success-text);
-            padding: 0.2rem 0.75rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-        }
-        
-        .status-pending {
-            background: var(--color-warning-bg);
-            color: var(--color-warning-text);
-            padding: 0.2rem 0.75rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-        }
-        
-        .status-cancelled {
-            background: var(--color-error-bg);
-            color: var(--color-error-text);
-            padding: 0.2rem 0.75rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-        }
-        
-        /* Modal overlay styles matching theme.css */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 50;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--bg-overlay);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
+        /* ============================================================
+           INVOICES MODULE — Page-specific only
+           ============================================================ */
+
+        /* 🔥 FIX: Prevent layout shift */
+        .main-content {
+            margin-left: 260px !important;
+            margin-top: 70px !important;
+            padding: 1.25rem 1.5rem !important;
+            transition: margin-left 0.3s ease !important;
+            min-height: 100vh !important;
             opacity: 0;
-            visibility: hidden;
-            transition: var(--transition-base);
+            animation: fadeIn 0.3s ease forwards;
         }
-        
-        .modal-overlay.active {
+        .main-content.loaded {
             opacity: 1;
-            visibility: visible;
         }
-        
-        .modal-overlay.active .modal-content {
-            transform: scale(1);
+        #mainSidebar[data-collapsed="true"] ~ .main-content,
+        #mainSidebar[data-collapsed="true"] + .main-content {
+            margin-left: 72px !important;
         }
-        
-        .modal-container {
-            width: 100%;
-            max-width: 650px;
-            margin: 1rem;
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 0 !important;
+                padding: 1rem !important;
+            }
         }
-        
-        .modal-content {
-            background-color: var(--bg-card);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            border-top: 4px solid var(--color-sage);
-            box-shadow: var(--shadow-lg);
-            transform: scale(0.96);
-            transition: var(--transition-base);
-            max-height: 90vh;
-            overflow-y: auto;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        
-        .modal-header {
-            padding: 1.25rem;
-            border-bottom: 1px solid var(--border-default);
-            background-color: var(--bg-card);
+
+        /* 🔥 Page Header - Hidden */
+        .page-header {
+            display: none !important;
         }
-        
-        .modal-header h2 {
-            font-size: 1.0625rem;
-            font-weight: var(--font-weight-light);
-            color: var(--color-brown-700);
-            margin: 0;
-            display: inline-block;
+
+        /* 🔥 Stats Cards - Perfect Spacing */
+        .grid-stats {
+            gap: 1rem !important;
+            margin-bottom: 1.25rem !important;
         }
-        
-        .modal-body {
-            padding: 1.25rem;
-            max-height: 60vh;
-            overflow-y: auto;
+        .stat-card {
+            padding: 1rem 1.25rem !important;
+            border-radius: var(--radius-lg) !important;
         }
-        
-        .modal-footer {
-            padding: 1rem 1.25rem;
-            border-top: 1px solid var(--border-default);
-            background-color: var(--bg-subtle);
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
+        .stat-card .stat-value {
+            font-size: 1.5rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            margin-top: 0.125rem !important;
         }
-        
-        .float-right {
-            float: right;
+        .stat-card .stat-label {
+            font-size: 0.625rem !important;
+            letter-spacing: 0.06em !important;
+            text-transform: uppercase !important;
+            color: var(--color-brown-200) !important;
         }
-        
-        .clearfix::after {
-            content: "";
-            clear: both;
-            display: table;
+        .stat-card .stat-icon-bg {
+            width: 2.5rem !important;
+            height: 2.5rem !important;
+            border-radius: var(--radius-md) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: var(--bg-muted) !important;
         }
-        
-        .btn-success {
-            background-color: var(--color-sage);
-            color: white;
-            border: none;
+        .stat-card .stat-icon-bg i {
+            font-size: 1rem !important;
         }
-        
-        .btn-success:hover {
-            background-color: var(--color-sage-dark);
-            transform: translateY(-1px);
+
+        /* 🔥 Filter Bar - Perfect Alignment */
+        .filter-bar {
+            padding: 0.625rem 1rem !important;
+            gap: 0.625rem !important;
+            margin-bottom: 1.25rem !important;
+            border-radius: var(--radius-lg) !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            display: flex !important;
+            align-items: center !important;
+            flex-wrap: nowrap !important;
         }
-        
-        .error-text {
-            color: var(--color-error-text);
-            font-size: 0.6875rem;
-            margin-top: 0.25rem;
-            display: none;
-            font-weight: var(--font-weight-light);
+        .filter-bar .search-wrapper {
+            flex: 1 1 220px !important;
+            min-width: 160px !important;
+            max-width: 320px !important;
+            position: relative !important;
         }
-        
-        .error-text.show {
-            display: block;
+        .filter-bar .search-wrapper i {
+            position: absolute !important;
+            left: 0.75rem !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            color: var(--color-brown-100);
+            font-size: 0.8125rem !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
         }
-        
-        .form-input.error, .form-select.error {
-            border-color: var(--color-error-text) !important;
-            background-color: var(--color-error-bg) !important;
+        .filter-bar .search-input {
+            width: 100% !important;
+            padding: 0.375rem 0.75rem 0.375rem 2.25rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            border-radius: var(--radius-md) !important;
+            border: 1px solid var(--border-input) !important;
+            background-color: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
+            font-family: var(--font-family) !important;
         }
-        
-        .border-l-blue-500 {
-            border-left-color: #3b82f6 !important;
+        .filter-bar .search-input:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+            outline: none !important;
         }
-        
-        .border-l-green-500 {
-            border-left-color: var(--color-success-text) !important;
+        .filter-bar .form-select {
+            min-width: 130px !important;
+            max-width: 180px !important;
+            padding: 0.375rem 1.75rem 0.375rem 0.75rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            border: 1px solid var(--border-input) !important;
+            border-radius: var(--radius-md) !important;
+            background-color: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
+            cursor: pointer !important;
+            font-family: var(--font-family) !important;
         }
-        
-        .border-l-yellow-500 {
-            border-left-color: var(--color-warning-text) !important;
+        .filter-bar .form-select:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+            outline: none !important;
         }
-        
-        .border-l-purple-500 {
-            border-left-color: #9333ea !important;
+        .filter-bar .form-input {
+            min-width: 120px !important;
+            max-width: 160px !important;
+            padding: 0.375rem 0.75rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            border: 1px solid var(--border-input) !important;
+            border-radius: var(--radius-md) !important;
+            background-color: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
+            font-family: var(--font-family) !important;
         }
-        
+        .filter-bar .form-input:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+            outline: none !important;
+        }
+        .filter-bar .btn-primary,
+        .filter-bar .btn-secondary {
+            flex: 0 0 auto !important;
+            padding: 0.375rem 0.875rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            border-radius: var(--radius-md) !important;
+            white-space: nowrap !important;
+            font-family: var(--font-family) !important;
+            cursor: pointer !important;
+        }
+        .filter-bar .btn-primary {
+            background-color: var(--color-sage) !important;
+            color: white !important;
+            border: none !important;
+        }
+        .filter-bar .btn-primary:hover {
+            background-color: var(--color-sage-dark) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+            transform: translateY(-1px) !important;
+        }
+        .filter-bar .btn-secondary {
+            background-color: transparent !important;
+            color: var(--color-brown-200) !important;
+            border: 1px solid var(--border-input) !important;
+        }
+        .filter-bar .btn-secondary:hover {
+            background-color: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+            border-color: var(--color-brown-100) !important;
+        }
+
+        @media (max-width: 768px) {
+            .filter-bar {
+                flex-wrap: wrap !important;
+                gap: 0.5rem !important;
+                padding: 0.5rem 0.75rem !important;
+            }
+            .filter-bar .search-wrapper {
+                flex: 1 1 100% !important;
+                min-width: 100px !important;
+                max-width: 100% !important;
+            }
+            .filter-bar .form-select,
+            .filter-bar .form-input {
+                min-width: 90px !important;
+                max-width: 140px !important;
+                font-size: 0.75rem !important;
+                height: 32px !important;
+            }
+            .filter-bar .btn-primary span,
+            .filter-bar .btn-secondary span {
+                display: none !important;
+            }
+            .filter-bar .btn-primary,
+            .filter-bar .btn-secondary {
+                padding: 0.3rem 0.6rem !important;
+                font-size: 0.75rem !important;
+                height: 32px !important;
+            }
+        }
+
+        /* 🔥 Table - Perfect Alignment */
+        .card-white {
+            border-radius: var(--radius-lg) !important;
+            border: 1px solid var(--border-default) !important;
+            overflow: hidden !important;
+            margin-top: 1.25rem !important;
+        }
+        .table-wrapper {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+        .data-table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            font-size: 0.8125rem !important;
+        }
+        .data-table thead {
+            background-color: var(--bg-muted) !important;
+            border-bottom: 1px solid var(--border-default) !important;
+        }
+        .data-table th {
+            padding: 0.625rem 1rem !important;
+            text-align: left !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-300) !important;
+            font-size: 0.625rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
+        }
+        .data-table td {
+            padding: 0.625rem 1rem !important;
+            color: var(--color-brown-700) !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid var(--border-default) !important;
+        }
+        .data-table tbody tr:last-child td {
+            border-bottom: none !important;
+        }
+
+        /* 🔥 Status Badges - Perfect */
+        .status-paid {
+            background: var(--color-success-bg) !important;
+            color: var(--color-success-text) !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
+        .status-pending {
+            background: var(--color-warning-bg) !important;
+            color: var(--color-warning-text) !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
+        .status-cancelled {
+            background: var(--color-error-bg) !important;
+            color: var(--color-error-text) !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
+
+        /* 🔥 Action Buttons - Perfect */
+        .action-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 2rem !important;
+            height: 2rem !important;
+            border-radius: var(--radius-sm) !important;
+            border: 1px solid var(--border-default) !important;
+            background: var(--bg-card) !important;
+            color: var(--color-brown-200) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            font-size: 0.75rem !important;
+        }
+        .action-btn i {
+            font-size: 0.75rem !important;
+        }
+        .action-btn:hover {
+            background-color: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+            border-color: var(--color-brown-100) !important;
+        }
+        .action-btn.view:hover {
+            color: var(--color-gold) !important;
+            border-color: var(--color-gold) !important;
+            background: #fefce8 !important;
+        }
+        .action-btn.pay:hover {
+            color: #10b981 !important;
+            border-color: #10b981 !important;
+            background: #ecfdf5 !important;
+        }
+        .action-btn.edit:hover {
+            color: var(--color-sage) !important;
+            border-color: var(--color-sage) !important;
+            background: #eef7ea !important;
+        }
+        .action-btn.delete:hover {
+            color: #dc2626 !important;
+            border-color: #dc2626 !important;
+            background: #fee2e2 !important;
+        }
+
+        /* 🔥 Cell Styles */
+        .invoice-no {
+            font-family: 'Courier New', monospace !important;
+            font-size: 0.75rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-600) !important;
+        }
+        .patient-name {
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            font-size: 0.8125rem !important;
+        }
+        .total-amount {
+            font-weight: var(--font-weight-semibold) !important;
+            color: var(--color-sage-dark) !important;
+            font-size: 0.8125rem !important;
+        }
+        .type-badge {
+            padding: 0.1rem 0.5rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            background: var(--bg-muted) !important;
+            color: var(--color-brown-300) !important;
+            display: inline-block !important;
+        }
+
+        /* 🔥 Pagination - Perfect */
+        .pagination-info {
+            font-size: 0.75rem !important;
+            color: var(--color-brown-100) !important;
+            font-weight: var(--font-weight-light) !important;
+        }
         .pagination-btn {
-            transition: var(--transition-base);
+            padding: 0.25rem 0.75rem !important;
+            border-radius: var(--radius-md) !important;
+            font-size: 0.8125rem !important;
+            font-weight: var(--font-weight-light) !important;
+            border: 1px solid var(--border-default) !important;
+            background-color: var(--bg-card) !important;
+            color: var(--color-brown-300) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
         }
-        
         .pagination-btn:hover {
-            background-color: var(--bg-hover);
+            background-color: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
         }
-        
-        @media print {
-            .no-print {
-                display: none;
-            }
-            body {
-                background: white;
-                margin: 0;
-                padding: 0;
-            }
-            .invoice-print {
-                padding: 20px;
-            }
-            .modal-overlay {
-                display: none;
-            }
+        .pagination-btn.active {
+            background-color: var(--color-sage) !important;
+            color: white !important;
+            border-color: var(--color-sage) !important;
         }
-        
-        /* Calculation box */
+
+        /* 🔥 Stat Card Border Colors */
+        .stat-card-blue { border-left: 4px solid #3b82f6 !important; }
+        .stat-card-green { border-left: 4px solid var(--color-success-text) !important; }
+        .stat-card-orange { border-left: 4px solid var(--color-warning-text) !important; }
+        .stat-card-purple { border-left: 4px solid #9333ea !important; }
+
+        /* 🔥 Delete Icon */
+        .delete-icon-circle {
+            width: 3.5rem !important;
+            height: 3.5rem !important;
+            border-radius: 50% !important;
+            background-color: #fee2e2 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 auto 1rem !important;
+            color: #dc2626 !important;
+            font-size: 1.25rem !important;
+        }
+
+        /* 🔥 Error Text */
+        .error-text {
+            color: var(--color-error-text) !important;
+            font-size: 0.6875rem !important;
+            margin-top: 0.25rem !important;
+            display: none !important;
+            font-weight: var(--font-weight-light) !important;
+        }
+        .error-text.show {
+            display: block !important;
+        }
+        .form-input.error,
+        .form-select.error {
+            border-color: var(--color-error-text) !important;
+        }
+
+        /* 🔥 Modal */
+        .form-card {
+            border-top: 4px solid var(--color-sage) !important;
+        }
+        .modal-body {
+            padding: 1.25rem !important;
+        }
+        .modal-footer {
+            padding: 0.75rem 1.25rem !important;
+            background-color: var(--bg-subtle) !important;
+            border-top: 1px solid var(--border-default) !important;
+            display: flex !important;
+            justify-content: flex-end !important;
+            gap: 0.75rem !important;
+        }
+
+        /* 🔥 Calculation Box */
         .calculation-box {
-            background-color: var(--bg-subtle);
-            border-radius: var(--radius-md);
-            padding: 1rem;
-            border: 1px solid var(--border-default);
+            background-color: var(--bg-subtle) !important;
+            border-radius: var(--radius-md) !important;
+            padding: 0.75rem 1rem !important;
+            border: 1px solid var(--border-default) !important;
+            margin-top: 0.75rem !important;
+        }
+        .calculation-box .calc-row {
+            display: flex !important;
+            justify-content: space-between !important;
+            font-size: 0.8125rem !important;
+            padding: 0.125rem 0 !important;
+        }
+        .calculation-box .calc-row .label {
+            color: var(--color-brown-200) !important;
+            font-weight: var(--font-weight-light) !important;
+        }
+        .calculation-box .calc-row .value {
+            color: var(--color-brown-700) !important;
+            font-weight: var(--font-weight-medium) !important;
+        }
+        .calculation-box .calc-row.total {
+            border-top: 1px solid var(--border-default) !important;
+            padding-top: 0.5rem !important;
+            margin-top: 0.25rem !important;
+            font-weight: var(--font-weight-semibold) !important;
+        }
+        .calculation-box .calc-row.total .value {
+            color: var(--color-sage-dark) !important;
+            font-size: 1rem !important;
+        }
+
+        /* 🔥 Buttons */
+        .btn-success {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            background-color: var(--color-sage) !important;
+            color: white !important;
+            font-family: var(--font-family) !important;
+            font-size: 0.8125rem !important;
+            font-weight: var(--font-weight-light) !important;
+            padding: 0.5rem 1.25rem !important;
+            border: none !important;
+            border-radius: var(--radius-lg) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+        .btn-success:hover {
+            background-color: var(--color-sage-dark) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+            transform: translateY(-1px) !important;
+        }
+        .btn-danger {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            background-color: #ef4444 !important;
+            color: white !important;
+            font-family: var(--font-family) !important;
+            font-size: 0.8125rem !important;
+            font-weight: var(--font-weight-light) !important;
+            padding: 0.5rem 1.25rem !important;
+            border: none !important;
+            border-radius: var(--radius-lg) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+        .btn-danger:hover {
+            background-color: #dc2626 !important;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; margin: 0 !important; padding: 0 !important; }
+            .invoice-print { padding: 20px !important; }
+            .modal-overlay { display: none !important; }
         }
     </style>
 </head>
@@ -223,323 +531,306 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+    <main class="main-content" id="mainContent">
         
-        <!-- Page Header matching theme -->
-        <div class="page-header mb-6">
-            <div class="page-header-left">
-                <div class="page-header-icon">
-                    <i class="fas fa-file-invoice-dollar"></i>
-                </div>
-                <div>
-                    <h1 class="page-header-title">Invoices & Billing</h1>
-                    <p class="page-header-subtitle">Manage patient invoices, payments, and billing history</p>
-                </div>
-            </div>
-            <div class="page-header-actions">
-                <button id="createInvoiceBtn" class="btn-primary">
-                    <i class="fas fa-plus-circle text-sm"></i>
-                    <span>Create New Invoice</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Stats Cards using theme classes -->
-        <div class="grid-stats mb-8">
-            <div class="stat-card" style="border-left: 4px solid #3b82f6;">
-                <div class="flex justify-between items-start">
+        <!-- Stats Cards -->
+        <div class="grid-stats">
+            <div class="stat-card stat-card-blue">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Total Invoices</p>
                         <p class="stat-value" id="totalInvoices">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-file-invoice text-sage text-lg"></i>
+                        <i class="fas fa-file-invoice" style="color:#3b82f6;"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid var(--color-success-text);">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-green">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Total Revenue</p>
                         <p class="stat-value" id="totalRevenue">₹0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-chart-line text-sage text-lg"></i>
+                        <i class="fas fa-chart-line" style="color:var(--color-success-text);"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid var(--color-warning-text);">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-orange">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Pending Amount</p>
-                        <p class="stat-value" id="pendingAmount">₹0</p>
+                        <p class="stat-value text-warning-text" id="pendingAmount">₹0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-clock text-sage text-lg"></i>
+                        <i class="fas fa-clock" style="color:var(--color-warning-text);"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid #9333ea;">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-purple">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Collection Rate</p>
-                        <p class="stat-value" id="collectionRate">0%</p>
+                        <p class="stat-value" style="color:#9333ea;" id="collectionRate">0%</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-percent text-sage text-lg"></i>
+                        <i class="fas fa-percent" style="color:#9333ea;"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Filter Bar using theme classes -->
+        <!-- Filter Bar -->
         <div class="filter-bar">
-            <div class="relative flex-1">
-                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-brown-100 text-sm"></i>
-                <input type="text" id="searchInput" placeholder="Search by patient or invoice #..." 
-                       class="search-input pl-10">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by patient or invoice #...">
             </div>
-            <select id="statusFilter" class="form-select w-auto min-w-[140px]">
+            <select id="statusFilter" class="form-select">
                 <option value="">All Status</option>
                 <option value="Paid">Paid</option>
                 <option value="Pending">Pending</option>
                 <option value="Cancelled">Cancelled</option>
             </select>
-            <input type="date" id="dateFrom" class="form-input w-auto min-w-[140px]" placeholder="From Date">
-            <input type="date" id="dateTo" class="form-input w-auto min-w-[140px]" placeholder="To Date">
+            <input type="date" id="dateFrom" class="form-input" placeholder="From Date">
+            <input type="date" id="dateTo" class="form-input" placeholder="To Date">
+            <button id="resetFilter" class="btn-secondary">
+                <i class="fas fa-undo-alt"></i>
+                <span>Reset</span>
+            </button>
+            <button id="createInvoiceBtn" class="btn-primary">
+                <i class="fas fa-plus"></i>
+                <span>New Invoice</span>
+            </button>
         </div>
 
         <!-- Invoices Table -->
-        <div class="card-white overflow-hidden">
+        <div class="card-white">
             <div class="table-wrapper">
-                <table class="data-table w-full">
+                <table class="data-table">
                     <thead>
                         <tr>
-                            <th class="px-5 py-3">Invoice #</th>
-                            <th class="px-5 py-3">Patient Name</th>
-                            <th class="px-5 py-3 hidden md:table-cell">Date</th>
-                            <th class="px-5 py-3">Amount</th>
-                            <th class="px-5 py-3 hidden lg:table-cell">Type</th>
-                            <th class="px-5 py-3">Status</th>
-                            <th class="px-5 py-3 text-center">Actions</th>
+                            <th style="width:130px;">Invoice #</th>
+                            <th style="min-width:140px;">Patient</th>
+                            <th class="hidden md:table-cell" style="width:110px;">Date</th>
+                            <th style="width:110px; text-align:center;">Amount</th>
+                            <th class="hidden lg:table-cell" style="width:90px;">Type</th>
+                            <th style="width:110px;">Status</th>
+                            <th style="width:160px; text-align:center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="invoicesTableBody">
                         <tr>
-                            <td colspan="7" class="text-center py-12 text-brown-100">
-                                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
-                                <p class="font-light">Loading invoices...</p>
+                            <td colspan="7" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
+                                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
+                                <p style="font-weight:var(--font-weight-light);">Loading invoices...</p>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <div class="border-t border-default px-5 py-3 flex justify-between items-center">
-                <div class="text-sm text-brown-300 font-light" id="paginationInfo"></div>
-                <div class="flex gap-2" id="paginationButtons"></div>
+            <div style="border-top:1px solid var(--border-default); padding:0.625rem 1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+                <div class="pagination-info" id="paginationInfo">Showing 0 of 0</div>
+                <div style="display:flex; gap:0.375rem; flex-wrap:wrap;" id="paginationButtons"></div>
             </div>
         </div>
     </main>
 
-    <!-- Create/Edit Invoice Modal - Matching theme.css structure -->
-    <div id="invoiceModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 id="modalTitle">Create New Invoice</h2>
-                    <button id="closeModalBtn" class="close-btn float-right">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="clearfix"></div>
-                </div>
-                <form id="invoiceForm">
-                    <input type="hidden" id="invoiceId">
-                    <div class="modal-body">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="form-group">
-                                <label class="form-label">Select Patient *</label>
-                                <select id="patientId" required class="form-select">
-                                    <option value="">-- Select Patient --</option>
-                                </select>
-                                <div class="error-text" id="patientIdError">Please select a patient</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Invoice Type *</label>
-                                <select id="invoiceType" required class="form-select">
-                                    <option value="OPD">OPD Consultation</option>
-                                    <option value="IPD">IPD Admission</option>
-                                    <option value="Pharmacy">Pharmacy</option>
-                                    <option value="Laboratory">Laboratory</option>
-                                    <option value="Radiology">Radiology</option>
-                                </select>
-                                <div class="error-text" id="invoiceTypeError">Please select invoice type</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Invoice Date *</label>
-                                <input type="date" id="invoiceDate" required class="form-input">
-                                <div class="error-text" id="invoiceDateError">Invoice date is required</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Due Date</label>
-                                <input type="date" id="dueDate" class="form-input">
-                            </div>
-                            <div class="md:col-span-2 form-group">
-                                <label class="form-label">Description</label>
-                                <textarea id="description" rows="2" class="form-textarea" placeholder="Consultation fee, medicines, lab tests..."></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Amount (₹) *</label>
-                                <input type="number" id="amount" step="0.01" required class="form-input" placeholder="0.00">
-                                <div class="error-text" id="amountError">Amount must be greater than 0</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Tax (%)</label>
-                                <input type="number" id="tax" step="0.01" value="0" class="form-input" placeholder="0">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Discount (₹)</label>
-                                <input type="number" id="discount" step="0.01" value="0" class="form-input" placeholder="0">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Status *</label>
-                                <select id="status" required class="form-select">
-                                    <option value="Pending">Pending</option>
-                                    <option value="Paid">Paid</option>
-                                    <option value="Cancelled">Cancelled</option>
-                                </select>
-                                <div class="error-text" id="statusError">Please select status</div>
-                            </div>
-                        </div>
-                        
-                        <div class="calculation-box mt-4">
-                            <div class="flex justify-between text-sm">
-                                <span class="text-brown-300">Subtotal:</span>
-                                <span class="font-medium text-brown-700" id="subtotalDisplay">₹0.00</span>
-                            </div>
-                            <div class="flex justify-between text-sm mt-1">
-                                <span class="text-brown-300">Tax (<span id="taxRate">0</span>%):</span>
-                                <span class="font-medium text-brown-700" id="taxAmountDisplay">₹0.00</span>
-                            </div>
-                            <div class="flex justify-between text-sm mt-1">
-                                <span class="text-brown-300">Discount:</span>
-                                <span class="font-medium text-brown-700" id="discountDisplay">₹0.00</span>
-                            </div>
-                            <div class="flex justify-between font-medium text-base mt-2 pt-2 border-t border-default">
-                                <span class="text-brown-700">Total Amount:</span>
-                                <span class="text-sage-dark" id="totalDisplay">₹0.00</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
-                        <button type="submit" class="btn-primary">
-                            <i class="fas fa-save mr-1"></i> Save Invoice
-                        </button>
-                    </div>
-                </form>
+    <!-- Create/Edit Invoice Modal -->
+    <div id="invoiceModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="form-card" style="max-width:48rem;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">
+                    <i class="fas fa-file-invoice"></i> Create New Invoice
+                </h3>
+                <button class="close-btn" id="closeModalBtn" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-        </div>
-    </div>
-
-    <!-- View Invoice Modal - Matching theme.css structure -->
-    <div id="viewInvoiceModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Invoice Details</h2>
-                    <div class="flex gap-2">
-                        <button id="printInvoiceBtn" class="btn-secondary text-sm px-3 py-1">
-                            <i class="fas fa-print mr-1"></i> Print
-                        </button>
-                        <button id="closeViewModalBtn" class="close-btn">
-                            <i class="fas fa-times"></i>
-                        </button>
+            <form id="invoiceForm">
+                <input type="hidden" id="invoiceId">
+                <div class="modal-body">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem 1.5rem;">
+                        <div class="form-group">
+                            <label class="form-label">Select Patient <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="patientId" required class="form-select">
+                                <option value="">-- Select Patient --</option>
+                            </select>
+                            <span class="error-text" id="patientIdError">Please select a patient</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Invoice Type <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="invoiceType" required class="form-select">
+                                <option value="OPD">OPD Consultation</option>
+                                <option value="IPD">IPD Admission</option>
+                                <option value="Pharmacy">Pharmacy</option>
+                                <option value="Laboratory">Laboratory</option>
+                                <option value="Radiology">Radiology</option>
+                            </select>
+                            <span class="error-text" id="invoiceTypeError">Please select invoice type</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Invoice Date <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="date" id="invoiceDate" required class="form-input">
+                            <span class="error-text" id="invoiceDateError">Invoice date is required</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Due Date</label>
+                            <input type="date" id="dueDate" class="form-input">
+                        </div>
+                        <div class="form-group" style="grid-column:1 / -1;">
+                            <label class="form-label">Description</label>
+                            <textarea id="description" rows="2" class="form-textarea" placeholder="Consultation fee, medicines, lab tests..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Amount (₹) <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="number" id="amount" step="0.01" required class="form-input" placeholder="0.00" min="0">
+                            <span class="error-text" id="amountError">Amount must be greater than 0</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tax (%)</label>
+                            <input type="number" id="tax" step="0.01" value="0" class="form-input" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Discount (₹)</label>
+                            <input type="number" id="discount" step="0.01" value="0" class="form-input" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="status" required class="form-select">
+                                <option value="Pending">Pending</option>
+                                <option value="Paid">Paid</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                            <span class="error-text" id="statusError">Please select status</span>
+                        </div>
                     </div>
-                    <div class="clearfix"></div>
-                </div>
-                <div id="invoicePrintArea" class="modal-body invoice-print">
-                    <!-- Invoice content loaded dynamically -->
+                    
+                    <div class="calculation-box">
+                        <div class="calc-row">
+                            <span class="label">Subtotal:</span>
+                            <span class="value" id="subtotalDisplay">₹0.00</span>
+                        </div>
+                        <div class="calc-row">
+                            <span class="label">Tax (<span id="taxRate">0</span>%):</span>
+                            <span class="value" id="taxAmountDisplay">₹0.00</span>
+                        </div>
+                        <div class="calc-row">
+                            <span class="label">Discount:</span>
+                            <span class="value" id="discountDisplay">₹0.00</span>
+                        </div>
+                        <div class="calc-row total">
+                            <span class="label">Total Amount:</span>
+                            <span class="value" id="totalDisplay">₹0.00</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" id="closeViewFooterBtn" class="btn-secondary">Close</button>
+                    <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Save Invoice
+                    </button>
                 </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Invoice Modal -->
+    <div id="viewInvoiceModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="form-card" style="max-width:44rem;">
+            <div class="modal-header">
+                <h3 class="modal-title" style="display:flex; align-items:center; gap:0.5rem;">
+                    <i class="fas fa-file-invoice"></i> Invoice Details
+                </h3>
+                <div style="display:flex; gap:0.5rem;">
+                    <button id="printInvoiceBtn" class="btn-secondary" style="padding:0.3rem 0.75rem; font-size:0.75rem;">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                    <button class="close-btn" id="closeViewModalBtn" aria-label="Close view modal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="invoicePrintArea" class="modal-body invoice-print"></div>
+            <div class="modal-footer">
+                <button type="button" id="closeViewFooterBtn" class="btn-secondary">Close</button>
             </div>
         </div>
     </div>
 
-    <!-- Payment Modal - Matching theme.css structure -->
-    <div id="paymentModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Record Payment</h2>
-                    <button id="closePaymentModalBtn" class="close-btn float-right">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="clearfix"></div>
-                </div>
-                <form id="paymentForm">
-                    <input type="hidden" id="paymentInvoiceId">
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label class="form-label">Payment Amount (₹) *</label>
-                            <input type="number" id="paymentAmount" step="0.01" required class="form-input">
-                            <div class="error-text" id="paymentAmountError">Amount must be greater than 0</div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Payment Method *</label>
-                            <select id="paymentMethod" required class="form-select">
-                                <option value="Cash">Cash</option>
-                                <option value="Card">Credit/Debit Card</option>
-                                <option value="UPI">UPI</option>
-                                <option value="Insurance">Insurance</option>
-                                <option value="Bank Transfer">Bank Transfer</option>
-                            </select>
-                            <div class="error-text" id="paymentMethodError">Please select payment method</div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Transaction ID (Optional)</label>
-                            <input type="text" id="transactionId" class="form-input" placeholder="Enter transaction ID">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" id="cancelPaymentBtn" class="btn-secondary">Cancel</button>
-                        <button type="submit" class="btn-success">
-                            <i class="fas fa-check-circle mr-1"></i> Record Payment
-                        </button>
-                    </div>
-                </form>
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="form-card" style="max-width:30rem;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-money-bill-wave" style="color:#10b981;"></i> Record Payment
+                </h3>
+                <button class="close-btn" id="closePaymentModalBtn" aria-label="Close payment modal">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
+            <form id="paymentForm">
+                <input type="hidden" id="paymentInvoiceId">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Payment Amount (₹) <span style="color:var(--color-error-text);">*</span></label>
+                        <input type="number" id="paymentAmount" step="0.01" required class="form-input" placeholder="0.00" min="0">
+                        <span class="error-text" id="paymentAmountError">Amount must be greater than 0</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Payment Method <span style="color:var(--color-error-text);">*</span></label>
+                        <select id="paymentMethod" required class="form-select">
+                            <option value="Cash">Cash</option>
+                            <option value="Card">Credit/Debit Card</option>
+                            <option value="UPI">UPI</option>
+                            <option value="Insurance">Insurance</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                        </select>
+                        <span class="error-text" id="paymentMethodError">Please select payment method</span>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label">Transaction ID (Optional)</label>
+                        <input type="text" id="transactionId" class="form-input" placeholder="Enter transaction ID">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancelPaymentBtn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-success">
+                        <i class="fas fa-check-circle"></i> Record Payment
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal - Matching theme.css structure -->
-    <div id="deleteModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Confirm Delete</h2>
-                    <button id="closeDeleteModalBtn" class="close-btn float-right">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="clearfix"></div>
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal-overlay modal-danger" role="dialog" aria-modal="true">
+        <div class="form-card" style="max-width:26rem; border-top-color:#ef4444;">
+            <div class="modal-header">
+                <h3 class="modal-title" style="color:var(--color-brown-700);">
+                    <i class="fas fa-triangle-exclamation" style="color:#ef4444;"></i> Confirm Delete
+                </h3>
+                <button class="close-btn" id="closeDeleteModalBtn" aria-label="Close delete modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="text-align:center; padding:1.75rem 1.25rem;">
+                <div class="delete-icon-circle">
+                    <i class="fas fa-trash-alt"></i>
                 </div>
-                <div class="modal-body text-center">
-                    <div class="w-16 h-16 bg-error-bg rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-trash-alt text-error-text text-2xl"></i>
-                    </div>
-                    <h3 class="text-base font-medium text-brown-700 mb-2">Delete Invoice?</h3>
-                    <p class="text-brown-300 text-sm font-light">This action cannot be undone. This invoice will be permanently removed.</p>
-                </div>
-                <div class="modal-footer justify-center gap-3">
-                    <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
-                    <button id="confirmDeleteBtn" class="btn-danger">
-                        <i class="fas fa-trash-alt mr-1"></i> Delete
-                    </button>
-                </div>
+                <p style="font-size:0.9375rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin-bottom:0.5rem;">
+                    Delete Invoice?
+                </p>
+                <p style="font-size:0.8125rem; color:var(--color-brown-300); font-weight:var(--font-weight-light); line-height:1.6;">
+                    This action cannot be undone. This invoice will be permanently removed.
+                </p>
+            </div>
+            <div class="modal-footer" style="justify-content:center;">
+                <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
+                <button id="confirmDeleteBtn" class="btn-danger">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
             </div>
         </div>
     </div>
@@ -547,6 +838,21 @@
     <script src="../../js/core/common.js"></script>
     <script src="../../js/core/form-validation.js"></script>
     <script src="invoices.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var checkSidebar = setInterval(function() {
+                var sidebar = document.getElementById('mainSidebar');
+                if (sidebar) {
+                    clearInterval(checkSidebar);
+                    document.getElementById('mainContent').classList.add('loaded');
+                }
+            }, 50);
+            setTimeout(function() {
+                document.getElementById('mainContent').classList.add('loaded');
+            }, 1000);
+        });
+    </script>
     
 </body>
 </html>

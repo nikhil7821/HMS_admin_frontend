@@ -1,23 +1,26 @@
 /**
  * Issue Medicines Management Module
  * MedFlow Pharmacy - Issue Medicines to Patients CRUD
- * Matching Executive Dashboard UI/UX - Indian Context
+ * Uses theme.css for styling, clean event handling
  */
 
-// Data Stores
 let issues = [];
 let patients = [];
 let medicines = [];
+let searchTerm = '';
+let isInitialized = false;
 
-// Helper: Escape HTML
-function escapeHtml(str) {
+// ─── Utility Functions ──────────────────────────────
+
+function esc(str) {
     if (!str) return '';
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
 }
 
-// Toast notification
+// ─── Toast Notification ──────────────────────────────
+
 function showToast(message, type = 'success') {
     const toast = document.createElement('div');
     const icons = { success: 'fa-check-circle', error: 'fa-exclamation-triangle', info: 'fa-info-circle' };
@@ -42,7 +45,7 @@ function showToast(message, type = 'success') {
         animation: slideInRight 0.25s ease-out;
         font-family: 'Poppins', system-ui, sans-serif;
     `;
-    toast.innerHTML = `<i class="fas ${icons[type]} text-sm"></i><span>${escapeHtml(message)}</span>`;
+    toast.innerHTML = `<i class="fas ${icons[type]}"></i><span>${esc(message)}</span>`;
     document.body.appendChild(toast);
     
     setTimeout(() => {
@@ -52,165 +55,151 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
-// Save issues to localStorage
-function saveIssues() {
-    localStorage.setItem('pharmacy_issues', JSON.stringify(issues));
+// ─── Data Management ──────────────────────────────
+
+function loadData() {
+    try {
+        // Load patients from HMS
+        const storedPatients = localStorage.getItem('hms_patients');
+        if (storedPatients) {
+            patients = JSON.parse(storedPatients);
+        } else {
+            // Sample Indian patients if none exist
+            patients = [
+                { id: 1, fullName: 'Rajesh Kumar', phone: '9876543210', age: 45 },
+                { id: 2, fullName: 'Priya Sharma', phone: '9876543211', age: 32 },
+                { id: 3, fullName: 'Amit Patel', phone: '9876543212', age: 28 }
+            ];
+            localStorage.setItem('hms_patients', JSON.stringify(patients));
+        }
+        
+        // Load medicines from pharmacy
+        const storedMedicines = localStorage.getItem('pharmacy_medicines');
+        medicines = storedMedicines ? JSON.parse(storedMedicines) : [];
+        
+        // Load issues
+        const storedIssues = localStorage.getItem('pharmacy_issues');
+        if (storedIssues) {
+            issues = JSON.parse(storedIssues);
+        } else {
+            issues = [];
+        }
+        refreshUI();
+        populateSelects();
+    } catch (error) {
+        console.error('Error loading data:', error);
+        showToast('Error loading data', 'error');
+    }
 }
 
-// Update statistics
+function saveIssues() {
+    try {
+        localStorage.setItem('pharmacy_issues', JSON.stringify(issues));
+    } catch (error) {
+        console.error('Error saving issues:', error);
+    }
+}
+
+// ─── Stats ──────────────────────────────────────────
+
 function updateStats() {
-    const totalIssuesEl = document.getElementById('totalIssues');
-    const totalQuantityEl = document.getElementById('totalQuantity');
-    const todayIssuesEl = document.getElementById('todayIssues');
-    
-    if (totalIssuesEl) totalIssuesEl.innerText = issues.length;
-    
+    const total = issues.length;
     const totalQty = issues.reduce((sum, i) => sum + i.quantity, 0);
-    if (totalQuantityEl) totalQuantityEl.innerText = totalQty;
     
     const today = new Date().toISOString().split('T')[0];
     const todayCount = issues.filter(i => i.date === today).length;
-    if (todayIssuesEl) todayIssuesEl.innerText = todayCount;
+    
+    document.getElementById('totalIssues').textContent = total;
+    document.getElementById('totalQuantity').textContent = totalQty;
+    document.getElementById('todayIssues').textContent = todayCount;
+    document.getElementById('lastUpdated').textContent = 
+        new Date().toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-// Load data from localStorage
-function loadData() {
-    // Load patients from HMS
-    const storedPatients = localStorage.getItem('hms_patients');
-    if (storedPatients) {
-        patients = JSON.parse(storedPatients);
-    } else {
-        // Sample Indian patients if none exist
-        patients = [
-            { id: 1, fullName: 'Rajesh Kumar', phone: '9876543210', age: 45 },
-            { id: 2, fullName: 'Priya Sharma', phone: '9876543211', age: 32 },
-            { id: 3, fullName: 'Amit Patel', phone: '9876543212', age: 28 }
-        ];
-        localStorage.setItem('hms_patients', JSON.stringify(patients));
-    }
-    
-    // Load medicines from pharmacy
-    const storedMedicines = localStorage.getItem('pharmacy_medicines');
-    if (storedMedicines) {
-        medicines = JSON.parse(storedMedicines);
-    } else {
-        medicines = [];
-    }
-    
-    // Load issues
-    const storedIssues = localStorage.getItem('pharmacy_issues');
-    if (storedIssues) {
-        issues = JSON.parse(storedIssues);
-    } else {
-        issues = [];
-    }
-    
-    renderTable();
-    populateSelects();
-    updateStats();
-}
+// ─── Filter ──────────────────────────────────────────
 
-// Validate issue form
-function validateIssueForm(patientId, medicineId, quantity, availableStock) {
-    let isValid = true;
-    
-    // Clear previous errors
-    const errorFields = ['patientError', 'medicineError', 'quantityError'];
-    errorFields.forEach(field => {
-        const el = document.getElementById(field);
-        if (el) el.innerText = '';
+function getFilteredIssues() {
+    return issues.filter(issue => {
+        const matchesSearch = searchTerm === '' || 
+            issue.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            issue.medicineName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (issue.prescribedBy && issue.prescribedBy.toLowerCase().includes(searchTerm.toLowerCase()));
+        return matchesSearch;
     });
-    
-    const patientSelect = document.getElementById('patientId');
-    const medicineSelect = document.getElementById('medicineId');
-    const quantityInput = document.getElementById('quantity');
-    
-    if (patientSelect) patientSelect.classList.remove('error');
-    if (medicineSelect) medicineSelect.classList.remove('error');
-    if (quantityInput) quantityInput.classList.remove('error');
-    
-    // Patient validation
-    if (!patientId) {
-        const errorEl = document.getElementById('patientError');
-        if (errorEl) errorEl.innerText = 'Please select a patient';
-        if (patientSelect) patientSelect.classList.add('error');
-        isValid = false;
-    }
-    
-    // Medicine validation
-    if (!medicineId) {
-        const errorEl = document.getElementById('medicineError');
-        if (errorEl) errorEl.innerText = 'Please select a medicine';
-        if (medicineSelect) medicineSelect.classList.add('error');
-        isValid = false;
-    }
-    
-    // Quantity validation
-    if (!quantity || quantity <= 0) {
-        const errorEl = document.getElementById('quantityError');
-        if (errorEl) errorEl.innerText = 'Please enter a valid quantity (minimum 1)';
-        if (quantityInput) quantityInput.classList.add('error');
-        isValid = false;
-    } else if (medicineId && quantity > availableStock) {
-        const errorEl = document.getElementById('quantityError');
-        if (errorEl) errorEl.innerText = `Insufficient stock! Only ${availableStock} available`;
-        if (quantityInput) quantityInput.classList.add('error');
-        isValid = false;
-    } else if (quantity > 1000) {
-        const errorEl = document.getElementById('quantityError');
-        if (errorEl) errorEl.innerText = 'Quantity cannot exceed 1000';
-        if (quantityInput) quantityInput.classList.add('error');
-        isValid = false;
-    }
-    
-    return isValid;
 }
 
-// Render issues table
+// ─── Render ──────────────────────────────────────────
+
 function renderTable() {
     const tbody = document.getElementById('issuesTable');
     if (!tbody) return;
     
-    if (issues.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-[#d4c9bc] text-sm"><i class="fas fa-folder-open mr-2"></i>No issues recorded. Click "New Issue" to issue medicine.</div></td></div>`;
+    const filtered = getFilteredIssues();
+    
+    if (filtered.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="issues-empty">
+                    <i class="fas fa-folder-open"></i>
+                    <p>No issues recorded</p>
+                    <p style="font-size:0.75rem; margin-top:0.25rem;">Issue medicine to a patient to get started.</p>
+                </td>
+            </tr>
+        `;
         return;
     }
     
     // Sort by date descending (newest first)
-    const sortedIssues = [...issues].sort((a, b) => new Date(b.date) - new Date(a.date));
+    const sorted = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
     
-    tbody.innerHTML = sortedIssues.map(issue => `
-        <tr class="dashboard-table-row">
-            <td class="px-5 py-3 text-sm text-[#5a4a3a]">${issue.date}</div>
-            <td class="px-5 py-3 text-sm font-medium text-[#5a4a3a]">${escapeHtml(issue.patientName)}</div>
-            <td class="px-5 py-3 text-sm text-[#9a8e82]">${escapeHtml(issue.medicineName)}</div>
-            <td class="px-5 py-3 text-sm text-[#5a4a3a]">${issue.quantity}</div>
-            <td class="px-5 py-3 text-sm text-[#9a8e82]">${escapeHtml(issue.prescribedBy || '—')}</div>
-            <td class="px-5 py-3 text-center">
-                <button onclick="window.deleteIssueHandler(${issue.id})" class="action-delete text-base transition" title="Delete Issue">
-                    <i class="fas fa-trash"></i>
+    tbody.innerHTML = sorted.map(issue => `
+        <tr class="issue-row" data-id="${issue.id}">
+            <td style="color:var(--color-brown-600); font-size:0.8125rem;">${issue.date}</td>
+            <td class="patient-name">${esc(issue.patientName)}</td>
+            <td class="medicine-name">${esc(issue.medicineName)}</td>
+            <td style="text-align:center;"><span class="qty-badge">${issue.quantity}</span></td>
+            <td style="color:var(--color-brown-300); font-size:0.8125rem;">${issue.prescribedBy ? esc(issue.prescribedBy) : '—'}</td>
+            <td style="text-align:center;">
+                <button class="action-btn delete delete-btn" data-id="${issue.id}" title="Delete Issue">
+                    <i class="fas fa-trash-alt"></i>
                 </button>
-             </div>
-         </div>
+            </td>
+        </tr>
     `).join('');
+    
+    // Bind events
+    tbody.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => deleteIssue(parseInt(btn.dataset.id)));
+    });
 }
 
-// Populate selects
+function refreshUI() {
+    updateStats();
+    renderTable();
+}
+
+// ─── Populate Selects ──────────────────────────────
+
 function populateSelects() {
+    // Patient select
     const patientSelect = document.getElementById('patientId');
     if (patientSelect) {
         patientSelect.innerHTML = '<option value="">Select Patient</option>' + 
-            patients.map(p => `<option value="${p.id}">${escapeHtml(p.fullName)}</option>`).join('');
+            patients.map(p => `<option value="${p.id}">${esc(p.fullName)}</option>`).join('');
     }
     
+    // Medicine select
     const medicineSelect = document.getElementById('medicineId');
     if (medicineSelect) {
         medicineSelect.innerHTML = '<option value="">Select Medicine</option>' + 
-            medicines.map(m => `<option value="${m.id}">${escapeHtml(m.name)} ${m.brand ? '(' + escapeHtml(m.brand) + ')' : ''} - Stock: ${m.stock} ${m.unit || ''}</option>`).join('');
+            medicines.map(m => 
+                `<option value="${m.id}">${esc(m.name)} ${m.brand ? '(' + esc(m.brand) + ')' : ''} - Stock: ${m.stock || 0} ${m.unit || ''}</option>`
+            ).join('');
     }
 }
 
-// Update stock warning when medicine is selected
+// ─── Stock Warning ──────────────────────────────────
+
 function updateStockWarning() {
     const medicineId = parseInt(document.getElementById('medicineId')?.value) || null;
     const medicine = medicines.find(m => m.id === medicineId);
@@ -218,111 +207,149 @@ function updateStockWarning() {
     const quantityInput = document.getElementById('quantity');
     
     if (medicine && stockWarning) {
-        if (medicine.stock < 100 && medicine.stock > 0) {
-            stockWarning.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i>Low stock: Only ${medicine.stock} ${medicine.unit || 'units'} left`;
-            stockWarning.style.color = '#d4a853';
-        } else if (medicine.stock === 0) {
-            stockWarning.innerHTML = `<i class="fas fa-times-circle mr-1"></i>Out of stock! Cannot issue this medicine`;
-            stockWarning.style.color = '#d8b48c';
-            if (quantityInput) quantityInput.disabled = true;
+        const stock = medicine.stock || 0;
+        const unit = medicine.unit || 'units';
+        
+        if (stock === 0) {
+            stockWarning.className = 'stock-warning danger';
+            stockWarning.innerHTML = `<i class="fas fa-times-circle"></i> Out of stock! Cannot issue this medicine`;
+            if (quantityInput) {
+                quantityInput.disabled = true;
+                quantityInput.value = '';
+            }
+        } else if (stock < 100) {
+            stockWarning.className = 'stock-warning warning';
+            stockWarning.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Low stock: Only ${stock} ${unit} left`;
+            if (quantityInput) quantityInput.disabled = false;
         } else {
-            stockWarning.innerHTML = `<i class="fas fa-check-circle mr-1"></i>Available stock: ${medicine.stock} ${medicine.unit || 'units'}`;
-            stockWarning.style.color = '#8aae7a';
+            stockWarning.className = 'stock-warning success';
+            stockWarning.innerHTML = `<i class="fas fa-check-circle"></i> Available stock: ${stock} ${unit}`;
             if (quantityInput) quantityInput.disabled = false;
         }
     } else if (stockWarning) {
+        stockWarning.className = 'stock-warning';
         stockWarning.innerHTML = '';
         if (quantityInput) quantityInput.disabled = false;
     }
+}
+
+// ─── Validation ──────────────────────────────────────
+
+function validateIssueForm(patientId, medicineId, quantity, availableStock) {
+    let isValid = true;
     
-    // Reset quantity if stock is 0
-    if (medicine && medicine.stock === 0 && quantityInput) {
-        quantityInput.value = '';
-        quantityInput.disabled = true;
-    } else if (quantityInput && medicine && medicine.stock > 0) {
-        quantityInput.disabled = false;
+    // Clear previous errors
+    const errorFields = ['patientError', 'medicineError', 'quantityError'];
+    errorFields.forEach(field => {
+        const el = document.getElementById(field);
+        if (el) el.textContent = '';
+    });
+    
+    const patientSelect = document.getElementById('patientId');
+    const medicineSelect = document.getElementById('medicineId');
+    const quantityInput = document.getElementById('quantity');
+    
+    [patientSelect, medicineSelect, quantityInput].forEach(el => {
+        if (el) el.classList.remove('error');
+    });
+    
+    // Patient validation
+    if (!patientId) {
+        const errorEl = document.getElementById('patientError');
+        if (errorEl) errorEl.textContent = 'Please select a patient';
+        if (patientSelect) patientSelect.classList.add('error');
+        isValid = false;
+    }
+    
+    // Medicine validation
+    if (!medicineId) {
+        const errorEl = document.getElementById('medicineError');
+        if (errorEl) errorEl.textContent = 'Please select a medicine';
+        if (medicineSelect) medicineSelect.classList.add('error');
+        isValid = false;
+    }
+    
+    // Quantity validation
+    if (!quantity || quantity <= 0) {
+        const errorEl = document.getElementById('quantityError');
+        if (errorEl) errorEl.textContent = 'Please enter a valid quantity (minimum 1)';
+        if (quantityInput) quantityInput.classList.add('error');
+        isValid = false;
+    } else if (medicineId && quantity > availableStock) {
+        const errorEl = document.getElementById('quantityError');
+        if (errorEl) errorEl.textContent = `Insufficient stock! Only ${availableStock} available`;
+        if (quantityInput) quantityInput.classList.add('error');
+        isValid = false;
+    } else if (quantity > 1000) {
+        const errorEl = document.getElementById('quantityError');
+        if (errorEl) errorEl.textContent = 'Quantity cannot exceed 1000';
+        if (quantityInput) quantityInput.classList.add('error');
+        isValid = false;
+    }
+    
+    return isValid;
+}
+
+// ─── Modals ──────────────────────────────────────────
+
+function openModal(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.add('opacity-100', 'visible');
     }
 }
 
-// Modal management
-const modal = document.getElementById('issueModal');
-const form = document.getElementById('issueForm');
+function closeModal(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.remove('opacity-100', 'visible');
+    }
+}
 
-function openModal() {
-    if (!modal) return;
-    // Refresh data before opening
+function openAddModal() {
+    // Refresh data
     const storedPatients = localStorage.getItem('hms_patients');
     const storedMedicines = localStorage.getItem('pharmacy_medicines');
     if (storedPatients) patients = JSON.parse(storedPatients);
     if (storedMedicines) medicines = JSON.parse(storedMedicines);
     populateSelects();
     
-    modal.classList.remove('opacity-0', 'invisible');
-    modal.classList.add('opacity-100', 'visible');
-    const modalCard = modal.querySelector('.form-card');
-    if (modalCard) {
-        modalCard.classList.remove('scale-95');
-        modalCard.classList.add('scale-100');
+    document.getElementById('issueForm').reset();
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-prescription-bottle"></i> Issue Medicine';
+    
+    // Reset stock warning
+    const stockWarning = document.getElementById('stockWarning');
+    if (stockWarning) {
+        stockWarning.className = 'stock-warning';
+        stockWarning.innerHTML = '';
     }
-}
-
-function closeModal() {
-    if (!modal) return;
-    modal.classList.add('opacity-0', 'invisible');
-    modal.classList.remove('opacity-100', 'visible');
-    const modalCard = modal.querySelector('.form-card');
-    if (modalCard) {
-        modalCard.classList.add('scale-95');
-        modalCard.classList.remove('scale-100');
-    }
-    if (form) form.reset();
+    
+    const quantityInput = document.getElementById('quantity');
+    if (quantityInput) quantityInput.disabled = false;
     
     // Clear errors
     const errorFields = ['patientError', 'medicineError', 'quantityError', 'prescribedError'];
     errorFields.forEach(field => {
         const el = document.getElementById(field);
-        if (el) el.innerText = '';
+        if (el) el.textContent = '';
     });
-    const inputs = ['patientId', 'medicineId', 'quantity'];
-    inputs.forEach(input => {
-        const el = document.getElementById(input);
+    ['patientId', 'medicineId', 'quantity'].forEach(id => {
+        const el = document.getElementById(id);
         if (el) el.classList.remove('error');
     });
     
-    const stockWarning = document.getElementById('stockWarning');
-    if (stockWarning) stockWarning.innerHTML = '';
-    
-    const quantityInput = document.getElementById('quantity');
-    if (quantityInput) quantityInput.disabled = false;
+    openModal('issueModal');
 }
 
-// Add issue
-function addIssue() {
-    openModal();
-}
+// ─── Form Submit ────────────────────────────────────
 
-// Delete issue handler
-window.deleteIssueHandler = function(id) {
-    const issue = issues.find(i => i.id === id);
-    if (!issue) return;
-    
-    if (confirm(`Are you sure you want to delete this issue record for "${issue.patientName}"? This will NOT revert stock changes.`)) {
-        issues = issues.filter(i => i.id !== id);
-        saveIssues();
-        renderTable();
-        updateStats();
-        showToast(`Issue record deleted successfully`, 'success');
-    }
-};
-
-// Save issue
-function saveIssueHandler(e) {
+function saveIssue(e) {
     e.preventDefault();
     
-    const patientId = parseInt(document.getElementById('patientId')?.value) || null;
-    const medicineId = parseInt(document.getElementById('medicineId')?.value) || null;
-    const quantity = parseInt(document.getElementById('quantity')?.value) || 0;
-    const prescribedBy = document.getElementById('prescribedBy')?.value.trim() || '';
+    const patientId = parseInt(document.getElementById('patientId').value) || null;
+    const medicineId = parseInt(document.getElementById('medicineId').value) || null;
+    const quantity = parseInt(document.getElementById('quantity').value) || 0;
+    const prescribedBy = document.getElementById('prescribedBy').value.trim();
     
     const medicine = medicines.find(m => m.id === medicineId);
     const availableStock = medicine ? medicine.stock : 0;
@@ -342,8 +369,7 @@ function saveIssueHandler(e) {
     // Update medicine stock
     const medicineIndex = medicines.findIndex(m => m.id === medicineId);
     if (medicineIndex !== -1) {
-        medicines[medicineIndex].stock -= quantity;
-        medicines[medicineIndex].status = medicines[medicineIndex].stock < 100 ? 'Low Stock' : 'In Stock';
+        medicines[medicineIndex].stock = (medicines[medicineIndex].stock || 0) - quantity;
         localStorage.setItem('pharmacy_medicines', JSON.stringify(medicines));
     }
     
@@ -363,34 +389,80 @@ function saveIssueHandler(e) {
     
     issues.push(newIssue);
     saveIssues();
-    renderTable();
-    updateStats();
-    showToast(`Issued ${quantity} ${medicine.unit || 'unit(s)'} of "${medicine.name}" to ${patient.fullName}`, 'success');
-    closeModal();
+    refreshUI();
+    closeModal('issueModal');
+    
+    showToast(`✅ Issued ${quantity} ${medicine.unit || 'unit(s)'} of "${medicine.name}" to ${patient.fullName}`, 'success');
 }
 
-// Event listeners
-document.addEventListener('DOMContentLoaded', () => {
+// ─── Delete ──────────────────────────────────────────
+
+function deleteIssue(id) {
+    const issue = issues.find(i => i.id === id);
+    if (!issue) return;
+    
+    if (confirm(`Are you sure you want to delete this issue record for "${issue.patientName}"? This will NOT revert stock changes.`)) {
+        issues = issues.filter(i => i.id !== id);
+        saveIssues();
+        refreshUI();
+        showToast(`🗑️ Issue record deleted successfully`, 'success');
+    }
+}
+
+// ─── Init ────────────────────────────────────────────
+
+function initIssueModule() {
+    if (isInitialized) return;
+    isInitialized = true;
+    
     loadData();
     
-    const addBtn = document.getElementById('issueBtn');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const cancelModalBtn = document.getElementById('cancelModalBtn');
-    const modalOverlay = document.querySelector('#issueModal .modal-overlay');
-    const issueForm = document.getElementById('issueForm');
-    const medicineSelect = document.getElementById('medicineId');
+    // Event Listeners
+    document.getElementById('issueBtn')?.addEventListener('click', openAddModal);
+    document.getElementById('closeModalBtn')?.addEventListener('click', () => closeModal('issueModal'));
+    document.getElementById('cancelModalBtn')?.addEventListener('click', () => closeModal('issueModal'));
+    document.getElementById('issueForm')?.addEventListener('submit', saveIssue);
     
-    if (addBtn) addBtn.addEventListener('click', addIssue);
-    if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
-    if (cancelModalBtn) cancelModalBtn.addEventListener('click', closeModal);
-    if (modalOverlay) modalOverlay.addEventListener('click', closeModal);
-    if (issueForm) issueForm.addEventListener('submit', saveIssueHandler);
-    if (medicineSelect) medicineSelect.addEventListener('change', updateStockWarning);
+    document.getElementById('resetFilter')?.addEventListener('click', () => {
+        searchTerm = '';
+        document.getElementById('searchInput').value = '';
+        renderTable();
+    });
     
-    // Close on Escape key
+    document.getElementById('searchInput')?.addEventListener('input', (e) => {
+        searchTerm = e.target.value;
+        renderTable();
+    });
+    
+    // Stock warning on medicine select
+    document.getElementById('medicineId')?.addEventListener('change', updateStockWarning);
+    
+    // Close modal on overlay click
+    document.getElementById('issueModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeModal('issueModal');
+    });
+    
+    // ESC key
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal && !modal.classList.contains('invisible')) {
-            closeModal();
+        if (e.key === 'Escape') {
+            closeModal('issueModal');
         }
     });
+}
+
+// ─── Wait for DOM and Common.js ──────────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
+    const checkInterval = setInterval(() => {
+        const sidebar = document.getElementById('mainSidebar');
+        if (sidebar) {
+            clearInterval(checkInterval);
+            setTimeout(initIssueModule, 100);
+        }
+    }, 50);
+    
+    setTimeout(() => {
+        clearInterval(checkInterval);
+        initIssueModule();
+    }, 3000);
 });

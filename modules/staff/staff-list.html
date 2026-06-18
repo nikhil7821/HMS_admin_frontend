@@ -5,235 +5,444 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Staff List | Staff Management | MedFlow</title>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- ✅ CENTRALIZED THEME CSS -->
+    
+    <!-- Theme CSS -->
     <link rel="stylesheet" href="../../css/theme.css">
 
     <style>
-        /* Additional page-specific styles that align with theme */
-        .staff-card {
-            transition: var(--transition-base);
-            border-radius: var(--radius-lg);
-            background: var(--bg-card);
-            border: 1px solid var(--border-default);
-        }
-        
-        .staff-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-            border-color: var(--color-sage-pale);
-        }
-        
-        /* Status badges */
-        .status-badge-active {
-            background: var(--color-success-bg);
-            color: var(--color-success-text);
-            padding: 0.2rem 0.625rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-        }
-        
-        .status-badge-inactive {
-            background: var(--color-error-bg);
-            color: var(--color-error-text);
-            padding: 0.2rem 0.625rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-        }
-        
-        .status-badge-leave {
-            background: var(--color-warning-bg);
-            color: var(--color-warning-text);
-            padding: 0.2rem 0.625rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-        }
-        
-        .role-badge {
-            background: var(--bg-muted);
-            color: var(--color-brown-600);
-            padding: 0.2rem 0.625rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-        }
-        
-        /* Modal overlay styles matching theme.css */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 50;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--bg-overlay);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
+        /* ============================================================
+           STAFF LIST MODULE — Page-specific only
+           ============================================================ */
+
+        /* 🔥 FIX: Prevent layout shift */
+        .main-content {
+            margin-left: 260px !important;
+            margin-top: 70px !important;
+            padding: 1.25rem 1.5rem !important;
+            transition: margin-left 0.3s ease !important;
+            min-height: 100vh !important;
             opacity: 0;
-            visibility: hidden;
-            transition: var(--transition-base);
+            animation: fadeIn 0.3s ease forwards;
         }
-        
-        .modal-overlay.active {
+        .main-content.loaded {
             opacity: 1;
-            visibility: visible;
         }
-        
-        .modal-overlay.active .modal-content {
-            transform: scale(1);
+        #mainSidebar[data-collapsed="true"] ~ .main-content,
+        #mainSidebar[data-collapsed="true"] + .main-content {
+            margin-left: 72px !important;
         }
-        
-        .modal-container {
-            width: 100%;
-            max-width: 650px;
-            margin: 1rem;
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 0 !important;
+                padding: 1rem !important;
+            }
         }
-        
-        .modal-content {
-            background-color: var(--bg-card);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            border-top: 4px solid var(--color-sage);
-            box-shadow: var(--shadow-lg);
-            transform: scale(0.96);
-            transition: var(--transition-base);
-            max-height: 90vh;
-            overflow-y: auto;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        
-        .modal-header {
-            padding: 1.25rem;
-            border-bottom: 1px solid var(--border-default);
-            background-color: var(--bg-card);
+
+        /* 🔥 Page Header - Hidden */
+        .page-header {
+            display: none !important;
         }
-        
-        .modal-header h2 {
-            font-size: 1.0625rem;
-            font-weight: var(--font-weight-light);
-            color: var(--color-brown-700);
-            margin: 0;
-            display: inline-block;
+
+        /* 🔥 Stats Cards - Perfect Spacing */
+        .grid-stats {
+            gap: 1rem !important;
+            margin-bottom: 1.25rem !important;
         }
-        
-        .modal-body {
-            padding: 1.25rem;
-            max-height: 60vh;
-            overflow-y: auto;
+        .stat-card {
+            padding: 1rem 1.25rem !important;
+            border-radius: var(--radius-lg) !important;
         }
-        
-        .modal-footer {
-            padding: 1rem 1.25rem;
-            border-top: 1px solid var(--border-default);
-            background-color: var(--bg-subtle);
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
+        .stat-card .stat-value {
+            font-size: 1.5rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            margin-top: 0.125rem !important;
         }
-        
-        .float-right {
-            float: right;
+        .stat-card .stat-label {
+            font-size: 0.625rem !important;
+            letter-spacing: 0.06em !important;
+            text-transform: uppercase !important;
+            color: var(--color-brown-200) !important;
         }
-        
-        .clearfix::after {
-            content: "";
-            clear: both;
-            display: table;
+        .stat-card .stat-icon-bg {
+            width: 2.5rem !important;
+            height: 2.5rem !important;
+            border-radius: var(--radius-md) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: var(--bg-muted) !important;
         }
-        
-        .border-l-blue-500 {
-            border-left-color: #3b82f6 !important;
+        .stat-card .stat-icon-bg i {
+            font-size: 1rem !important;
         }
-        
-        .border-l-green-500 {
-            border-left-color: var(--color-success-text) !important;
+
+        /* 🔥 Filter Bar - Perfect Alignment */
+        .filter-bar {
+            padding: 0.625rem 1rem !important;
+            gap: 0.625rem !important;
+            margin-bottom: 1.25rem !important;
+            border-radius: var(--radius-lg) !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            display: flex !important;
+            align-items: center !important;
+            flex-wrap: wrap !important;
         }
-        
-        .border-l-purple-500 {
-            border-left-color: #9333ea !important;
+        .filter-bar .search-wrapper {
+            flex: 1 1 200px !important;
+            min-width: 150px !important;
+            max-width: 280px !important;
+            position: relative !important;
         }
-        
-        .border-l-orange-500 {
-            border-left-color: var(--color-warning-text) !important;
+        .filter-bar .search-wrapper i {
+            position: absolute !important;
+            left: 0.75rem !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            color: var(--color-brown-100);
+            font-size: 0.8125rem !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
         }
-        
-        .error-text {
-            color: var(--color-error-text);
-            font-size: 0.6875rem;
-            margin-top: 0.25rem;
-            display: none;
-            font-weight: var(--font-weight-light);
+        .filter-bar .search-input {
+            width: 100% !important;
+            padding: 0.375rem 0.75rem 0.375rem 2.25rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            border-radius: var(--radius-md) !important;
+            border: 1px solid var(--border-input) !important;
+            background-color: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
+            font-family: var(--font-family) !important;
         }
-        
-        .error-text.show {
-            display: block;
+        .filter-bar .search-input:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+            outline: none !important;
         }
-        
-        .form-input.error, .form-select.error {
-            border-color: var(--color-error-text) !important;
-            background-color: var(--color-error-bg) !important;
+        .filter-bar .form-select {
+            min-width: 130px !important;
+            max-width: 170px !important;
+            padding: 0.375rem 1.75rem 0.375rem 0.75rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            border: 1px solid var(--border-input) !important;
+            border-radius: var(--radius-md) !important;
+            background-color: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
+            cursor: pointer !important;
+            font-family: var(--font-family) !important;
         }
-        
-        /* Staff Grid - 5 cards per row on large screens */
-        .grid-staff {
+        .filter-bar .form-select:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+            outline: none !important;
+        }
+        .filter-bar .btn-primary,
+        .filter-bar .btn-secondary {
+            flex: 0 0 auto !important;
+            padding: 0.375rem 0.875rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            border-radius: var(--radius-md) !important;
+            white-space: nowrap !important;
+            font-family: var(--font-family) !important;
+            cursor: pointer !important;
+        }
+        .filter-bar .btn-primary {
+            background-color: var(--color-sage) !important;
+            color: white !important;
+            border: none !important;
+        }
+        .filter-bar .btn-primary:hover {
+            background-color: var(--color-sage-dark) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+            transform: translateY(-1px) !important;
+        }
+        .filter-bar .btn-secondary {
+            background-color: transparent !important;
+            color: var(--color-brown-200) !important;
+            border: 1px solid var(--border-input) !important;
+        }
+        .filter-bar .btn-secondary:hover {
+            background-color: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+            border-color: var(--color-brown-100) !important;
+        }
+
+        @media (max-width: 768px) {
+            .filter-bar {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 0.5rem !important;
+                padding: 0.75rem !important;
+            }
+            .filter-bar .search-wrapper {
+                max-width: 100% !important;
+            }
+            .filter-bar .form-select {
+                max-width: 100% !important;
+            }
+            .filter-bar .btn-primary span,
+            .filter-bar .btn-secondary span {
+                display: none !important;
+            }
+        }
+
+        /* 🔥 Staff Card */
+        .staff-card {
+            transition: all 0.25s ease !important;
+            border-radius: var(--radius-lg) !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            padding: 1rem 1.25rem !important;
+            box-shadow: var(--shadow-card) !important;
+        }
+        .staff-card:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: var(--shadow-md) !important;
+            border-color: var(--color-sage-pale) !important;
+        }
+
+        /* 🔥 Status Badges */
+        .status-badge-active {
+            background: var(--color-success-bg) !important;
+            color: var(--color-success-text) !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
+        .status-badge-inactive {
+            background: var(--color-error-bg) !important;
+            color: var(--color-error-text) !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
+        .status-badge-leave {
+            background: var(--color-warning-bg) !important;
+            color: var(--color-warning-text) !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
+
+        /* 🔥 Role Badge */
+        .role-badge {
+            background: var(--bg-muted) !important;
+            color: var(--color-brown-400) !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
+
+        /* 🔥 Card Button */
+        .card-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 0.375rem !important;
+            padding: 0.375rem 0.75rem !important;
+            border-radius: var(--radius-md) !important;
+            font-size: 0.6875rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            border: none !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            font-family: var(--font-family) !important;
+            flex: 1 !important;
+        }
+        .card-btn-primary {
+            background-color: var(--color-sage) !important;
+            color: white !important;
+        }
+        .card-btn-primary:hover {
+            background-color: var(--color-sage-dark) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+        }
+        .card-btn-danger {
+            background-color: var(--color-warm-tan) !important;
+            color: white !important;
+        }
+        .card-btn-danger:hover {
+            background-color: var(--color-warm-tan-dark) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* 🔥 Staff Grid */
+        .staff-grid {
             display: grid;
-            grid-template-columns: repeat(1, 1fr);
-            gap: 1rem;
+            grid-template-columns: 1fr;
+            gap: 1rem !important;
         }
-        
         @media (min-width: 640px) {
-            .grid-staff {
+            .staff-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
-        
         @media (min-width: 1024px) {
-            .grid-staff {
+            .staff-grid {
                 grid-template-columns: repeat(3, 1fr);
             }
         }
-        
         @media (min-width: 1280px) {
-            .grid-staff {
+            .staff-grid {
                 grid-template-columns: repeat(4, 1fr);
             }
         }
-        
         @media (min-width: 1536px) {
-            .grid-staff {
+            .staff-grid {
                 grid-template-columns: repeat(5, 1fr);
             }
         }
-        
-        /* Staff card content sizing */
+
+        /* 🔥 Staff Card Content */
+        .staff-card .staff-avatar {
+            width: 2.5rem !important;
+            height: 2.5rem !important;
+            background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%) !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: white !important;
+            font-size: 0.75rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            flex-shrink: 0 !important;
+        }
         .staff-card .staff-name {
-            font-size: 0.875rem;
-            font-weight: var(--font-weight-medium);
+            font-size: 0.875rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
         }
-        
-        .staff-card .staff-role {
-            font-size: 0.6875rem;
-            color: var(--color-brown-300);
-        }
-        
         .staff-card .staff-id {
-            font-size: 0.625rem;
-            color: var(--color-brown-100);
+            font-size: 0.625rem !important;
+            color: var(--color-brown-100) !important;
         }
+        .staff-card .staff-role-text {
+            font-size: 0.6875rem !important;
+            color: var(--color-brown-300) !important;
+        }
+        .staff-card .staff-dept {
+            font-size: 0.6875rem !important;
+            color: var(--color-brown-300) !important;
+        }
+        .staff-card .staff-info-row {
+            display: flex !important;
+            justify-content: space-between !important;
+            font-size: 0.6875rem !important;
+            padding: 0.125rem 0 !important;
+        }
+        .staff-card .staff-info-row .label {
+            color: var(--color-brown-100) !important;
+        }
+        .staff-card .staff-info-row .value {
+            color: var(--color-brown-700) !important;
+            font-weight: var(--font-weight-medium) !important;
+        }
+        .staff-card .staff-qualifications {
+            font-size: 0.625rem !important;
+            color: var(--color-brown-100) !important;
+            padding-top: 0.5rem !important;
+            margin-top: 0.5rem !important;
+            border-top: 1px solid var(--border-default) !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            white-space: nowrap !important;
+        }
+
+        /* 🔥 Modal */
+        .form-card {
+            border-top: 4px solid var(--color-sage) !important;
+        }
+        .modal-body {
+            padding: 1.25rem !important;
+        }
+        .modal-footer {
+            padding: 0.75rem 1.25rem !important;
+            background-color: var(--bg-subtle) !important;
+            border-top: 1px solid var(--border-default) !important;
+            display: flex !important;
+            justify-content: flex-end !important;
+            gap: 0.75rem !important;
+        }
+
+        /* 🔥 Error Text */
+        .error-text {
+            color: var(--color-error-text) !important;
+            font-size: 0.6875rem !important;
+            margin-top: 0.25rem !important;
+            display: none !important;
+            font-weight: var(--font-weight-light) !important;
+        }
+        .error-text.show {
+            display: block !important;
+        }
+        .form-input.error,
+        .form-select.error {
+            border-color: var(--color-error-text) !important;
+        }
+
+        /* 🔥 Delete Icon */
+        .delete-icon-circle {
+            width: 3.5rem !important;
+            height: 3.5rem !important;
+            border-radius: 50% !important;
+            background-color: #fee2e2 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 auto 1rem !important;
+            color: #dc2626 !important;
+            font-size: 1.25rem !important;
+        }
+
+        .btn-danger {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            background-color: #ef4444 !important;
+            color: white !important;
+            font-family: var(--font-family) !important;
+            font-size: 0.8125rem !important;
+            font-weight: var(--font-weight-light) !important;
+            padding: 0.5rem 1.25rem !important;
+            border: none !important;
+            border-radius: var(--radius-lg) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+        .btn-danger:hover {
+            background-color: #dc2626 !important;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
+        }
+
+        /* 🔥 Stat Card Border Colors */
+        .stat-card-blue { border-left: 4px solid #3b82f6 !important; }
+        .stat-card-green { border-left: 4px solid var(--color-success-text) !important; }
+        .stat-card-purple { border-left: 4px solid #9333ea !important; }
+        .stat-card-orange { border-left: 4px solid var(--color-warning-text) !important; }
+
+        .text-success-text { color: var(--color-success-text) !important; }
+        .text-warning-text { color: var(--color-warning-text) !important; }
     </style>
 </head>
 <body class="bg-subtle">
@@ -241,86 +450,63 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+    <main class="main-content" id="mainContent">
         
-        <!-- Page Header matching theme -->
-        <div class="page-header mb-6">
-            <div class="page-header-left">
-                <div class="page-header-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div>
-                    <h1 class="page-header-title">Staff Management</h1>
-                    <p class="page-header-subtitle">Manage hospital staff, nurses, technicians, and other employees</p>
-                </div>
-            </div>
-            <div class="page-header-actions">
-                <button id="addStaffBtn" class="btn-primary">
-                    <i class="fas fa-plus text-sm"></i>
-                    <span>Add Staff</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Stats Cards using theme classes -->
-        <div class="grid-stats mb-8">
-            <div class="stat-card" style="border-left: 4px solid #3b82f6;">
-                <div class="flex justify-between items-start">
+        <!-- Stats Cards -->
+        <div class="grid-stats">
+            <div class="stat-card stat-card-blue">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Total Staff</p>
                         <p class="stat-value" id="totalStaff">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-users text-sage text-lg"></i>
+                        <i class="fas fa-users" style="color:#3b82f6;"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid var(--color-success-text);">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-green">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Active</p>
                         <p class="stat-value text-success-text" id="activeStaff">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-user-check text-sage text-lg"></i>
+                        <i class="fas fa-user-check" style="color:var(--color-success-text);"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid #9333ea;">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-purple">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Departments</p>
-                        <p class="stat-value" id="totalDepts">0</p>
+                        <p class="stat-value" style="color:#9333ea;" id="totalDepts">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-building text-sage text-lg"></i>
+                        <i class="fas fa-building" style="color:#9333ea;"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid var(--color-warning-text);">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-orange">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">On Leave Today</p>
                         <p class="stat-value text-warning-text" id="onLeave">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-clock text-sage text-lg"></i>
+                        <i class="fas fa-clock" style="color:var(--color-warning-text);"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Filter Bar using theme classes -->
+        <!-- Filter Bar -->
         <div class="filter-bar">
-            <div class="relative flex-1">
-                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-brown-100 text-sm"></i>
-                <input type="text" id="searchInput" placeholder="Search by name, ID, or department..." 
-                       class="search-input pl-10">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by name, ID, or department...">
             </div>
-            <select id="roleFilter" class="form-select w-auto min-w-[160px]">
+            <select id="roleFilter" class="form-select">
                 <option value="">All Roles</option>
                 <option value="Nurse">Nurse</option>
                 <option value="Receptionist">Receptionist</option>
@@ -331,141 +517,148 @@
                 <option value="Accountant">Accountant</option>
                 <option value="Housekeeping">Housekeeping</option>
             </select>
-            <select id="statusFilter" class="form-select w-auto min-w-[140px]">
+            <select id="statusFilter" class="form-select">
                 <option value="">All Status</option>
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
                 <option value="On Leave">On Leave</option>
             </select>
             <button id="resetFilter" class="btn-secondary">
-                <i class="fas fa-undo-alt mr-1"></i> Reset
+                <i class="fas fa-undo-alt"></i>
+                <span>Reset</span>
+            </button>
+            <button id="addStaffBtn" class="btn-primary">
+                <i class="fas fa-plus"></i>
+                <span>Add Staff</span>
             </button>
         </div>
 
-        <!-- Staff Grid - 5 cards per row on 2K screens -->
-        <div id="staffGrid" class="grid-staff">
-            <div class="col-span-full text-center py-12 text-brown-100">
-                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
-                <p class="font-light">Loading staff members...</p>
+        <!-- Staff Grid -->
+        <div class="staff-grid" id="staffGrid">
+            <div style="grid-column:1/-1; text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
+                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
+                <p style="font-weight:var(--font-weight-light);">Loading staff members...</p>
             </div>
         </div>
     </main>
 
-    <!-- Add/Edit Staff Modal - Matching theme.css structure -->
-    <div id="staffModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 id="modalTitle">Add Staff Member</h2>
-                    <button id="closeModalBtn" class="close-btn float-right">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="clearfix"></div>
-                </div>
-                <form id="staffForm">
-                    <input type="hidden" id="staffId">
-                    <div class="modal-body">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="form-group">
-                                <label class="form-label">Full Name *</label>
-                                <input type="text" id="fullName" required class="form-input" placeholder="e.g., Priya Sharma">
-                                <div class="error-text" id="fullNameError">Full name is required</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Staff ID *</label>
-                                <input type="text" id="staffIdNumber" required class="form-input" placeholder="e.g., NUR001">
-                                <div class="error-text" id="staffIdError">Staff ID is required</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Role *</label>
-                                <select id="role" required class="form-select">
-                                    <option value="">Select Role</option>
-                                    <option value="Nurse">Nurse</option>
-                                    <option value="Receptionist">Receptionist</option>
-                                    <option value="Lab Technician">Lab Technician</option>
-                                    <option value="Radiology Technician">Radiology Technician</option>
-                                    <option value="Pharmacist">Pharmacist</option>
-                                    <option value="Admin">Admin</option>
-                                    <option value="Accountant">Accountant</option>
-                                    <option value="Housekeeping">Housekeeping</option>
-                                </select>
-                                <div class="error-text" id="roleError">Please select a role</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Department</label>
-                                <input type="text" id="department" class="form-input" placeholder="e.g., ICU, Cardiology">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Phone *</label>
-                                <input type="tel" id="phone" required class="form-input" placeholder="+91 98765 43210">
-                                <div class="error-text" id="phoneError">Phone number is required</div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Email</label>
-                                <input type="email" id="email" class="form-input" placeholder="staff@medflow.com">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Date of Joining</label>
-                                <input type="date" id="joiningDate" class="form-input">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Salary (₹)</label>
-                                <input type="number" id="salary" class="form-input" placeholder="35000">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Status *</label>
-                                <select id="status" required class="form-select">
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
-                                    <option value="On Leave">On Leave</option>
-                                </select>
-                                <div class="error-text" id="statusError">Please select status</div>
-                            </div>
-                            <div class="md:col-span-2 form-group">
-                                <label class="form-label">Address</label>
-                                <textarea id="address" rows="2" class="form-textarea" placeholder="Enter address..."></textarea>
-                            </div>
-                            <div class="md:col-span-2 form-group">
-                                <label class="form-label">Qualifications / Skills</label>
-                                <textarea id="qualifications" rows="2" class="form-textarea" placeholder="e.g., B.Sc Nursing, Critical Care Certified"></textarea>
-                            </div>
+    <!-- Add/Edit Staff Modal -->
+    <div id="staffModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="form-card" style="max-width:44rem;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">
+                    <i class="fas fa-user-plus"></i> Add Staff Member
+                </h3>
+                <button class="close-btn" id="closeModalBtn" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="staffForm">
+                <input type="hidden" id="staffId">
+                <div class="modal-body">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem 1.5rem;">
+                        <div class="form-group">
+                            <label class="form-label">Full Name <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="text" id="fullName" required class="form-input" placeholder="e.g., Priya Sharma">
+                            <span class="error-text" id="fullNameError">Full name is required</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Staff ID <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="text" id="staffIdNumber" required class="form-input" placeholder="e.g., NUR001">
+                            <span class="error-text" id="staffIdError">Staff ID is required</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Role <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="role" required class="form-select">
+                                <option value="">Select Role</option>
+                                <option value="Nurse">Nurse</option>
+                                <option value="Receptionist">Receptionist</option>
+                                <option value="Lab Technician">Lab Technician</option>
+                                <option value="Radiology Technician">Radiology Technician</option>
+                                <option value="Pharmacist">Pharmacist</option>
+                                <option value="Admin">Admin</option>
+                                <option value="Accountant">Accountant</option>
+                                <option value="Housekeeping">Housekeeping</option>
+                            </select>
+                            <span class="error-text" id="roleError">Please select a role</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Department</label>
+                            <input type="text" id="department" class="form-input" placeholder="e.g., ICU, Cardiology">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="tel" id="phone" required class="form-input" placeholder="+91 98765 43210">
+                            <span class="error-text" id="phoneError">Phone number is required</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="email" class="form-input" placeholder="staff@medflow.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date of Joining</label>
+                            <input type="date" id="joiningDate" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Salary (₹)</label>
+                            <input type="number" id="salary" class="form-input" placeholder="35000">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="status" required class="form-select">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="On Leave">On Leave</option>
+                            </select>
+                            <span class="error-text" id="statusError">Please select status</span>
+                        </div>
+                        <div class="form-group" style="grid-column:1 / -1;">
+                            <label class="form-label">Address</label>
+                            <textarea id="address" rows="2" class="form-textarea" placeholder="Enter address..."></textarea>
+                        </div>
+                        <div class="form-group" style="grid-column:1 / -1; margin-bottom:0;">
+                            <label class="form-label">Qualifications / Skills</label>
+                            <textarea id="qualifications" rows="2" class="form-textarea" placeholder="e.g., B.Sc Nursing, Critical Care Certified"></textarea>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
-                        <button type="submit" class="btn-primary">
-                            <i class="fas fa-save mr-1"></i> Save Staff
-                        </button>
-                    </div>
-                </form>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Save Staff
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal - Matching theme.css structure -->
-    <div id="deleteModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Confirm Delete</h2>
-                    <button id="closeDeleteModalBtn" class="close-btn float-right">
-                        <i class="fas fa-times"></i>
-                    </button>
-                    <div class="clearfix"></div>
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal-overlay modal-danger" role="dialog" aria-modal="true">
+        <div class="form-card" style="max-width:26rem; border-top-color:#ef4444;">
+            <div class="modal-header">
+                <h3 class="modal-title" style="color:var(--color-brown-700);">
+                    <i class="fas fa-triangle-exclamation" style="color:#ef4444;"></i> Confirm Delete
+                </h3>
+                <button class="close-btn" id="closeDeleteModalBtn" aria-label="Close delete modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="text-align:center; padding:1.75rem 1.25rem;">
+                <div class="delete-icon-circle">
+                    <i class="fas fa-trash-alt"></i>
                 </div>
-                <div class="modal-body text-center">
-                    <div class="w-16 h-16 bg-error-bg rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-trash-alt text-error-text text-2xl"></i>
-                    </div>
-                    <h3 class="text-base font-medium text-brown-700 mb-2">Delete Staff Member?</h3>
-                    <p class="text-brown-300 text-sm font-light">This action cannot be undone. This staff record will be permanently removed.</p>
-                </div>
-                <div class="modal-footer justify-center gap-3">
-                    <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
-                    <button id="confirmDeleteBtn" class="btn-danger">
-                        <i class="fas fa-trash-alt mr-1"></i> Delete
-                    </button>
-                </div>
+                <p style="font-size:0.9375rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin-bottom:0.5rem;">
+                    Delete Staff Member?
+                </p>
+                <p style="font-size:0.8125rem; color:var(--color-brown-300); font-weight:var(--font-weight-light); line-height:1.6;">
+                    This action cannot be undone. This staff record will be permanently removed.
+                </p>
+            </div>
+            <div class="modal-footer" style="justify-content:center;">
+                <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
+                <button id="confirmDeleteBtn" class="btn-danger">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
             </div>
         </div>
     </div>
@@ -473,6 +666,21 @@
     <script src="../../js/core/common.js"></script>
     <script src="../../js/core/form-validation.js"></script>
     <script src="staff-list.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var checkSidebar = setInterval(function() {
+                var sidebar = document.getElementById('mainSidebar');
+                if (sidebar) {
+                    clearInterval(checkSidebar);
+                    document.getElementById('mainContent').classList.add('loaded');
+                }
+            }, 50);
+            setTimeout(function() {
+                document.getElementById('mainContent').classList.add('loaded');
+            }, 1000);
+        });
+    </script>
     
 </body>
 </html>

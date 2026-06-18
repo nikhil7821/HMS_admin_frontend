@@ -1,37 +1,62 @@
 /**
  * Rooms Management JS - Ward Management Module
- * Professional UI, Fully Working, Indian Names, Form Validation
+ * Uses theme.css for styling, clean event handling
  */
 
 let rooms = [];
 let wards = [];
-let deleteId = null;
+let deleteTargetId = null;
+let searchTerm = '';
+let wardFilter = '';
+let isInitialized = false;
+
+// ─── Utility Functions ──────────────────────────────
+
+function esc(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+// ─── Data Management ──────────────────────────────
 
 function loadData() {
-    wards = JSON.parse(localStorage.getItem('wards') || '[]');
-    const stored = localStorage.getItem('rooms');
-    if(stored) {
-        rooms = JSON.parse(stored);
-    } else {
-        rooms = [
-            {id: 1, wardId: 1, wardName: 'ICU', roomNumber: '101', roomType: 'ICU', bedCount: 1, availableBeds: 0, amenities: 'Monitor, Ventilator, AC'},
-            {id: 2, wardId: 2, wardName: 'General Ward', roomNumber: '201', roomType: 'General', bedCount: 6, availableBeds: 2, amenities: 'Fan, Common bathroom'},
-            {id: 3, wardId: 2, wardName: 'General Ward', roomNumber: '202', roomType: 'General', bedCount: 4, availableBeds: 1, amenities: 'Fan, Common bathroom'},
-            {id: 4, wardId: 3, wardName: 'Private Ward', roomNumber: '301', roomType: 'Private', bedCount: 1, availableBeds: 1, amenities: 'AC, TV, Attached bathroom'},
-            {id: 5, wardId: 4, wardName: 'Maternity Ward', roomNumber: '401', roomType: 'Private', bedCount: 2, availableBeds: 1, amenities: 'AC, Attached bathroom, Baby crib'},
-            {id: 6, wardId: 5, wardName: 'Pediatric Ward', roomNumber: '501', roomType: 'General', bedCount: 4, availableBeds: 2, amenities: 'Colorful decor, Play area'},
-            {id: 7, wardId: 6, wardName: 'Emergency Ward', roomNumber: 'G01', roomType: 'ICU', bedCount: 2, availableBeds: 0, amenities: 'Emergency equipment'}
-        ];
-        saveRooms();
-        updateWardStats();
+    try {
+        wards = JSON.parse(localStorage.getItem('wards') || '[]');
+        
+        const stored = localStorage.getItem('rooms');
+        if (stored) {
+            rooms = JSON.parse(stored);
+        } else {
+            rooms = [
+                {id: 1, wardId: 1, wardName: 'ICU', roomNumber: '101', roomType: 'ICU', bedCount: 1, availableBeds: 0, amenities: 'Monitor, Ventilator, AC'},
+                {id: 2, wardId: 2, wardName: 'General Ward', roomNumber: '201', roomType: 'General', bedCount: 6, availableBeds: 2, amenities: 'Fan, Common bathroom'},
+                {id: 3, wardId: 2, wardName: 'General Ward', roomNumber: '202', roomType: 'General', bedCount: 4, availableBeds: 1, amenities: 'Fan, Common bathroom'},
+                {id: 4, wardId: 3, wardName: 'Private Ward', roomNumber: '301', roomType: 'Private', bedCount: 1, availableBeds: 1, amenities: 'AC, TV, Attached bathroom'},
+                {id: 5, wardId: 4, wardName: 'Maternity Ward', roomNumber: '401', roomType: 'Private', bedCount: 2, availableBeds: 1, amenities: 'AC, Attached bathroom, Baby crib'},
+                {id: 6, wardId: 5, wardName: 'Pediatric Ward', roomNumber: '501', roomType: 'General', bedCount: 4, availableBeds: 2, amenities: 'Colorful decor, Play area'},
+                {id: 7, wardId: 6, wardName: 'Emergency Ward', roomNumber: 'G01', roomType: 'ICU', bedCount: 2, availableBeds: 0, amenities: 'Emergency equipment'}
+            ];
+            saveRooms();
+            updateWardStats();
+        }
+        refreshUI();
+        populateFilters();
+    } catch (error) {
+        console.error('Error loading room data:', error);
+        if (window.showToast) {
+            window.showToast('Error loading room data', 'error');
+        }
     }
-    updateStats();
-    renderTable();
-    populateFilters();
 }
 
 function saveRooms() {
-    localStorage.setItem('rooms', JSON.stringify(rooms));
+    try {
+        localStorage.setItem('rooms', JSON.stringify(rooms));
+    } catch (error) {
+        console.error('Error saving rooms:', error);
+    }
 }
 
 function updateWardStats() {
@@ -41,7 +66,7 @@ function updateWardStats() {
         const availableBedsInWard = wardRooms.reduce((sum, r) => sum + (r.availableBeds || 0), 0);
         
         const wardIndex = wards.findIndex(w => w.id === ward.id);
-        if(wardIndex !== -1) {
+        if (wardIndex !== -1) {
             wards[wardIndex].totalBeds = totalBedsInWard;
             wards[wardIndex].availableBeds = availableBedsInWard;
         }
@@ -49,16 +74,113 @@ function updateWardStats() {
     localStorage.setItem('wards', JSON.stringify(wards));
 }
 
+// ─── Stats ──────────────────────────────────────────
+
 function updateStats() {
     const totalRooms = rooms.length;
     const totalBeds = rooms.reduce((sum, r) => sum + (r.bedCount || 0), 0);
     const availableBeds = rooms.reduce((sum, r) => sum + (r.availableBeds || 0), 0);
     
-    document.getElementById('totalWards').innerText = wards.length;
-    document.getElementById('totalRooms').innerText = totalRooms;
-    document.getElementById('totalBeds').innerText = totalBeds;
-    document.getElementById('availableBeds').innerText = availableBeds;
+    document.getElementById('totalWards').textContent = wards.length;
+    document.getElementById('totalRooms').textContent = totalRooms;
+    document.getElementById('totalBeds').textContent = totalBeds;
+    document.getElementById('availableBeds').textContent = availableBeds;
 }
+
+// ─── Filter ──────────────────────────────────────────
+
+function getFilteredRooms() {
+    return rooms.filter(room => {
+        const matchesSearch = searchTerm === '' || 
+            room.roomNumber.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        const matchesWard = wardFilter === '' || room.wardId.toString() === wardFilter;
+        
+        return matchesSearch && matchesWard;
+    });
+}
+
+// ─── Render ──────────────────────────────────────────
+
+function renderTable() {
+    const tbody = document.getElementById('roomsTable');
+    if (!tbody) return;
+    
+    const filtered = getFilteredRooms();
+    
+    if (filtered.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="rooms-empty">
+                    <i class="fas fa-door-open"></i>
+                    <p>No rooms found</p>
+                    <p style="font-size:0.75rem; margin-top:0.25rem;">Add a room to get started.</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    // Sort by room number
+    const sorted = [...filtered].sort((a, b) => a.roomNumber.localeCompare(b.roomNumber));
+    
+    tbody.innerHTML = sorted.map(room => {
+        const isAvailable = room.availableBeds > 0;
+        const statusClass = isAvailable ? 'status-available' : 'status-full';
+        const statusText = isAvailable ? 'Available' : 'Full';
+        const bedsClass = isAvailable ? 'beds-available' : 'beds-full';
+        
+        return `
+            <tr class="room-row" data-id="${room.id}">
+                <td style="font-weight:var(--font-weight-medium); color:var(--color-brown-700); font-size:0.875rem;">${esc(room.roomNumber)}</td>
+                <td style="color:var(--color-brown-300);">${esc(room.wardName)}</td>
+                <td><span class="room-type-badge">${esc(room.roomType)}</span></td>
+                <td style="text-align:center; color:var(--color-brown-300);">${room.bedCount || 0}</td>
+                <td style="text-align:center;" class="${bedsClass}">${room.availableBeds || 0}</td>
+                <td><span class="${statusClass}">${statusText}</span></td>
+                <td style="text-align:center;">
+                    <div style="display:flex; gap:0.25rem; justify-content:center;">
+                        <button class="action-btn edit-btn" data-id="${room.id}" title="Edit Room">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete delete-btn" data-id="${room.id}" title="Delete Room">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+    
+    // Bind events
+    tbody.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', () => openEditModal(parseInt(btn.dataset.id)));
+    });
+    tbody.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => openDeleteModal(parseInt(btn.dataset.id)));
+    });
+}
+
+function refreshUI() {
+    updateStats();
+    renderTable();
+}
+
+function populateFilters() {
+    const wardSelect = document.getElementById('wardFilter');
+    if (wardSelect) {
+        wardSelect.innerHTML = '<option value="">All Wards</option>' + 
+            wards.map(w => `<option value="${w.id}">${esc(w.name)}</option>`).join('');
+    }
+    
+    const wardSelectModal = document.getElementById('wardId');
+    if (wardSelectModal) {
+        wardSelectModal.innerHTML = '<option value="">-- Select Ward --</option>' + 
+            wards.map(w => `<option value="${w.id}">${esc(w.name)} (${w.totalBeds || 0} beds)</option>`).join('');
+    }
+}
+
+// ─── Validation ──────────────────────────────────────
 
 function validateRoomForm() {
     let isValid = true;
@@ -68,161 +190,91 @@ function validateRoomForm() {
     const roomType = document.getElementById('roomType').value;
     const bedCount = document.getElementById('bedCount').value;
     
+    // Reset errors
+    document.querySelectorAll('.error-text').forEach(el => el.classList.remove('show'));
+    document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
+    
     if (!wardId) {
         document.getElementById('wardIdError').classList.add('show');
         document.getElementById('wardId').classList.add('error');
         isValid = false;
-    } else {
-        document.getElementById('wardIdError').classList.remove('show');
-        document.getElementById('wardId').classList.remove('error');
     }
     
     if (!roomNumber) {
         document.getElementById('roomNumberError').classList.add('show');
         document.getElementById('roomNumber').classList.add('error');
         isValid = false;
-    } else {
-        document.getElementById('roomNumberError').classList.remove('show');
-        document.getElementById('roomNumber').classList.remove('error');
     }
     
     if (!roomType) {
         document.getElementById('roomTypeError').classList.add('show');
         document.getElementById('roomType').classList.add('error');
         isValid = false;
-    } else {
-        document.getElementById('roomTypeError').classList.remove('show');
-        document.getElementById('roomType').classList.remove('error');
     }
     
     if (bedCount && (parseInt(bedCount) < 1 || isNaN(parseInt(bedCount)))) {
         document.getElementById('bedCountError').classList.add('show');
         document.getElementById('bedCount').classList.add('error');
         isValid = false;
-    } else {
-        document.getElementById('bedCountError').classList.remove('show');
-        document.getElementById('bedCount').classList.remove('error');
     }
     
     return isValid;
 }
 
-function renderTable() {
-    const search = document.getElementById('searchInput')?.value.toLowerCase() || '';
-    const wardFilter = document.getElementById('wardFilter')?.value || '';
-    
-    let filtered = rooms.filter(room => {
-        const matchesSearch = room.roomNumber.toLowerCase().includes(search);
-        const matchesWard = wardFilter === '' || room.wardId.toString() === wardFilter;
-        return matchesSearch && matchesWard;
-    });
-    
-    const tbody = document.getElementById('roomsTable');
-    if(filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-[#94a3b8]"><i class="fas fa-door-open text-3xl mb-2 block"></i><p class="font-normal">No rooms found</p> </td></tr>';
-        return;
-    }
-    
-    tbody.innerHTML = filtered.map(room => `
-        <tr class="room-row">
-            <td class="px-5 py-3 font-medium text-[#1e293b] text-sm">${escapeHtml(room.roomNumber)}</td>
-            <td class="px-5 py-3 text-[#475569] text-sm">${escapeHtml(room.wardName)}</td>
-            <td class="px-5 py-3"><span class="px-2 py-1 bg-[#f1f5f9] text-[#475569] rounded-full text-xs font-medium">${escapeHtml(room.roomType)}</span></td>
-            <td class="px-5 py-3 text-center text-[#475569] text-sm">${room.bedCount || 0}</td>
-            <td class="px-5 py-3 text-center ${room.availableBeds > 0 ? 'text-[#16a34a] font-medium' : 'text-[#ef4444] font-medium'} text-sm">${room.availableBeds || 0}</td>
-            <td class="px-5 py-3">
-                <span class="px-2 py-1 rounded-full text-xs font-medium ${room.availableBeds > 0 ? 'bg-[#dcfce7] text-[#16a34a]' : 'bg-[#fee2e2] text-[#ef4444]'}">
-                    ${room.availableBeds > 0 ? 'Available' : 'Full'}
-                </span>
-            </td>
-            <td class="px-5 py-3 text-center">
-                <div class="flex gap-2 justify-center">
-                    <button onclick="editRoom(${room.id})" class="text-[#a8c49a] hover:text-[#7a9a68] transition" title="Edit Room">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="deleteRoom(${room.id})" class="text-[#d8b48c] hover:text-[#c49a6c] transition" title="Delete Room">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </div>
-             </td>
-         </tr>
-    `).join('');
+// ─── Modals ──────────────────────────────────────────
+
+function openModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('opacity-100', 'visible');
 }
 
-function populateFilters() {
-    const wardSelect = document.getElementById('wardFilter');
-    if(wardSelect) {
-        wardSelect.innerHTML = '<option value="">All Wards</option>' + 
-            wards.map(w => `<option value="${w.id}">${escapeHtml(w.name)}</option>`).join('');
-    }
-    
-    const wardSelectModal = document.getElementById('wardId');
-    if(wardSelectModal) {
-        wardSelectModal.innerHTML = '<option value="">-- Select Ward --</option>' + 
-            wards.map(w => `<option value="${w.id}">${escapeHtml(w.name)} (${w.totalBeds || 0} beds)</option>`).join('');
-    }
+function closeModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('opacity-100', 'visible');
 }
 
-function openModal() {
+function openAddModal() {
     document.getElementById('roomForm').reset();
     document.getElementById('roomId').value = '';
-    document.getElementById('modalTitle').innerText = 'Add Room';
     document.getElementById('bedCount').value = '1';
-    document.getElementById('roomModal').classList.add('active');
-    populateFilters();
-    
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-door-open"></i> Add Room';
     document.querySelectorAll('.error-text').forEach(el => el.classList.remove('show'));
     document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
+    populateFilters();
+    openModal('roomModal');
 }
 
-function editRoom(id) {
+function openEditModal(id) {
     const room = rooms.find(r => r.id === id);
-    if(room) {
+    if (room) {
         document.getElementById('roomId').value = room.id;
         document.getElementById('wardId').value = room.wardId;
         document.getElementById('roomNumber').value = room.roomNumber;
         document.getElementById('roomType').value = room.roomType;
         document.getElementById('bedCount').value = room.bedCount;
         document.getElementById('amenities').value = room.amenities || '';
-        document.getElementById('modalTitle').innerText = 'Edit Room';
-        document.getElementById('roomModal').classList.add('active');
-        populateFilters();
-        
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Room';
         document.querySelectorAll('.error-text').forEach(el => el.classList.remove('show'));
         document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
+        populateFilters();
+        openModal('roomModal');
     }
 }
 
-function deleteRoom(id) {
-    deleteId = id;
-    document.getElementById('deleteModal').classList.add('active');
+function openDeleteModal(id) {
+    deleteTargetId = id;
+    openModal('deleteModal');
 }
 
-function confirmDelete() {
-    if(deleteId) {
-        const room = rooms.find(r => r.id === deleteId);
-        rooms = rooms.filter(r => r.id !== deleteId);
-        saveRooms();
-        
-        // Delete associated beds
-        let beds = JSON.parse(localStorage.getItem('beds') || '[]');
-        beds = beds.filter(b => b.roomId !== deleteId);
-        localStorage.setItem('beds', JSON.stringify(beds));
-        
-        updateWardStats();
-        updateStats();
-        renderTable();
-        showToast(`Room ${room?.roomNumber} deleted successfully`, 'success');
-        deleteId = null;
-        document.getElementById('deleteModal').classList.remove('active');
-    }
-}
+// ─── Form Submit ────────────────────────────────────
 
 function saveRoom(e) {
     e.preventDefault();
     
-    if(!validateRoomForm()) {
-        showToast('Please fill all required fields correctly', 'error');
+    if (!validateRoomForm()) {
+        if (window.showToast) {
+            window.showToast('Please fill all required fields correctly', 'error');
+        }
         return;
     }
     
@@ -237,104 +289,115 @@ function saveRoom(e) {
         roomNumber: document.getElementById('roomNumber').value.trim(),
         roomType: document.getElementById('roomType').value,
         bedCount: bedCount,
-        availableBeds: bedCount,
-        amenities: document.getElementById('amenities').value
+        amenities: document.getElementById('amenities').value.trim()
     };
     
-    if(id) {
+    if (id) {
         const index = rooms.findIndex(r => r.id === parseInt(id));
-        if(index !== -1) {
+        if (index !== -1) {
             const oldRoom = rooms[index];
-            if(oldRoom.bedCount !== bedCount) {
+            if (oldRoom.bedCount !== bedCount) {
                 const difference = bedCount - oldRoom.bedCount;
-                data.availableBeds = (oldRoom.availableBeds || 0) + difference;
+                data.availableBeds = Math.max(0, (oldRoom.availableBeds || 0) + difference);
             } else {
                 data.availableBeds = oldRoom.availableBeds;
             }
             rooms[index] = { ...rooms[index], ...data };
-            showToast('Room updated successfully', 'success');
+            if (window.showToast) {
+                window.showToast(`✅ Room ${data.roomNumber} updated successfully`, 'success');
+            }
         }
     } else {
         const newId = rooms.length > 0 ? Math.max(...rooms.map(r => r.id)) + 1 : 1;
+        data.availableBeds = bedCount;
         rooms.push({ id: newId, ...data });
-        showToast('Room added successfully', 'success');
+        if (window.showToast) {
+            window.showToast(`✅ Room ${data.roomNumber} added successfully`, 'success');
+        }
     }
     
     saveRooms();
     updateWardStats();
-    updateStats();
-    renderTable();
-    closeModal();
+    refreshUI();
+    closeModal('roomModal');
 }
 
-function closeModal() {
-    document.getElementById('roomModal').classList.remove('active');
-    document.getElementById('roomForm').reset();
-    document.querySelectorAll('.error-text').forEach(el => el.classList.remove('show'));
-    document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
+// ─── Delete ──────────────────────────────────────────
+
+function handleConfirmDelete() {
+    if (!deleteTargetId) return;
+    
+    const room = rooms.find(r => r.id === deleteTargetId);
+    rooms = rooms.filter(r => r.id !== deleteTargetId);
+    saveRooms();
+    
+    // Delete associated beds
+    let beds = JSON.parse(localStorage.getItem('beds') || '[]');
+    beds = beds.filter(b => b.roomId !== deleteTargetId);
+    localStorage.setItem('beds', JSON.stringify(beds));
+    
+    updateWardStats();
+    refreshUI();
+    closeModal('deleteModal');
+    
+    if (room && window.showToast) {
+        window.showToast(`🗑️ Room ${room.roomNumber} deleted successfully`, 'success');
+    }
+    deleteTargetId = null;
 }
 
-function closeDeleteModal() {
-    document.getElementById('deleteModal').classList.remove('active');
-    deleteId = null;
-}
+// ─── Init ────────────────────────────────────────────
 
-function showToast(message, type) {
-    const toast = document.createElement('div');
-    const colors = { success: '#10b981', error: '#ef4444', info: '#a8c49a' };
-    toast.className = `fixed bottom-6 right-6 z-50 px-5 py-3 rounded-lg shadow-lg text-white text-sm font-medium transition-all duration-300`;
-    toast.style.backgroundColor = colors[type] || colors.info;
-    toast.innerHTML = `<div class="flex items-center gap-2"><i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i><span>${message}</span></div>`;
-    document.body.appendChild(toast);
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
-function escapeHtml(str) {
-    if(!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-}
-
-document.addEventListener('DOMContentLoaded', () => {
+function initRoomsModule() {
+    if (isInitialized) return;
+    isInitialized = true;
+    
     loadData();
     
-    document.getElementById('addRoomBtn')?.addEventListener('click', openModal);
-    document.getElementById('closeModalBtn')?.addEventListener('click', closeModal);
-    document.getElementById('cancelModalBtn')?.addEventListener('click', closeModal);
-    document.getElementById('closeDeleteModalBtn')?.addEventListener('click', closeDeleteModal);
-    document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeDeleteModal);
-    document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
+    // Event Listeners
+    document.getElementById('addRoomBtn')?.addEventListener('click', openAddModal);
+    document.getElementById('closeModalBtn')?.addEventListener('click', () => closeModal('roomModal'));
+    document.getElementById('cancelModalBtn')?.addEventListener('click', () => closeModal('roomModal'));
+    document.getElementById('closeDeleteModalBtn')?.addEventListener('click', () => closeModal('deleteModal'));
+    document.getElementById('cancelDeleteBtn')?.addEventListener('click', () => closeModal('deleteModal'));
+    document.getElementById('confirmDeleteBtn')?.addEventListener('click', handleConfirmDelete);
     document.getElementById('roomForm')?.addEventListener('submit', saveRoom);
-    document.getElementById('wardFilter')?.addEventListener('change', () => renderTable());
-    document.getElementById('searchInput')?.addEventListener('input', () => renderTable());
+    
     document.getElementById('resetFilter')?.addEventListener('click', () => {
+        searchTerm = '';
+        wardFilter = '';
         document.getElementById('searchInput').value = '';
         document.getElementById('wardFilter').value = '';
         renderTable();
     });
     
+    document.getElementById('searchInput')?.addEventListener('input', (e) => {
+        searchTerm = e.target.value;
+        renderTable();
+    });
+    
+    document.getElementById('wardFilter')?.addEventListener('change', (e) => {
+        wardFilter = e.target.value;
+        renderTable();
+    });
+    
     // Real-time validation
     document.getElementById('wardId')?.addEventListener('change', function() {
-        if(this.value) {
+        if (this.value) {
             document.getElementById('wardIdError')?.classList.remove('show');
             this.classList.remove('error');
         }
     });
     
     document.getElementById('roomNumber')?.addEventListener('input', function() {
-        if(this.value.trim()) {
+        if (this.value.trim()) {
             document.getElementById('roomNumberError')?.classList.remove('show');
             this.classList.remove('error');
         }
     });
     
     document.getElementById('roomType')?.addEventListener('change', function() {
-        if(this.value) {
+        if (this.value) {
             document.getElementById('roomTypeError')?.classList.remove('show');
             this.classList.remove('error');
         }
@@ -342,12 +405,42 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('bedCount')?.addEventListener('input', function() {
         const val = parseInt(this.value);
-        if(!this.value || (val >= 1 && !isNaN(val))) {
+        if (!this.value || (val >= 1 && !isNaN(val))) {
             document.getElementById('bedCountError')?.classList.remove('show');
             this.classList.remove('error');
         }
     });
-});
+    
+    // Close modals on overlay click
+    document.getElementById('roomModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeModal('roomModal');
+    });
+    document.getElementById('deleteModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeModal('deleteModal');
+    });
+    
+    // ESC key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeModal('roomModal');
+            closeModal('deleteModal');
+        }
+    });
+}
 
-window.editRoom = editRoom;
-window.deleteRoom = deleteRoom;
+// ─── Wait for DOM and Common.js ──────────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
+    const checkInterval = setInterval(() => {
+        const sidebar = document.getElementById('mainSidebar');
+        if (sidebar) {
+            clearInterval(checkInterval);
+            setTimeout(initRoomsModule, 100);
+        }
+    }, 50);
+    
+    setTimeout(() => {
+        clearInterval(checkInterval);
+        initRoomsModule();
+    }, 3000);
+});

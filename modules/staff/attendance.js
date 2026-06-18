@@ -1,122 +1,177 @@
 /**
  * Attendance Management JS - Staff Module
- * Professional UI, Fully Working, Indian Names
+ * Uses theme.css for styling, clean event handling
  */
 
-let staffMembers = [];
-let attendanceRecords = [];
-let currentDate = new Date().toISOString().split('T')[0];
+var staffMembers = [];
+var attendanceRecords = [];
+var currentDate = '';
+var isInitialized = false;
+
+// ─── Utility Functions ──────────────────────────────
+
+function esc(str) {
+    if (!str) return '';
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+// ─── Toast Notification ──────────────────────────────
+
+function showToast(message, type) {
+    type = type || 'success';
+    var toast = document.createElement('div');
+    var colors = { success: '#8aae7a', error: '#d8b48c', info: '#a8c49a' };
+    toast.style.cssText = 'position:fixed; bottom:24px; right:24px; z-index:9999; display:flex; align-items:center; gap:8px; padding:10px 20px; border-radius:12px; background:' + colors[type] + '; color:white; font-weight:500; font-size:0.75rem; backdrop-filter:blur(8px); box-shadow:0 4px 12px rgba(0,0,0,0.08); animation:slideInRight 0.25s ease-out; font-family:Poppins, sans-serif;';
+    toast.innerHTML = '<i class="fas ' + (type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle') + '"></i><span>' + esc(message) + '</span>';
+    document.body.appendChild(toast);
+    setTimeout(function() {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(function() { toast.remove(); }, 250);
+    }, 3000);
+}
+
+// ─── Data Management ──────────────────────────────
 
 function loadData() {
-    staffMembers = JSON.parse(localStorage.getItem('staff_members') || '[]');
-    const stored = localStorage.getItem('staff_attendance');
-    if(stored) {
-        attendanceRecords = JSON.parse(stored);
-    } else {
-        attendanceRecords = [];
-        // Add some demo attendance for today
-        const today = new Date().toISOString().split('T')[0];
-        const activeStaff = staffMembers.filter(s => s.status === 'Active');
-        activeStaff.forEach((staff, index) => {
-            let status = index % 3 === 0 ? 'Present' : (index % 3 === 1 ? 'Present' : 'Late');
-            attendanceRecords.push({
-                staffId: staff.id,
-                date: today,
-                status: status,
-                checkIn: status === 'Late' ? '09:30' : '09:00',
-                checkOut: '17:00',
-                notes: ''
-            });
-        });
-        localStorage.setItem('staff_attendance', JSON.stringify(attendanceRecords));
+    try {
+        staffMembers = JSON.parse(localStorage.getItem('staff_members') || '[]');
+        var stored = localStorage.getItem('staff_attendance');
+        if (stored) {
+            attendanceRecords = JSON.parse(stored);
+        } else {
+            attendanceRecords = [];
+            var today = new Date().toISOString().split('T')[0];
+            var activeStaff = staffMembers.filter(function(s) { return s.status === 'Active'; });
+            for (var i = 0; i < activeStaff.length; i++) {
+                var status = i % 3 === 0 ? 'Present' : (i % 3 === 1 ? 'Present' : 'Late');
+                attendanceRecords.push({
+                    staffId: activeStaff[i].id,
+                    date: today,
+                    status: status,
+                    checkIn: status === 'Late' ? '09:30' : '09:00',
+                    checkOut: '17:00',
+                    notes: ''
+                });
+            }
+            localStorage.setItem('staff_attendance', JSON.stringify(attendanceRecords));
+        }
+        currentDate = new Date().toISOString().split('T')[0];
+        document.getElementById('attendanceDate').value = currentDate;
+        refreshUI();
+    } catch (error) {
+        console.error('Error loading data:', error);
+        showToast('Error loading attendance data', 'error');
     }
-    updateStats();
-    document.getElementById('attendanceDate').value = currentDate;
-    loadAttendance();
 }
+
+// ─── Stats ──────────────────────────────────────────
 
 function updateStats() {
-    const totalActiveStaff = staffMembers.filter(s => s.status === 'Active').length;
-    const presentCount = attendanceRecords.filter(a => a.date === currentDate && a.status === 'Present').length;
-    const absentCount = attendanceRecords.filter(a => a.date === currentDate && a.status === 'Absent').length;
-    const lateCount = attendanceRecords.filter(a => a.date === currentDate && a.status === 'Late').length;
+    var totalActiveStaff = 0;
+    for (var i = 0; i < staffMembers.length; i++) {
+        if (staffMembers[i].status === 'Active') totalActiveStaff++;
+    }
     
-    document.getElementById('totalStaff').innerText = totalActiveStaff;
-    document.getElementById('presentCount').innerText = presentCount;
-    document.getElementById('absentCount').innerText = absentCount;
-    document.getElementById('lateCount').innerText = lateCount;
+    var presentCount = 0, absentCount = 0, lateCount = 0;
+    for (var j = 0; j < attendanceRecords.length; j++) {
+        if (attendanceRecords[j].date === currentDate) {
+            if (attendanceRecords[j].status === 'Present') presentCount++;
+            else if (attendanceRecords[j].status === 'Absent') absentCount++;
+            else if (attendanceRecords[j].status === 'Late') lateCount++;
+        }
+    }
+    
+    document.getElementById('totalStaff').textContent = totalActiveStaff;
+    document.getElementById('presentCount').textContent = presentCount;
+    document.getElementById('absentCount').textContent = absentCount;
+    document.getElementById('lateCount').textContent = lateCount;
 }
 
-function loadAttendance() {
-    currentDate = document.getElementById('attendanceDate').value;
-    const tbody = document.getElementById('attendanceTable');
-    const activeStaff = staffMembers.filter(s => s.status === 'Active');
+// ─── Render ──────────────────────────────────────────
+
+function renderTable() {
+    var tbody = document.getElementById('attendanceTable');
+    if (!tbody) return;
     
-    if(activeStaff.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-12 text-[#94a3b8]"><i class="fas fa-users text-3xl mb-2 block"></i><p class="font-normal">No active staff members found</p> </td><tr>';
+    var activeStaff = staffMembers.filter(function(s) { return s.status === 'Active'; });
+    
+    if (activeStaff.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);"><i class="fas fa-users" style="font-size:2rem; margin-bottom:0.75rem; display:block; opacity:0.4;"></i><p style="font-size:0.875rem; font-weight:var(--font-weight-light);">No active staff members found</p></td></tr>';
         return;
     }
     
-    tbody.innerHTML = activeStaff.map(staff => {
-        let existing = attendanceRecords.find(a => a.staffId === staff.id && a.date === currentDate);
+    var html = '';
+    for (var i = 0; i < activeStaff.length; i++) {
+        var staff = activeStaff[i];
+        var existing = null;
+        for (var j = 0; j < attendanceRecords.length; j++) {
+            if (attendanceRecords[j].staffId === staff.id && attendanceRecords[j].date === currentDate) {
+                existing = attendanceRecords[j];
+                break;
+            }
+        }
         
-        const statusOptions = ['Present', 'Absent', 'Late', 'Half Day', 'Holiday'];
-        const statusHtml = statusOptions.map(status => {
-            const selected = existing?.status === status ? 'selected' : '';
-            return `<option value="${status}" ${selected}>${status}</option>`;
-        }).join('');
+        var statusOptions = ['Present', 'Absent', 'Late', 'Half Day', 'Holiday'];
+        var statusHtml = '';
+        for (var k = 0; k < statusOptions.length; k++) {
+            var selected = (existing && existing.status === statusOptions[k]) ? 'selected' : '';
+            statusHtml += '<option value="' + statusOptions[k] + '" ' + selected + '>' + statusOptions[k] + '</option>';
+        }
         
-        const checkInValue = existing?.checkIn || '09:00';
-        const checkOutValue = existing?.checkOut || '17:00';
-        const notesValue = existing?.notes || '';
+        var checkInValue = (existing && existing.checkIn) ? existing.checkIn : '09:00';
+        var checkOutValue = (existing && existing.checkOut) ? existing.checkOut : '17:00';
+        var notesValue = (existing && existing.notes) ? existing.notes : '';
         
-        return `
-            <tr class="attendance-row">
-                <td class="px-5 py-3">
-                    <div>
-                        <p class="font-medium text-[#1e293b] text-sm">${escapeHtml(staff.fullName)}</p>
-                        <p class="text-xs text-[#94a3b8]">${escapeHtml(staff.staffId)}</p>
-                    </div>
-                </td>
-                <td class="px-5 py-3 text-sm text-[#475569]">${escapeHtml(staff.role)}</td>
-                <td class="px-5 py-3">
-                    <select class="status-select" data-staff="${staff.id}">
-                        ${statusHtml}
-                    </select>
-                </td>
-                <td class="px-5 py-3">
-                    <input type="time" class="time-input" data-staff="${staff.id}" data-type="checkin" value="${checkInValue}">
-                </td>
-                <td class="px-5 py-3">
-                    <input type="time" class="time-input" data-staff="${staff.id}" data-type="checkout" value="${checkOutValue}">
-                </td>
-                <td class="px-5 py-3">
-                    <input type="text" class="notes-input" data-staff="${staff.id}" data-type="notes" value="${escapeHtml(notesValue)}" placeholder="Notes...">
-                </td>
-            </tr>
-        `;
-    }).join('');
-    
-    updateStats();
+        html += '<tr class="attendance-row">';
+        html += '<td><div><p class="staff-name">' + esc(staff.fullName) + '</p><p class="staff-id">' + esc(staff.staffId) + '</p></div></td>';
+        html += '<td class="staff-role">' + esc(staff.role) + '</td>';
+        html += '<td><select class="status-select" data-staff="' + staff.id + '">' + statusHtml + '</select></td>';
+        html += '<td><input type="time" class="time-input" data-staff="' + staff.id + '" data-type="checkin" value="' + checkInValue + '"></td>';
+        html += '<td><input type="time" class="time-input" data-staff="' + staff.id + '" data-type="checkout" value="' + checkOutValue + '"></td>';
+        html += '<td><input type="text" class="notes-input" data-staff="' + staff.id + '" data-type="notes" value="' + esc(notesValue) + '" placeholder="Notes..."></td>';
+        html += '</tr>';
+    }
+    tbody.innerHTML = html;
 }
 
+function refreshUI() {
+    updateStats();
+    renderTable();
+}
+
+// ─── Load Attendance ──────────────────────────────────
+
+function loadAttendance() {
+    var dateInput = document.getElementById('attendanceDate');
+    if (dateInput) {
+        currentDate = dateInput.value;
+        refreshUI();
+        showToast('Attendance loaded for ' + currentDate, 'info');
+    }
+}
+
+// ─── Save Attendance ──────────────────────────────────
+
 function saveAttendance() {
-    let newRecords = [];
-    let hasChanges = false;
+    var newRecords = [];
+    var hasChanges = false;
     
-    // Collect all status selections
-    document.querySelectorAll('.status-select').forEach(select => {
-        const staffId = parseInt(select.dataset.staff);
-        const status = select.value;
+    var statusSelects = document.querySelectorAll('.status-select');
+    for (var i = 0; i < statusSelects.length; i++) {
+        var select = statusSelects[i];
+        var staffId = parseInt(select.dataset.staff);
+        var status = select.value;
         
-        // Find corresponding check-in, check-out, and notes
-        const checkInInput = document.querySelector(`.time-input[data-staff="${staffId}"][data-type="checkin"]`);
-        const checkOutInput = document.querySelector(`.time-input[data-staff="${staffId}"][data-type="checkout"]`);
-        const notesInput = document.querySelector(`.notes-input[data-staff="${staffId}"][data-type="notes"]`);
+        var checkInInput = document.querySelector('.time-input[data-staff="' + staffId + '"][data-type="checkin"]');
+        var checkOutInput = document.querySelector('.time-input[data-staff="' + staffId + '"][data-type="checkout"]');
+        var notesInput = document.querySelector('.notes-input[data-staff="' + staffId + '"][data-type="notes"]');
         
-        const checkIn = checkInInput?.value || '09:00';
-        const checkOut = checkOutInput?.value || '17:00';
-        const notes = notesInput?.value || '';
+        var checkIn = (checkInInput && checkInInput.value) ? checkInInput.value : '09:00';
+        var checkOut = (checkOutInput && checkOutInput.value) ? checkOutInput.value : '17:00';
+        var notes = (notesInput && notesInput.value) ? notesInput.value : '';
         
         newRecords.push({
             staffId: staffId,
@@ -128,15 +183,17 @@ function saveAttendance() {
         });
         
         // Check if there are changes
-        const existing = attendanceRecords.find(a => a.staffId === staffId && a.date === currentDate);
-        if (!existing || 
-            existing.status !== status || 
-            existing.checkIn !== checkIn || 
-            existing.checkOut !== checkOut || 
-            existing.notes !== notes) {
+        var existing = null;
+        for (var j = 0; j < attendanceRecords.length; j++) {
+            if (attendanceRecords[j].staffId === staffId && attendanceRecords[j].date === currentDate) {
+                existing = attendanceRecords[j];
+                break;
+            }
+        }
+        if (!existing || existing.status !== status || existing.checkIn !== checkIn || existing.checkOut !== checkOut || existing.notes !== notes) {
             hasChanges = true;
         }
-    });
+    }
     
     if (!hasChanges) {
         showToast('No changes to save', 'info');
@@ -144,42 +201,39 @@ function saveAttendance() {
     }
     
     // Remove old records for this date and add new ones
-    attendanceRecords = attendanceRecords.filter(a => a.date !== currentDate);
-    attendanceRecords.push(...newRecords);
+    attendanceRecords = attendanceRecords.filter(function(a) { return a.date !== currentDate; });
+    for (var k = 0; k < newRecords.length; k++) {
+        attendanceRecords.push(newRecords[k]);
+    }
     localStorage.setItem('staff_attendance', JSON.stringify(attendanceRecords));
     
-    updateStats();
-    showToast('Attendance saved successfully!', 'success');
+    refreshUI();
+    showToast('✅ Attendance saved successfully!', 'success');
 }
 
-function showToast(message, type) {
-    const toast = document.createElement('div');
-    const colors = { success: '#10b981', error: '#ef4444', info: '#a8c49a' };
-    toast.className = `fixed bottom-6 right-6 z-50 px-5 py-3 rounded-lg shadow-lg text-white text-sm font-medium transition-all duration-300`;
-    toast.style.backgroundColor = colors[type] || colors.info;
-    toast.innerHTML = `<div class="flex items-center gap-2"><i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i><span>${message}</span></div>`;
-    document.body.appendChild(toast);
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
+// ─── Init ────────────────────────────────────────────
 
-function escapeHtml(str) {
-    if(!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-}
-
-document.addEventListener('DOMContentLoaded', () => {
+function initAttendanceModule() {
+    if (isInitialized) return;
+    isInitialized = true;
     loadData();
     
-    document.getElementById('loadAttendanceBtn')?.addEventListener('click', () => {
-        loadAttendance();
-        showToast('Attendance loaded', 'info');
-    });
-    
-    document.getElementById('saveAttendanceBtn')?.addEventListener('click', saveAttendance);
+    document.getElementById('loadAttendanceBtn').addEventListener('click', loadAttendance);
+    document.getElementById('saveAttendanceBtn').addEventListener('click', saveAttendance);
+}
+
+// ─── Wait for DOM and Common.js ──────────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
+    var checkInterval = setInterval(function() {
+        var sidebar = document.getElementById('mainSidebar');
+        if (sidebar) {
+            clearInterval(checkInterval);
+            setTimeout(initAttendanceModule, 100);
+        }
+    }, 50);
+    setTimeout(function() {
+        clearInterval(checkInterval);
+        initAttendanceModule();
+    }, 3000);
 });

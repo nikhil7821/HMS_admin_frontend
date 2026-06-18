@@ -1,31 +1,68 @@
 /**
  * Beds Management JS - Ward Management Module
- * Professional UI, Fully Working, Indian Names - BUTTONS ALIGNED
+ * Uses theme.css for styling, clean event handling
  */
 
 let beds = [];
 let wards = [];
 let rooms = [];
 let patients = [];
-let deleteId = null;
+let deleteTargetId = null;
+let searchTerm = '';
+let wardFilter = '';
+let roomFilter = '';
+let statusFilter = '';
+let isInitialized = false;
+
+// ─── Utility Functions ──────────────────────────────
+
+function esc(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function getBorderClass(status) {
+    const map = {
+        'Available': 'border-available',
+        'Occupied': 'border-occupied',
+        'Maintenance': 'border-maintenance'
+    };
+    return map[status] || 'border-available';
+}
+
+function getStatusIcon(status) {
+    const map = {
+        'Available': 'fa-check-circle',
+        'Occupied': 'fa-user-circle',
+        'Maintenance': 'fa-tools'
+    };
+    return map[status] || 'fa-circle';
+}
+
+// ─── Data Management ──────────────────────────────
 
 function loadData() {
-    wards = JSON.parse(localStorage.getItem('wards') || '[]');
-    rooms = JSON.parse(localStorage.getItem('rooms') || '[]');
-    patients = JSON.parse(localStorage.getItem('hms_patients') || '[]');
-    
-    const stored = localStorage.getItem('beds');
-    if(stored) {
-        beds = JSON.parse(stored);
-        if (beds[0] && (beds[0].allocatedTo === 'John Doe' || beds[0].allocatedTo === 'Jane Smith')) {
+    try {
+        wards = JSON.parse(localStorage.getItem('wards') || '[]');
+        rooms = JSON.parse(localStorage.getItem('rooms') || '[]');
+        patients = JSON.parse(localStorage.getItem('hms_patients') || '[]');
+        
+        const stored = localStorage.getItem('beds');
+        if (stored) {
+            beds = JSON.parse(stored);
+        } else {
             setIndianBeds();
         }
-    } else {
-        setIndianBeds();
+        refreshUI();
+        populateFilters();
+    } catch (error) {
+        console.error('Error loading bed data:', error);
+        if (window.showToast) {
+            window.showToast('Error loading bed data', 'error');
+        }
     }
-    updateStats();
-    renderBeds();
-    populateFilters();
 }
 
 function setIndianBeds() {
@@ -46,7 +83,11 @@ function setIndianBeds() {
 }
 
 function saveBeds() {
-    localStorage.setItem('beds', JSON.stringify(beds));
+    try {
+        localStorage.setItem('beds', JSON.stringify(beds));
+    } catch (error) {
+        console.error('Error saving beds:', error);
+    }
 }
 
 function updateRoomStats() {
@@ -54,7 +95,7 @@ function updateRoomStats() {
         const roomBeds = beds.filter(b => b.roomId === room.id);
         const availableBeds = roomBeds.filter(b => b.status === 'Available').length;
         const roomIndex = rooms.findIndex(r => r.id === room.id);
-        if(roomIndex !== -1) {
+        if (roomIndex !== -1) {
             rooms[roomIndex].availableBeds = availableBeds;
         }
     });
@@ -67,7 +108,7 @@ function updateWardStats() {
         const totalBeds = wardBeds.length;
         const availableBeds = wardBeds.filter(b => b.status === 'Available').length;
         const wardIndex = wards.findIndex(w => w.id === ward.id);
-        if(wardIndex !== -1) {
+        if (wardIndex !== -1) {
             wards[wardIndex].totalBeds = totalBeds;
             wards[wardIndex].availableBeds = availableBeds;
         }
@@ -75,15 +116,190 @@ function updateWardStats() {
     localStorage.setItem('wards', JSON.stringify(wards));
 }
 
+// ─── Stats ──────────────────────────────────────────
+
 function updateStats() {
     const totalBeds = beds.length;
     const availableBeds = beds.filter(b => b.status === 'Available').length;
     
-    document.getElementById('totalWards').innerText = wards.length;
-    document.getElementById('totalRooms').innerText = rooms.length;
-    document.getElementById('totalBeds').innerText = totalBeds;
-    document.getElementById('availableBeds').innerText = availableBeds;
+    document.getElementById('totalWards').textContent = wards.length;
+    document.getElementById('totalRooms').textContent = rooms.length;
+    document.getElementById('totalBeds').textContent = totalBeds;
+    document.getElementById('availableBeds').textContent = availableBeds;
 }
+
+// ─── Filter ──────────────────────────────────────────
+
+function getFilteredBeds() {
+    return beds.filter(bed => {
+        const matchesSearch = searchTerm === '' || 
+            bed.bedNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (bed.allocatedTo && bed.allocatedTo.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            bed.wardName.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        const matchesWard = wardFilter === '' || bed.wardId.toString() === wardFilter;
+        const matchesRoom = roomFilter === '' || bed.roomId.toString() === roomFilter;
+        const matchesStatus = statusFilter === '' || bed.status === statusFilter;
+        
+        return matchesSearch && matchesWard && matchesRoom && matchesStatus;
+    });
+}
+
+// ─── Render ──────────────────────────────────────────
+
+function renderBeds() {
+    const grid = document.getElementById('bedsGrid');
+    if (!grid) return;
+    
+    const filtered = getFilteredBeds();
+    
+    if (filtered.length === 0) {
+        grid.innerHTML = `
+            <div class="beds-empty">
+                <i class="fas fa-bed"></i>
+                <p>No beds found</p>
+                <p style="font-size:0.75rem; margin-top:0.25rem;">Try adjusting your search or filters.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    grid.innerHTML = filtered.map(bed => {
+        const borderClass = getBorderClass(bed.status);
+        const statusIcon = getStatusIcon(bed.status);
+        const statusClass = bed.status.toLowerCase();
+        const isAvailable = bed.status === 'Available';
+        const isOccupied = bed.status === 'Occupied';
+        const isMaintenance = bed.status === 'Maintenance';
+        
+        return `
+            <div class="bed-card ${borderClass}" data-id="${bed.id}">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.5rem;">
+                    <div>
+                        <h3 style="font-weight:var(--font-weight-medium); color:var(--color-brown-700); font-size:0.875rem; margin:0;">Bed ${esc(bed.bedNumber)}</h3>
+                        <p style="font-size:0.6875rem; color:var(--color-brown-100); margin:0;">${esc(bed.wardName)} - Room ${esc(bed.roomNumber)}</p>
+                    </div>
+                    <div style="display:flex; gap:0.25rem;">
+                        <button class="icon-btn-sm edit-btn" data-id="${bed.id}" title="Edit Bed">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button class="icon-btn-sm danger delete-btn" data-id="${bed.id}" title="Delete Bed">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="display:flex; flex-direction:column; gap:0.25rem; font-size:0.6875rem; flex:1;">
+                    <div class="bed-info-row">
+                        <span class="label">Bed Type:</span>
+                        <span class="value">${bed.bedType || 'Standard'}</span>
+                    </div>
+                    <div class="bed-info-row">
+                        <span class="label">Status:</span>
+                        <span class="status-${statusClass}">
+                            <i class="fas ${statusIcon}" style="font-size:0.5rem;"></i>
+                            ${bed.status}
+                        </span>
+                    </div>
+                    ${isOccupied ? `
+                        <div class="bed-info-row">
+                            <span class="label">Patient:</span>
+                            <span class="value">${esc(bed.allocatedTo || 'Unknown')}</span>
+                        </div>
+                        <div class="bed-info-row">
+                            <span class="label">Admitted:</span>
+                            <span class="value" style="font-weight:var(--font-weight-light);">${bed.admissionDate || '-'}</span>
+                        </div>
+                    ` : ''}
+                    ${bed.features ? `<div class="bed-features">${esc(bed.features)}</div>` : ''}
+                </div>
+                
+                <!-- Action Button - Always at bottom -->
+                <div style="margin-top:0.75rem; padding-top:0.5rem; border-top:1px solid var(--border-default);">
+                    ${isAvailable ? `
+                        <button class="bed-action-btn allocate allocate-btn" data-id="${bed.id}">
+                            <i class="fas fa-user-plus"></i> Allocate to Patient
+                        </button>
+                    ` : isOccupied ? `
+                        <button class="bed-action-btn discharge discharge-btn" data-id="${bed.id}">
+                            <i class="fas fa-download"></i> Discharge / Vacate
+                        </button>
+                    ` : `
+                        <button class="bed-action-btn mark-available mark-btn" data-id="${bed.id}">
+                            <i class="fas fa-check"></i> Mark Available
+                        </button>
+                    `}
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Bind events
+    grid.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', () => openEditModal(parseInt(btn.dataset.id)));
+    });
+    grid.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => openDeleteModal(parseInt(btn.dataset.id)));
+    });
+    grid.querySelectorAll('.allocate-btn').forEach(btn => {
+        btn.addEventListener('click', () => openAllocateModal(parseInt(btn.dataset.id)));
+    });
+    grid.querySelectorAll('.discharge-btn').forEach(btn => {
+        btn.addEventListener('click', () => dischargePatient(parseInt(btn.dataset.id)));
+    });
+    grid.querySelectorAll('.mark-btn').forEach(btn => {
+        btn.addEventListener('click', () => markAvailable(parseInt(btn.dataset.id)));
+    });
+}
+
+function refreshUI() {
+    updateStats();
+    renderBeds();
+}
+
+// ─── Filters Population ─────────────────────────────function populateFilters() {
+    // Ward filter
+    const wardSelect = document.getElementById('wardFilter');
+    if (wardSelect) {
+        wardSelect.innerHTML = '<option value="">All Wards</option>' + 
+            wards.map(w => `<option value="${w.id}">${esc(w.name)}</option>`).join('');
+    }
+    
+    // Ward select in modal
+    const wardSelectModal = document.getElementById('wardId');
+    if (wardSelectModal) {
+        wardSelectModal.innerHTML = '<option value="">-- Select Ward --</option>' + 
+            wards.map(w => `<option value="${w.id}">${esc(w.name)}</option>`).join('');
+        wardSelectModal.addEventListener('change', function() {
+            const roomSelect = document.getElementById('roomId');
+            const filteredRooms = rooms.filter(r => r.wardId === parseInt(this.value));
+            roomSelect.innerHTML = '<option value="">-- Select Room --</option>' + 
+                filteredRooms.map(r => `<option value="${r.id}">${esc(r.roomNumber)}</option>`).join('');
+        });
+    }
+    
+    // Room filter
+    const roomFilterSelect = document.getElementById('roomFilter');
+    if (roomFilterSelect) {
+        const updateRoomFilter = () => {
+            const selectedWard = document.getElementById('wardFilter').value;
+            const filteredRooms = selectedWard ? rooms.filter(r => r.wardId === parseInt(selectedWard)) : rooms;
+            roomFilterSelect.innerHTML = '<option value="">All Rooms</option>' + 
+                filteredRooms.map(r => `<option value="${r.id}">${esc(r.roomNumber)}</option>`).join('');
+        };
+        document.getElementById('wardFilter')?.addEventListener('change', updateRoomFilter);
+        updateRoomFilter();
+    }
+    
+    // Patient select in allocate modal
+    const patientSelect = document.getElementById('patientId');
+    if (patientSelect) {
+        patientSelect.innerHTML = '<option value="">-- Select Patient --</option>' + 
+            patients.map(p => `<option value="${p.id}">${esc(p.fullName)} (${p.phone})</option>`).join('');
+    }
+
+
+// ─── Validation ──────────────────────────────────────
 
 function validateBedForm() {
     let isValid = true;
@@ -93,180 +309,65 @@ function validateBedForm() {
     const bedNumber = document.getElementById('bedNumber').value.trim();
     const status = document.getElementById('status').value;
     
+    // Reset errors
+    document.querySelectorAll('.error-text').forEach(el => el.classList.remove('show'));
+    document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
+    
     if (!wardId) {
         document.getElementById('wardIdError').classList.add('show');
         document.getElementById('wardId').classList.add('error');
         isValid = false;
-    } else {
-        document.getElementById('wardIdError').classList.remove('show');
-        document.getElementById('wardId').classList.remove('error');
     }
     
     if (!roomId) {
         document.getElementById('roomIdError').classList.add('show');
         document.getElementById('roomId').classList.add('error');
         isValid = false;
-    } else {
-        document.getElementById('roomIdError').classList.remove('show');
-        document.getElementById('roomId').classList.remove('error');
     }
     
     if (!bedNumber) {
         document.getElementById('bedNumberError').classList.add('show');
         document.getElementById('bedNumber').classList.add('error');
         isValid = false;
-    } else {
-        document.getElementById('bedNumberError').classList.remove('show');
-        document.getElementById('bedNumber').classList.remove('error');
     }
     
     if (!status) {
         document.getElementById('statusError').classList.add('show');
         document.getElementById('status').classList.add('error');
         isValid = false;
-    } else {
-        document.getElementById('statusError').classList.remove('show');
-        document.getElementById('status').classList.remove('error');
     }
     
     return isValid;
 }
 
-function renderBeds() {
-    const wardFilter = document.getElementById('wardFilter')?.value || '';
-    const roomFilter = document.getElementById('roomFilter')?.value || '';
-    const statusFilter = document.getElementById('statusFilter')?.value || '';
-    
-    let filtered = beds.filter(bed => {
-        const matchesWard = wardFilter === '' || bed.wardId.toString() === wardFilter;
-        const matchesRoom = roomFilter === '' || bed.roomId.toString() === roomFilter;
-        const matchesStatus = statusFilter === '' || bed.status === statusFilter;
-        return matchesWard && matchesRoom && matchesStatus;
-    });
-    
-    const grid = document.getElementById('bedsGrid');
-    if(filtered.length === 0) {
-        grid.innerHTML = '<div class="col-span-full text-center py-12 text-[#94a3b8]"><i class="fas fa-bed text-3xl mb-2 block"></i><p class="font-normal">No beds found</p></div>';
-        return;
-    }
-    
-    // Calculate max height for consistent card size - using flex column layout
-    grid.innerHTML = filtered.map(bed => `
-        <div class="bed-card p-3 border-l-4 ${bed.status === 'Available' ? 'border-l-green-500' : bed.status === 'Occupied' ? 'border-l-red-500' : 'border-l-yellow-500'} flex flex-col h-full">
-            <div class="flex justify-between items-start mb-2">
-                <div>
-                    <h3 class="font-semibold text-[#1e293b] text-sm">Bed ${escapeHtml(bed.bedNumber)}</h3>
-                    <p class="text-xs text-[#94a3b8]">${escapeHtml(bed.wardName)} - Room ${escapeHtml(bed.roomNumber)}</p>
-                </div>
-                <div class="flex gap-1">
-                    <button onclick="editBed(${bed.id})" class="text-[#a8c49a] hover:text-[#7a9a68] transition p-1 rounded" title="Edit Bed">
-                        <i class="fas fa-edit text-xs"></i>
-                    </button>
-                    <button onclick="deleteBed(${bed.id})" class="text-[#d8b48c] hover:text-[#c49a6c] transition p-1 rounded" title="Delete Bed">
-                        <i class="fas fa-trash-alt text-xs"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="space-y-1.5 text-xs mb-3 flex-grow">
-                <div class="flex justify-between items-center">
-                    <span class="text-[#64748b]">Bed Type:</span>
-                    <span class="font-medium text-[#1e293b]">${bed.bedType || 'Standard'}</span>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-[#64748b]">Status:</span>
-                    <span class="status-${bed.status.toLowerCase()}">
-                        <i class="fas ${bed.status === 'Available' ? 'fa-check-circle' : bed.status === 'Occupied' ? 'fa-user-circle' : 'fa-tools'} text-xs"></i>
-                        ${bed.status}
-                    </span>
-                </div>
-                ${bed.status === 'Occupied' ? `
-                    <div class="flex justify-between items-center">
-                        <span class="text-[#64748b]">Patient:</span>
-                        <span class="font-medium text-[#1e293b]">${escapeHtml(bed.allocatedTo || 'Unknown')}</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-[#64748b]">Admitted:</span>
-                        <span class="text-[#475569]">${bed.admissionDate || '-'}</span>
-                    </div>
-                ` : ''}
-                ${bed.features ? `<div class="text-[#64748b] text-[10px] mt-1 pt-1 border-t border-[#f0e8e0]">${escapeHtml(bed.features)}</div>` : ''}
-            </div>
-            
-            <!-- ALL BUTTONS - SAME HEIGHT, SAME WIDTH, SAME STYLE, ALWAYS AT BOTTOM -->
-            <div class="mt-auto pt-2">
-                ${bed.status === 'Available' ? `
-                    <button onclick="openAllocateModal(${bed.id})" class="btn-success w-full py-1.5 rounded-lg text-xs font-medium">
-                        <i class="fas fa-user-plus mr-1"></i> Allocate to Patient
-                    </button>
-                ` : bed.status === 'Occupied' ? `
-                    <button onclick="dischargePatient(${bed.id})" class="btn-primary w-full py-1.5 rounded-lg text-xs font-medium">
-                        <i class="fas fa-download mr-1"></i> Discharge / Vacate
-                    </button>
-                ` : `
-                    <button onclick="markAvailable(${bed.id})" class="bg-gray-500 hover:bg-gray-600 text-white w-full py-1.5 rounded-lg text-xs font-medium transition">
-                        <i class="fas fa-check mr-1"></i> Mark Available
-                    </button>
-                `}
-            </div>
-        </div>
-    `).join('');
+// ─── Modals ──────────────────────────────────────────
+
+function openModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('opacity-100', 'visible');
 }
 
-function populateFilters() {
-    const wardSelect = document.getElementById('wardFilter');
-    if(wardSelect) {
-        wardSelect.innerHTML = '<option value="">All Wards</option>' + 
-            wards.map(w => `<option value="${w.id}">${escapeHtml(w.name)}</option>`).join('');
-    }
-    
-    const wardSelectModal = document.getElementById('wardId');
-    if(wardSelectModal) {
-        wardSelectModal.innerHTML = '<option value="">-- Select Ward --</option>' + 
-            wards.map(w => `<option value="${w.id}">${escapeHtml(w.name)}</option>`).join('');
-        wardSelectModal.addEventListener('change', function() {
-            const roomSelect = document.getElementById('roomId');
-            const filteredRooms = rooms.filter(r => r.wardId === parseInt(this.value));
-            roomSelect.innerHTML = '<option value="">-- Select Room --</option>' + 
-                filteredRooms.map(r => `<option value="${r.id}">${escapeHtml(r.roomNumber)}</option>`).join('');
-        });
-    }
-    
-    const roomFilter = document.getElementById('roomFilter');
-    if(roomFilter) {
-        const updateRoomFilter = () => {
-            const selectedWard = document.getElementById('wardFilter').value;
-            const filteredRooms = selectedWard ? rooms.filter(r => r.wardId === parseInt(selectedWard)) : rooms;
-            roomFilter.innerHTML = '<option value="">All Rooms</option>' + 
-                filteredRooms.map(r => `<option value="${r.id}">${escapeHtml(r.roomNumber)}</option>`).join('');
-        };
-        document.getElementById('wardFilter')?.addEventListener('change', updateRoomFilter);
-        updateRoomFilter();
-    }
-    
-    const patientSelect = document.getElementById('patientId');
-    if(patientSelect) {
-        patientSelect.innerHTML = '<option value="">-- Select Patient --</option>' + 
-            patients.map(p => `<option value="${p.id}">${escapeHtml(p.fullName)} (${p.phone})</option>`).join('');
-    }
+function closeModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('opacity-100', 'visible');
 }
 
-function openModal() {
+function openAddModal() {
     document.getElementById('bedForm').reset();
     document.getElementById('bedId').value = '';
-    document.getElementById('modalTitle').innerText = 'Add Bed';
-    document.getElementById('bedModal').classList.add('active');
-    populateFilters();
-    
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-bed"></i> Add Bed';
     document.querySelectorAll('.error-text').forEach(el => el.classList.remove('show'));
     document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
+    populateFilters();
+    openModal('bedModal');
 }
 
-function editBed(id) {
+function openEditModal(id) {
     const bed = beds.find(b => b.id === id);
-    if(bed) {
+    if (bed) {
         document.getElementById('bedId').value = bed.id;
         document.getElementById('wardId').value = bed.wardId;
+        // Trigger change event to populate rooms
         const event = new Event('change');
         document.getElementById('wardId').dispatchEvent(event);
         setTimeout(() => {
@@ -276,38 +377,37 @@ function editBed(id) {
         document.getElementById('bedType').value = bed.bedType || 'Standard';
         document.getElementById('status').value = bed.status;
         document.getElementById('features').value = bed.features || '';
-        document.getElementById('modalTitle').innerText = 'Edit Bed';
-        document.getElementById('bedModal').classList.add('active');
-        
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Bed';
         document.querySelectorAll('.error-text').forEach(el => el.classList.remove('show'));
         document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
+        openModal('bedModal');
     }
 }
 
-function deleteBed(id) {
-    deleteId = id;
-    document.getElementById('deleteModal').classList.add('active');
+function openDeleteModal(id) {
+    deleteTargetId = id;
+    openModal('deleteModal');
 }
 
-function confirmDelete() {
-    if(deleteId) {
-        beds = beds.filter(b => b.id !== deleteId);
-        saveBeds();
-        updateRoomStats();
-        updateWardStats();
-        updateStats();
-        renderBeds();
-        showToast('Bed deleted successfully', 'success');
-        deleteId = null;
-        document.getElementById('deleteModal').classList.remove('active');
+function openAllocateModal(bedId) {
+    const bed = beds.find(b => b.id === bedId);
+    if (bed) {
+        document.getElementById('allocateBedId').value = bedId;
+        populateFilters();
+        document.getElementById('allocateForm').reset();
+        openModal('allocateModal');
     }
 }
+
+// ─── Form Submit - Bed ──────────────────────────────
 
 function saveBed(e) {
     e.preventDefault();
     
-    if(!validateBedForm()) {
-        showToast('Please fill all required fields', 'error');
+    if (!validateBedForm()) {
+        if (window.showToast) {
+            window.showToast('Please fill all required fields', 'error');
+        }
         return;
     }
     
@@ -318,7 +418,9 @@ function saveBed(e) {
     const room = rooms.find(r => r.id === roomId);
     
     if (!ward || !room) {
-        showToast('Invalid ward or room selection', 'error');
+        if (window.showToast) {
+            window.showToast('Invalid ward or room selection', 'error');
+        }
         return;
     }
     
@@ -330,37 +432,33 @@ function saveBed(e) {
         bedNumber: document.getElementById('bedNumber').value.trim(),
         bedType: document.getElementById('bedType').value,
         status: document.getElementById('status').value,
-        features: document.getElementById('features').value
+        features: document.getElementById('features').value.trim()
     };
     
-    if(id) {
+    if (id) {
         const index = beds.findIndex(b => b.id === parseInt(id));
-        if(index !== -1) {
+        if (index !== -1) {
             beds[index] = { ...beds[index], ...data };
-            showToast('Bed updated successfully', 'success');
+            if (window.showToast) {
+                window.showToast(`✅ Bed ${data.bedNumber} updated successfully`, 'success');
+            }
         }
     } else {
         const newId = beds.length > 0 ? Math.max(...beds.map(b => b.id)) + 1 : 1;
         beds.push({ id: newId, ...data });
-        showToast('Bed added successfully', 'success');
+        if (window.showToast) {
+            window.showToast(`✅ Bed ${data.bedNumber} added successfully`, 'success');
+        }
     }
     
     saveBeds();
     updateRoomStats();
     updateWardStats();
-    updateStats();
-    renderBeds();
-    closeModal();
+    refreshUI();
+    closeModal('bedModal');
 }
 
-function openAllocateModal(bedId) {
-    const bed = beds.find(b => b.id === bedId);
-    if(bed) {
-        document.getElementById('allocateBedId').value = bedId;
-        document.getElementById('allocateModal').classList.add('active');
-        populateFilters();
-    }
-}
+// ─── Form Submit - Allocate ──────────────────────────
 
 function allocateBed(e) {
     e.preventDefault();
@@ -370,16 +468,20 @@ function allocateBed(e) {
     const admissionType = document.getElementById('admissionType').value;
     
     if (!patientId) {
-        showToast('Please select a patient', 'error');
+        if (window.showToast) {
+            window.showToast('Please select a patient', 'error');
+        }
         return;
     }
     
     const patient = patients.find(p => p.id === patientId);
     const bed = beds.find(b => b.id === bedId);
     
-    if(bed && patient) {
+    if (bed && patient) {
         if (bed.status !== 'Available') {
-            showToast('This bed is not available for allocation', 'error');
+            if (window.showToast) {
+                window.showToast('This bed is not available for allocation', 'error');
+            }
             return;
         }
         
@@ -392,168 +494,233 @@ function allocateBed(e) {
         saveBeds();
         updateRoomStats();
         updateWardStats();
-        updateStats();
-        renderBeds();
-        closeAllocateModal();
-        showToast(`Bed ${bed.bedNumber} allocated to ${patient.fullName}`, 'success');
+        refreshUI();
+        closeModal('allocateModal');
+        
+        if (window.showToast) {
+            window.showToast(`✅ Bed ${bed.bedNumber} allocated to ${patient.fullName}`, 'success');
+        }
         
         createIPDRecord(bed, patient);
     }
 }
 
 function createIPDRecord(bed, patient) {
-    let ipdPatients = JSON.parse(localStorage.getItem('hms_ipd') || '[]');
-    const newId = ipdPatients.length > 0 ? Math.max(...ipdPatients.map(p => p.id)) + 1 : 1;
-    
-    ipdPatients.push({
-        id: newId,
-        patientId: patient?.id,
-        patientName: patient?.fullName || '',
-        doctorName: '',
-        wardName: bed.wardName,
-        bedNo: bed.bedNumber,
-        admissionDate: new Date().toISOString().split('T')[0],
-        diagnosis: '',
-        status: 'Admitted',
-        admissionType: bed.admissionType || 'General'
-    });
-    
-    localStorage.setItem('hms_ipd', JSON.stringify(ipdPatients));
+    try {
+        let ipdPatients = JSON.parse(localStorage.getItem('hms_ipd') || '[]');
+        const newId = ipdPatients.length > 0 ? Math.max(...ipdPatients.map(p => p.id)) + 1 : 1;
+        
+        ipdPatients.push({
+            id: newId,
+            patientId: patient?.id,
+            patientName: patient?.fullName || '',
+            doctorName: '',
+            wardName: bed.wardName,
+            bedNo: bed.bedNumber,
+            admissionDate: new Date().toISOString().split('T')[0],
+            diagnosis: '',
+            status: 'Admitted',
+            admissionType: bed.admissionType || 'General'
+        });
+        
+        localStorage.setItem('hms_ipd', JSON.stringify(ipdPatients));
+    } catch (error) {
+        console.error('Error creating IPD record:', error);
+    }
 }
 
+// ─── Actions ──────────────────────────────────────────
+
 function dischargePatient(bedId) {
-    if(confirm('Discharge this patient and vacate the bed?')) {
+    if (confirm('Discharge this patient and vacate the bed?')) {
         const bed = beds.find(b => b.id === bedId);
-        if(bed) {
-            bed.status = 'Available';
+        if (bed) {
             const patientName = bed.allocatedTo;
+            bed.status = 'Available';
             bed.allocatedTo = '';
             bed.allocatedPatientId = null;
             bed.admissionDate = '';
             bed.admissionType = '';
             
-            let ipdPatients = JSON.parse(localStorage.getItem('hms_ipd') || '[]');
-            const ipdIndex = ipdPatients.findIndex(p => p.patientId === bed.allocatedPatientId && p.status === 'Admitted');
-            if(ipdIndex !== -1) {
-                ipdPatients[ipdIndex].status = 'Discharged';
-                ipdPatients[ipdIndex].dischargeDate = new Date().toISOString().split('T')[0];
-                localStorage.setItem('hms_ipd', JSON.stringify(ipdPatients));
+            // Update IPD record
+            try {
+                let ipdPatients = JSON.parse(localStorage.getItem('hms_ipd') || '[]');
+                const ipdIndex = ipdPatients.findIndex(p => p.patientId === bed.allocatedPatientId && p.status === 'Admitted');
+                if (ipdIndex !== -1) {
+                    ipdPatients[ipdIndex].status = 'Discharged';
+                    ipdPatients[ipdIndex].dischargeDate = new Date().toISOString().split('T')[0];
+                    localStorage.setItem('hms_ipd', JSON.stringify(ipdPatients));
+                }
+            } catch (error) {
+                console.error('Error updating IPD record:', error);
             }
             
             saveBeds();
             updateRoomStats();
             updateWardStats();
-            updateStats();
-            renderBeds();
-            showToast(`${patientName} discharged, bed vacated successfully`, 'success');
+            refreshUI();
+            
+            if (window.showToast) {
+                window.showToast(`✅ ${patientName} discharged, bed vacated`, 'success');
+            }
         }
     }
 }
 
 function markAvailable(bedId) {
     const bed = beds.find(b => b.id === bedId);
-    if(bed) {
+    if (bed) {
         bed.status = 'Available';
+        bed.allocatedTo = '';
+        bed.allocatedPatientId = null;
+        bed.admissionDate = '';
+        bed.admissionType = '';
+        
         saveBeds();
         updateRoomStats();
         updateWardStats();
-        renderBeds();
-        showToast('Bed marked as available', 'success');
+        refreshUI();
+        
+        if (window.showToast) {
+            window.showToast(`✅ Bed ${bed.bedNumber} marked as available`, 'success');
+        }
     }
 }
 
-function closeModal() {
-    document.getElementById('bedModal').classList.remove('active');
-    document.getElementById('bedForm').reset();
-    document.querySelectorAll('.error-text').forEach(el => el.classList.remove('show'));
-    document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
+// ─── Delete ──────────────────────────────────────────
+
+function handleConfirmDelete() {
+    if (!deleteTargetId) return;
+    
+    const bed = beds.find(b => b.id === deleteTargetId);
+    beds = beds.filter(b => b.id !== deleteTargetId);
+    saveBeds();
+    updateRoomStats();
+    updateWardStats();
+    refreshUI();
+    closeModal('deleteModal');
+    
+    if (bed && window.showToast) {
+        window.showToast(`🗑️ Bed ${bed.bedNumber} deleted successfully`, 'success');
+    }
+    deleteTargetId = null;
 }
 
-function closeAllocateModal() {
-    document.getElementById('allocateModal').classList.remove('active');
-    document.getElementById('allocateForm').reset();
-}
+// ─── Init ────────────────────────────────────────────
 
-function closeDeleteModal() {
-    document.getElementById('deleteModal').classList.remove('active');
-    deleteId = null;
-}
-
-function showToast(message, type) {
-    const toast = document.createElement('div');
-    const colors = { success: '#10b981', error: '#ef4444', info: '#a8c49a' };
-    toast.className = `fixed bottom-6 right-6 z-50 px-5 py-3 rounded-lg shadow-lg text-white text-sm font-medium transition-all duration-300`;
-    toast.style.backgroundColor = colors[type] || colors.info;
-    toast.innerHTML = `<div class="flex items-center gap-2"><i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i><span>${message}</span></div>`;
-    document.body.appendChild(toast);
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
-function escapeHtml(str) {
-    if(!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-}
-
-document.addEventListener('DOMContentLoaded', () => {
+function initBedsModule() {
+    if (isInitialized) return;
+    isInitialized = true;
+    
     loadData();
     
-    document.getElementById('addBedBtn')?.addEventListener('click', openModal);
-    document.getElementById('closeModalBtn')?.addEventListener('click', closeModal);
-    document.getElementById('cancelModalBtn')?.addEventListener('click', closeModal);
-    document.getElementById('closeAllocateModalBtn')?.addEventListener('click', closeAllocateModal);
-    document.getElementById('cancelAllocateModalBtn')?.addEventListener('click', closeAllocateModal);
-    document.getElementById('closeDeleteModalBtn')?.addEventListener('click', closeDeleteModal);
-    document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeDeleteModal);
-    document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
+    // Event Listeners
+    document.getElementById('addBedBtn')?.addEventListener('click', openAddModal);
+    document.getElementById('closeModalBtn')?.addEventListener('click', () => closeModal('bedModal'));
+    document.getElementById('cancelModalBtn')?.addEventListener('click', () => closeModal('bedModal'));
+    document.getElementById('closeAllocateModalBtn')?.addEventListener('click', () => closeModal('allocateModal'));
+    document.getElementById('cancelAllocateModalBtn')?.addEventListener('click', () => closeModal('allocateModal'));
+    document.getElementById('closeDeleteModalBtn')?.addEventListener('click', () => closeModal('deleteModal'));
+    document.getElementById('cancelDeleteBtn')?.addEventListener('click', () => closeModal('deleteModal'));
+    document.getElementById('confirmDeleteBtn')?.addEventListener('click', handleConfirmDelete);
     document.getElementById('bedForm')?.addEventListener('submit', saveBed);
     document.getElementById('allocateForm')?.addEventListener('submit', allocateBed);
-    document.getElementById('wardFilter')?.addEventListener('change', () => renderBeds());
-    document.getElementById('roomFilter')?.addEventListener('change', () => renderBeds());
-    document.getElementById('statusFilter')?.addEventListener('change', () => renderBeds());
+    
     document.getElementById('resetFilter')?.addEventListener('click', () => {
+        searchTerm = '';
+        wardFilter = '';
+        roomFilter = '';
+        statusFilter = '';
+        document.getElementById('searchInput').value = '';
         document.getElementById('wardFilter').value = '';
-        document.getElementById('roomFilter').innerHTML = '<option value="">All Rooms</option>';
+        document.getElementById('roomFilter').value = '';
         document.getElementById('statusFilter').value = '';
         renderBeds();
     });
     
+    document.getElementById('searchInput')?.addEventListener('input', (e) => {
+        searchTerm = e.target.value;
+        renderBeds();
+    });
+    
+    document.getElementById('wardFilter')?.addEventListener('change', (e) => {
+        wardFilter = e.target.value;
+        renderBeds();
+    });
+    
+    document.getElementById('roomFilter')?.addEventListener('change', (e) => {
+        roomFilter = e.target.value;
+        renderBeds();
+    });
+    
+    document.getElementById('statusFilter')?.addEventListener('change', (e) => {
+        statusFilter = e.target.value;
+        renderBeds();
+    });
+    
+    // Real-time validation
     document.getElementById('wardId')?.addEventListener('change', function() {
-        if(this.value) {
+        if (this.value) {
             document.getElementById('wardIdError')?.classList.remove('show');
             this.classList.remove('error');
         }
     });
     
     document.getElementById('roomId')?.addEventListener('change', function() {
-        if(this.value) {
+        if (this.value) {
             document.getElementById('roomIdError')?.classList.remove('show');
             this.classList.remove('error');
         }
     });
     
     document.getElementById('bedNumber')?.addEventListener('input', function() {
-        if(this.value.trim()) {
+        if (this.value.trim()) {
             document.getElementById('bedNumberError')?.classList.remove('show');
             this.classList.remove('error');
         }
     });
     
     document.getElementById('status')?.addEventListener('change', function() {
-        if(this.value) {
+        if (this.value) {
             document.getElementById('statusError')?.classList.remove('show');
             this.classList.remove('error');
         }
     });
-});
+    
+    // Close modals on overlay click
+    document.getElementById('bedModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeModal('bedModal');
+    });
+    document.getElementById('allocateModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeModal('allocateModal');
+    });
+    document.getElementById('deleteModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeModal('deleteModal');
+    });
+    
+    // ESC key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeModal('bedModal');
+            closeModal('allocateModal');
+            closeModal('deleteModal');
+        }
+    });
+}
 
-window.editBed = editBed;
-window.deleteBed = deleteBed;
-window.openAllocateModal = openAllocateModal;
-window.dischargePatient = dischargePatient;
-window.markAvailable = markAvailable;
+// ─── Wait for DOM and Common.js ──────────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
+    const checkInterval = setInterval(() => {
+        const sidebar = document.getElementById('mainSidebar');
+        if (sidebar) {
+            clearInterval(checkInterval);
+            setTimeout(initBedsModule, 100);
+        }
+    }, 50);
+    
+    setTimeout(() => {
+        clearInterval(checkInterval);
+        initBedsModule();
+    }, 3000);
+});

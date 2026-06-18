@@ -1,94 +1,263 @@
 /**
  * Consultation Management JS - Clinical Module
- * Professional UI, Fully Working, Indian Names
+ * Uses theme.css for styling, clean event handling
  */
 
 let consultations = [];
 let patients = [];
 let doctors = [];
+let searchTerm = '';
+let isInitialized = false;
+
+// ─── Utility Functions ──────────────────────────────
+
+function esc(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return 'N/A';
+    try {
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('en-IN', { 
+            day: '2-digit', 
+            month: 'short', 
+            year: 'numeric' 
+        });
+    } catch {
+        return dateStr;
+    }
+}
+
+// ─── Data Management ──────────────────────────────
 
 function loadData() {
-    patients = JSON.parse(localStorage.getItem('hms_patients') || '[]');
-    doctors = JSON.parse(localStorage.getItem('hms_doctors') || '[]');
-    
-    const stored = localStorage.getItem('hms_consultations');
-    if (stored) {
-        consultations = JSON.parse(stored);
-    } else {
-        // Demo consultations data
-        consultations = [
-            {id: 1, patientId: 1, patientName: 'Rajesh Kumar', doctorId: 1, doctorName: 'Dr. Anjali Nair', date: '2026-06-10', symptoms: 'Chest pain, shortness of breath', diagnosis: 'Hypertension', prescription: 'Amlodipine 5mg once daily', notes: 'Follow up in 2 weeks'},
-            {id: 2, patientId: 2, patientName: 'Priya Sharma', doctorId: 2, doctorName: 'Dr. Vikram Singh', date: '2026-06-09', symptoms: 'Severe headache, blurred vision', diagnosis: 'Migraine', prescription: 'Sumatriptan 50mg as needed', notes: 'Avoid bright lights'},
-            {id: 3, patientId: 3, patientName: 'Amit Patel', doctorId: 3, doctorName: 'Dr. Sneha Joshi', date: '2026-06-08', symptoms: 'Fever, cough, body ache', diagnosis: 'Viral Fever', prescription: 'Paracetamol 500mg, rest', notes: 'Monitor temperature'}
-        ];
-        saveConsultations();
+    try {
+        patients = JSON.parse(localStorage.getItem('hms_patients') || '[]');
+        doctors = JSON.parse(localStorage.getItem('hms_doctors') || '[]');
+        
+        const stored = localStorage.getItem('hms_consultations');
+        if (stored) {
+            consultations = JSON.parse(stored);
+        } else {
+            // Demo consultations data
+            const today = new Date().toISOString().split('T')[0];
+            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+            const twoDaysAgo = new Date(Date.now() - 172800000).toISOString().split('T')[0];
+            
+            consultations = [
+                {
+                    id: 1, 
+                    patientId: 1, 
+                    patientName: 'Rajesh Kumar', 
+                    doctorId: 1, 
+                    doctorName: 'Dr. Anjali Nair', 
+                    date: today, 
+                    symptoms: 'Chest pain, shortness of breath, palpitations', 
+                    diagnosis: 'Hypertension Stage 2', 
+                    prescription: 'Amlodipine 5mg once daily\nAtenolol 25mg once daily', 
+                    notes: 'Follow up in 2 weeks. Monitor BP daily.'
+                },
+                {
+                    id: 2, 
+                    patientId: 2, 
+                    patientName: 'Priya Sharma', 
+                    doctorId: 2, 
+                    doctorName: 'Dr. Vikram Singh', 
+                    date: yesterday, 
+                    symptoms: 'Severe headache, blurred vision, nausea', 
+                    diagnosis: 'Migraine with Aura', 
+                    prescription: 'Sumatriptan 50mg as needed\nPropranolol 40mg daily for prevention', 
+                    notes: 'Avoid bright lights and stress. Keep a headache diary.'
+                },
+                {
+                    id: 3, 
+                    patientId: 3, 
+                    patientName: 'Amit Patel', 
+                    doctorId: 3, 
+                    doctorName: 'Dr. Sneha Joshi', 
+                    date: twoDaysAgo, 
+                    symptoms: 'Fever 101°F, cough, body ache, fatigue', 
+                    diagnosis: 'Viral Fever with Upper Respiratory Infection', 
+                    prescription: 'Paracetamol 500mg SOS\nCough syrup 10ml TID\nRest and hydration', 
+                    notes: 'Monitor temperature. Review if fever persists >3 days.'
+                }
+            ];
+            saveConsultations();
+        }
+        refreshUI();
+    } catch (error) {
+        console.error('Error loading consultations:', error);
+        if (window.showToast) {
+            window.showToast('Error loading consultation data', 'error');
+        }
     }
-    renderTable();
 }
 
 function saveConsultations() {
-    localStorage.setItem('hms_consultations', JSON.stringify(consultations));
+    try {
+        localStorage.setItem('hms_consultations', JSON.stringify(consultations));
+    } catch (error) {
+        console.error('Error saving consultations:', error);
+    }
 }
+
+// ─── Stats ──────────────────────────────────────────
+
+function updateStats() {
+    const total = consultations.length;
+    
+    const today = new Date().toISOString().split('T')[0];
+    const todayConsults = consultations.filter(c => c.date === today).length;
+    
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    const monthConsults = consultations.filter(c => {
+        const consultDate = new Date(c.date);
+        return consultDate.getMonth() === currentMonth && 
+               consultDate.getFullYear() === currentYear;
+    }).length;
+    
+    const withPrescription = consultations.filter(c => c.prescription && c.prescription.trim()).length;
+    
+    document.getElementById('totalConsults').textContent = total;
+    document.getElementById('todayConsults').textContent = todayConsults;
+    document.getElementById('monthConsults').textContent = monthConsults;
+    document.getElementById('prescriptionCount').textContent = withPrescription;
+}
+
+// ─── Filter ──────────────────────────────────────────
+
+function getFilteredConsultations() {
+    return consultations.filter(c => {
+        const matchesSearch = searchTerm === '' || 
+            c.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            c.doctorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            c.diagnosis.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        return matchesSearch;
+    });
+}
+
+// ─── Render ──────────────────────────────────────────
 
 function renderTable() {
     const tbody = document.getElementById('consultTable');
     if (!tbody) return;
     
-    if (consultations.length === 0) {
-        tbody.innerHTML = '<td><td colspan="5" class="text-center py-12 text-[#94a3b8]"><i class="fas fa-notes-medical text-3xl mb-2 block"></i><p class="font-normal">No consultations found</p> </td></tr>';
+    const filtered = getFilteredConsultations();
+    
+    if (filtered.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="consult-empty">
+                    <i class="fas fa-notes-medical"></i>
+                    <p>No consultations found</p>
+                    <p style="font-size:0.75rem; margin-top:0.25rem;">Start a new consultation to get started.</p>
+                </td>
+            </tr>
+        `;
         return;
     }
     
-    tbody.innerHTML = consultations.map(c => `
-        <tr class="consult-row">
-            <td class="px-5 py-3 font-medium text-[#1e293b] text-sm">${escapeHtml(c.patientName)}</td>
-            <td class="px-5 py-3 text-[#475569] text-sm">${escapeHtml(c.doctorName)}</td>
-            <td class="px-5 py-3 text-[#475569] text-sm">${c.date}</td>
-            <td class="px-5 py-3 text-[#475569] text-sm">${c.diagnosis.length > 30 ? c.diagnosis.substring(0, 30) + '...' : c.diagnosis}</td>
-            <td class="px-5 py-3 text-center">
-                <button onclick="viewConsultation(${c.id})" class="text-[#a8c49a] hover:text-[#7a9a68] transition" title="View Details">
-                    <i class="fas fa-eye"></i>
-                </button>
-            </td>
-        </tr>
-    `).join('');
+    // Sort by date (newest first)
+    const sorted = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    tbody.innerHTML = sorted.map(c => {
+        const diagnosisDisplay = c.diagnosis.length > 30 ? 
+            c.diagnosis.substring(0, 30) + '...' : 
+            c.diagnosis;
+        
+        return `
+            <tr class="consult-row" data-id="${c.id}">
+                <td style="font-weight:var(--font-weight-medium); color:var(--color-brown-700);">${esc(c.patientName)}</td>
+                <td style="color:var(--color-brown-300);">${esc(c.doctorName)}</td>
+                <td style="color:var(--color-brown-300);">${formatDate(c.date)}</td>
+                <td style="color:var(--color-brown-300);">${esc(diagnosisDisplay)}</td>
+                <td style="text-align:center;">
+                    <button class="action-btn view-btn" data-id="${c.id}" title="View Details">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+    
+    // Bind events
+    tbody.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', () => viewConsultation(parseInt(btn.dataset.id)));
+    });
 }
 
-function openModal() {
+function refreshUI() {
+    updateStats();
+    renderTable();
+}
+
+// ─── Modals ──────────────────────────────────────────
+
+function openModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('opacity-100', 'visible');
+}
+
+function closeModal(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('opacity-100', 'visible');
+}
+
+function openAddModal() {
     const patientSelect = document.getElementById('patientId');
     const doctorSelect = document.getElementById('doctorId');
     
     if (patientSelect) {
         patientSelect.innerHTML = '<option value="">-- Select Patient --</option>' + 
-            patients.map(p => `<option value="${p.id}">${escapeHtml(p.fullName)} (${p.phone})</option>`).join('');
+            patients.map(p => `<option value="${p.id}">${esc(p.fullName)} (${p.phone})</option>`).join('');
     }
     
     if (doctorSelect) {
         doctorSelect.innerHTML = '<option value="">-- Select Doctor --</option>' + 
-            doctors.map(d => `<option value="${d.id}">${escapeHtml(d.name)} (${d.specialization})</option>`).join('');
+            doctors.map(d => `<option value="${d.id}">${esc(d.name)} (${d.specialization})</option>`).join('');
     }
     
-    document.getElementById('consultModal').classList.add('active');
+    // Set default date to today
+    const dateInput = document.getElementById('consultDate');
+    if (dateInput) {
+        dateInput.value = new Date().toISOString().split('T')[0];
+    }
+    
     document.getElementById('consultForm').reset();
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-stethoscope"></i> New Consultation';
+    openModal('consultModal');
 }
+
+// ─── Form Submit ────────────────────────────────────
 
 function saveConsultation(e) {
     e.preventDefault();
     
     const patientId = parseInt(document.getElementById('patientId').value);
     const doctorId = parseInt(document.getElementById('doctorId').value);
-    const symptoms = document.getElementById('symptoms').value;
-    const diagnosis = document.getElementById('diagnosis').value;
-    const prescription = document.getElementById('prescription').value;
-    const notes = document.getElementById('notes').value;
+    const symptoms = document.getElementById('symptoms').value.trim();
+    const diagnosis = document.getElementById('diagnosis').value.trim();
+    const prescription = document.getElementById('prescription').value.trim();
+    const notes = document.getElementById('notes').value.trim();
+    const date = document.getElementById('consultDate').value || new Date().toISOString().split('T')[0];
     
     if (!patientId || !doctorId) {
-        showToast('Please select both patient and doctor', 'error');
+        if (window.showToast) {
+            window.showToast('Please select both patient and doctor', 'error');
+        }
         return;
     }
     
     if (!diagnosis) {
-        showToast('Please enter diagnosis', 'error');
+        if (window.showToast) {
+            window.showToast('Please enter a diagnosis', 'error');
+        }
         return;
     }
     
@@ -96,7 +265,9 @@ function saveConsultation(e) {
     const doctor = doctors.find(d => d.id === doctorId);
     
     if (!patient || !doctor) {
-        showToast('Invalid patient or doctor selection', 'error');
+        if (window.showToast) {
+            window.showToast('Invalid patient or doctor selection', 'error');
+        }
         return;
     }
     
@@ -108,7 +279,7 @@ function saveConsultation(e) {
         patientName: patient.fullName,
         doctorId: doctorId,
         doctorName: doctor.name,
-        date: new Date().toISOString().split('T')[0],
+        date: date,
         symptoms: symptoms,
         diagnosis: diagnosis,
         prescription: prescription,
@@ -116,10 +287,15 @@ function saveConsultation(e) {
     });
     
     saveConsultations();
-    renderTable();
-    closeModal();
-    showToast(`Consultation saved for ${patient.fullName}`, 'success');
+    refreshUI();
+    closeModal('consultModal');
+    
+    if (window.showToast) {
+        window.showToast(`✅ Consultation saved for ${patient.fullName}`, 'success');
+    }
 }
+
+// ─── View ────────────────────────────────────────────
 
 function viewConsultation(id) {
     const c = consultations.find(c => c.id === id);
@@ -127,90 +303,113 @@ function viewConsultation(id) {
     
     const viewContent = document.getElementById('viewContent');
     viewContent.innerHTML = `
-        <div class="space-y-4">
-            <div class="grid grid-cols-2 gap-4 pb-3 border-b border-[#f0e8e0]">
+        <div style="display:flex; flex-direction:column; gap:1.25rem;">
+            <div class="detail-grid">
                 <div>
-                    <p class="text-xs text-[#64748b] font-medium">Patient Name</p>
-                    <p class="text-sm text-[#1e293b] font-medium mt-1">${escapeHtml(c.patientName)}</p>
+                    <p class="detail-label">Patient Name</p>
+                    <p class="detail-value" style="font-weight:var(--font-weight-medium);">${esc(c.patientName)}</p>
                 </div>
                 <div>
-                    <p class="text-xs text-[#64748b] font-medium">Doctor</p>
-                    <p class="text-sm text-[#1e293b] font-medium mt-1">${escapeHtml(c.doctorName)}</p>
+                    <p class="detail-label">Doctor</p>
+                    <p class="detail-value" style="font-weight:var(--font-weight-medium);">${esc(c.doctorName)}</p>
                 </div>
                 <div>
-                    <p class="text-xs text-[#64748b] font-medium">Date</p>
-                    <p class="text-sm text-[#1e293b] mt-1">${c.date}</p>
+                    <p class="detail-label">Date</p>
+                    <p class="detail-value">${formatDate(c.date)}</p>
                 </div>
                 <div>
-                    <p class="text-xs text-[#64748b] font-medium">Diagnosis</p>
-                    <p class="text-sm text-[#1e293b] mt-1">${escapeHtml(c.diagnosis)}</p>
+                    <p class="detail-label">Diagnosis</p>
+                    <p class="detail-value" style="font-weight:var(--font-weight-medium);">${esc(c.diagnosis)}</p>
                 </div>
             </div>
+            
             ${c.symptoms ? `
-            <div>
-                <p class="text-xs text-[#64748b] font-medium">Symptoms / Chief Complaints</p>
-                <p class="text-sm text-[#475569] mt-1">${escapeHtml(c.symptoms)}</p>
+            <div class="detail-section">
+                <p class="detail-label">Symptoms / Chief Complaints</p>
+                <p class="detail-value">${esc(c.symptoms)}</p>
             </div>
             ` : ''}
+            
             ${c.prescription ? `
-            <div>
-                <p class="text-xs text-[#64748b] font-medium">Prescription</p>
-                <div class="bg-[#f8fafc] rounded-lg p-3 mt-1">
-                    <p class="text-sm text-[#475569] whitespace-pre-wrap">${escapeHtml(c.prescription)}</p>
+            <div class="detail-section">
+                <p class="detail-label">Prescription</p>
+                <div class="prescription-box">
+                    <p>${esc(c.prescription)}</p>
                 </div>
             </div>
             ` : ''}
+            
             ${c.notes ? `
-            <div>
-                <p class="text-xs text-[#64748b] font-medium">Additional Notes</p>
-                <p class="text-sm text-[#475569] mt-1">${escapeHtml(c.notes)}</p>
+            <div class="detail-section" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
+                <p class="detail-label">Additional Notes</p>
+                <p class="detail-value" style="color:var(--color-brown-300);">${esc(c.notes)}</p>
             </div>
             ` : ''}
         </div>
     `;
     
-    document.getElementById('viewModal').classList.add('active');
+    openModal('viewModal');
 }
 
-function closeModal() {
-    document.getElementById('consultModal').classList.remove('active');
-    document.getElementById('consultForm').reset();
-}
+// ─── Init ────────────────────────────────────────────
 
-function closeViewModal() {
-    document.getElementById('viewModal').classList.remove('active');
-}
-
-function showToast(message, type) {
-    const toast = document.createElement('div');
-    const colors = { success: '#10b981', error: '#ef4444', info: '#a8c49a' };
-    toast.className = `fixed bottom-6 right-6 z-50 px-5 py-3 rounded-lg shadow-lg text-white text-sm font-medium transition-all duration-300`;
-    toast.style.backgroundColor = colors[type] || colors.info;
-    toast.innerHTML = `<div class="flex items-center gap-2"><i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i><span>${message}</span></div>`;
-    document.body.appendChild(toast);
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
-function escapeHtml(str) {
-    if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-}
-
-document.addEventListener('DOMContentLoaded', () => {
+function initConsultationModule() {
+    if (isInitialized) return;
+    isInitialized = true;
+    
     loadData();
     
-    document.getElementById('newConsultBtn')?.addEventListener('click', openModal);
-    document.getElementById('closeConsultModalBtn')?.addEventListener('click', closeModal);
-    document.getElementById('cancelConsultModalBtn')?.addEventListener('click', closeModal);
-    document.getElementById('closeViewModalBtn')?.addEventListener('click', closeViewModal);
-    document.getElementById('closeViewFooterBtn')?.addEventListener('click', closeViewModal);
+    // Event Listeners
+    document.getElementById('newConsultBtn')?.addEventListener('click', openAddModal);
+    document.getElementById('closeConsultModalBtn')?.addEventListener('click', () => closeModal('consultModal'));
+    document.getElementById('cancelConsultModalBtn')?.addEventListener('click', () => closeModal('consultModal'));
+    document.getElementById('closeViewModalBtn')?.addEventListener('click', () => closeModal('viewModal'));
+    document.getElementById('closeViewFooterBtn')?.addEventListener('click', () => closeModal('viewModal'));
     document.getElementById('consultForm')?.addEventListener('submit', saveConsultation);
-});
+    
+    document.getElementById('resetFilterBtn')?.addEventListener('click', () => {
+        searchTerm = '';
+        document.getElementById('searchInput').value = '';
+        renderTable();
+    });
+    
+    document.getElementById('searchInput')?.addEventListener('input', (e) => {
+        searchTerm = e.target.value;
+        renderTable();
+    });
+    
+    // Close modals on overlay click
+    document.getElementById('consultModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeModal('consultModal');
+    });
+    document.getElementById('viewModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeModal('viewModal');
+    });
+    
+    // ESC key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeModal('consultModal');
+            closeModal('viewModal');
+        }
+    });
+}
 
-window.viewConsultation = viewConsultation;
+// ─── Wait for DOM and Common.js ──────────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if common.js has loaded sidebar
+    const checkInterval = setInterval(() => {
+        const sidebar = document.getElementById('mainSidebar');
+        if (sidebar) {
+            clearInterval(checkInterval);
+            setTimeout(initConsultationModule, 100);
+        }
+    }, 50);
+    
+    // Fallback: if sidebar doesn't load in 3 seconds, init anyway
+    setTimeout(() => {
+        clearInterval(checkInterval);
+        initConsultationModule();
+    }, 3000);
+});

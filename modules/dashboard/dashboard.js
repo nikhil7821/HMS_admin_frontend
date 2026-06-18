@@ -1,11 +1,11 @@
 /**
  * Dashboard JS - MedFlow HMS
- * Complete dashboard functionality with centralized theme
+ * Redirects to pages and auto-opens forms
+ * Uses theme.css for styling
  */
 
-// ========================
-// DATA STORE
-// ========================
+// ─── Data Store ──────────────────────────────────────
+
 const DashboardData = {
     stats: {
         opd: 217,
@@ -13,9 +13,7 @@ const DashboardData = {
         revenue: 19420,
         bedOccupancy: 71,
         totalBeds: 118,
-        availableBeds: 34,
-        opdTrend: '+8.2%',
-        revenueTrend: '+12.5%'
+        availableBeds: 34
     },
     
     appointments: [
@@ -43,388 +41,389 @@ const DashboardData = {
     ]
 };
 
-// ========================
-// TOAST NOTIFICATION SYSTEM
-// ========================
-window.showToast = function(message, type = 'success') {
-    // Remove existing toast if any
-    const existingToast = document.querySelector('.toast-notification');
-    if (existingToast) existingToast.remove();
-    
-    const toast = document.createElement('div');
-    toast.className = `toast-notification toast-${type}`;
-    
-    const icons = { success: 'fa-check-circle', error: 'fa-exclamation-triangle', info: 'fa-info-circle' };
-    toast.innerHTML = `<i class="fas ${icons[type]} text-sm"></i><span>${escapeHtml(message)}</span>`;
-    
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.classList.add('toast-fade-out');
-        setTimeout(() => toast.remove(), 300);
-    }, 2800);
+// ─── Page URL Mappings ──────────────────────────────
+
+const PAGE_CONFIG = {
+    'add-patient': {
+        url: '../../modules/clinical/patients.html',
+        action: 'openAddPatient'
+    },
+    'book-appointment': {
+        url: '../../modules/clinical/appointments.html',
+        action: 'openBookAppointment'
+    },
+    'admit-patient': {
+        url: '../../modules/clinical/ipd.html',
+        action: 'openAdmitPatient'
+    },
+    'create-bill': {
+        url: '../../modules/billing/invoices.html',
+        action: 'openCreateInvoice'
+    },
+    'emergency': {
+        url: '../../modules/emergency/emergency.html',
+        action: null
+    },
+    'appointments': {
+        url: '../../modules/clinical/appointments.html',
+        action: null
+    },
+    'invoices': {
+        url: '../../modules/billing/invoices.html',
+        action: null
+    },
+    'patients': {
+        url: '../../modules/clinical/patients.html',
+        action: null
+    }
 };
 
-// ========================
-// UTILITY FUNCTIONS
-// ========================
-function escapeHtml(str) {
+// ─── Get Correct Path ───────────────────────────────
+
+function getPageUrl(pageKey) {
+    var config = PAGE_CONFIG[pageKey];
+    if (!config) return '#';
+    var url = config.url;
+    var currentPath = window.location.pathname;
+    if (currentPath.includes('/modules/')) {
+        url = url.replace('../../modules/', '../');
+    }
+    return url;
+}
+
+function getPageAction(pageKey) {
+    var config = PAGE_CONFIG[pageKey];
+    return config ? config.action : null;
+}
+
+// ─── Redirect with Auto-Open Form ───────────────────
+
+function redirectWithAction(pageKey) {
+    var url = getPageUrl(pageKey);
+    var action = getPageAction(pageKey);
+    
+    if (url && url !== '#') {
+        // Store the action in sessionStorage before redirect
+        if (action) {
+            sessionStorage.setItem('dashboard_action', action);
+        }
+        window.location.href = url;
+    } else {
+        showToast('Page not found', 'error');
+    }
+}
+
+// ─── Check and Execute Auto-Open Action ────────────
+
+function checkAndExecuteAction() {
+    var action = sessionStorage.getItem('dashboard_action');
+    if (action) {
+        // Clear it immediately to prevent re-triggering
+        sessionStorage.removeItem('dashboard_action');
+        
+        // Wait for page to fully load
+        setTimeout(function() {
+            executeAction(action);
+        }, 500);
+    }
+}
+
+function executeAction(action) {
+    switch(action) {
+        case 'openAddPatient':
+            openModal('patientModal', 'openAddModal');
+            break;
+        case 'openBookAppointment':
+            openModal('appointmentModal', 'openAddModal');
+            break;
+        case 'openAdmitPatient':
+            openModal('ipdModal', 'openAddModal');
+            break;
+        case 'openCreateInvoice':
+            openModal('invoiceModal', 'openCreateModal');
+            break;
+        default:
+            console.log('Unknown action:', action);
+    }
+}
+
+// ─── Generic Modal Opener ───────────────────────────
+
+function openModal(modalId, openFunction) {
+    // Check if modal exists
+    var modal = document.getElementById(modalId);
+    if (modal) {
+        // Try to call the open function
+        if (typeof window[openFunction] === 'function') {
+            window[openFunction]();
+        } else {
+            // Fallback: just open the modal
+            modal.classList.add('active');
+        }
+    } else {
+        console.log('Modal not found:', modalId);
+    }
+}
+
+// ─── Escape HTML ──────────────────────────────────────
+
+function esc(str) {
     if (!str) return '';
-    const div = document.createElement('div');
+    var div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
 }
 
-function animateNumber(elementId, endValue, isCurrency = false, suffix = '') {
-    const element = document.getElementById(elementId);
+// ─── Toast Notification ──────────────────────────────
+
+function showToast(message, type) {
+    type = type || 'success';
+    var toast = document.createElement('div');
+    var icons = { success: 'fa-check-circle', error: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+    var colors = { success: '#8aae7a', error: '#d8b48c', info: '#a8c49a' };
+    
+    toast.style.cssText = 'position:fixed; bottom:24px; right:24px; z-index:9999; display:flex; align-items:center; gap:8px; padding:10px 20px; border-radius:12px; background:' + colors[type] + '; color:white; font-weight:500; font-size:0.75rem; backdrop-filter:blur(8px); box-shadow:0 4px 12px rgba(0,0,0,0.08); animation:slideInRight 0.25s ease-out; font-family:Poppins, sans-serif;';
+    toast.innerHTML = '<i class="fas ' + icons[type] + '"></i><span>' + esc(message) + '</span>';
+    document.body.appendChild(toast);
+    
+    setTimeout(function() {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(function() { toast.remove(); }, 250);
+    }, 3000);
+}
+
+// ─── Number Animation ──────────────────────────────
+
+function animateNumber(elementId, endValue, isCurrency, suffix) {
+    isCurrency = isCurrency || false;
+    suffix = suffix || '';
+    var element = document.getElementById(elementId);
     if (!element) return;
     
-    const duration = 500;
-    const startTime = performance.now();
-    const startValue = 0;
+    var duration = 500;
+    var startTime = performance.now();
     
     function easeOutQuad(t) { return t * (2 - t); }
     
     function update(currentTime) {
-        const elapsed = currentTime - startTime;
-        let progress = Math.min(1, elapsed / duration);
+        var elapsed = currentTime - startTime;
+        var progress = Math.min(1, elapsed / duration);
         progress = easeOutQuad(progress);
-        const currentValue = Math.floor(progress * endValue);
+        var currentValue = Math.floor(progress * endValue);
         
         if (isCurrency) {
-            element.innerText = '₹' + currentValue.toLocaleString('en-IN');
+            element.textContent = '₹' + currentValue.toLocaleString('en-IN');
         } else {
-            element.innerText = currentValue + suffix;
+            element.textContent = currentValue + suffix;
         }
         
         if (progress < 1) {
             requestAnimationFrame(update);
         } else {
-            element.innerText = isCurrency ? '₹' + endValue.toLocaleString('en-IN') : endValue + suffix;
+            element.textContent = isCurrency ? '₹' + endValue.toLocaleString('en-IN') : endValue + suffix;
         }
     }
     
     requestAnimationFrame(update);
 }
 
-// ========================
-// LOAD DASHBOARD COMPONENTS
-// ========================
+// ─── Load Stats ──────────────────────────────────────
+
 function loadDashboardStats() {
-    const s = DashboardData.stats;
+    var s = DashboardData.stats;
     animateNumber('opdCount', s.opd, false, '');
     animateNumber('ipdCount', s.ipd, false, '');
     animateNumber('revenueCount', s.revenue, true, '');
     animateNumber('bedOccupancy', s.bedOccupancy, false, '%');
     
-    const availableEl = document.getElementById('availableBeds');
-    if (availableEl) availableEl.innerText = s.availableBeds;
-    
-    const opdTrendEl = document.getElementById('opdTrend');
-    const revenueTrendEl = document.getElementById('revenueTrend');
-    if (opdTrendEl) opdTrendEl.innerText = s.opdTrend;
-    if (revenueTrendEl) revenueTrendEl.innerText = s.revenueTrend;
+    var availableEl = document.getElementById('availableBeds');
+    if (availableEl) availableEl.textContent = s.availableBeds;
 }
 
+// ─── Load Appointments ──────────────────────────────
+
 function loadRecentAppointments() {
-    const tbody = document.getElementById('recentAppointments');
+    var tbody = document.getElementById('recentAppointments');
     if (!tbody) return;
     
-    const statusClassMap = {
+    var statusClassMap = {
         completed: 'badge-completed',
         progress: 'badge-progress',
         scheduled: 'badge-scheduled'
     };
     
-    const rows = DashboardData.appointments.map(app => `
-        <tr class="dashboard-table-row">
-            <td class="py-2.5 text-sm font-normal text-[#6a5a4a]">${escapeHtml(app.patient)}</td>
-            <td class="py-2.5 text-sm font-normal text-[#9a8e82]">${escapeHtml(app.doctor)}</td>
-            <td class="py-2.5 text-sm font-normal text-[#9a8e82]">${app.time}</td>
-            <td class="py-2.5"><span class="${statusClassMap[app.statusType]}">${app.status}</span></td>
-        </tr>
-    `).join('');
+    var rows = '';
+    for (var i = 0; i < DashboardData.appointments.length; i++) {
+        var app = DashboardData.appointments[i];
+        var badgeClass = statusClassMap[app.statusType] || 'badge-scheduled';
+        rows += '<tr class="dashboard-table-row">';
+        rows += '<td style="font-weight:var(--font-weight-medium); color:var(--color-brown-700); font-size:0.875rem;">' + esc(app.patient) + '</td>';
+        rows += '<td style="color:var(--color-brown-300); font-size:0.8125rem;">' + esc(app.doctor) + '</td>';
+        rows += '<td style="color:var(--color-brown-300); font-size:0.8125rem;">' + app.time + '</td>';
+        rows += '<td><span class="' + badgeClass + '">' + app.status + '</span></td>';
+        rows += '</tr>';
+    }
     
     tbody.innerHTML = rows;
 }
 
+// ─── Load Schedule ──────────────────────────────────
+
 function loadTodaySchedule() {
-    const container = document.getElementById('todaySchedule');
+    var container = document.getElementById('todaySchedule');
     if (!container) return;
     
-    const scheduleHtml = DashboardData.schedule.map(s => `
-        <div class="schedule-item flex items-center justify-between p-2.5 bg-white rounded-xl hover:bg-[#fefcf9] transition-all border border-[#f0e8e0]">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-[#faf7f2] flex items-center justify-center">
-                    <i class="fas fa-user-md text-[#a8c49a] text-sm"></i>
-                </div>
-                <div>
-                    <p class="font-medium text-[#5a4a3a] text-sm">${escapeHtml(s.doctor)}</p>
-                    <p class="text-xs text-[#d4c9bc] font-light">${escapeHtml(s.dept)}</p>
-                </div>
-            </div>
-            <div class="text-right">
-                <p class="text-sm font-medium text-[#6a5a4a]">${s.time}</p>
-                <p class="text-[11px] text-[#a8c49a] font-medium">${s.patients} pts</p>
-            </div>
-        </div>
-    `).join('');
+    var html = '';
+    for (var i = 0; i < DashboardData.schedule.length; i++) {
+        var s = DashboardData.schedule[i];
+        html += '<div class="schedule-item">';
+        html += '<div class="doc-info">';
+        html += '<div class="doc-avatar"><i class="fas fa-user-md"></i></div>';
+        html += '<div><p class="doc-name">' + esc(s.doctor) + '</p><p class="doc-dept">' + esc(s.dept) + '</p></div>';
+        html += '</div>';
+        html += '<div style="text-align:right;"><p class="schedule-time">' + s.time + '</p><p class="schedule-patients">' + s.patients + ' pts</p></div>';
+        html += '</div>';
+    }
     
-    container.innerHTML = scheduleHtml;
+    container.innerHTML = html;
 }
+
+// ─── Load Tasks ──────────────────────────────────────
 
 function loadPendingTasks() {
-    const container = document.getElementById('pendingTasks');
+    var container = document.getElementById('pendingTasks');
     if (!container) return;
     
-    const tasksHtml = DashboardData.tasks.map(task => `
-        <div class="task-card p-3.5 transition-all border border-[#f0e8e0] rounded-xl" style="background: ${task.bg};">
-            <div class="flex justify-between items-start mb-2">
-                <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 rounded-xl bg-white flex items-center justify-center shadow-sm">
-                        <i class="fas ${task.icon}" style="color: ${task.iconColor}; font-size: 0.75rem;"></i>
-                    </div>
-                    <span class="font-medium text-[#5a4a3a] text-sm">${task.title}</span>
-                </div>
-                <span class="text-xl font-medium" style="color: ${task.textColor};">${task.count}</span>
-            </div>
-            <button class="task-action-btn w-full mt-2 text-xs font-medium rounded-lg py-1.5 transition-all flex items-center justify-center gap-1.5 hover:opacity-80" 
-                    style="color: ${task.textColor}; background: white; border: 1px solid #f0e8e0;" 
-                    data-action-type="${task.action}">
-                ${task.action} <i class="fas fa-arrow-right text-[10px]"></i>
-            </button>
-        </div>
-    `).join('');
+    var html = '';
+    for (var i = 0; i < DashboardData.tasks.length; i++) {
+        var task = DashboardData.tasks[i];
+        html += '<div class="task-card" style="background:' + task.bg + ';">';
+        html += '<div class="task-header">';
+        html += '<div style="display:flex; align-items:center; gap:0.5rem;">';
+        html += '<div class="task-icon"><i class="fas ' + task.icon + '" style="color:' + task.iconColor + ';"></i></div>';
+        html += '<span class="task-title">' + task.title + '</span>';
+        html += '</div>';
+        html += '<span class="task-count" style="color:' + task.textColor + ';">' + task.count + '</span>';
+        html += '</div>';
+        html += '<button class="task-action-btn" data-action="' + task.action + '" style="color:' + task.textColor + ';">';
+        html += task.action + ' <i class="fas fa-arrow-right" style="font-size:0.625rem;"></i>';
+        html += '</button>';
+        html += '</div>';
+    }
     
-    container.innerHTML = tasksHtml;
-    
-    document.querySelectorAll('.task-action-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const action = btn.dataset.actionType;
-            showToast(`⚡ ${action} module - Coming soon`, 'info');
-        });
-    });
+    container.innerHTML = html;
 }
+
+// ─── Update Alert Count ─────────────────────────────
 
 function updateAlertCount() {
-    const alertEl = document.getElementById('alertCount');
+    var alertEl = document.getElementById('alertCount');
     if (alertEl) {
-        const total = DashboardData.tasks.reduce((sum, t) => sum + t.count, 0);
-        alertEl.innerText = total;
+        var total = 0;
+        for (var i = 0; i < DashboardData.tasks.length; i++) {
+            total += DashboardData.tasks[i].count;
+        }
+        alertEl.textContent = total;
     }
 }
 
-// ========================
-// WELCOME & TIME FUNCTIONS
-// ========================
+// ─── Welcome Message ────────────────────────────────
+
 function loadWelcomeMessage() {
-    // Try to get user from localStorage (set by login page)
-    let userName = 'Dr. Arjun';
-    try {
-        const user = JSON.parse(localStorage.getItem('user') || '{"name":"Dr. Arjun"}');
-        userName = user.name || 'Dr. Arjun';
-    } catch(e) {
-        userName = 'Dr. Arjun';
-    }
-    
-    const hour = new Date().getHours();
-    let greeting = 'Good morning';
+    var user = JSON.parse(localStorage.getItem('user') || '{"name":"Dr. Arjun"}');
+    var hour = new Date().getHours();
+    var greeting = 'Good morning';
     if (hour >= 12 && hour < 17) greeting = 'Good afternoon';
     if (hour >= 17) greeting = 'Good evening';
     
-    const welcomeEl = document.getElementById('welcomeMessage');
+    var welcomeEl = document.getElementById('welcomeMessage');
     if (welcomeEl) {
-        welcomeEl.innerHTML = `${greeting}, ${escapeHtml(userName)} <span class="font-light">🌿</span>`;
+        welcomeEl.innerHTML = greeting + ', <span style="font-weight:var(--font-weight-medium);">' + esc(user.name || 'Dr. Arjun') + '</span> <span style="font-weight:var(--font-weight-light);">🌿</span>';
     }
 }
+
+// ─── Update DateTime ─────────────────────────────────
 
 function updateDateTime() {
-    const now = new Date();
-    const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    var now = new Date();
+    var dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    var timeOptions = { hour: '2-digit', minute: '2-digit' };
     
-    const dateStr = now.toLocaleDateString('en-IN', dateOptions);
-    const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    var dateStr = now.toLocaleDateString('en-IN', dateOptions);
+    var timeStr = now.toLocaleTimeString('en-IN', timeOptions);
     
-    const dateTimeEl = document.getElementById('currentDateTime');
+    var dateTimeEl = document.getElementById('currentDateTime');
     if (dateTimeEl) {
-        dateTimeEl.innerHTML = `<i class="far fa-calendar-alt mr-1"></i> ${dateStr} | <i class="far fa-clock mr-1"></i> ${timeStr}`;
+        dateTimeEl.innerHTML = '<i class="far fa-calendar-alt" style="margin-right:0.25rem;"></i> ' + dateStr + ' | <i class="far fa-clock" style="margin-right:0.25rem;"></i> ' + timeStr;
     }
     
-    const todayDateEl = document.getElementById('todayDate');
+    var todayDateEl = document.getElementById('todayDate');
     if (todayDateEl) {
-        todayDateEl.innerText = now.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+        todayDateEl.textContent = now.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
     }
     
-    const liveEl = document.getElementById('liveTimestamp');
+    var liveEl = document.getElementById('liveTimestamp');
     if (liveEl) {
-        liveEl.innerText = `Updated ${now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}`;
+        liveEl.textContent = 'Updated ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
     }
 }
 
-// ========================
-// MODAL MANAGER
-// ========================
-const ModalManager = {
-    overlay: null,
-    
-    init() {
-        this.overlay = document.getElementById('modalOverlay');
-        if (!this.overlay) return;
-        
-        const closeBtn = document.getElementById('closeModalBtn');
-        const cancelBtn = document.getElementById('cancelModalBtn');
-        const confirmBtn = document.getElementById('confirmModalBtn');
-        
-        if (closeBtn) closeBtn.addEventListener('click', () => this.close());
-        if (cancelBtn) cancelBtn.addEventListener('click', () => this.close());
-        if (confirmBtn) confirmBtn.addEventListener('click', () => this.handleConfirm());
-        
-        this.overlay.addEventListener('click', (e) => {
-            if (e.target === this.overlay) this.close();
-        });
-        
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.isOpen()) this.close();
-        });
-    },
-    
-    open() {
-        if (!this.overlay) return;
-        this.overlay.classList.remove('opacity-0', 'invisible');
-        this.overlay.classList.add('opacity-100', 'visible');
-        const formCard = this.overlay.querySelector('.form-card');
-        if (formCard) {
-            formCard.classList.remove('scale-95');
-            formCard.classList.add('scale-100');
-        }
-    },
-    
-    close() {
-        if (!this.overlay) return;
-        this.overlay.classList.add('opacity-0', 'invisible');
-        this.overlay.classList.remove('opacity-100', 'visible');
-        const formCard = this.overlay.querySelector('.form-card');
-        if (formCard) {
-            formCard.classList.add('scale-95');
-            formCard.classList.remove('scale-100');
-        }
-        
-        // Clear form fields
-        const nameInput = document.getElementById('patientName');
-        const phoneInput = document.getElementById('patientPhone');
-        if (nameInput) nameInput.value = '';
-        if (phoneInput) phoneInput.value = '';
-    },
-    
-    isOpen() {
-        return this.overlay && !this.overlay.classList.contains('invisible');
-    },
-    
-    handleConfirm() {
-        const nameInput = document.getElementById('patientName');
-        const patientName = nameInput?.value.trim();
-        
-        if (!patientName) {
-            showToast('Please enter patient name', 'error');
-            nameInput?.focus();
-            return;
-        }
-        
-        const phoneInput = document.getElementById('patientPhone');
-        const phone = phoneInput?.value.trim() || '';
-        const deptSelect = document.getElementById('patientDept');
-        const department = deptSelect?.value || 'General Medicine';
-        
-        // Get existing patients from localStorage
-        let existingPatients = JSON.parse(localStorage.getItem('hms_patients') || '[]');
-        
-        // Calculate next ID
-        const newId = existingPatients.length > 0 ? Math.max(...existingPatients.map(p => p.id)) + 1 : 1001;
-        
-        // Create new patient object
-        const newPatient = {
-            id: newId,
-            fullName: patientName,
-            phone: phone,
-            department: department,
-            dob: '',
-            gender: '',
-            bloodGroup: '',
-            email: '',
-            address: '',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        };
-        
-        existingPatients.push(newPatient);
-        localStorage.setItem('hms_patients', JSON.stringify(existingPatients));
-        
-        // Update OPD count in UI
-        const currentOpd = DashboardData.stats.opd;
-        DashboardData.stats.opd = currentOpd + 1;
-        animateNumber('opdCount', DashboardData.stats.opd, false, '');
-        
-        showToast(`✅ ${escapeHtml(patientName)} registered successfully`, 'success');
-        this.close();
-    }
-};
+// ─── Quick Actions ──────────────────────────────────
 
-// ========================
-// QUICK ACTIONS
-// ========================
 function initQuickActions() {
-    const buttons = document.querySelectorAll('[data-action]');
+    var buttons = document.querySelectorAll('[data-action]');
     
-    const actions = {
-        'add-patient': () => ModalManager.open(),
-        'book-appointment': () => showToast('📅 Appointment booking - Demo mode', 'info'),
-        'admit-patient': () => showToast('🏥 Admission form - Coming soon', 'info'),
-        'create-bill': () => showToast('💰 Billing system - Preview', 'info'),
-        'emergency': () => showToast('🚨 Emergency protocol activated', 'error')
-    };
-    
-    buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const action = btn.getAttribute('data-action');
-            const handler = actions[action];
-            if (handler) handler();
-            else showToast(`Action: ${action}`, 'info');
+    buttons.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var action = this.getAttribute('data-action');
+            redirectWithAction(action);
         });
     });
 }
 
-// ========================
-// AUTO REFRESH
-// ========================
+// ─── View All Links ─────────────────────────────────
+
+function initViewAllLinks() {
+    var links = document.querySelectorAll('.view-all');
+    
+    links.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var target = this.getAttribute('data-target');
+            if (target) {
+                redirectWithAction(target);
+            }
+        });
+    });
+}
+
+// ─── Task Actions ───────────────────────────────────
+
+function initTaskActions() {
+    document.addEventListener('click', function(e) {
+        var target = e.target.closest('.task-action-btn');
+        if (target) {
+            var action = target.getAttribute('data-action');
+            showToast('⚡ ' + action + ' module - Preview', 'info');
+        }
+    });
+}
+
+// ─── Auto Refresh ───────────────────────────────────
+
 function startAutoRefresh() {
-    setInterval(() => {
-        const now = new Date();
-        const liveEl = document.getElementById('liveTimestamp');
+    setInterval(function() {
+        var now = new Date();
+        var liveEl = document.getElementById('liveTimestamp');
         if (liveEl) {
-            liveEl.innerHTML = `Updated ${now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}`;
+            liveEl.textContent = 'Updated ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
         }
     }, 30000);
 }
 
-// ========================
-// SIDEBAR TOGGLE (Mobile)
-// ========================
-function initMobileSidebar() {
-    // Check if sidebar toggle button exists in header
-    const toggleBtn = document.getElementById('sidebarToggle');
-    const sidebar = document.querySelector('.sidebar');
-    
-    if (toggleBtn && sidebar) {
-        toggleBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('mobile-open');
-        });
-    }
-}
+// ─── Init Dashboard ─────────────────────────────────
 
-// ========================
-// INITIALIZE DASHBOARD
-// ========================
 function initDashboard() {
     loadWelcomeMessage();
     updateDateTime();
@@ -433,18 +432,30 @@ function initDashboard() {
     loadTodaySchedule();
     loadPendingTasks();
     updateAlertCount();
-    ModalManager.init();
     initQuickActions();
-    initMobileSidebar();
+    initViewAllLinks();
+    initTaskActions();
     
-    // Update time every second
     setInterval(updateDateTime, 1000);
     startAutoRefresh();
 }
 
-// Start everything when DOM is ready
+// ─── Expose for inline usage ───────────────────────
+
+window.showToast = showToast;
+window.redirectWithAction = redirectWithAction;
+window.checkAndExecuteAction = checkAndExecuteAction;
+window.executeAction = executeAction;
+window.openModal = openModal;
+
+// ─── Check for auto-open action on page load ───────
+
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initDashboard);
+    document.addEventListener('DOMContentLoaded', function() {
+        initDashboard();
+        checkAndExecuteAction();
+    });
 } else {
     initDashboard();
+    checkAndExecuteAction();
 }

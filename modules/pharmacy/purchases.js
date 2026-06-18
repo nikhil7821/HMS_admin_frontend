@@ -1,23 +1,27 @@
 /**
  * Purchases Management Module
  * MedFlow Pharmacy - Purchase Orders CRUD
- * Matching Executive Dashboard UI/UX - Indian Context (₹)
+ * Uses theme.css for styling, clean event handling
  */
 
-// Data Stores
 let purchases = [];
 let suppliers = [];
 let medicines = [];
+let searchTerm = '';
+let supplierFilter = '';
+let isInitialized = false;
 
-// Helper: Escape HTML
-function escapeHtml(str) {
+// ─── Utility Functions ──────────────────────────────
+
+function esc(str) {
     if (!str) return '';
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
 }
 
-// Toast notification
+// ─── Toast Notification ──────────────────────────────
+
 function showToast(message, type = 'success') {
     const toast = document.createElement('div');
     const icons = { success: 'fa-check-circle', error: 'fa-exclamation-triangle', info: 'fa-info-circle' };
@@ -42,7 +46,7 @@ function showToast(message, type = 'success') {
         animation: slideInRight 0.25s ease-out;
         font-family: 'Poppins', system-ui, sans-serif;
     `;
-    toast.innerHTML = `<i class="fas ${icons[type]} text-sm"></i><span>${escapeHtml(message)}</span>`;
+    toast.innerHTML = `<i class="fas ${icons[type]}"></i><span>${esc(message)}</span>`;
     document.body.appendChild(toast);
     
     setTimeout(() => {
@@ -52,62 +56,194 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
-// Save purchases to localStorage
-function savePurchases() {
-    localStorage.setItem('pharmacy_purchases', JSON.stringify(purchases));
-}
+// ─── Data Management ──────────────────────────────
 
-// Update statistics
-function updateStats() {
-    const totalPurchasesEl = document.getElementById('totalPurchases');
-    const totalQuantityEl = document.getElementById('totalQuantity');
-    const totalInvestmentEl = document.getElementById('totalInvestment');
-    
-    if (totalPurchasesEl) totalPurchasesEl.innerText = purchases.length;
-    
-    const totalQty = purchases.reduce((sum, p) => sum + p.quantity, 0);
-    if (totalQuantityEl) totalQuantityEl.innerText = totalQty;
-    
-    const totalInv = purchases.reduce((sum, p) => sum + p.total, 0);
-    if (totalInvestmentEl) totalInvestmentEl.innerText = '₹' + totalInv.toLocaleString('en-IN');
-}
-
-// Load data from localStorage
 function loadData() {
-    // Load suppliers
-    const storedSuppliers = localStorage.getItem('pharmacy_suppliers');
-    if (storedSuppliers) {
-        suppliers = JSON.parse(storedSuppliers);
-    } else {
-        suppliers = [];
-    }
-    
-    // Load medicines
-    const storedMedicines = localStorage.getItem('pharmacy_medicines');
-    if (storedMedicines) {
-        medicines = JSON.parse(storedMedicines);
-    } else {
-        medicines = [];
-    }
-    
-    // Load purchases
-    const storedPurchases = localStorage.getItem('pharmacy_purchases');
-    if (storedPurchases) {
-        purchases = JSON.parse(storedPurchases);
-    } else {
-        purchases = [];
-        // Add some sample purchase data if needed
-        if (medicines.length > 0 && suppliers.length > 0) {
-            // Optional: Add demo data
+    try {
+        // Load suppliers
+        const storedSuppliers = localStorage.getItem('pharmacy_suppliers');
+        suppliers = storedSuppliers ? JSON.parse(storedSuppliers) : [];
+        
+        // Load medicines
+        const storedMedicines = localStorage.getItem('pharmacy_medicines');
+        medicines = storedMedicines ? JSON.parse(storedMedicines) : [];
+        
+        // Load purchases
+        const storedPurchases = localStorage.getItem('pharmacy_purchases');
+        if (storedPurchases) {
+            purchases = JSON.parse(storedPurchases);
+        } else {
+            purchases = [];
+            // Create sample purchase if data exists
+            if (medicines.length > 0 && suppliers.length > 0) {
+                const today = new Date().toISOString().split('T')[0];
+                purchases = [
+                    {
+                        id: 1,
+                        supplierId: 1,
+                        supplierName: 'Medico Pharma Distributors',
+                        medicineId: 1,
+                        medicineName: 'Paracetamol',
+                        quantity: 100,
+                        unitPrice: 20,
+                        total: 2000,
+                        date: today,
+                        invoiceNo: 'INV-001'
+                    },
+                    {
+                        id: 2,
+                        supplierId: 2,
+                        supplierName: 'HealthCare Ltd India',
+                        medicineId: 2,
+                        medicineName: 'Amoxicillin',
+                        quantity: 50,
+                        unitPrice: 75,
+                        total: 3750,
+                        date: today,
+                        invoiceNo: 'INV-002'
+                    }
+                ];
+                savePurchases();
+            }
         }
+        refreshUI();
+        populateSelects();
+        populateSupplierFilter();
+    } catch (error) {
+        console.error('Error loading data:', error);
+        showToast('Error loading data', 'error');
     }
-    
-    renderTable();
-    populateSelects();
-    updateStats();
 }
 
-// Validate purchase form
+function savePurchases() {
+    try {
+        localStorage.setItem('pharmacy_purchases', JSON.stringify(purchases));
+    } catch (error) {
+        console.error('Error saving purchases:', error);
+    }
+}
+
+// ─── Stats ──────────────────────────────────────────
+
+function updateStats() {
+    const total = purchases.length;
+    const totalQty = purchases.reduce((sum, p) => sum + p.quantity, 0);
+    const totalInv = purchases.reduce((sum, p) => sum + p.total, 0);
+    
+    document.getElementById('totalPurchases').textContent = total;
+    document.getElementById('totalQuantity').textContent = totalQty;
+    document.getElementById('totalInvestment').textContent = '₹' + totalInv.toLocaleString('en-IN');
+    document.getElementById('lastUpdated').textContent = 
+        new Date().toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+// ─── Filter ──────────────────────────────────────────
+
+function getFilteredPurchases() {
+    return purchases.filter(p => {
+        const matchesSearch = searchTerm === '' || 
+            p.supplierName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.medicineName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.invoiceNo.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        const matchesSupplier = supplierFilter === '' || p.supplierId.toString() === supplierFilter;
+        
+        return matchesSearch && matchesSupplier;
+    });
+}
+
+// ─── Render ──────────────────────────────────────────
+
+function renderTable() {
+    const tbody = document.getElementById('purchasesTable');
+    if (!tbody) return;
+    
+    const filtered = getFilteredPurchases();
+    
+    if (filtered.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="9" class="purchases-empty">
+                    <i class="fas fa-folder-open"></i>
+                    <p>No purchase orders found</p>
+                    <p style="font-size:0.75rem; margin-top:0.25rem;">Create a new purchase to get started.</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    // Sort by date descending (newest first)
+    const sorted = [...filtered].sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    tbody.innerHTML = sorted.map(p => `
+        <tr class="purchase-row" data-id="${p.id}">
+            <td><span class="badge-purchase">PO-${p.id}</span></td>
+            <td style="color:var(--color-brown-600); font-size:0.8125rem;">${p.date}</td>
+            <td class="supplier-name">${esc(p.supplierName)}</td>
+            <td class="medicine-name">${esc(p.medicineName)}</td>
+            <td style="text-align:center; color:var(--color-brown-600);">${p.quantity}</td>
+            <td style="text-align:center; color:var(--color-brown-600);">₹${p.unitPrice.toLocaleString('en-IN')}</td>
+            <td style="text-align:center;" class="total-amount">₹${p.total.toLocaleString('en-IN')}</td>
+            <td style="color:var(--color-brown-300); font-size:0.8125rem;">${p.invoiceNo ? esc(p.invoiceNo) : '—'}</td>
+            <td style="text-align:center;">
+                <button class="action-btn delete delete-btn" data-id="${p.id}" title="Delete Purchase">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+    
+    // Bind events
+    tbody.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => deletePurchase(parseInt(btn.dataset.id)));
+    });
+}
+
+function refreshUI() {
+    updateStats();
+    renderTable();
+}
+
+// ─── Populate Selects ──────────────────────────────
+
+function populateSelects() {
+    // Supplier select in modal
+    const supplierSelect = document.getElementById('supplierId');
+    if (supplierSelect) {
+        supplierSelect.innerHTML = '<option value="">Select Supplier</option>' + 
+            suppliers.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('');
+    }
+    
+    // Medicine select in modal
+    const medicineSelect = document.getElementById('medicineId');
+    if (medicineSelect) {
+        medicineSelect.innerHTML = '<option value="">Select Medicine</option>' + 
+            medicines.map(m => 
+                `<option value="${m.id}">${esc(m.name)} ${m.brand ? '(' + esc(m.brand) + ')' : ''} - Stock: ${m.stock || 0}</option>`
+            ).join('');
+    }
+}
+
+function populateSupplierFilter() {
+    const filterSelect = document.getElementById('supplierFilter');
+    if (filterSelect) {
+        const uniqueSuppliers = [...new Set(purchases.map(p => p.supplierId))];
+        const supplierMap = {};
+        purchases.forEach(p => {
+            if (!supplierMap[p.supplierId]) {
+                supplierMap[p.supplierId] = p.supplierName;
+            }
+        });
+        filterSelect.innerHTML = '<option value="">All Suppliers</option>' + 
+            Object.entries(supplierMap).map(([id, name]) => 
+                `<option value="${id}">${esc(name)}</option>`
+            ).join('');
+    }
+}
+
+// ─── Validation ──────────────────────────────────────
+
 function validatePurchaseForm(supplierId, medicineId, quantity, unitPrice, purchaseDate) {
     let isValid = true;
     
@@ -115,7 +251,7 @@ function validatePurchaseForm(supplierId, medicineId, quantity, unitPrice, purch
     const errorFields = ['supplierError', 'medicineError', 'quantityError', 'unitPriceError', 'dateError'];
     errorFields.forEach(field => {
         const el = document.getElementById(field);
-        if (el) el.innerText = '';
+        if (el) el.textContent = '';
     });
     
     const supplierSelect = document.getElementById('supplierId');
@@ -124,16 +260,14 @@ function validatePurchaseForm(supplierId, medicineId, quantity, unitPrice, purch
     const priceInput = document.getElementById('unitPrice');
     const dateInput = document.getElementById('purchaseDate');
     
-    if (supplierSelect) supplierSelect.classList.remove('error');
-    if (medicineSelect) medicineSelect.classList.remove('error');
-    if (quantityInput) quantityInput.classList.remove('error');
-    if (priceInput) priceInput.classList.remove('error');
-    if (dateInput) dateInput.classList.remove('error');
+    [supplierSelect, medicineSelect, quantityInput, priceInput, dateInput].forEach(el => {
+        if (el) el.classList.remove('error');
+    });
     
     // Supplier validation
     if (!supplierId) {
         const errorEl = document.getElementById('supplierError');
-        if (errorEl) errorEl.innerText = 'Please select a supplier';
+        if (errorEl) errorEl.textContent = 'Please select a supplier';
         if (supplierSelect) supplierSelect.classList.add('error');
         isValid = false;
     }
@@ -141,7 +275,7 @@ function validatePurchaseForm(supplierId, medicineId, quantity, unitPrice, purch
     // Medicine validation
     if (!medicineId) {
         const errorEl = document.getElementById('medicineError');
-        if (errorEl) errorEl.innerText = 'Please select a medicine';
+        if (errorEl) errorEl.textContent = 'Please select a medicine';
         if (medicineSelect) medicineSelect.classList.add('error');
         isValid = false;
     }
@@ -149,12 +283,12 @@ function validatePurchaseForm(supplierId, medicineId, quantity, unitPrice, purch
     // Quantity validation
     if (!quantity || quantity <= 0) {
         const errorEl = document.getElementById('quantityError');
-        if (errorEl) errorEl.innerText = 'Please enter a valid quantity (minimum 1)';
+        if (errorEl) errorEl.textContent = 'Please enter a valid quantity (minimum 1)';
         if (quantityInput) quantityInput.classList.add('error');
         isValid = false;
     } else if (quantity > 10000) {
         const errorEl = document.getElementById('quantityError');
-        if (errorEl) errorEl.innerText = 'Quantity cannot exceed 10,000';
+        if (errorEl) errorEl.textContent = 'Quantity cannot exceed 10,000';
         if (quantityInput) quantityInput.classList.add('error');
         isValid = false;
     }
@@ -162,12 +296,12 @@ function validatePurchaseForm(supplierId, medicineId, quantity, unitPrice, purch
     // Unit price validation
     if (!unitPrice || unitPrice <= 0) {
         const errorEl = document.getElementById('unitPriceError');
-        if (errorEl) errorEl.innerText = 'Please enter a valid unit price';
+        if (errorEl) errorEl.textContent = 'Please enter a valid unit price';
         if (priceInput) priceInput.classList.add('error');
         isValid = false;
     } else if (unitPrice > 100000) {
         const errorEl = document.getElementById('unitPriceError');
-        if (errorEl) errorEl.innerText = 'Unit price cannot exceed ₹1,00,000';
+        if (errorEl) errorEl.textContent = 'Unit price cannot exceed ₹1,00,000';
         if (priceInput) priceInput.classList.add('error');
         isValid = false;
     }
@@ -175,7 +309,7 @@ function validatePurchaseForm(supplierId, medicineId, quantity, unitPrice, purch
     // Date validation
     if (!purchaseDate) {
         const errorEl = document.getElementById('dateError');
-        if (errorEl) errorEl.innerText = 'Please select purchase date';
+        if (errorEl) errorEl.textContent = 'Please select purchase date';
         if (dateInput) dateInput.classList.add('error');
         isValid = false;
     } else {
@@ -184,7 +318,7 @@ function validatePurchaseForm(supplierId, medicineId, quantity, unitPrice, purch
         today.setHours(0, 0, 0, 0);
         if (selectedDate > today) {
             const errorEl = document.getElementById('dateError');
-            if (errorEl) errorEl.innerText = 'Purchase date cannot be in the future';
+            if (errorEl) errorEl.textContent = 'Purchase date cannot be in the future';
             if (dateInput) dateInput.classList.add('error');
             isValid = false;
         }
@@ -193,84 +327,33 @@ function validatePurchaseForm(supplierId, medicineId, quantity, unitPrice, purch
     return isValid;
 }
 
-// Render purchases table
-function renderTable() {
-    const tbody = document.getElementById('purchasesTable');
-    if (!tbody) return;
-    
-    if (purchases.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 text-[#d4c9bc] text-sm"><i class="fas fa-folder-open mr-2"></i>No purchase orders found. Click "New Purchase" to create one.</div></td></div>`;
-        return;
-    }
-    
-    // Sort by date descending (newest first)
-    const sortedPurchases = [...purchases].sort((a, b) => new Date(b.date) - new Date(a.date));
-    
-    tbody.innerHTML = sortedPurchases.map(purchase => `
-        <tr class="dashboard-table-row">
-            <td class="px-5 py-3">
-                <span class="badge-purchase">PO-${purchase.id}</span>
-             </div>
-            <td class="px-5 py-3 text-sm text-[#5a4a3a]">${purchase.date}</div>
-            <td class="px-5 py-3 text-sm font-medium text-[#5a4a3a]">${escapeHtml(purchase.supplierName)}</div>
-            <td class="px-5 py-3 text-sm text-[#9a8e82]">${escapeHtml(purchase.medicineName)}</div>
-            <td class="px-5 py-3 text-sm text-[#5a4a3a]">${purchase.quantity}</div>
-            <td class="px-5 py-3 text-sm text-[#5a4a3a]">₹${purchase.unitPrice.toLocaleString('en-IN')}</div>
-            <td class="px-5 py-3 text-sm font-semibold text-[#8aae7a]">₹${purchase.total.toLocaleString('en-IN')}</div>
-            <td class="px-5 py-3 text-sm text-[#9a8e82]">${escapeHtml(purchase.invoiceNo || '—')}</div>
-            <td class="px-5 py-3 text-center">
-                <button onclick="window.deletePurchaseHandler(${purchase.id})" class="action-delete text-base transition" title="Delete Purchase">
-                    <i class="fas fa-trash"></i>
-                </button>
-             </div>
-         </div>
-    `).join('');
-}
+// ─── Modals ──────────────────────────────────────────
 
-// Populate selects
-function populateSelects() {
-    const supplierSelect = document.getElementById('supplierId');
-    if (supplierSelect) {
-        supplierSelect.innerHTML = '<option value="">Select Supplier</option>' + 
-            suppliers.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
-    }
-    
-    const medicineSelect = document.getElementById('medicineId');
-    if (medicineSelect) {
-        medicineSelect.innerHTML = '<option value="">Select Medicine</option>' + 
-            medicines.map(m => `<option value="${m.id}">${escapeHtml(m.name)} ${m.brand ? '(' + escapeHtml(m.brand) + ')' : ''} - Current Stock: ${m.stock}</option>`).join('');
+function openModal(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.add('opacity-100', 'visible');
     }
 }
 
-// Calculate and update total preview
-function updateTotalPreview() {
-    const quantity = parseInt(document.getElementById('quantity')?.value) || 0;
-    const unitPrice = parseFloat(document.getElementById('unitPrice')?.value) || 0;
-    const total = quantity * unitPrice;
-    const totalPreview = document.getElementById('totalAmountPreview');
-    if (totalPreview) {
-        totalPreview.innerText = '₹' + total.toLocaleString('en-IN');
-        if (total > 0) {
-            totalPreview.style.color = '#8aae7a';
-        } else {
-            totalPreview.style.color = '#d4c9bc';
-        }
+function closeModal(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.remove('opacity-100', 'visible');
     }
 }
 
-// Modal management
-const modal = document.getElementById('purchaseModal');
-const form = document.getElementById('purchaseForm');
-
-function openModal() {
-    if (!modal) return;
-    modal.classList.remove('opacity-0', 'invisible');
-    modal.classList.add('opacity-100', 'visible');
-    const modalCard = modal.querySelector('.form-card');
-    if (modalCard) {
-        modalCard.classList.remove('scale-95');
-        modalCard.classList.add('scale-100');
-    }
+function openAddModal() {
+    // Refresh data
+    const storedSuppliers = localStorage.getItem('pharmacy_suppliers');
+    const storedMedicines = localStorage.getItem('pharmacy_medicines');
+    if (storedSuppliers) suppliers = JSON.parse(storedSuppliers);
+    if (storedMedicines) medicines = JSON.parse(storedMedicines);
+    populateSelects();
+    
+    document.getElementById('purchaseForm').reset();
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-shopping-cart"></i> New Purchase Order';
+    
     // Set default date to today
     const today = new Date().toISOString().split('T')[0];
     const dateInput = document.getElementById('purchaseDate');
@@ -278,68 +361,36 @@ function openModal() {
     
     // Reset total preview
     const totalPreview = document.getElementById('totalAmountPreview');
-    if (totalPreview) totalPreview.innerText = '₹0.00';
-}
-
-function closeModal() {
-    if (!modal) return;
-    modal.classList.add('opacity-0', 'invisible');
-    modal.classList.remove('opacity-100', 'visible');
-    const modalCard = modal.querySelector('.form-card');
-    if (modalCard) {
-        modalCard.classList.add('scale-95');
-        modalCard.classList.remove('scale-100');
+    if (totalPreview) {
+        totalPreview.textContent = '₹0.00';
+        totalPreview.className = 'total-amount zero';
     }
-    if (form) form.reset();
     
     // Clear errors
     const errorFields = ['supplierError', 'medicineError', 'quantityError', 'unitPriceError', 'dateError', 'invoiceError'];
     errorFields.forEach(field => {
         const el = document.getElementById(field);
-        if (el) el.innerText = '';
+        if (el) el.textContent = '';
     });
-    const inputs = ['supplierId', 'medicineId', 'quantity', 'unitPrice', 'purchaseDate'];
-    inputs.forEach(input => {
-        const el = document.getElementById(input);
+    ['supplierId', 'medicineId', 'quantity', 'unitPrice', 'purchaseDate'].forEach(id => {
+        const el = document.getElementById(id);
         if (el) el.classList.remove('error');
     });
-}
-
-// Add purchase
-function addPurchase() {
-    // Refresh suppliers and medicines before opening
-    const storedSuppliers = localStorage.getItem('pharmacy_suppliers');
-    const storedMedicines = localStorage.getItem('pharmacy_medicines');
-    if (storedSuppliers) suppliers = JSON.parse(storedSuppliers);
-    if (storedMedicines) medicines = JSON.parse(storedMedicines);
-    populateSelects();
-    openModal();
-}
-
-// Delete purchase handler
-window.deletePurchaseHandler = function(id) {
-    const purchase = purchases.find(p => p.id === id);
-    if (!purchase) return;
     
-    if (confirm(`Are you sure you want to delete purchase order PO-${id}? This will NOT revert stock changes.`)) {
-        purchases = purchases.filter(p => p.id !== id);
-        savePurchases();
-        renderTable();
-        updateStats();
-        showToast(`Purchase order PO-${id} deleted successfully`, 'success');
-    }
-};
+    openModal('purchaseModal');
+}
 
-// Save purchase (add only, no edit)
-function savePurchaseHandler(e) {
+// ─── Form Submit ────────────────────────────────────
+
+function savePurchase(e) {
     e.preventDefault();
     
-    const supplierId = parseInt(document.getElementById('supplierId')?.value) || null;
-    const medicineId = parseInt(document.getElementById('medicineId')?.value) || null;
-    const quantity = parseInt(document.getElementById('quantity')?.value) || 0;
-    const unitPrice = parseFloat(document.getElementById('unitPrice')?.value) || 0;
-    const purchaseDate = document.getElementById('purchaseDate')?.value || '';
-    const invoiceNo = document.getElementById('invoiceNo')?.value.trim() || '';
+    const supplierId = parseInt(document.getElementById('supplierId').value) || null;
+    const medicineId = parseInt(document.getElementById('medicineId').value) || null;
+    const quantity = parseInt(document.getElementById('quantity').value) || 0;
+    const unitPrice = parseFloat(document.getElementById('unitPrice').value) || 0;
+    const purchaseDate = document.getElementById('purchaseDate').value;
+    const invoiceNo = document.getElementById('invoiceNo').value.trim();
     
     if (!validatePurchaseForm(supplierId, medicineId, quantity, unitPrice, purchaseDate)) {
         showToast('Please fix the errors in the form', 'error');
@@ -375,43 +426,108 @@ function savePurchaseHandler(e) {
     // Update medicine stock
     const medicineIndex = medicines.findIndex(m => m.id === medicineId);
     if (medicineIndex !== -1) {
-        medicines[medicineIndex].stock += quantity;
-        medicines[medicineIndex].status = medicines[medicineIndex].stock < 100 ? 'Low Stock' : 'In Stock';
+        medicines[medicineIndex].stock = (medicines[medicineIndex].stock || 0) + quantity;
         localStorage.setItem('pharmacy_medicines', JSON.stringify(medicines));
     }
     
     savePurchases();
-    renderTable();
-    updateStats();
-    showToast(`Purchase recorded! Added ${quantity} ${medicine.unit || 'units'} of "${medicine.name}" to stock.`, 'success');
-    closeModal();
+    refreshUI();
+    populateSupplierFilter();
+    closeModal('purchaseModal');
+    
+    showToast(`✅ Purchase recorded! Added ${quantity} ${medicine.unit || 'units'} of "${medicine.name}" to stock.`, 'success');
 }
 
-// Real-time total preview
-document.addEventListener('DOMContentLoaded', () => {
+// ─── Delete ──────────────────────────────────────────
+
+function deletePurchase(id) {
+    const purchase = purchases.find(p => p.id === id);
+    if (!purchase) return;
+    
+    if (confirm(`Are you sure you want to delete purchase order PO-${id}? This will NOT revert stock changes.`)) {
+        purchases = purchases.filter(p => p.id !== id);
+        savePurchases();
+        refreshUI();
+        populateSupplierFilter();
+        showToast(`🗑️ Purchase order PO-${id} deleted successfully`, 'success');
+    }
+}
+
+// ─── Total Preview ──────────────────────────────────
+
+function updateTotalPreview() {
+    const quantity = parseInt(document.getElementById('quantity')?.value) || 0;
+    const unitPrice = parseFloat(document.getElementById('unitPrice')?.value) || 0;
+    const total = quantity * unitPrice;
+    const totalPreview = document.getElementById('totalAmountPreview');
+    if (totalPreview) {
+        totalPreview.textContent = '₹' + total.toLocaleString('en-IN');
+        totalPreview.className = 'total-amount' + (total > 0 ? '' : ' zero');
+    }
+}
+
+// ─── Init ────────────────────────────────────────────
+
+function initPurchasesModule() {
+    if (isInitialized) return;
+    isInitialized = true;
+    
     loadData();
     
-    const addBtn = document.getElementById('addPurchaseBtn');
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const cancelModalBtn = document.getElementById('cancelModalBtn');
-    const modalOverlay = document.querySelector('#purchaseModal .modal-overlay');
-    const purchaseForm = document.getElementById('purchaseForm');
-    const quantityInput = document.getElementById('quantity');
-    const unitPriceInput = document.getElementById('unitPrice');
+    // Event Listeners
+    document.getElementById('addPurchaseBtn')?.addEventListener('click', openAddModal);
+    document.getElementById('closeModalBtn')?.addEventListener('click', () => closeModal('purchaseModal'));
+    document.getElementById('cancelModalBtn')?.addEventListener('click', () => closeModal('purchaseModal'));
+    document.getElementById('purchaseForm')?.addEventListener('submit', savePurchase);
     
-    if (addBtn) addBtn.addEventListener('click', addPurchase);
-    if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
-    if (cancelModalBtn) cancelModalBtn.addEventListener('click', closeModal);
-    if (modalOverlay) modalOverlay.addEventListener('click', closeModal);
-    if (purchaseForm) purchaseForm.addEventListener('submit', savePurchaseHandler);
+    document.getElementById('resetFilter')?.addEventListener('click', () => {
+        searchTerm = '';
+        supplierFilter = '';
+        document.getElementById('searchInput').value = '';
+        document.getElementById('supplierFilter').value = '';
+        renderTable();
+    });
     
-    if (quantityInput) quantityInput.addEventListener('input', updateTotalPreview);
-    if (unitPriceInput) unitPriceInput.addEventListener('input', updateTotalPreview);
+    document.getElementById('searchInput')?.addEventListener('input', (e) => {
+        searchTerm = e.target.value;
+        renderTable();
+    });
     
-    // Close on Escape key
+    document.getElementById('supplierFilter')?.addEventListener('change', (e) => {
+        supplierFilter = e.target.value;
+        renderTable();
+    });
+    
+    // Real-time total preview
+    document.getElementById('quantity')?.addEventListener('input', updateTotalPreview);
+    document.getElementById('unitPrice')?.addEventListener('input', updateTotalPreview);
+    
+    // Close modal on overlay click
+    document.getElementById('purchaseModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeModal('purchaseModal');
+    });
+    
+    // ESC key
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal && !modal.classList.contains('invisible')) {
-            closeModal();
+        if (e.key === 'Escape') {
+            closeModal('purchaseModal');
         }
     });
+}
+
+// ─── Wait for DOM and Common.js ──────────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
+    const checkInterval = setInterval(() => {
+        const sidebar = document.getElementById('mainSidebar');
+        if (sidebar) {
+            clearInterval(checkInterval);
+            setTimeout(initPurchasesModule, 100);
+        }
+    }, 50);
+    
+    setTimeout(() => {
+        clearInterval(checkInterval);
+        initPurchasesModule();
+    }, 3000);
 });

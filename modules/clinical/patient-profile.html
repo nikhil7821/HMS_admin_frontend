@@ -5,38 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Patient Profile | Clinical | MedFlow</title>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- ✅ CENTRALIZED THEME CSS -->
+    
+    <!-- ✅ ONLY THEME CSS - NO TAILWIND -->
     <link rel="stylesheet" href="../../css/theme.css">
 
     <style>
-        /* Additional page-specific styles that align with theme */
+        /* ============================================================
+           PATIENT PROFILE — Page-specific only
+           All base styles come from theme.css
+           ============================================================ */
+
+        /* Profile card - extends theme */
         .profile-card {
             background: var(--bg-card);
             border: 1px solid var(--border-default);
             border-radius: var(--radius-lg);
+            padding: 1.5rem;
             transition: var(--transition-base);
         }
-        
         .profile-card:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
         }
-        
+
+        /* Info card - extends theme */
         .info-card {
             background: var(--bg-card);
             border: 1px solid var(--border-default);
             border-radius: var(--radius-lg);
+            overflow: hidden;
         }
-        
+
+        /* Avatar initials */
+        .avatar-initials {
+            width: 7rem;
+            height: 7rem;
+            background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.25rem;
+            font-weight: var(--font-weight-medium);
+            margin: 0 auto 1rem;
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
+        }
+
+        /* Info label/value */
+        .info-label {
+            font-size: 0.6875rem;
+            font-weight: var(--font-weight-light);
+            color: var(--color-brown-200);
+            letter-spacing: 0.03em;
+            margin-bottom: 0.125rem;
+        }
+        .info-value {
+            font-size: 0.875rem;
+            font-weight: var(--font-weight-regular);
+            color: var(--color-brown-700);
+        }
+
+        /* Profile info row */
+        .profile-info-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-default);
+        }
+        .profile-info-row:last-child {
+            border-bottom: none;
+        }
+        .profile-info-row .info-icon {
+            width: 1.5rem;
+            color: var(--color-sage);
+            text-align: center;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        /* Tabs */
         .tab-btn {
             transition: var(--transition-base);
             font-weight: var(--font-weight-medium);
@@ -47,60 +99,148 @@
             border: none;
             border-bottom: 2px solid transparent;
             color: var(--color-brown-200);
+            font-family: var(--font-family);
         }
-        
+        .tab-btn:hover {
+            color: var(--color-brown-600);
+            background-color: var(--bg-hover);
+        }
         .tab-btn.active {
             color: var(--color-sage-dark);
             border-bottom-color: var(--color-sage);
         }
-        
-        .tab-btn:not(.active):hover {
-            color: var(--color-brown-600);
-            background-color: var(--bg-hover);
-        }
-        
+
+        /* History items */
         .history-item {
             transition: var(--transition-base);
             border-bottom: 1px solid var(--border-default);
             padding: 1rem;
             border-radius: var(--radius-md);
         }
-        
         .history-item:last-child {
             border-bottom: none;
         }
-        
         .history-item:hover {
             background-color: var(--bg-subtle);
         }
-        
-        .info-label {
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-light);
-            color: var(--color-brown-200);
-            letter-spacing: 0.03em;
-            margin-bottom: 0.25rem;
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.25rem;
+            color: var(--color-brown-100);
         }
-        
-        .info-value {
-            font-size: 0.875rem;
-            font-weight: var(--font-weight-regular);
-            color: var(--color-brown-700);
-        }
-        
-        .avatar-initials {
-            width: 7rem;
-            height: 7rem;
-            background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
+        .empty-state i {
             font-size: 2rem;
+            margin-bottom: 0.75rem;
+            display: block;
+            opacity: 0.4;
+        }
+        .empty-state p {
+            font-size: 0.875rem;
+            font-weight: var(--font-weight-light);
+        }
+
+        /* Visit badge */
+        .visit-badge {
+            font-size: 0.625rem;
+            background-color: #eef7ea;
+            color: var(--color-sage-dark);
+            padding: 0.15rem 0.625rem;
+            border-radius: var(--radius-full);
             font-weight: var(--font-weight-medium);
-            margin: 0 auto 1rem;
-            box-shadow: var(--shadow-sm);
+        }
+
+        /* Prescription box */
+        .prescription-box {
+            background-color: var(--bg-subtle);
+            border-radius: var(--radius-md);
+            padding: 0.75rem 1rem;
+            margin-top: 0.5rem;
+            border-left: 3px solid var(--color-sage);
+        }
+        .prescription-box p {
+            font-size: 0.8125rem;
+            color: var(--color-brown-600);
+            white-space: pre-wrap;
+            font-weight: var(--font-weight-light);
+            line-height: 1.6;
+        }
+
+        /* Grid layout for profile */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        @media (min-width: 1024px) {
+            .profile-grid {
+                grid-template-columns: 1fr 2fr;
+            }
+        }
+
+        /* Tab content */
+        .tab-content {
+            padding: 1.25rem;
+        }
+        .tab-content.hidden {
+            display: none;
+        }
+
+        /* Tabs container */
+        .tabs-container {
+            border-bottom: 1px solid var(--border-default);
+            padding: 0 1rem;
+            padding-top: 0.75rem;
+            display: flex;
+            gap: 0.25rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Back button in filter bar style */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.4rem 0.85rem;
+            font-size: 0.8125rem;
+            font-family: var(--font-family);
+            font-weight: var(--font-weight-light);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-input);
+            background-color: transparent;
+            color: var(--color-brown-200);
+            cursor: pointer;
+            transition: var(--transition-base);
+            text-decoration: none;
+        }
+        .back-btn:hover {
+            background-color: var(--bg-hover);
+            color: var(--color-brown-600);
+            border-color: var(--color-brown-100);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .avatar-initials {
+                width: 5rem;
+                height: 5rem;
+                font-size: 1.5rem;
+            }
+            .tab-btn {
+                font-size: 0.75rem;
+                padding: 0.5rem 0.75rem;
+            }
+            .profile-card {
+                padding: 1rem;
+            }
+            .tab-content {
+                padding: 0.75rem;
+            }
+            .history-item {
+                padding: 0.75rem;
+            }
         }
     </style>
 </head>
@@ -109,89 +249,89 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+    <main class="main-content">
         
-        <!-- Page Header matching theme -->
-        <div class="page-header mb-6">
-            <div class="page-header-left">
-                <div class="page-header-icon">
-                    <i class="fas fa-user-circle"></i>
+        <!-- Simple header with back button (no page header) -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+                <div style="width:2.5rem; height:2.5rem; background-color:var(--bg-muted); border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; color:var(--color-sage);">
+                    <i class="fas fa-user-circle" style="font-size:1rem;"></i>
                 </div>
                 <div>
-                    <h1 class="page-header-title">Patient Profile</h1>
-                    <p class="page-header-subtitle">View patient details and medical history</p>
+                    <h1 style="font-size:1.375rem; font-weight:var(--font-weight-light); color:var(--color-brown-700); margin:0;">Patient Profile</h1>
+                    <p style="font-size:0.75rem; color:var(--color-brown-100); font-weight:var(--font-weight-light); margin:0;">View patient details and medical history</p>
                 </div>
             </div>
-            <div class="page-header-actions">
-                <a href="patients.html" class="btn-secondary">
-                    <i class="fas fa-arrow-left mr-1"></i> Back to Patients
-                </a>
-            </div>
+            <a href="patients.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back</span>
+            </a>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Profile Grid -->
+        <div class="profile-grid">
             
             <!-- Left Column - Profile Info -->
-            <div class="lg:col-span-1">
-                <div class="profile-card p-6 text-center">
-                    <div class="avatar-initials" id="profileInitials">
-                        --
+            <div>
+                <div class="profile-card">
+                    <div style="text-align:center;">
+                        <div class="avatar-initials" id="profileInitials">--</div>
+                        <h2 style="font-size:1.125rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin:0;" id="profileName">Loading...</h2>
+                        <p style="font-size:0.75rem; color:var(--color-brown-100); margin-top:0.25rem; font-weight:var(--font-weight-light);" id="profileId">P-00000</p>
                     </div>
-                    <h2 class="text-lg font-medium text-brown-700" id="profileName">Loading...</h2>
-                    <p class="text-brown-100 text-xs mt-1 font-light" id="profileId">P-00000</p>
                     
-                    <div class="mt-6 space-y-4 text-left">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 text-sage"><i class="fas fa-venus-mars"></i></div>
+                    <div style="margin-top:1.5rem;">
+                        <div class="profile-info-row">
+                            <span class="info-icon"><i class="fas fa-venus-mars"></i></span>
                             <div>
                                 <p class="info-label">Gender</p>
                                 <p class="info-value" id="profileGender">-</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 text-sage"><i class="fas fa-calendar"></i></div>
+                        <div class="profile-info-row">
+                            <span class="info-icon"><i class="fas fa-calendar"></i></span>
                             <div>
                                 <p class="info-label">Date of Birth</p>
                                 <p class="info-value" id="profileDob">-</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 text-sage"><i class="fas fa-birthday-cake"></i></div>
+                        <div class="profile-info-row">
+                            <span class="info-icon"><i class="fas fa-birthday-cake"></i></span>
                             <div>
                                 <p class="info-label">Age</p>
                                 <p class="info-value" id="profileAge">-</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 text-sage"><i class="fas fa-tint"></i></div>
+                        <div class="profile-info-row">
+                            <span class="info-icon"><i class="fas fa-tint"></i></span>
                             <div>
                                 <p class="info-label">Blood Group</p>
                                 <p class="info-value" id="profileBloodGroup">-</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 text-sage"><i class="fas fa-phone"></i></div>
+                        <div class="profile-info-row">
+                            <span class="info-icon"><i class="fas fa-phone"></i></span>
                             <div>
                                 <p class="info-label">Phone</p>
                                 <p class="info-value" id="profilePhone">-</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 text-sage"><i class="fas fa-envelope"></i></div>
+                        <div class="profile-info-row">
+                            <span class="info-icon"><i class="fas fa-envelope"></i></span>
                             <div>
                                 <p class="info-label">Email</p>
                                 <p class="info-value" id="profileEmail">-</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 text-sage"><i class="fas fa-map-marker-alt"></i></div>
+                        <div class="profile-info-row">
+                            <span class="info-icon"><i class="fas fa-map-marker-alt"></i></span>
                             <div>
                                 <p class="info-label">Address</p>
                                 <p class="info-value" id="profileAddress">-</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 text-sage"><i class="fas fa-calendar-plus"></i></div>
+                        <div class="profile-info-row">
+                            <span class="info-icon"><i class="fas fa-calendar-plus"></i></span>
                             <div>
                                 <p class="info-label">Registered On</p>
                                 <p class="info-value" id="profileRegistered">-</p>
@@ -202,26 +342,27 @@
             </div>
 
             <!-- Right Column - Medical Records -->
-            <div class="lg:col-span-2">
-                <div class="info-card overflow-hidden">
+            <div>
+                <div class="info-card">
                     <!-- Tabs -->
-                    <div class="border-b border-default px-4 pt-3">
-                        <div class="flex gap-1">
-                            <button class="tab-btn active" data-tab="medical">
-                                <i class="fas fa-notes-medical mr-2"></i>Medical History
-                            </button>
-                            <button class="tab-btn" data-tab="consultations">
-                                <i class="fas fa-stethoscope mr-2"></i>Consultations
-                            </button>
-                            <button class="tab-btn" data-tab="prescriptions">
-                                <i class="fas fa-prescription-bottle mr-2"></i>Prescriptions
-                            </button>
-                        </div>
+                    <div class="tabs-container">
+                        <button class="tab-btn active" data-tab="medical">
+                            <i class="fas fa-notes-medical"></i>
+                            <span>Medical History</span>
+                        </button>
+                        <button class="tab-btn" data-tab="consultations">
+                            <i class="fas fa-stethoscope"></i>
+                            <span>Consultations</span>
+                        </button>
+                        <button class="tab-btn" data-tab="prescriptions">
+                            <i class="fas fa-prescription-bottle"></i>
+                            <span>Prescriptions</span>
+                        </button>
                     </div>
 
                     <!-- Medical History Tab -->
-                    <div id="medicalTab" class="p-5">
-                        <div id="medicalHistoryList" class="space-y-3">
+                    <div id="medicalTab" class="tab-content">
+                        <div id="medicalHistoryList">
                             <div class="empty-state">
                                 <i class="fas fa-spinner fa-pulse"></i>
                                 <p>Loading medical history...</p>
@@ -230,8 +371,8 @@
                     </div>
 
                     <!-- Consultations Tab -->
-                    <div id="consultationsTab" class="p-5 hidden">
-                        <div id="consultationsList" class="space-y-3">
+                    <div id="consultationsTab" class="tab-content hidden">
+                        <div id="consultationsList">
                             <div class="empty-state">
                                 <i class="fas fa-spinner fa-pulse"></i>
                                 <p>Loading consultations...</p>
@@ -240,8 +381,8 @@
                     </div>
 
                     <!-- Prescriptions Tab -->
-                    <div id="prescriptionsTab" class="p-5 hidden">
-                        <div id="prescriptionsList" class="space-y-3">
+                    <div id="prescriptionsTab" class="tab-content hidden">
+                        <div id="prescriptionsList">
                             <div class="empty-state">
                                 <i class="fas fa-spinner fa-pulse"></i>
                                 <p>Loading prescriptions...</p>

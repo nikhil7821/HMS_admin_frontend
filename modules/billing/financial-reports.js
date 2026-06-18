@@ -1,30 +1,76 @@
 /**
  * Financial Reports JS - Billing Module
- * Professional UI, Fully Working, Rupee Symbol, Charts
+ * Uses theme.css for styling, clean event handling
  */
 
 let invoices = [];
 let payments = [];
 let revenueChart = null;
 let paymentMethodChart = null;
+let isInitialized = false;
+
+// ─── Data Management ──────────────────────────────
 
 function loadData() {
-    invoices = JSON.parse(localStorage.getItem('hms_invoices') || '[]');
-    payments = JSON.parse(localStorage.getItem('hms_payments') || '[]');
-    
-    updateReports();
-    renderCharts();
-    renderMonthlySummary();
+    try {
+        invoices = JSON.parse(localStorage.getItem('hms_invoices') || '[]');
+        payments = JSON.parse(localStorage.getItem('hms_payments') || '[]');
+        
+        updateReports();
+        renderCharts();
+        renderMonthlySummary();
+    } catch (error) {
+        console.error('Error loading financial data:', error);
+        showToast('Error loading financial data', 'error');
+    }
 }
+
+// ─── Toast Notification ──────────────────────────────
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    const icons = { success: 'fa-check-circle', error: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+    const colors = { success: '#8aae7a', error: '#d8b48c', info: '#a8c49a' };
+    
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border-radius: 12px;
+        background: ${colors[type]};
+        color: white;
+        font-weight: 500;
+        font-size: 0.75rem;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        animation: slideInRight 0.25s ease-out;
+        font-family: 'Poppins', system-ui, sans-serif;
+    `;
+    toast.innerHTML = `<i class="fas ${icons[type]}"></i><span>${message}</span>`;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 250);
+    }, 3000);
+}
+
+// ─── Update Reports ──────────────────────────────────
 
 function updateReports() {
     const total = payments.reduce((sum, p) => sum + p.amount, 0);
     const avg = payments.length > 0 ? total / payments.length : 0;
     const totalTransactions = payments.length;
     
-    document.getElementById('reportTotal').innerText = '₹' + total.toLocaleString('en-IN');
-    document.getElementById('avgTransaction').innerText = '₹' + avg.toFixed(2);
-    document.getElementById('totalTransactions').innerText = totalTransactions;
+    document.getElementById('reportTotal').textContent = '₹' + total.toLocaleString('en-IN');
+    document.getElementById('avgTransaction').textContent = '₹' + avg.toFixed(2);
+    document.getElementById('totalTransactions').textContent = totalTransactions;
     
     // Revenue by Type/Department
     const typeRevenue = {};
@@ -34,12 +80,12 @@ function updateReports() {
     });
     
     const typeColors = {
-        'OPD': 'bg-blue-100 text-blue-700',
-        'IPD': 'bg-purple-100 text-purple-700',
-        'Pharmacy': 'bg-green-100 text-green-700',
-        'Laboratory': 'bg-yellow-100 text-yellow-700',
-        'Radiology': 'bg-orange-100 text-orange-700',
-        'Other': 'bg-gray-100 text-gray-700'
+        'OPD': 'opd',
+        'IPD': 'ipd',
+        'Pharmacy': 'pharmacy',
+        'Laboratory': 'laboratory',
+        'Radiology': 'radiology',
+        'Other': 'other'
     };
     
     const typeIcons = {
@@ -51,34 +97,53 @@ function updateReports() {
         'Other': 'fa-circle'
     };
     
-    const typeHtml = Object.entries(typeRevenue).map(([type, amount]) => {
+    const container = document.getElementById('revenueByType');
+    
+    if (Object.keys(typeRevenue).length === 0) {
+        container.innerHTML = `
+            <div class="empty-state-sm">
+                <i class="fas fa-chart-pie"></i>
+                <p>No revenue data available</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = Object.entries(typeRevenue).map(([type, amount]) => {
         const percent = total > 0 ? ((amount / total) * 100).toFixed(1) : 0;
+        const colorClass = typeColors[type] || 'other';
+        const icon = typeIcons[type] || 'fa-chart-line';
+        
         return `
             <div class="revenue-type-item">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-lg ${typeColors[type] || 'bg-gray-100'} flex items-center justify-center">
-                        <i class="fas ${typeIcons[type] || 'fa-chart-line'} text-sm"></i>
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                    <div class="type-badge ${colorClass}">
+                        <i class="fas ${icon}"></i>
                     </div>
                     <div>
-                        <p class="revenue-type-label font-medium">${type}</p>
-                        <p class="text-xs text-[#94a3b8]">${percent}% of total</p>
+                        <p class="revenue-type-label" style="font-weight:var(--font-weight-medium);">${type}</p>
+                        <p style="font-size:0.625rem; color:var(--color-brown-100);">${percent}% of total</p>
                     </div>
                 </div>
-                <div class="text-right">
+                <div style="text-align:right;">
                     <p class="revenue-type-value">₹${amount.toLocaleString('en-IN')}</p>
-                    <div class="w-24 bg-[#e2e8f0] rounded-full h-1 mt-1">
-                        <div class="bg-[#a8c49a] h-1 rounded-full" style="width: ${percent}%"></div>
+                    <div class="progress-bar-track">
+                        <div class="fill" style="width: ${percent}%;"></div>
                     </div>
                 </div>
             </div>
         `;
     }).join('');
-    
-    document.getElementById('revenueByType').innerHTML = typeHtml || '<div class="text-center py-8 text-[#94a3b8]"><p class="font-normal">No revenue data available</p></div>';
 }
 
+// ─── Render Charts ───────────────────────────────────
+
 function renderCharts() {
-    // Revenue Trend - Last 7 Days
+    renderRevenueChart();
+    renderPaymentMethodChart();
+}
+
+function renderRevenueChart() {
     const last7Days = [];
     const revenueData = [];
     
@@ -86,72 +151,79 @@ function renderCharts() {
         const date = new Date();
         date.setDate(date.getDate() - i);
         const dateStr = date.toISOString().split('T')[0];
-        last7Days.push(dateStr.substring(5)); // Show MM-DD
+        last7Days.push(dateStr.substring(5));
         const dailyRevenue = payments.filter(p => p.date === dateStr).reduce((sum, p) => sum + p.amount, 0);
         revenueData.push(dailyRevenue);
     }
     
     const revenueCtx = document.getElementById('revenueChart')?.getContext('2d');
-    if (revenueCtx) {
-        if (revenueChart) revenueChart.destroy();
-        revenueChart = new Chart(revenueCtx, {
-            type: 'line',
-            data: {
-                labels: last7Days,
-                datasets: [{
-                    label: 'Daily Revenue (₹)',
-                    data: revenueData,
-                    borderColor: '#a8c49a',
-                    backgroundColor: 'rgba(168, 196, 154, 0.1)',
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#8aae7a',
-                    pointBorderColor: '#fff',
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            font: { family: 'Poppins', size: 11 }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return '₹' + context.raw.toLocaleString('en-IN');
-                            }
-                        }
+    if (!revenueCtx) return;
+    
+    if (revenueChart) revenueChart.destroy();
+    
+    revenueChart = new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: last7Days,
+            datasets: [{
+                label: 'Daily Revenue (₹)',
+                data: revenueData,
+                borderColor: '#a8c49a',
+                backgroundColor: 'rgba(168, 196, 154, 0.1)',
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#8aae7a',
+                pointBorderColor: '#fff',
+                pointRadius: 3,
+                pointHoverRadius: 5,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        font: { family: 'Poppins', size: 10 },
+                        boxWidth: 10,
+                        padding: 8
                     }
                 },
-                scales: {
-                    y: {
-                        ticks: {
-                            callback: function(value) {
-                                return '₹' + value.toLocaleString('en-IN');
-                            },
-                            font: { family: 'Poppins', size: 10 }
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            font: { family: 'Poppins', size: 10 }
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return '₹' + context.raw.toLocaleString('en-IN');
                         }
                     }
                 }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '₹' + value.toLocaleString('en-IN');
+                        },
+                        font: { family: 'Poppins', size: 9 }
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: { family: 'Poppins', size: 9 }
+                    }
+                }
             }
-        });
-    }
-    
-    // Payment Method Distribution
+        }
+    });
+}
+
+function renderPaymentMethodChart() {
     const methodData = {};
     payments.forEach(p => {
-        methodData[p.method] = (methodData[p.method] || 0) + p.amount;
+        const method = p.method || 'Cash';
+        methodData[method] = (methodData[method] || 0) + p.amount;
     });
     
     const methodColors = {
@@ -167,53 +239,71 @@ function renderCharts() {
     const backgroundColors = methodLabels.map(label => methodColors[label] || '#a8c49a');
     
     const methodCtx = document.getElementById('paymentMethodChart')?.getContext('2d');
-    if (methodCtx) {
-        if (paymentMethodChart) paymentMethodChart.destroy();
-        paymentMethodChart = new Chart(methodCtx, {
-            type: 'doughnut',
-            data: {
-                labels: methodLabels,
-                datasets: [{
-                    data: methodAmounts,
-                    backgroundColor: backgroundColors,
-                    borderWidth: 0,
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            font: { family: 'Poppins', size: 11 },
-                            usePointStyle: true,
-                            boxWidth: 8
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const label = context.label || '';
-                                const value = context.raw;
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percent = ((value / total) * 100).toFixed(1);
-                                return `${label}: ₹${value.toLocaleString('en-IN')} (${percent}%)`;
-                            }
+    if (!methodCtx) return;
+    
+    if (paymentMethodChart) paymentMethodChart.destroy();
+    
+    if (methodLabels.length === 0) {
+        const container = methodCtx.canvas.parentElement;
+        if (container) {
+            container.innerHTML = `
+                <div class="empty-state-sm" style="padding:0.5rem;">
+                    <i class="fas fa-credit-card"></i>
+                    <p style="font-size:0.6875rem;">No payment data available</p>
+                </div>
+            `;
+        }
+        return;
+    }
+    
+    paymentMethodChart = new Chart(methodCtx, {
+        type: 'doughnut',
+        data: {
+            labels: methodLabels,
+            datasets: [{
+                data: methodAmounts,
+                backgroundColor: backgroundColors,
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            cutout: '60%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        font: { family: 'Poppins', size: 10 },
+                        usePointStyle: true,
+                        boxWidth: 8,
+                        padding: 6
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percent = ((value / total) * 100).toFixed(1);
+                            return `${label}: ₹${value.toLocaleString('en-IN')} (${percent}%)`;
                         }
                     }
                 }
             }
-        });
-    }
+        }
+    });
 }
+
+// ─── Render Monthly Summary ──────────────────────────
 
 function renderMonthlySummary() {
     const monthlyData = {};
     
     payments.forEach(p => {
-        const month = p.date.substring(0, 7); // YYYY-MM
+        const month = p.date.substring(0, 7);
         monthlyData[month] = (monthlyData[month] || 0) + p.amount;
     });
     
@@ -226,7 +316,12 @@ function renderMonthlySummary() {
     const container = document.getElementById('monthlySummary');
     
     if (sortedMonths.length === 0) {
-        container.innerHTML = '<div class="text-center py-8 text-[#94a3b8]"><i class="fas fa-chart-line text-3xl mb-2 block"></i><p class="font-normal">No monthly data available</p></div>';
+        container.innerHTML = `
+            <div class="empty-state-sm">
+                <i class="fas fa-calendar-alt"></i>
+                <p>No monthly data available</p>
+            </div>
+        `;
         return;
     }
     
@@ -235,28 +330,50 @@ function renderMonthlySummary() {
     container.innerHTML = sortedMonths.map(month => {
         const year = month.substring(0, 4);
         const monthNum = month.substring(5, 7);
-        const monthName = monthsMap[monthNum];
+        const monthName = monthsMap[monthNum] || monthNum;
         const amount = monthlyData[month];
         const percent = maxRevenue > 0 ? (amount / maxRevenue) * 100 : 0;
         
         return `
-            <div class="flex items-center justify-between py-2 border-b border-[#f0e8e0] last:border-b-0">
-                <div class="w-24">
-                    <p class="font-medium text-[#1e293b] text-sm">${monthName} ${year}</p>
+            <div class="monthly-item">
+                <div style="min-width:4.5rem;">
+                    <p style="font-weight:var(--font-weight-medium); color:var(--color-brown-700); font-size:0.8125rem;">${monthName} ${year}</p>
                 </div>
-                <div class="flex-1 mx-3">
-                    <div class="w-full bg-[#e2e8f0] rounded-full h-2">
-                        <div class="bg-gradient-to-r from-[#a8c49a] to-[#8aae7a] h-2 rounded-full" style="width: ${percent}%"></div>
+                <div class="monthly-progress">
+                    <div class="track">
+                        <div class="fill" style="width: ${percent}%;"></div>
                     </div>
                 </div>
-                <div class="text-right">
-                    <p class="font-semibold text-[#1e293b] text-sm">₹${amount.toLocaleString('en-IN')}</p>
+                <div style="text-align:right; min-width:5rem;">
+                    <p style="font-weight:var(--font-weight-semibold); color:var(--color-sage-dark); font-size:0.8125rem;">₹${amount.toLocaleString('en-IN')}</p>
                 </div>
             </div>
         `;
     }).join('');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+// ─── Init ────────────────────────────────────────────
+
+function initFinancialReportsModule() {
+    if (isInitialized) return;
+    isInitialized = true;
+    
     loadData();
+}
+
+// ─── Wait for DOM and Common.js ──────────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
+    const checkInterval = setInterval(() => {
+        const sidebar = document.getElementById('mainSidebar');
+        if (sidebar) {
+            clearInterval(checkInterval);
+            setTimeout(initFinancialReportsModule, 100);
+        }
+    }, 50);
+    
+    setTimeout(() => {
+        clearInterval(checkInterval);
+        initFinancialReportsModule();
+    }, 3000);
 });

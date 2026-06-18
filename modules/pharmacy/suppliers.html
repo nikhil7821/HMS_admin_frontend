@@ -5,89 +5,203 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Suppliers | Pharmacy | MedFlow</title>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- ✅ CENTRALIZED THEME CSS -->
+    
+    <!-- ✅ ONLY THEME CSS - NO TAILWIND -->
     <link rel="stylesheet" href="../../css/theme.css">
 
     <style>
-        /* Additional page-specific styles that align with theme */
-        .badge-contact {
-            background: var(--bg-muted);
-            color: var(--color-brown-300);
-            padding: 0.2rem 0.65rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
+        /* ============================================================
+           SUPPLIERS MODULE — Page-specific only
+           All base styles come from theme.css
+           ============================================================ */
+
+        /* Table wrapper */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
-        
-        /* Modal overlay styles matching theme.css */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 50;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--bg-overlay);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition-base);
-        }
-        
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .modal-overlay.active .form-card {
-            transform: scale(1);
-        }
-        
-        .form-card {
-            transform: scale(0.96);
-            transition: var(--transition-base);
-            border-radius: var(--radius-lg);
-            background: var(--bg-card);
-            border: 1px solid var(--border-default);
-            border-top: 4px solid var(--color-sage);
+
+        /* Data table */
+        .data-table {
             width: 100%;
-            max-width: 28rem;
-            margin: 1rem;
-            box-shadow: var(--shadow-lg);
+            border-collapse: collapse;
+            font-size: 0.8125rem;
         }
-        
-        .action-edit {
+        .data-table thead {
+            background-color: var(--bg-muted);
+            border-bottom: 1px solid var(--border-default);
+        }
+        .data-table th {
+            text-align: left;
+            padding: 0.75rem 1.25rem;
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-300);
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .data-table td {
+            padding: 0.75rem 1.25rem;
+            color: var(--color-brown-700);
+            vertical-align: middle;
+        }
+
+        /* Table row hover */
+        .supplier-row {
+            transition: var(--transition-base);
+            border-bottom: 1px solid var(--border-default);
+        }
+        .supplier-row:hover {
+            background-color: var(--bg-subtle);
+        }
+        .supplier-row:last-child {
+            border-bottom: none;
+        }
+
+        /* Action buttons */
+        .action-btn {
+            color: var(--color-brown-100);
+            transition: var(--transition-base);
+            padding: 0.25rem 0.375rem;
+            border-radius: var(--radius-sm);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .action-btn:hover {
+            color: var(--color-sage-dark);
+        }
+        .action-btn.edit:hover {
             color: var(--color-sage);
-            transition: var(--transition-base);
         }
-        .action-edit:hover { 
-            color: var(--color-sage-dark); 
+        .action-btn.delete:hover {
+            color: #dc2626;
         }
-        .action-delete {
-            color: var(--color-warm-tan);
-            transition: var(--transition-base);
+
+        /* Supplier name */
+        .supplier-name {
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-700);
+            font-size: 0.875rem;
         }
-        .action-delete:hover { 
-            color: var(--color-warm-tan-dark); 
+        .supplier-contact {
+            font-size: 0.75rem;
+            color: var(--color-brown-100);
         }
-        
+
+        /* Override: Add button inside filter bar */
+        .filter-bar .btn-primary {
+            flex: 0 0 auto !important;
+            padding: 0.4rem 0.85rem !important;
+            font-size: 0.8125rem !important;
+            height: 38px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.35rem !important;
+            border-radius: var(--radius-md) !important;
+            white-space: nowrap !important;
+            background-color: var(--color-sage) !important;
+            color: white !important;
+            border: none !important;
+        }
+        .filter-bar .btn-primary:hover {
+            background-color: var(--color-sage-dark) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.35) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* Search wrapper inside filter bar */
+        .filter-bar .search-wrapper {
+            flex: 1 1 200px !important;
+            min-width: 150px !important;
+            max-width: 350px !important;
+        }
+
+        @media (max-width: 768px) {
+            .filter-bar .btn-primary span {
+                display: none !important;
+            }
+            .filter-bar .search-wrapper {
+                flex: 1 1 120px !important;
+                min-width: 100px !important;
+                max-width: 200px !important;
+            }
+            .filter-bar .search-input {
+                font-size: 0.75rem !important;
+                padding: 0.3rem 0.5rem 0.3rem 1.75rem !important;
+                height: 32px !important;
+            }
+            .data-table th,
+            .data-table td {
+                padding: 0.5rem 0.75rem !important;
+                font-size: 0.75rem !important;
+            }
+        }
+
+        /* Modal overrides */
+        .form-card {
+            border-top-color: var(--color-sage);
+        }
+
+        /* Error message */
         .error-message {
             color: var(--color-error-text);
             font-size: 0.6875rem;
             margin-top: 0.25rem;
             display: block;
             font-weight: var(--font-weight-light);
+        }
+
+        .form-input.error,
+        .form-select.error {
+            border-color: var(--color-error-text);
+        }
+        .form-input.error:focus,
+        .form-select.error:focus {
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+        }
+
+        /* Empty state */
+        .suppliers-empty {
+            text-align: center;
+            padding: 3rem 1.25rem;
+            color: var(--color-brown-100);
+        }
+        .suppliers-empty i {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            display: block;
+            opacity: 0.4;
+        }
+        .suppliers-empty p {
+            font-size: 0.875rem;
+            font-weight: var(--font-weight-light);
+        }
+
+        /* Address column truncate */
+        .address-cell {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--color-brown-300);
+            font-size: 0.8125rem;
+        }
+
+        /* Phone number */
+        .phone-cell {
+            color: var(--color-brown-600);
+            font-size: 0.8125rem;
+            font-weight: var(--font-weight-medium);
+        }
+
+        /* Email */
+        .email-cell {
+            color: var(--color-brown-300);
+            font-size: 0.8125rem;
         }
     </style>
 </head>
@@ -96,45 +210,94 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+    <main class="main-content">
         
-        <!-- Page Header matching theme -->
-        <div class="page-header mb-6">
-            <div class="page-header-left">
-                <div class="page-header-icon">
-                    <i class="fas fa-truck"></i>
-                </div>
-                <div>
-                    <h1 class="page-header-title">Suppliers</h1>
-                    <p class="page-header-subtitle">Manage medicine suppliers and vendors</p>
+        <!-- Stats Cards -->
+        <div class="grid-stats" style="margin-bottom: 1.5rem;">
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <p class="stat-label">Total Suppliers</p>
+                        <p class="stat-value" id="totalSuppliers">0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-truck" style="color:var(--color-sage); font-size:1.125rem;"></i>
+                    </div>
                 </div>
             </div>
-            <div class="page-header-actions">
-                <button id="addSupplierBtn" class="btn-primary">
-                    <i class="fas fa-plus text-sm"></i>
-                    <span>Add Supplier</span>
-                </button>
+            
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <p class="stat-label">Active Suppliers</p>
+                        <p class="stat-value" id="activeSuppliers">0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-check-circle" style="color:var(--color-sage); font-size:1.125rem;"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <p class="stat-label">With Email</p>
+                        <p class="stat-value" id="withEmailCount">0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-envelope" style="color:var(--color-sage); font-size:1.125rem;"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <p class="stat-label">Last Updated</p>
+                        <p class="stat-value" id="lastUpdated" style="font-size:1.125rem; margin-top:0.375rem;">Today</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-calendar-alt" style="color:var(--color-sage); font-size:1.125rem;"></i>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Suppliers Table Card -->
-        <div class="card-white overflow-hidden">
+        <!-- Filter Bar with Add Button -->
+        <div class="filter-bar">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search suppliers...">
+            </div>
+            <button id="resetFilter" class="btn-secondary">
+                <i class="fas fa-undo-alt"></i>
+                <span>Reset</span>
+            </button>
+            <button id="addSupplierBtn" class="btn-primary">
+                <i class="fas fa-plus"></i>
+                <span>Add Supplier</span>
+            </button>
+        </div>
+
+        <!-- Suppliers Table -->
+        <div class="card-white" style="margin-top: 1.5rem; overflow:hidden;">
             <div class="table-wrapper">
-                <table class="data-table w-full">
+                <table class="data-table">
                     <thead>
                         <tr>
-                            <th class="px-5 py-4">Supplier Name</th>
-                            <th class="px-5 py-4">Contact Person</th>
-                            <th class="px-5 py-4">Phone</th>
-                            <th class="px-5 py-4">Email</th>
-                            <th class="px-5 py-4">Address</th>
-                            <th class="px-5 py-4 text-center">Actions</th>
+                            <th>Supplier Name</th>
+                            <th>Contact Person</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Address</th>
+                            <th style="text-align:center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="suppliersTable">
                         <tr>
-                            <td colspan="6" class="text-center py-8 text-brown-100">
-                                <i class="fas fa-spinner fa-pulse mr-2"></i>Loading suppliers...
+                            <td colspan="6" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
+                                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
+                                <p style="font-weight:var(--font-weight-light);">Loading suppliers...</p>
                             </td>
                         </tr>
                     </tbody>
@@ -143,22 +306,23 @@
         </div>
     </main>
 
-    <!-- Add/Edit Supplier Modal - Matching theme.css structure -->
-    <div id="supplierModal" class="modal-overlay">
-        <div class="form-card">
-            <div class="flex justify-between items-center p-5 border-b border-default">
-                <h3 id="modalTitle" class="modal-title">
-                    <i class="fas fa-truck text-sage"></i> Add Supplier
+    <!-- Add/Edit Supplier Modal -->
+    <div id="supplierModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="form-card" style="max-width:30rem;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">
+                    <i class="fas fa-truck"></i>
+                    Add Supplier
                 </h3>
-                <button id="closeModalBtn" class="close-btn">
-                    <i class="fas fa-times text-lg"></i>
+                <button class="close-btn" id="closeModalBtn" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
             <form id="supplierForm">
                 <input type="hidden" id="supplierId">
-                <div class="p-5 space-y-4">
+                <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Supplier Name <span class="text-error-text">*</span></label>
+                        <label class="form-label">Supplier Name <span style="color:var(--color-error-text);">*</span></label>
                         <input type="text" id="supName" class="form-input" placeholder="e.g., Medico Pharma, HealthCare Ltd" autocomplete="off">
                         <span class="error-message" id="supNameError"></span>
                     </div>
@@ -168,7 +332,7 @@
                         <span class="error-message" id="contactPersonError"></span>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Phone Number <span class="text-error-text">*</span></label>
+                        <label class="form-label">Phone Number <span style="color:var(--color-error-text);">*</span></label>
                         <input type="tel" id="phone" class="form-input" placeholder="e.g., 9876543210" autocomplete="off" maxlength="15">
                         <span class="error-message" id="phoneError"></span>
                     </div>
@@ -177,16 +341,17 @@
                         <input type="email" id="email" class="form-input" placeholder="e.g., supplier@company.com" autocomplete="off">
                         <span class="error-message" id="emailError"></span>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="margin-bottom:0;">
                         <label class="form-label">Address</label>
                         <textarea id="address" rows="3" class="form-textarea" placeholder="Full address with city, state, pincode"></textarea>
                         <span class="error-message" id="addressError"></span>
                     </div>
                 </div>
-                <div class="p-5 bg-subtle rounded-b-xl flex justify-end gap-3 border-t border-default">
+                <div class="modal-footer">
                     <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
                     <button type="submit" class="btn-primary">
-                        <i class="fas fa-save mr-2 text-xs"></i>Save Supplier
+                        <i class="fas fa-save"></i>
+                        Save Supplier
                     </button>
                 </div>
             </form>

@@ -5,107 +5,193 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Stock Adjustments | Pharmacy | MedFlow</title>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- ✅ CENTRALIZED THEME CSS -->
+    
+    <!-- ✅ ONLY THEME CSS - NO TAILWIND -->
     <link rel="stylesheet" href="../../css/theme.css">
 
     <style>
-        /* Additional page-specific styles that align with theme */
-        /* Badges for adjustment types */
+        /* ============================================================
+           STOCK ADJUSTMENTS MODULE — Page-specific only
+           All base styles come from theme.css
+           ============================================================ */
+
+        /* Adjustment type badges */
         .badge-add {
             background: var(--color-success-bg);
             color: var(--color-success-text);
-            padding: 0.2rem 0.85rem;
+            padding: 0.1rem 0.625rem;
             border-radius: var(--radius-full);
-            font-size: 0.6875rem;
+            font-size: 0.625rem;
             font-weight: var(--font-weight-medium);
             display: inline-block;
         }
-        
         .badge-remove {
             background: var(--color-warning-bg);
             color: var(--color-warning-text);
-            padding: 0.2rem 0.85rem;
+            padding: 0.1rem 0.625rem;
             border-radius: var(--radius-full);
-            font-size: 0.6875rem;
+            font-size: 0.625rem;
             font-weight: var(--font-weight-medium);
             display: inline-block;
         }
-        
         .badge-damage {
             background: var(--color-error-bg);
             color: var(--color-error-text);
-            padding: 0.2rem 0.85rem;
+            padding: 0.1rem 0.625rem;
             border-radius: var(--radius-full);
-            font-size: 0.6875rem;
+            font-size: 0.625rem;
             font-weight: var(--font-weight-medium);
             display: inline-block;
         }
-        
         .badge-expiry {
             background: #fef0f0;
             color: #c98a8a;
-            padding: 0.2rem 0.85rem;
+            padding: 0.1rem 0.625rem;
             border-radius: var(--radius-full);
-            font-size: 0.6875rem;
+            font-size: 0.625rem;
             font-weight: var(--font-weight-medium);
             display: inline-block;
         }
-        
-        /* Modal overlay styles matching theme.css */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 50;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--bg-overlay);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition-base);
+
+        /* Table wrapper */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
-        
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .modal-overlay.active .form-card {
-            transform: scale(1);
-        }
-        
-        .form-card {
-            transform: scale(0.96);
-            transition: var(--transition-base);
-            border-radius: var(--radius-lg);
-            background: var(--bg-card);
-            border: 1px solid var(--border-default);
-            border-top: 4px solid var(--color-sage);
+
+        /* Data table */
+        .data-table {
             width: 100%;
-            max-width: 28rem;
-            margin: 1rem;
-            box-shadow: var(--shadow-lg);
+            border-collapse: collapse;
+            font-size: 0.8125rem;
         }
-        
-        .action-delete {
-            color: var(--color-warm-tan);
+        .data-table thead {
+            background-color: var(--bg-muted);
+            border-bottom: 1px solid var(--border-default);
+        }
+        .data-table th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-300);
+            font-size: 0.6875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .data-table td {
+            padding: 0.75rem 1rem;
+            color: var(--color-brown-700);
+            vertical-align: middle;
+        }
+
+        /* Table row hover */
+        .adjustment-row {
             transition: var(--transition-base);
+            border-bottom: 1px solid var(--border-default);
         }
-        .action-delete:hover { 
-            color: var(--color-warm-tan-dark); 
+        .adjustment-row:hover {
+            background-color: var(--bg-subtle);
         }
-        
+        .adjustment-row:last-child {
+            border-bottom: none;
+        }
+
+        /* Action buttons */
+        .action-btn {
+            color: var(--color-brown-100);
+            transition: var(--transition-base);
+            padding: 0.25rem 0.375rem;
+            border-radius: var(--radius-sm);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        .action-btn:hover {
+            color: var(--color-sage-dark);
+        }
+        .action-btn.delete:hover {
+            color: #dc2626;
+        }
+
+        /* Medicine name */
+        .med-name {
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-700);
+            font-size: 0.875rem;
+        }
+
+        /* Reason column */
+        .reason-cell {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--color-brown-300);
+            font-size: 0.8125rem;
+        }
+
+        /* Override: Add button inside filter bar */
+        .filter-bar .btn-primary {
+            flex: 0 0 auto !important;
+            padding: 0.4rem 0.85rem !important;
+            font-size: 0.8125rem !important;
+            height: 38px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.35rem !important;
+            border-radius: var(--radius-md) !important;
+            white-space: nowrap !important;
+            background-color: var(--color-sage) !important;
+            color: white !important;
+            border: none !important;
+        }
+        .filter-bar .btn-primary:hover {
+            background-color: var(--color-sage-dark) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.35) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* Search wrapper inside filter bar */
+        .filter-bar .search-wrapper {
+            flex: 1 1 200px !important;
+            min-width: 150px !important;
+            max-width: 300px !important;
+        }
+
+        @media (max-width: 768px) {
+            .filter-bar .form-select {
+                min-width: 100px !important;
+                font-size: 0.75rem !important;
+            }
+            .filter-bar .btn-primary span {
+                display: none !important;
+            }
+            .filter-bar .search-wrapper {
+                flex: 1 1 120px !important;
+                min-width: 100px !important;
+                max-width: 200px !important;
+            }
+            .filter-bar .search-input {
+                font-size: 0.75rem !important;
+                padding: 0.3rem 0.5rem 0.3rem 1.75rem !important;
+                height: 32px !important;
+            }
+            .data-table th,
+            .data-table td {
+                padding: 0.5rem 0.5rem !important;
+                font-size: 0.6875rem !important;
+            }
+        }
+
+        /* Modal overrides */
+        .form-card {
+            border-top-color: var(--color-sage);
+        }
+
+        /* Error message */
         .error-message {
             color: var(--color-error-text);
             font-size: 0.6875rem;
@@ -113,13 +199,59 @@
             display: block;
             font-weight: var(--font-weight-light);
         }
-        
+
+        .form-input.error,
+        .form-select.error {
+            border-color: var(--color-error-text);
+        }
+        .form-input.error:focus,
+        .form-select.error:focus {
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+        }
+
+        /* Stock warning */
         .stock-warning {
-            color: var(--color-warning-text);
             font-size: 0.6875rem;
             margin-top: 0.25rem;
             display: block;
             font-weight: var(--font-weight-light);
+        }
+        .stock-warning.warning {
+            color: var(--color-warning-text);
+        }
+        .stock-warning.danger {
+            color: var(--color-error-text);
+        }
+        .stock-warning.success {
+            color: var(--color-success-text);
+        }
+
+        /* Empty state */
+        .adjustments-empty {
+            text-align: center;
+            padding: 3rem 1.25rem;
+            color: var(--color-brown-100);
+        }
+        .adjustments-empty i {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            display: block;
+            opacity: 0.4;
+        }
+        .adjustments-empty p {
+            font-size: 0.875rem;
+            font-weight: var(--font-weight-light);
+        }
+
+        /* Stat card text colors */
+        .text-success {
+            color: var(--color-success-text);
+        }
+        .text-warning {
+            color: var(--color-warning-text);
+        }
+        .text-error {
+            color: var(--color-error-text);
         }
     </style>
 </head>
@@ -128,96 +260,101 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+    <main class="main-content">
         
-        <!-- Page Header matching theme -->
-        <div class="page-header mb-6">
-            <div class="page-header-left">
-                <div class="page-header-icon">
-                    <i class="fas fa-clipboard-list"></i>
-                </div>
-                <div>
-                    <h1 class="page-header-title">Stock Adjustments</h1>
-                    <p class="page-header-subtitle">Manage stock corrections, damages, and expiry</p>
-                </div>
-            </div>
-            <div class="page-header-actions">
-                <button id="adjustBtn" class="btn-primary">
-                    <i class="fas fa-plus text-sm"></i>
-                    <span>New Adjustment</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Stats Cards using theme classes -->
-        <div class="grid-stats mb-6">
+        <!-- Stats Cards -->
+        <div class="grid-stats" style="margin-bottom: 1.5rem;">
             <div class="stat-card">
-                <div class="flex justify-between items-start">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Total Adjustments</p>
                         <p class="stat-value" id="totalAdjustments">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-clipboard-list text-sage text-lg"></i>
+                        <i class="fas fa-clipboard-list" style="color:var(--color-sage); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
             
             <div class="stat-card">
-                <div class="flex justify-between items-start">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Stock Added</p>
-                        <p class="stat-value text-success-text" id="totalAdded">0</p>
+                        <p class="stat-value text-success" id="totalAdded">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-plus-circle text-success-text"></i>
+                        <i class="fas fa-plus-circle" style="color:var(--color-success-text); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
             
             <div class="stat-card">
-                <div class="flex justify-between items-start">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Stock Removed</p>
-                        <p class="stat-value text-warning-text" id="totalRemoved">0</p>
+                        <p class="stat-value text-warning" id="totalRemoved">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-minus-circle text-warning-text"></i>
+                        <i class="fas fa-minus-circle" style="color:var(--color-warning-text); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
             
             <div class="stat-card">
-                <div class="flex justify-between items-start">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Damaged/Expired</p>
-                        <p class="stat-value text-error-text" id="totalLoss">0</p>
+                        <p class="stat-value text-error" id="totalLoss">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-exclamation-triangle text-error-text"></i>
+                        <i class="fas fa-exclamation-triangle" style="color:var(--color-error-text); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Adjustments Table Card -->
-        <div class="card-white overflow-hidden">
+        <!-- Filter Bar with Add Button -->
+        <div class="filter-bar">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by medicine or reason...">
+            </div>
+            <select id="typeFilter" class="form-select">
+                <option value="">All Types</option>
+                <option value="Add">Add Stock</option>
+                <option value="Remove">Remove Stock</option>
+                <option value="Damage">Damage</option>
+                <option value="Expiry">Expiry</option>
+            </select>
+            <button id="resetFilter" class="btn-secondary">
+                <i class="fas fa-undo-alt"></i>
+                <span>Reset</span>
+            </button>
+            <button id="adjustBtn" class="btn-primary">
+                <i class="fas fa-plus"></i>
+                <span>New Adjustment</span>
+            </button>
+        </div>
+
+        <!-- Adjustments Table -->
+        <div class="card-white" style="margin-top: 1.5rem; overflow:hidden;">
             <div class="table-wrapper">
-                <table class="data-table w-full">
+                <table class="data-table">
                     <thead>
                         <tr>
-                            <th class="px-5 py-4">Date</th>
-                            <th class="px-5 py-4">Medicine</th>
-                            <th class="px-5 py-4">Type</th>
-                            <th class="px-5 py-4">Quantity</th>
-                            <th class="px-5 py-4">Reason</th>
-                            <th class="px-5 py-4 text-center">Actions</th>
+                            <th>Date</th>
+                            <th>Medicine</th>
+                            <th>Type</th>
+                            <th style="text-align:center;">Qty</th>
+                            <th>Reason</th>
+                            <th style="text-align:center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="adjustmentsTable">
                         <tr>
-                            <td colspan="6" class="text-center py-8 text-brown-100">
-                                <i class="fas fa-spinner fa-pulse mr-2"></i>Loading adjustments...
+                            <td colspan="6" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
+                                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
+                                <p style="font-weight:var(--font-weight-light);">Loading adjustments...</p>
                             </td>
                         </tr>
                     </tbody>
@@ -226,21 +363,22 @@
         </div>
     </main>
 
-    <!-- Stock Adjustment Modal - Matching theme.css structure -->
-    <div id="adjustModal" class="modal-overlay">
-        <div class="form-card">
-            <div class="flex justify-between items-center p-5 border-b border-default">
-                <h3 id="modalTitle" class="modal-title">
-                    <i class="fas fa-clipboard-list text-sage"></i> Stock Adjustment
+    <!-- Stock Adjustment Modal -->
+    <div id="adjustModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="form-card" style="max-width:30rem;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">
+                    <i class="fas fa-clipboard-list"></i>
+                    Stock Adjustment
                 </h3>
-                <button id="closeModalBtn" class="close-btn">
-                    <i class="fas fa-times text-lg"></i>
+                <button class="close-btn" id="closeModalBtn" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
             <form id="adjustForm">
-                <div class="p-5 space-y-4">
+                <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">Medicine <span class="text-error-text">*</span></label>
+                        <label class="form-label">Medicine <span style="color:var(--color-error-text);">*</span></label>
                         <select id="medicineId" class="form-select" required>
                             <option value="">Select Medicine</option>
                         </select>
@@ -248,31 +386,32 @@
                         <span class="stock-warning" id="stockWarning"></span>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Adjustment Type <span class="text-error-text">*</span></label>
+                        <label class="form-label">Adjustment Type <span style="color:var(--color-error-text);">*</span></label>
                         <select id="adjustType" class="form-select" required>
                             <option value="">Select Type</option>
-                            <option value="Add">➕ Add Stock</option>
-                            <option value="Remove">➖ Remove Stock</option>
-                            <option value="Damage">⚠️ Damage</option>
-                            <option value="Expiry">📅 Expiry</option>
+                            <option value="Add">Add Stock</option>
+                            <option value="Remove">Remove Stock</option>
+                            <option value="Damage">Damage</option>
+                            <option value="Expiry">Expiry</option>
                         </select>
                         <span class="error-message" id="typeError"></span>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Quantity <span class="text-error-text">*</span></label>
+                        <label class="form-label">Quantity <span style="color:var(--color-error-text);">*</span></label>
                         <input type="number" id="quantity" class="form-input" placeholder="Enter quantity" min="1" step="1">
                         <span class="error-message" id="quantityError"></span>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Reason <span class="text-error-text">*</span></label>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label">Reason <span style="color:var(--color-error-text);">*</span></label>
                         <textarea id="reason" rows="3" class="form-textarea" placeholder="e.g., Stock received from supplier, Physical count mismatch, Damaged in transit, Expired batch"></textarea>
                         <span class="error-message" id="reasonError"></span>
                     </div>
                 </div>
-                <div class="p-5 bg-subtle rounded-b-xl flex justify-end gap-3 border-t border-default">
+                <div class="modal-footer">
                     <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
                     <button type="submit" class="btn-primary">
-                        <i class="fas fa-save mr-2 text-xs"></i>Save Adjustment
+                        <i class="fas fa-save"></i>
+                        Save Adjustment
                     </button>
                 </div>
             </form>

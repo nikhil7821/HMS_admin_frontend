@@ -1,163 +1,308 @@
 /**
  * Patient Profile JS - Clinical Module
- * Professional UI, Fully Working, Indian Names
+ * Uses theme.css for styling, clean event handling
  */
 
 let patient = null;
 let consultations = [];
 let prescriptions = [];
+let isInitialized = false;
 
-function loadProfile() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const patientId = parseInt(urlParams.get('id'));
-    const patients = JSON.parse(localStorage.getItem('hms_patients') || '[]');
-    patient = patients.find(p => p.id === patientId);
-    consultations = JSON.parse(localStorage.getItem('hms_consultations') || '[]');
-    const allPrescriptions = JSON.parse(localStorage.getItem('hms_consultations') || '[]');
-    prescriptions = allPrescriptions.filter(c => c.patientId === patientId);
-    
-    if (patient) {
-        // Profile Avatar - First letters of name
-        const nameParts = patient.fullName.split(' ');
-        let initials = '';
-        if (nameParts.length >= 2) {
-            initials = nameParts[0].charAt(0) + nameParts[1].charAt(0);
-        } else {
-            initials = patient.fullName.charAt(0);
+// ─── Utility Functions ──────────────────────────────
+
+function esc(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function calculateAge(dob) {
+    if (!dob) return '?';
+    try {
+        const birthDate = new Date(dob);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
         }
-        document.getElementById('profileAvatar').innerText = initials.toUpperCase();
-        document.getElementById('profileName').innerText = patient.fullName;
-        document.getElementById('profileId').innerText = 'P-' + patient.id.toString().padStart(5, '0');
-        document.getElementById('profileGender').innerText = patient.gender;
-        
-        let age = new Date().getFullYear() - new Date(patient.dob).getFullYear();
-        document.getElementById('profileAge').innerText = age + ' yrs';
-        document.getElementById('profileBloodGroup').innerText = patient.bloodGroup || 'N/A';
-        document.getElementById('profilePhone').innerText = patient.phone;
-        document.getElementById('profileEmail').innerText = patient.email || 'N/A';
-        document.getElementById('profileAddress').innerText = patient.address || 'N/A';
-        
-        // Medical History (Consultations with diagnosis and symptoms)
-        const patientConsultations = consultations.filter(c => c.patientId === patientId);
-        const historyDiv = document.getElementById('medicalHistoryList');
-        
-        if (patientConsultations.length === 0) {
-            historyDiv.innerHTML = `
-                <div class="text-center py-8 text-[#94a3b8]">
-                    <i class="fas fa-folder-open text-3xl mb-2 block"></i>
-                    <p class="font-normal">No medical history found</p>
-                </div>
-            `;
-        } else {
-            historyDiv.innerHTML = patientConsultations.map(c => `
-                <div class="history-item pb-3 mb-3 last:border-b-0">
-                    <div class="flex justify-between items-start mb-2">
-                        <p class="font-medium text-[#1e293b] text-sm">${c.date || 'Date not specified'}</p>
-                        <span class="text-xs text-[#a8c49a] bg-[#f0fdf4] px-2 py-0.5 rounded-full">Visit</span>
-                    </div>
-                    <p class="text-sm"><span class="font-medium text-[#475569]">Diagnosis:</span> <span class="text-[#334155]">${c.diagnosis || 'N/A'}</span></p>
-                    <p class="text-sm text-[#64748b] mt-1">${c.symptoms || 'No symptoms recorded'}</p>
-                    <p class="text-xs text-[#94a3b8] mt-2">Doctor: ${c.doctorName || 'Not assigned'}</p>
-                </div>
-            `).join('');
-        }
-        
-        // Consultations List
-        const consultDiv = document.getElementById('consultationsList');
-        if (patientConsultations.length === 0) {
-            consultDiv.innerHTML = `
-                <div class="text-center py-8 text-[#94a3b8]">
-                    <i class="fas fa-stethoscope text-3xl mb-2 block"></i>
-                    <p class="font-normal">No consultations found</p>
-                </div>
-            `;
-        } else {
-            consultDiv.innerHTML = patientConsultations.map(c => `
-                <div class="history-item pb-3 mb-3 last:border-b-0">
-                    <div class="flex justify-between items-start mb-2">
-                        <p class="font-medium text-[#1e293b] text-sm">${c.date || 'Date not specified'}</p>
-                        <span class="text-xs text-[#a8c49a] bg-[#f0fdf4] px-2 py-0.5 rounded-full">Consultation</span>
-                    </div>
-                    <p class="text-sm"><span class="font-medium text-[#475569]">Doctor:</span> <span class="text-[#334155]">${c.doctorName || 'Not assigned'}</span></p>
-                    <p class="text-sm"><span class="font-medium text-[#475569]">Diagnosis:</span> <span class="text-[#334155]">${c.diagnosis || 'N/A'}</span></p>
-                    ${c.notes ? `<p class="text-sm text-[#64748b] mt-1">Notes: ${c.notes}</p>` : ''}
-                </div>
-            `).join('');
-        }
-        
-        // Prescriptions List
-        const presDiv = document.getElementById('prescriptionsList');
-        if (prescriptions.length === 0) {
-            presDiv.innerHTML = `
-                <div class="text-center py-8 text-[#94a3b8]">
-                    <i class="fas fa-prescription-bottle text-3xl mb-2 block"></i>
-                    <p class="font-normal">No prescriptions found</p>
-                </div>
-            `;
-        } else {
-            presDiv.innerHTML = prescriptions.map(p => `
-                <div class="history-item pb-3 mb-3 last:border-b-0">
-                    <div class="flex justify-between items-start mb-2">
-                        <p class="font-medium text-[#1e293b] text-sm">${p.date || 'Date not specified'}</p>
-                        <span class="text-xs text-[#a8c49a] bg-[#f0fdf4] px-2 py-0.5 rounded-full">Prescription</span>
-                    </div>
-                    <div class="bg-[#f8fafc] rounded-lg p-3 mt-2">
-                        <p class="text-sm whitespace-pre-wrap text-[#334155]">${p.prescription || 'No prescription details'}</p>
-                    </div>
-                    ${p.doctorName ? `<p class="text-xs text-[#94a3b8] mt-2">Prescribed by: ${p.doctorName}</p>` : ''}
-                </div>
-            `).join('');
-        }
-    } else {
-        // Patient not found
-        const profileName = document.getElementById('profileName');
-        if (profileName) profileName.innerText = 'Patient Not Found';
-        
-        const errorHtml = `
-            <div class="text-center py-12 text-[#94a3b8]">
-                <i class="fas fa-user-slash text-4xl mb-3 block"></i>
-                <p class="font-normal">Patient not found. Please select a valid patient.</p>
-                <a href="patients.html" class="inline-block mt-4 text-[#a8c49a] hover:underline">← Back to Patients</a>
-            </div>
-        `;
-        document.getElementById('medicalHistoryList').innerHTML = errorHtml;
-        document.getElementById('consultationsList').innerHTML = errorHtml;
-        document.getElementById('prescriptionsList').innerHTML = errorHtml;
+        return age;
+    } catch {
+        return '?';
     }
 }
 
-// Tab switching functionality
+function getInitials(name) {
+    if (!name) return '--';
+    const parts = name.split(' ');
+    if (parts.length >= 2) {
+        return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return 'N/A';
+    try {
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('en-IN', { 
+            day: '2-digit', 
+            month: 'short', 
+            year: 'numeric' 
+        });
+    } catch {
+        return dateStr;
+    }
+}
+
+// ─── Load Profile ────────────────────────────────────
+
+function loadProfile() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const patientId = parseInt(urlParams.get('id'));
+        
+        if (!patientId) {
+            showError('No patient ID provided');
+            return;
+        }
+        
+        const patients = JSON.parse(localStorage.getItem('hms_patients') || '[]');
+        patient = patients.find(p => p.id === patientId);
+        
+        if (!patient) {
+            showError('Patient not found');
+            return;
+        }
+        
+        // Load related data
+        consultations = JSON.parse(localStorage.getItem('hms_consultations') || '[]');
+        const patientConsultations = consultations.filter(c => c.patientId === patientId);
+        prescriptions = patientConsultations.filter(c => c.prescription);
+        
+        // Render profile
+        renderProfile();
+        renderMedicalHistory(patientConsultations);
+        renderConsultations(patientConsultations);
+        renderPrescriptions(patientConsultations);
+        
+    } catch (error) {
+        console.error('Error loading profile:', error);
+        showError('Error loading patient data');
+    }
+}
+
+function showError(message) {
+    const nameEl = document.getElementById('profileName');
+    if (nameEl) nameEl.textContent = 'Error';
+    
+    const errorHtml = `
+        <div class="empty-state">
+            <i class="fas fa-user-slash"></i>
+            <p>${esc(message)}</p>
+            <a href="patients.html" style="display:inline-block; margin-top:1rem; color:var(--color-sage); text-decoration:none;">
+                ← Back to Patients
+            </a>
+        </div>
+    `;
+    
+    document.getElementById('medicalHistoryList').innerHTML = errorHtml;
+    document.getElementById('consultationsList').innerHTML = errorHtml;
+    document.getElementById('prescriptionsList').innerHTML = errorHtml;
+}
+
+// ─── Render Profile ──────────────────────────────────
+
+function renderProfile() {
+    if (!patient) return;
+    
+    // Avatar
+    document.getElementById('profileInitials').textContent = getInitials(patient.fullName);
+    
+    // Name & ID
+    document.getElementById('profileName').textContent = patient.fullName;
+    document.getElementById('profileId').textContent = 'P-' + patient.id.toString().padStart(5, '0');
+    
+    // Info fields
+    document.getElementById('profileGender').textContent = patient.gender || 'N/A';
+    document.getElementById('profileDob').textContent = formatDate(patient.dob);
+    document.getElementById('profileAge').textContent = calculateAge(patient.dob) + ' yrs';
+    document.getElementById('profileBloodGroup').textContent = patient.bloodGroup || 'N/A';
+    document.getElementById('profilePhone').textContent = patient.phone || 'N/A';
+    document.getElementById('profileEmail').textContent = patient.email || 'N/A';
+    document.getElementById('profileAddress').textContent = patient.address || 'N/A';
+    document.getElementById('profileRegistered').textContent = formatDate(patient.createdAt);
+}
+
+// ─── Render Medical History ──────────────────────────
+
+function renderMedicalHistory(patientConsultations) {
+    const container = document.getElementById('medicalHistoryList');
+    
+    if (!patientConsultations || patientConsultations.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-folder-open"></i>
+                <p>No medical history found</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = patientConsultations.map(c => `
+        <div class="history-item">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                <span style="font-weight:var(--font-weight-medium); color:var(--color-brown-700); font-size:0.8125rem;">
+                    ${formatDate(c.date)}
+                </span>
+                <span class="visit-badge">
+                    <i class="fas fa-notes-medical" style="font-size:0.5rem; margin-right:0.25rem;"></i>
+                    Visit
+                </span>
+            </div>
+            <p style="font-size:0.8125rem;">
+                <span style="font-weight:var(--font-weight-medium); color:var(--color-brown-300);">Diagnosis:</span>
+                <span style="color:var(--color-brown-700);">${esc(c.diagnosis || 'N/A')}</span>
+            </p>
+            ${c.symptoms ? `<p style="font-size:0.75rem; color:var(--color-brown-300); margin-top:0.25rem;">${esc(c.symptoms)}</p>` : ''}
+            <p style="font-size:0.6875rem; color:var(--color-brown-100); margin-top:0.5rem;">
+                <i class="fas fa-user-md" style="margin-right:0.25rem;"></i>
+                ${esc(c.doctorName || 'Not assigned')}
+            </p>
+        </div>
+    `).join('');
+}
+
+// ─── Render Consultations ────────────────────────────
+
+function renderConsultations(patientConsultations) {
+    const container = document.getElementById('consultationsList');
+    
+    if (!patientConsultations || patientConsultations.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-stethoscope"></i>
+                <p>No consultations found</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = patientConsultations.map(c => `
+        <div class="history-item">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                <span style="font-weight:var(--font-weight-medium); color:var(--color-brown-700); font-size:0.8125rem;">
+                    ${formatDate(c.date)}
+                </span>
+                <span class="visit-badge" style="background-color:#e2f0fb; color:var(--color-info-text);">
+                    <i class="fas fa-stethoscope" style="font-size:0.5rem; margin-right:0.25rem;"></i>
+                    Consultation
+                </span>
+            </div>
+            <p style="font-size:0.8125rem;">
+                <span style="font-weight:var(--font-weight-medium); color:var(--color-brown-300);">Doctor:</span>
+                <span style="color:var(--color-brown-700);">${esc(c.doctorName || 'Not assigned')}</span>
+            </p>
+            <p style="font-size:0.8125rem;">
+                <span style="font-weight:var(--font-weight-medium); color:var(--color-brown-300);">Diagnosis:</span>
+                <span style="color:var(--color-brown-700);">${esc(c.diagnosis || 'N/A')}</span>
+            </p>
+            ${c.notes ? `<p style="font-size:0.75rem; color:var(--color-brown-300); margin-top:0.25rem;">📝 ${esc(c.notes)}</p>` : ''}
+        </div>
+    `).join('');
+}
+
+// ─── Render Prescriptions ────────────────────────────
+
+function renderPrescriptions(patientConsultations) {
+    const container = document.getElementById('prescriptionsList');
+    const presc = patientConsultations.filter(c => c.prescription);
+    
+    if (!presc || presc.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-prescription-bottle"></i>
+                <p>No prescriptions found</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = presc.map(c => `
+        <div class="history-item">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                <span style="font-weight:var(--font-weight-medium); color:var(--color-brown-700); font-size:0.8125rem;">
+                    ${formatDate(c.date)}
+                </span>
+                <span class="visit-badge" style="background-color:#fef3dd; color:var(--color-warning-text);">
+                    <i class="fas fa-prescription-bottle" style="font-size:0.5rem; margin-right:0.25rem;"></i>
+                    Prescription
+                </span>
+            </div>
+            <div class="prescription-box">
+                <p>${esc(c.prescription)}</p>
+            </div>
+            ${c.doctorName ? `<p style="font-size:0.6875rem; color:var(--color-brown-100); margin-top:0.5rem;">👨‍⚕️ Prescribed by: ${esc(c.doctorName)}</p>` : ''}
+        </div>
+    `).join('');
+}
+
+// ─── Tabs ─────────────────────────────────────────────
+
 function initTabs() {
     const tabs = document.querySelectorAll('.tab-btn');
-    const medicalTab = document.getElementById('medicalTab');
-    const consultationsTab = document.getElementById('consultationsTab');
-    const prescriptionsTab = document.getElementById('prescriptionsTab');
+    const tabContents = {
+        medical: document.getElementById('medicalTab'),
+        consultations: document.getElementById('consultationsTab'),
+        prescriptions: document.getElementById('prescriptionsTab')
+    };
     
     tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const tabName = tab.getAttribute('data-tab');
+        tab.addEventListener('click', function() {
+            const tabName = this.getAttribute('data-tab');
             
-            // Update active class on tabs
+            // Update active class
             tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
+            this.classList.add('active');
             
-            // Show/hide tab content
-            medicalTab.classList.add('hidden');
-            consultationsTab.classList.add('hidden');
-            prescriptionsTab.classList.add('hidden');
-            
-            if (tabName === 'medical') {
-                medicalTab.classList.remove('hidden');
-            } else if (tabName === 'consultations') {
-                consultationsTab.classList.remove('hidden');
-            } else if (tabName === 'prescriptions') {
-                prescriptionsTab.classList.remove('hidden');
-            }
+            // Show/hide content
+            Object.keys(tabContents).forEach(key => {
+                if (key === tabName) {
+                    tabContents[key].classList.remove('hidden');
+                } else {
+                    tabContents[key].classList.add('hidden');
+                }
+            });
         });
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+// ─── Init ─────────────────────────────────────────────
+
+function initPatientProfile() {
+    if (isInitialized) return;
+    isInitialized = true;
+    
     loadProfile();
     initTabs();
+}
+
+// ─── Wait for DOM and Common.js ──────────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if common.js has loaded sidebar
+    const checkInterval = setInterval(() => {
+        const sidebar = document.getElementById('mainSidebar');
+        if (sidebar) {
+            clearInterval(checkInterval);
+            setTimeout(initPatientProfile, 100);
+        }
+    }, 50);
+    
+    // Fallback: if sidebar doesn't load in 3 seconds, init anyway
+    setTimeout(() => {
+        clearInterval(checkInterval);
+        initPatientProfile();
+    }, 3000);
 });

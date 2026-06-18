@@ -5,51 +5,224 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Prescriptions | Documents | MedFlow</title>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- ✅ CENTRALIZED THEME CSS -->
+    
+    <!-- Theme CSS -->
     <link rel="stylesheet" href="../../css/theme.css">
 
     <style>
-        /* Additional page-specific styles that align with theme */
+        /* ============================================================
+           PRESCRIPTIONS MODULE — Page-specific only
+           ============================================================ */
+
+        /* 🔥 FIX: Prevent layout shift */
+        .main-content {
+            margin-left: 260px !important;
+            margin-top: 70px !important;
+            padding: 1.25rem 1.5rem !important;
+            transition: margin-left 0.3s ease !important;
+            min-height: 100vh !important;
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
+        }
+        .main-content.loaded {
+            opacity: 1;
+        }
+        #mainSidebar[data-collapsed="true"] ~ .main-content,
+        #mainSidebar[data-collapsed="true"] + .main-content {
+            margin-left: 72px !important;
+        }
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 0 !important;
+                padding: 1rem !important;
+            }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 🔥 Page Header - Hidden */
+        .page-header {
+            display: none !important;
+        }
+
+        /* 🔥 Stats Cards - Perfect Spacing */
+        .grid-stats {
+            gap: 1rem !important;
+            margin-bottom: 1.25rem !important;
+        }
+        .stat-card {
+            padding: 1rem 1.25rem !important;
+            border-radius: var(--radius-lg) !important;
+        }
+        .stat-card .stat-value {
+            font-size: 1.5rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            margin-top: 0.125rem !important;
+        }
+        .stat-card .stat-label {
+            font-size: 0.625rem !important;
+            letter-spacing: 0.06em !important;
+            text-transform: uppercase !important;
+            color: var(--color-brown-200) !important;
+        }
+        .stat-card .stat-icon-bg {
+            width: 2.5rem !important;
+            height: 2.5rem !important;
+            border-radius: var(--radius-md) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: var(--bg-muted) !important;
+        }
+        .stat-card .stat-icon-bg i {
+            font-size: 1rem !important;
+        }
+
+        /* 🔥 Filter Bar - Perfect Alignment */
+        .filter-bar {
+            padding: 0.625rem 1rem !important;
+            gap: 0.625rem !important;
+            margin-bottom: 1.25rem !important;
+            border-radius: var(--radius-lg) !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            display: flex !important;
+            align-items: center !important;
+            flex-wrap: nowrap !important;
+        }
+        .filter-bar .search-wrapper {
+            flex: 1 1 220px !important;
+            min-width: 160px !important;
+            max-width: 320px !important;
+            position: relative !important;
+        }
+        .filter-bar .search-wrapper i {
+            position: absolute !important;
+            left: 0.75rem !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            color: var(--color-brown-100);
+            font-size: 0.8125rem !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
+        }
+        .filter-bar .search-input {
+            width: 100% !important;
+            padding: 0.375rem 0.75rem 0.375rem 2.25rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            border-radius: var(--radius-md) !important;
+            border: 1px solid var(--border-input) !important;
+            background-color: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
+            font-family: var(--font-family) !important;
+        }
+        .filter-bar .search-input:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+            outline: none !important;
+        }
+        .filter-bar .form-select {
+            min-width: 130px !important;
+            max-width: 180px !important;
+            padding: 0.375rem 1.75rem 0.375rem 0.75rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            border: 1px solid var(--border-input) !important;
+            border-radius: var(--radius-md) !important;
+            background-color: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
+            cursor: pointer !important;
+            font-family: var(--font-family) !important;
+        }
+        .filter-bar .form-select:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+            outline: none !important;
+        }
+        .filter-bar .btn-secondary {
+            flex: 0 0 auto !important;
+            padding: 0.375rem 0.875rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            border-radius: var(--radius-md) !important;
+            white-space: nowrap !important;
+            font-family: var(--font-family) !important;
+            cursor: pointer !important;
+            background-color: transparent !important;
+            color: var(--color-brown-200) !important;
+            border: 1px solid var(--border-input) !important;
+        }
+        .filter-bar .btn-secondary:hover {
+            background-color: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+            border-color: var(--color-brown-100) !important;
+        }
+
+        @media (max-width: 768px) {
+            .filter-bar {
+                flex-wrap: wrap !important;
+                gap: 0.5rem !important;
+                padding: 0.5rem 0.75rem !important;
+            }
+            .filter-bar .search-wrapper {
+                flex: 1 1 100% !important;
+                min-width: 100px !important;
+                max-width: 100% !important;
+            }
+            .filter-bar .form-select {
+                min-width: 90px !important;
+                max-width: 140px !important;
+                font-size: 0.75rem !important;
+                height: 32px !important;
+            }
+            .filter-bar .btn-secondary span {
+                display: none !important;
+            }
+            .filter-bar .btn-secondary {
+                padding: 0.3rem 0.6rem !important;
+                font-size: 0.75rem !important;
+                height: 32px !important;
+            }
+        }
+
+        /* 🔥 Prescription Card */
         .prescription-card {
-            transition: var(--transition-base);
-            border-radius: var(--radius-md);
-            background: var(--bg-card);
-            border: 1px solid var(--border-default);
-            border-left: 3px solid var(--color-sage);
+            transition: all 0.25s ease !important;
+            border-radius: var(--radius-md) !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            border-left: 3px solid var(--color-sage) !important;
+            padding: 1rem 1.25rem !important;
+            box-shadow: var(--shadow-card) !important;
         }
-        
         .prescription-card:hover {
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-sm);
-            border-color: var(--color-sage-pale);
-            border-left-color: var(--color-sage-dark);
+            transform: translateY(-2px) !important;
+            box-shadow: var(--shadow-md) !important;
+            border-color: var(--color-sage-pale) !important;
+            border-left-color: var(--color-sage-dark) !important;
         }
-        
-        /* Smaller prescription card content */
+
+        /* 🔥 Prescription Card Content */
         .prescription-card .patient-name {
             font-size: 0.8125rem !important;
             font-weight: var(--font-weight-medium) !important;
         }
-        
         .prescription-card .doctor-name {
             font-size: 0.6875rem !important;
             color: var(--color-brown-300) !important;
         }
-        
         .prescription-card .date-text {
             font-size: 0.625rem !important;
             color: var(--color-brown-100) !important;
         }
-        
         .prescription-card .diagnosis-text {
             font-size: 0.6875rem !important;
             color: var(--color-brown-600) !important;
@@ -58,7 +231,6 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
-        
         .prescription-card .medicines-text {
             font-size: 0.6875rem !important;
             color: var(--color-sage-dark) !important;
@@ -67,107 +239,132 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
-        
-        /* Modal overlay styles */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 50;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--bg-overlay);
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition-base);
+
+        /* 🔥 Card Button - Print */
+        .card-btn-print {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 0.375rem !important;
+            padding: 0.375rem 0.75rem !important;
+            border-radius: var(--radius-md) !important;
+            font-size: 0.6875rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            border: none !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            font-family: var(--font-family) !important;
+            width: 100% !important;
+            background-color: var(--color-warm-tan) !important;
+            color: white !important;
         }
-        
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
+        .card-btn-print:hover {
+            background-color: var(--color-warm-tan-dark) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(216, 180, 140, 0.3) !important;
         }
-        
-        .modal-overlay.active .form-card {
-            transform: scale(1);
+
+        /* 🔥 Medicine Tag */
+        .medicine-tag {
+            display: inline-block !important;
+            padding: 0.1rem 0.5rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            background: var(--color-success-bg) !important;
+            color: var(--color-success-text) !important;
         }
-        
-        .form-card {
-            transform: scale(0.96);
-            transition: var(--transition-base);
-            border-radius: var(--radius-lg);
-            background: var(--bg-card);
-            border: 1px solid var(--border-default);
-            border-top: 4px solid var(--color-sage);
-            width: 100%;
-            max-width: 48rem;
-            margin: 1rem;
-            box-shadow: var(--shadow-lg);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .btn-print {
-            background-color: var(--color-warm-tan);
-            color: white;
-            border: none;
-        }
-        
-        .btn-print:hover {
-            background-color: var(--color-warm-tan-dark);
-            transform: translateY(-1px);
-        }
-        
-        /* Prescriptions Grid - 5 cards per row */
-        .grid-prescriptions {
+
+        /* 🔥 Prescriptions Grid */
+        .prescriptions-grid {
             display: grid;
-            grid-template-columns: repeat(1, 1fr);
-            gap: 1rem;
+            grid-template-columns: 1fr;
+            gap: 1rem !important;
         }
-        
         @media (min-width: 640px) {
-            .grid-prescriptions {
+            .prescriptions-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
-        
         @media (min-width: 1024px) {
-            .grid-prescriptions {
+            .prescriptions-grid {
                 grid-template-columns: repeat(3, 1fr);
             }
         }
-        
         @media (min-width: 1280px) {
-            .grid-prescriptions {
+            .prescriptions-grid {
                 grid-template-columns: repeat(4, 1fr);
             }
         }
-        
         @media (min-width: 1536px) {
-            .grid-prescriptions {
+            .prescriptions-grid {
                 grid-template-columns: repeat(5, 1fr);
             }
         }
-        
-        /* Print styles */
+
+        /* 🔥 Modal */
+        .form-card {
+            border-top: 4px solid var(--color-sage) !important;
+        }
+        .modal-body {
+            padding: 1.25rem !important;
+        }
+        .modal-footer {
+            padding: 0.75rem 1.25rem !important;
+            background-color: var(--bg-subtle) !important;
+            border-top: 1px solid var(--border-default) !important;
+            display: flex !important;
+            justify-content: flex-end !important;
+            gap: 0.75rem !important;
+        }
+
+        /* 🔥 Print Button in Modal */
+        .btn-print {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            padding: 0.3rem 0.75rem !important;
+            border-radius: var(--radius-md) !important;
+            font-size: 0.75rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            border: none !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            font-family: var(--font-family) !important;
+            background-color: var(--color-warm-tan) !important;
+            color: white !important;
+        }
+        .btn-print:hover {
+            background-color: var(--color-warm-tan-dark) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* 🔥 Prescription content in modal */
+        .prescription-content {
+            white-space: pre-wrap !important;
+            font-family: 'Courier New', monospace !important;
+            font-size: 0.8125rem !important;
+            line-height: 1.8 !important;
+            color: var(--color-brown-700) !important;
+            margin: 0 !important;
+        }
+
+        /* 🔥 Stat Card Border Colors */
+        .stat-card-sage { border-left: 4px solid var(--color-sage) !important; }
+        .stat-card-sage-dark { border-left: 4px solid var(--color-sage-dark) !important; }
+        .stat-card-gold { border-left: 4px solid var(--color-gold) !important; }
+        .stat-card-tan { border-left: 4px solid var(--color-warm-tan) !important; }
+
+        .text-sage-dark { color: var(--color-sage-dark) !important; }
+        .text-gold { color: var(--color-gold) !important; }
+        .text-tan { color: var(--color-warm-tan) !important; }
+
+        /* 🔥 Print styles */
         @media print {
-            body * {
-                visibility: hidden;
-            }
-            #printablePrescription, #printablePrescription * {
-                visibility: visible;
-            }
-            #printablePrescription {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                padding: 20px;
-            }
-            .no-print {
-                display: none;
-            }
+            .no-print { display: none !important; }
+            body { background: white !important; margin: 0 !important; padding: 0 !important; }
+            #printablePrescription { padding: 20px !important; }
+            .modal-overlay { display: none !important; }
         }
     </style>
 </head>
@@ -176,123 +373,120 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+    <main class="main-content" id="mainContent">
         
-        <!-- Page Header matching theme -->
-        <div class="page-header mb-6">
-            <div class="page-header-left">
-                <div class="page-header-icon">
-                    <i class="fas fa-prescription-bottle"></i>
-                </div>
-                <div>
-                    <h1 class="page-header-title">Prescriptions</h1>
-                    <p class="page-header-subtitle">Manage patient prescriptions and medication history</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Stats Cards - Keeping theme.css size -->
-        <div class="grid-stats mb-8">
-            <div class="stat-card" style="border-left: 4px solid var(--color-sage);">
-                <div class="flex justify-between items-start">
+        <!-- Stats Cards -->
+        <div class="grid-stats">
+            <div class="stat-card stat-card-sage">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Total Prescriptions</p>
                         <p class="stat-value" id="totalPrescriptions">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-prescription-bottle text-sage text-lg"></i>
+                        <i class="fas fa-prescription-bottle" style="color:var(--color-sage);"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid var(--color-sage-dark);">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-sage-dark">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">This Month</p>
                         <p class="stat-value text-sage-dark" id="monthPrescriptions">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-calendar-alt text-sage-dark"></i>
+                        <i class="fas fa-calendar-alt" style="color:var(--color-sage-dark);"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid var(--color-gold);">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-gold">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Active Patients</p>
                         <p class="stat-value text-gold" id="activePatients">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-user-check text-gold"></i>
+                        <i class="fas fa-user-check" style="color:var(--color-gold);"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid var(--color-warm-tan);">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-tan">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Unique Medicines</p>
                         <p class="stat-value text-tan" id="uniqueMedicines">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-capsules text-tan"></i>
+                        <i class="fas fa-capsules" style="color:var(--color-warm-tan);"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Filter Bar using theme classes -->
+        <!-- Filter Bar -->
         <div class="filter-bar">
-            <div class="relative flex-1">
-                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-brown-100 text-sm"></i>
-                <input type="text" id="searchInput" placeholder="Search by patient name, doctor or medicine..." 
-                       class="search-input pl-10">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by patient, doctor or medicine...">
             </div>
-            <div class="w-full md:w-56">
-                <select id="patientFilter" class="form-select">
-                    <option value="">All Patients</option>
-                </select>
-            </div>
+            <select id="patientFilter" class="form-select">
+                <option value="">All Patients</option>
+            </select>
             <button id="resetFilter" class="btn-secondary">
-                <i class="fas fa-undo-alt mr-1"></i> Reset
+                <i class="fas fa-undo-alt"></i>
+                <span>Reset</span>
             </button>
         </div>
 
-        <!-- Prescriptions Grid - 5 cards per row on 2K screens -->
-        <div id="prescriptionsGrid" class="grid-prescriptions">
-            <div class="col-span-full text-center py-12 text-brown-100">
-                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
-                <p class="font-light">Loading prescriptions...</p>
+        <!-- Prescriptions Grid -->
+        <div class="prescriptions-grid" id="prescriptionsGrid">
+            <div style="grid-column:1/-1; text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
+                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
+                <p style="font-weight:var(--font-weight-light);">Loading prescriptions...</p>
             </div>
         </div>
     </main>
 
     <!-- Prescription Details Modal -->
-    <div id="prescriptionModal" class="modal-overlay">
-        <div class="form-card">
-            <div class="flex justify-between items-center p-5 border-b border-default">
+    <div id="prescriptionModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="form-card" style="max-width:44rem;">
+            <div class="modal-header">
                 <h3 class="modal-title">
-                    <i class="fas fa-prescription-bottle text-sage"></i> Prescription Details
+                    <i class="fas fa-prescription-bottle"></i> Prescription Details
                 </h3>
-                <div class="flex gap-2">
-                    <button id="printModalBtn" class="btn-print px-3 py-1.5 rounded-lg text-sm">
-                        <i class="fas fa-print mr-1"></i> Print
+                <div style="display:flex; gap:0.5rem;">
+                    <button id="printModalBtn" class="btn-print">
+                        <i class="fas fa-print"></i> Print
                     </button>
-                    <button id="closeModalBtn" class="close-btn">
-                        <i class="fas fa-times text-lg"></i>
+                    <button class="close-btn" id="closeModalBtn" aria-label="Close modal">
+                        <i class="fas fa-times"></i>
                     </button>
                 </div>
             </div>
-            <div id="prescriptionDetails" class="p-5"></div>
+            <div id="prescriptionDetails" class="modal-body"></div>
+            <div class="modal-footer">
+                <button type="button" id="closeFooterBtn" class="btn-secondary">Close</button>
+            </div>
         </div>
     </div>
 
-    <!-- Hidden Printable Prescription Template -->
-    <div id="printablePrescription" style="display: none;"></div>
-
     <script src="../../js/core/common.js"></script>
     <script src="prescriptions.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var checkSidebar = setInterval(function() {
+                var sidebar = document.getElementById('mainSidebar');
+                if (sidebar) {
+                    clearInterval(checkSidebar);
+                    document.getElementById('mainContent').classList.add('loaded');
+                }
+            }, 50);
+            setTimeout(function() {
+                document.getElementById('mainContent').classList.add('loaded');
+            }, 1000);
+        });
+    </script>
     
 </body>
 </html>

@@ -1,275 +1,351 @@
 /**
  * Invoices Management JS - Billing Module
- * Professional UI, Fully Working, Indian Names, Rupee Symbol
+ * Uses theme.css for styling, clean event handling
  */
 
-let invoices = [];
-let patients = [];
-let currentPage = 1;
-let rowsPerPage = 10;
-let deleteId = null;
+var invoices = [];
+var patients = [];
+var currentPage = 1;
+var rowsPerPage = 10;
+var deleteTargetId = null;
+var searchTerm = '';
+var statusFilter = '';
+var dateFrom = '';
+var dateTo = '';
+var isInitialized = false;
 
-function loadData() {
-    patients = JSON.parse(localStorage.getItem('hms_patients') || '[]');
-    
-    const stored = localStorage.getItem('hms_invoices');
-    if (stored) {
-        invoices = JSON.parse(stored);
-        if (invoices[0] && (invoices[0].patientName === 'John Doe' || invoices[0].patientName === 'Jane Smith')) {
-            setIndianInvoices();
-        }
-    } else {
-        setIndianInvoices();
+// ─── 🔥 ADD THIS HERE - Auto-Open from Dashboard ───
+document.addEventListener('DOMContentLoaded', function() {
+    var action = sessionStorage.getItem('dashboard_action');
+    if (action === 'openCreateInvoice') {
+        sessionStorage.removeItem('dashboard_action');
+        setTimeout(function() {
+            if (typeof openCreateModal === 'function') {
+                openCreateModal();
+            } else if (typeof window.openCreateModal === 'function') {
+                window.openCreateModal();
+            } else {
+                var addBtn = document.getElementById('createInvoiceBtn');
+                if (addBtn) addBtn.click();
+            }
+        }, 600);
     }
-    
-    updateStats();
-    renderTable();
-    populatePatientSelect();
-}
+});
+// ─── 🔥 END OF AUTO-OPEN SECTION ────────────────────
 
-function setIndianInvoices() {
-    const today = new Date().toISOString().split('T')[0];
-    invoices = [
-        {id: 1, patientId: 1, patientName: 'Rajesh Kumar', invoiceNo: 'INV-20260001', date: today, dueDate: addDays(today, 15), type: 'OPD', description: 'Consultation fee for cardiology', amount: 1500, tax: 5, discount: 0, total: 1575, status: 'Paid'},
-        {id: 2, patientId: 2, patientName: 'Priya Sharma', invoiceNo: 'INV-20260002', date: today, dueDate: addDays(today, 15), type: 'Laboratory', description: 'Blood tests - Complete Blood Count, Lipid Profile', amount: 2500, tax: 5, discount: 100, total: 2525, status: 'Pending'},
-        {id: 3, patientId: 3, patientName: 'Amit Patel', invoiceNo: 'INV-20260003', date: today, dueDate: addDays(today, 15), type: 'Pharmacy', description: 'Medicines - Paracetamol, Antibiotics', amount: 800, tax: 5, discount: 0, total: 840, status: 'Paid'},
-        {id: 4, patientId: 1, patientName: 'Rajesh Kumar', invoiceNo: 'INV-20260004', date: today, dueDate: addDays(today, 15), type: 'Radiology', description: 'Chest X-Ray', amount: 1200, tax: 5, discount: 0, total: 1260, status: 'Pending'},
-        {id: 5, patientId: 4, patientName: 'Neha Gupta', invoiceNo: 'INV-20260005', date: today, dueDate: addDays(today, 15), type: 'OPD', description: 'Gynacology consultation', amount: 1000, tax: 5, discount: 50, total: 1000, status: 'Paid'},
-        {id: 6, patientId: 5, patientName: 'Sunil Reddy', invoiceNo: 'INV-20260006', date: today, dueDate: addDays(today, 15), type: 'Laboratory', description: 'Thyroid Profile, Vitamin D Test', amount: 1800, tax: 5, discount: 0, total: 1890, status: 'Cancelled'}
-    ];
-    saveInvoices();
+// ─── Utility Functions ──────────────────────────────
+
+function esc(str) {
+    if (!str) return '';
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
 }
 
 function addDays(date, days) {
-    const result = new Date(date);
+    var result = new Date(date);
     result.setDate(result.getDate() + days);
     return result.toISOString().split('T')[0];
 }
 
-function saveInvoices() {
-    localStorage.setItem('hms_invoices', JSON.stringify(invoices));
+// ─── Toast Notification ──────────────────────────────
+
+function showToast(message, type) {
+    type = type || 'success';
+    var toast = document.createElement('div');
+    var colors = { success: '#10b981', error: '#ef4444', info: '#a8c49a' };
+    toast.className = 'fixed bottom-6 right-6 z-50 px-5 py-3 rounded-lg shadow-lg text-white text-sm font-medium transition-all duration-300';
+    toast.style.backgroundColor = colors[type] || colors.info;
+    toast.innerHTML = '<div class="flex items-center gap-2"><i class="fas ' + (type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle') + '"></i><span>' + esc(message) + '</span></div>';
+    document.body.appendChild(toast);
+    setTimeout(function() {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(function() { toast.remove(); }, 300);
+    }, 3000);
 }
+
+// ─── Data Management ──────────────────────────────
+
+function loadData() {
+    try {
+        patients = JSON.parse(localStorage.getItem('hms_patients') || '[]');
+        var stored = localStorage.getItem('hms_invoices');
+        if (stored) {
+            invoices = JSON.parse(stored);
+        } else {
+            var today = new Date().toISOString().split('T')[0];
+            invoices = [
+                {id: 1, patientId: 1, patientName: 'Rajesh Kumar', invoiceNo: 'INV-20260001', date: today, dueDate: addDays(today, 15), type: 'OPD', description: 'Consultation fee for cardiology', amount: 1500, tax: 5, discount: 0, total: 1575, status: 'Paid'},
+                {id: 2, patientId: 2, patientName: 'Priya Sharma', invoiceNo: 'INV-20260002', date: today, dueDate: addDays(today, 15), type: 'Laboratory', description: 'Blood tests - Complete Blood Count, Lipid Profile', amount: 2500, tax: 5, discount: 100, total: 2525, status: 'Pending'},
+                {id: 3, patientId: 3, patientName: 'Amit Patel', invoiceNo: 'INV-20260003', date: today, dueDate: addDays(today, 15), type: 'Pharmacy', description: 'Medicines - Paracetamol, Antibiotics', amount: 800, tax: 5, discount: 0, total: 840, status: 'Paid'},
+                {id: 4, patientId: 1, patientName: 'Rajesh Kumar', invoiceNo: 'INV-20260004', date: today, dueDate: addDays(today, 15), type: 'Radiology', description: 'Chest X-Ray', amount: 1200, tax: 5, discount: 0, total: 1260, status: 'Pending'},
+                {id: 5, patientId: 4, patientName: 'Neha Gupta', invoiceNo: 'INV-20260005', date: today, dueDate: addDays(today, 15), type: 'OPD', description: 'Gynacology consultation', amount: 1000, tax: 5, discount: 50, total: 1000, status: 'Paid'},
+                {id: 6, patientId: 5, patientName: 'Sunil Reddy', invoiceNo: 'INV-20260006', date: today, dueDate: addDays(today, 15), type: 'Laboratory', description: 'Thyroid Profile, Vitamin D Test', amount: 1800, tax: 5, discount: 0, total: 1890, status: 'Cancelled'}
+            ];
+            saveInvoices();
+        }
+        refreshUI();
+        populatePatientSelect();
+    } catch (error) {
+        console.error('Error loading data:', error);
+        showToast('Error loading invoice data', 'error');
+    }
+}
+
+function saveInvoices() {
+    try {
+        localStorage.setItem('hms_invoices', JSON.stringify(invoices));
+    } catch (error) {
+        console.error('Error saving invoices:', error);
+    }
+}
+
+// ─── Stats ──────────────────────────────────────────
 
 function updateStats() {
-    const total = invoices.length;
-    const totalRevenue = invoices.filter(i => i.status === 'Paid').reduce((sum, i) => sum + i.total, 0);
-    const pendingAmount = invoices.filter(i => i.status === 'Pending').reduce((sum, i) => sum + i.total, 0);
-    const collectionRate = (totalRevenue + pendingAmount) > 0 ? Math.round((totalRevenue / (totalRevenue + pendingAmount)) * 100) : 0;
+    var total = invoices.length;
+    var totalRevenue = 0;
+    var pendingAmount = 0;
+    for (var i = 0; i < invoices.length; i++) {
+        if (invoices[i].status === 'Paid') totalRevenue += invoices[i].total;
+        if (invoices[i].status === 'Pending') pendingAmount += invoices[i].total;
+    }
+    var collectionRate = (totalRevenue + pendingAmount) > 0 ? Math.round((totalRevenue / (totalRevenue + pendingAmount)) * 100) : 0;
     
-    document.getElementById('totalInvoices').innerText = total;
-    document.getElementById('totalRevenue').innerText = '₹' + totalRevenue.toLocaleString('en-IN');
-    document.getElementById('pendingAmount').innerText = '₹' + pendingAmount.toLocaleString('en-IN');
-    document.getElementById('collectionRate').innerText = collectionRate + '%';
+    document.getElementById('totalInvoices').textContent = total;
+    document.getElementById('totalRevenue').textContent = '₹' + totalRevenue.toLocaleString('en-IN');
+    document.getElementById('pendingAmount').textContent = '₹' + pendingAmount.toLocaleString('en-IN');
+    document.getElementById('collectionRate').textContent = collectionRate + '%';
 }
 
-function validateInvoiceForm() {
-    let isValid = true;
+// ─── Filter ──────────────────────────────────────────
+
+function getFilteredInvoices() {
+    var result = [];
+    for (var i = 0; i < invoices.length; i++) {
+        var inv = invoices[i];
+        var matchesSearch = searchTerm === '' || inv.patientName.toLowerCase().includes(searchTerm.toLowerCase()) || inv.invoiceNo.toLowerCase().includes(searchTerm.toLowerCase());
+        var matchesStatus = statusFilter === '' || inv.status === statusFilter;
+        var matchesDateFrom = dateFrom === '' || inv.date >= dateFrom;
+        var matchesDateTo = dateTo === '' || inv.date <= dateTo;
+        if (matchesSearch && matchesStatus && matchesDateFrom && matchesDateTo) {
+            result.push(inv);
+        }
+    }
+    return result;
+}
+
+// ─── Render ──────────────────────────────────────────
+
+function renderTable() {
+    var tbody = document.getElementById('invoicesTableBody');
+    if (!tbody) return;
     
-    const patientId = document.getElementById('patientId').value;
-    const invoiceType = document.getElementById('invoiceType').value;
-    const invoiceDate = document.getElementById('invoiceDate').value;
-    const amount = document.getElementById('amount').value;
-    const status = document.getElementById('status').value;
+    var filtered = getFilteredInvoices();
+    var totalPages = Math.ceil(filtered.length / rowsPerPage) || 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+    
+    var start = (currentPage - 1) * rowsPerPage;
+    var end = Math.min(start + rowsPerPage, filtered.length);
+    var pageInvoices = filtered.slice(start, end);
+    
+    if (pageInvoices.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);"><i class="fas fa-file-invoice" style="font-size:2rem; margin-bottom:0.75rem; display:block; opacity:0.4;"></i><p style="font-size:0.875rem; font-weight:var(--font-weight-light);">No invoices found</p><p style="font-size:0.75rem; margin-top:0.25rem; color:var(--color-brown-100);">Create an invoice to get started.</p></td></tr>';
+        document.getElementById('paginationInfo').textContent = 'Showing 0 of 0';
+        document.getElementById('paginationButtons').innerHTML = '';
+        return;
+    }
+    
+    var html = '';
+    for (var i = 0; i < pageInvoices.length; i++) {
+        var inv = pageInvoices[i];
+        var statusClass = inv.status.toLowerCase();
+        var isPending = inv.status === 'Pending';
+        
+        html += '<tr class="invoice-row" data-id="' + inv.id + '">';
+        html += '<td class="invoice-no">' + inv.invoiceNo + '</td>';
+        html += '<td class="patient-name">' + esc(inv.patientName) + '</td>';
+        html += '<td class="hidden md:table-cell" style="color:var(--color-brown-300); font-size:0.8125rem;">' + inv.date + '</td>';
+        html += '<td style="text-align:center;" class="total-amount">₹' + inv.total.toLocaleString('en-IN') + '</td>';
+        html += '<td class="hidden lg:table-cell"><span class="type-badge">' + inv.type + '</span></td>';
+        html += '<td><span class="status-' + statusClass + '">' + inv.status + '</span></td>';
+        html += '<td style="text-align:center;"><div style="display:flex; gap:0.375rem; justify-content:center;">';
+        html += '<button class="action-btn view view-btn" data-id="' + inv.id + '" title="View Invoice"><i class="fas fa-eye"></i></button>';
+        if (isPending) {
+            html += '<button class="action-btn pay pay-btn" data-id="' + inv.id + '" title="Record Payment"><i class="fas fa-money-bill-wave"></i></button>';
+        }
+        html += '<button class="action-btn edit edit-btn" data-id="' + inv.id + '" title="Edit Invoice"><i class="fas fa-edit"></i></button>';
+        html += '<button class="action-btn delete delete-btn" data-id="' + inv.id + '" title="Delete Invoice"><i class="fas fa-trash-alt"></i></button>';
+        html += '</div></td></tr>';
+    }
+    tbody.innerHTML = html;
+    
+    document.getElementById('paginationInfo').textContent = 'Showing ' + (start + 1) + ' to ' + end + ' of ' + filtered.length + ' invoices';
+    
+    var paginationHtml = '';
+    for (var j = 1; j <= totalPages; j++) {
+        paginationHtml += '<button class="pagination-btn ' + (j === currentPage ? 'active' : '') + '" data-page="' + j + '">' + j + '</button>';
+    }
+    document.getElementById('paginationButtons').innerHTML = paginationHtml;
+    
+    // Bind events
+    tbody.querySelectorAll('.view-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() { viewInvoice(parseInt(this.dataset.id)); });
+    });
+    tbody.querySelectorAll('.pay-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() { openPaymentModal(parseInt(this.dataset.id)); });
+    });
+    tbody.querySelectorAll('.edit-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() { openEditModal(parseInt(this.dataset.id)); });
+    });
+    tbody.querySelectorAll('.delete-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() { openDeleteModal(parseInt(this.dataset.id)); });
+    });
+    
+    document.querySelectorAll('.pagination-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            currentPage = parseInt(this.dataset.page);
+            renderTable();
+        });
+    });
+}
+
+function refreshUI() {
+    updateStats();
+    renderTable();
+}
+
+// ─── Populate Patient Select ──────────────────────────
+
+function populatePatientSelect() {
+    var select = document.getElementById('patientId');
+    if (select) {
+        var html = '<option value="">-- Select Patient --</option>';
+        for (var i = 0; i < patients.length; i++) {
+            html += '<option value="' + patients[i].id + '">' + esc(patients[i].fullName) + ' (' + patients[i].phone + ')</option>';
+        }
+        select.innerHTML = html;
+    }
+}
+
+// ─── Validation ──────────────────────────────────────
+
+function validateInvoiceForm() {
+    var isValid = true;
+    var patientId = document.getElementById('patientId').value;
+    var invoiceType = document.getElementById('invoiceType').value;
+    var invoiceDate = document.getElementById('invoiceDate').value;
+    var amount = document.getElementById('amount').value;
+    var status = document.getElementById('status').value;
+    
+    document.querySelectorAll('.error-text').forEach(function(el) { el.classList.remove('show'); });
+    document.querySelectorAll('.form-input, .form-select').forEach(function(el) { el.classList.remove('error'); });
     
     if (!patientId) {
         document.getElementById('patientIdError').classList.add('show');
         document.getElementById('patientId').classList.add('error');
         isValid = false;
-    } else {
-        document.getElementById('patientIdError').classList.remove('show');
-        document.getElementById('patientId').classList.remove('error');
     }
-    
     if (!invoiceType) {
         document.getElementById('invoiceTypeError').classList.add('show');
         document.getElementById('invoiceType').classList.add('error');
         isValid = false;
-    } else {
-        document.getElementById('invoiceTypeError').classList.remove('show');
-        document.getElementById('invoiceType').classList.remove('error');
     }
-    
     if (!invoiceDate) {
         document.getElementById('invoiceDateError').classList.add('show');
         document.getElementById('invoiceDate').classList.add('error');
         isValid = false;
-    } else {
-        document.getElementById('invoiceDateError').classList.remove('show');
-        document.getElementById('invoiceDate').classList.remove('error');
     }
-    
     if (!amount || parseFloat(amount) <= 0) {
         document.getElementById('amountError').classList.add('show');
         document.getElementById('amount').classList.add('error');
         isValid = false;
-    } else {
-        document.getElementById('amountError').classList.remove('show');
-        document.getElementById('amount').classList.remove('error');
     }
-    
     if (!status) {
         document.getElementById('statusError').classList.add('show');
         document.getElementById('status').classList.add('error');
         isValid = false;
-    } else {
-        document.getElementById('statusError').classList.remove('show');
-        document.getElementById('status').classList.remove('error');
     }
-    
     return isValid;
 }
 
 function validatePaymentForm() {
-    let isValid = true;
-    const paymentAmount = document.getElementById('paymentAmount').value;
-    const paymentMethod = document.getElementById('paymentMethod').value;
+    var isValid = true;
+    var paymentAmount = document.getElementById('paymentAmount').value;
+    var paymentMethod = document.getElementById('paymentMethod').value;
+    
+    document.getElementById('paymentAmountError').classList.remove('show');
+    document.getElementById('paymentMethodError').classList.remove('show');
+    document.getElementById('paymentAmount').classList.remove('error');
+    document.getElementById('paymentMethod').classList.remove('error');
     
     if (!paymentAmount || parseFloat(paymentAmount) <= 0) {
         document.getElementById('paymentAmountError').classList.add('show');
         document.getElementById('paymentAmount').classList.add('error');
         isValid = false;
-    } else {
-        document.getElementById('paymentAmountError').classList.remove('show');
-        document.getElementById('paymentAmount').classList.remove('error');
     }
-    
     if (!paymentMethod) {
         document.getElementById('paymentMethodError').classList.add('show');
         document.getElementById('paymentMethod').classList.add('error');
         isValid = false;
-    } else {
-        document.getElementById('paymentMethodError').classList.remove('show');
-        document.getElementById('paymentMethod').classList.remove('error');
     }
-    
     return isValid;
 }
 
-function getFilteredInvoices() {
-    const search = document.getElementById('searchInput')?.value.toLowerCase() || '';
-    const status = document.getElementById('statusFilter')?.value || '';
-    const dateFrom = document.getElementById('dateFrom')?.value || '';
-    const dateTo = document.getElementById('dateTo')?.value || '';
-    
-    return invoices.filter(inv => {
-        const matchesSearch = search === '' || 
-            inv.patientName.toLowerCase().includes(search) || 
-            inv.invoiceNo.toLowerCase().includes(search);
-        const matchesStatus = status === '' || inv.status === status;
-        const matchesDateFrom = dateFrom === '' || inv.date >= dateFrom;
-        const matchesDateTo = dateTo === '' || inv.date <= dateTo;
-        return matchesSearch && matchesStatus && matchesDateFrom && matchesDateTo;
-    });
-}
-
-function renderTable() {
-    const filtered = getFilteredInvoices();
-    const totalPages = Math.ceil(filtered.length / rowsPerPage);
-    const start = (currentPage - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    const pageInvoices = filtered.slice(start, end);
-    
-    const tbody = document.getElementById('invoicesTableBody');
-    
-    if (pageInvoices.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-[#94a3b8]"><i class="fas fa-file-invoice text-3xl mb-2 block"></i><p class="font-normal">No invoices found</p> </td></tr>';
-        document.getElementById('paginationInfo').innerHTML = 'Showing 0 of 0';
-        document.getElementById('paginationButtons').innerHTML = '';
-        return;
-    }
-    
-    tbody.innerHTML = pageInvoices.map(inv => `
-        <tr class="invoice-row">
-            <td class="px-5 py-3 text-sm font-mono font-medium text-[#1e293b]">${inv.invoiceNo}</td>
-            <td class="px-5 py-3 font-medium text-[#1e293b] text-sm">${escapeHtml(inv.patientName)}</td>
-            <td class="px-5 py-3 text-sm text-[#475569] hidden md:table-cell">${inv.date}</td>
-            <td class="px-5 py-3 font-semibold text-[#1e293b] text-sm">₹${inv.total.toLocaleString('en-IN')}</td>
-            <td class="px-5 py-3 text-sm text-[#475569] hidden lg:table-cell">${inv.type}</td>
-            <td class="px-5 py-3">
-                <span class="status-${inv.status.toLowerCase()}">${inv.status}</span>
-            </td>
-            <td class="px-5 py-3 text-center">
-                <div class="flex gap-2 justify-center">
-                    <button onclick="viewInvoice(${inv.id})" class="text-[#a8c49a] hover:text-[#7a9a68] transition" title="View Invoice">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    ${inv.status === 'Pending' ? `
-                        <button onclick="openPaymentModal(${inv.id})" class="text-[#10b981] hover:text-[#059669] transition" title="Record Payment">
-                            <i class="fas fa-money-bill-wave"></i>
-                        </button>
-                    ` : ''}
-                    <button onclick="editInvoice(${inv.id})" class="text-[#a8c49a] hover:text-[#7a9a68] transition" title="Edit Invoice">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button onclick="deleteInvoice(${inv.id})" class="text-[#d8b48c] hover:text-[#c49a6c] transition" title="Delete Invoice">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </div>
-            </td>
-          </tr>
-    `).join('');
-    
-    document.getElementById('paginationInfo').innerHTML = `Showing ${start + 1} to ${Math.min(end, filtered.length)} of ${filtered.length} invoices`;
-    
-    let paginationHtml = '';
-    for (let i = 1; i <= totalPages; i++) {
-        paginationHtml += `<button onclick="goToPage(${i})" class="pagination-btn px-3 py-1 rounded-lg text-sm ${i === currentPage ? 'bg-[#a8c49a] text-white' : 'bg-[#f1f5f9] text-[#475569] hover:bg-[#e2e8f0]'} transition">${i}</button>`;
-    }
-    document.getElementById('paginationButtons').innerHTML = paginationHtml;
-}
-
-function goToPage(page) {
-    currentPage = page;
-    renderTable();
-}
-
-function populatePatientSelect() {
-    const select = document.getElementById('patientId');
-    if (select) {
-        select.innerHTML = '<option value="">-- Select Patient --</option>' + 
-            patients.map(p => `<option value="${p.id}">${escapeHtml(p.fullName)} (${p.phone})</option>`).join('');
-    }
-}
+// ─── Calculations ──────────────────────────────────
 
 function calculateTotal() {
-    const amount = parseFloat(document.getElementById('amount').value) || 0;
-    const tax = parseFloat(document.getElementById('tax').value) || 0;
-    const discount = parseFloat(document.getElementById('discount').value) || 0;
+    var amount = parseFloat(document.getElementById('amount').value) || 0;
+    var tax = parseFloat(document.getElementById('tax').value) || 0;
+    var discount = parseFloat(document.getElementById('discount').value) || 0;
+    var subtotal = amount;
+    var taxAmount = (subtotal * tax) / 100;
+    var total = subtotal + taxAmount - discount;
     
-    const subtotal = amount;
-    const taxAmount = (subtotal * tax) / 100;
-    const total = subtotal + taxAmount - discount;
-    
-    document.getElementById('subtotalDisplay').innerText = '₹' + subtotal.toFixed(2);
-    document.getElementById('taxRate').innerText = tax;
-    document.getElementById('taxAmountDisplay').innerText = '₹' + taxAmount.toFixed(2);
-    document.getElementById('discountDisplay').innerText = '₹' + discount.toFixed(2);
-    document.getElementById('totalDisplay').innerText = '₹' + total.toFixed(2);
-    
+    document.getElementById('subtotalDisplay').textContent = '₹' + subtotal.toFixed(2);
+    document.getElementById('taxRate').textContent = tax;
+    document.getElementById('taxAmountDisplay').textContent = '₹' + taxAmount.toFixed(2);
+    document.getElementById('discountDisplay').textContent = '₹' + discount.toFixed(2);
+    document.getElementById('totalDisplay').textContent = '₹' + total.toFixed(2);
     return total;
+}
+
+// ─── Modals ──────────────────────────────────────────
+
+function openModal(id) {
+    var el = document.getElementById(id);
+    if (el) { el.classList.add('active'); }
+}
+
+function closeModal(id) {
+    var el = document.getElementById(id);
+    if (el) { el.classList.remove('active'); }
 }
 
 function openCreateModal() {
     document.getElementById('invoiceForm').reset();
     document.getElementById('invoiceId').value = '';
-    document.getElementById('modalTitle').innerText = 'Create New Invoice';
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-file-invoice"></i> Create New Invoice';
     document.getElementById('invoiceDate').value = new Date().toISOString().split('T')[0];
-    document.getElementById('subtotalDisplay').innerText = '₹0.00';
-    document.getElementById('taxAmountDisplay').innerText = '₹0.00';
-    document.getElementById('discountDisplay').innerText = '₹0.00';
-    document.getElementById('totalDisplay').innerText = '₹0.00';
-    document.getElementById('invoiceModal').classList.add('active');
+    document.getElementById('subtotalDisplay').textContent = '₹0.00';
+    document.getElementById('taxAmountDisplay').textContent = '₹0.00';
+    document.getElementById('discountDisplay').textContent = '₹0.00';
+    document.getElementById('totalDisplay').textContent = '₹0.00';
+    document.querySelectorAll('.error-text').forEach(function(el) { el.classList.remove('show'); });
+    document.querySelectorAll('.form-input, .form-select').forEach(function(el) { el.classList.remove('error'); });
     populatePatientSelect();
-    
-    document.querySelectorAll('.error-text').forEach(el => el.classList.remove('show'));
-    document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
+    openModal('invoiceModal');
 }
 
-function editInvoice(id) {
-    const invoice = invoices.find(i => i.id === id);
+function openEditModal(id) {
+    var invoice = null;
+    for (var i = 0; i < invoices.length; i++) {
+        if (invoices[i].id === id) { invoice = invoices[i]; break; }
+    }
     if (invoice) {
         document.getElementById('invoiceId').value = invoice.id;
-        document.getElementById('modalTitle').innerText = 'Edit Invoice';
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Invoice';
         document.getElementById('patientId').value = invoice.patientId;
         document.getElementById('invoiceType').value = invoice.type;
         document.getElementById('invoiceDate').value = invoice.date;
@@ -280,329 +356,322 @@ function editInvoice(id) {
         document.getElementById('discount').value = invoice.discount;
         document.getElementById('status').value = invoice.status;
         calculateTotal();
-        document.getElementById('invoiceModal').classList.add('active');
+        document.querySelectorAll('.error-text').forEach(function(el) { el.classList.remove('show'); });
+        document.querySelectorAll('.form-input, .form-select').forEach(function(el) { el.classList.remove('error'); });
         populatePatientSelect();
-        
-        document.querySelectorAll('.error-text').forEach(el => el.classList.remove('show'));
-        document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
+        openModal('invoiceModal');
     }
 }
 
-function deleteInvoice(id) {
-    deleteId = id;
-    document.getElementById('deleteModal').classList.add('active');
+function openDeleteModal(id) {
+    deleteTargetId = id;
+    openModal('deleteModal');
 }
 
-function confirmDelete() {
-    if (deleteId) {
-        invoices = invoices.filter(i => i.id !== deleteId);
-        saveInvoices();
-        updateStats();
-        renderTable();
-        showToast('Invoice deleted successfully', 'success');
-        deleteId = null;
-        document.getElementById('deleteModal').classList.remove('active');
+function openPaymentModal(id) {
+    var invoice = null;
+    for (var i = 0; i < invoices.length; i++) {
+        if (invoices[i].id === id) { invoice = invoices[i]; break; }
+    }
+    if (invoice) {
+        document.getElementById('paymentInvoiceId').value = id;
+        document.getElementById('paymentAmount').value = invoice.total;
+        document.querySelectorAll('.error-text').forEach(function(el) { el.classList.remove('show'); });
+        document.querySelectorAll('.form-input, .form-select').forEach(function(el) { el.classList.remove('error'); });
+        openModal('paymentModal');
     }
 }
+
+// ─── Save Invoice ──────────────────────────────────
 
 function saveInvoice(e) {
     e.preventDefault();
-    
     if (!validateInvoiceForm()) {
         showToast('Please fill all required fields correctly', 'error');
         return;
     }
-    
-    const id = document.getElementById('invoiceId').value;
-    const patientId = parseInt(document.getElementById('patientId').value);
-    const patient = patients.find(p => p.id === patientId);
-    const type = document.getElementById('invoiceType').value;
-    const date = document.getElementById('invoiceDate').value;
-    const dueDate = document.getElementById('dueDate').value;
-    const description = document.getElementById('description').value;
-    const amount = parseFloat(document.getElementById('amount').value);
-    const tax = parseFloat(document.getElementById('tax').value) || 0;
-    const discount = parseFloat(document.getElementById('discount').value) || 0;
-    const status = document.getElementById('status').value;
-    
-    const subtotal = amount;
-    const taxAmount = (subtotal * tax) / 100;
-    const total = subtotal + taxAmount - discount;
-    
-    const invoiceData = {
-        patientId,
-        patientName: patient?.fullName || '',
-        type,
-        date,
-        dueDate,
-        description,
-        amount,
-        tax,
-        discount,
-        total,
-        status
-    };
+    var id = document.getElementById('invoiceId').value;
+    var patientId = parseInt(document.getElementById('patientId').value);
+    var patient = null;
+    for (var i = 0; i < patients.length; i++) {
+        if (patients[i].id === patientId) { patient = patients[i]; break; }
+    }
+    var type = document.getElementById('invoiceType').value;
+    var date = document.getElementById('invoiceDate').value;
+    var dueDate = document.getElementById('dueDate').value;
+    var description = document.getElementById('description').value.trim();
+    var amount = parseFloat(document.getElementById('amount').value);
+    var tax = parseFloat(document.getElementById('tax').value) || 0;
+    var discount = parseFloat(document.getElementById('discount').value) || 0;
+    var status = document.getElementById('status').value;
+    var subtotal = amount;
+    var taxAmount = (subtotal * tax) / 100;
+    var total = subtotal + taxAmount - discount;
     
     if (id) {
-        const index = invoices.findIndex(i => i.id === parseInt(id));
+        var index = -1;
+        for (var j = 0; j < invoices.length; j++) {
+            if (invoices[j].id === parseInt(id)) { index = j; break; }
+        }
         if (index !== -1) {
-            invoices[index] = { ...invoices[index], ...invoiceData };
-            showToast('Invoice updated successfully', 'success');
+            invoices[index].patientId = patientId;
+            invoices[index].patientName = patient ? patient.fullName : '';
+            invoices[index].type = type;
+            invoices[index].date = date;
+            invoices[index].dueDate = dueDate;
+            invoices[index].description = description;
+            invoices[index].amount = amount;
+            invoices[index].tax = tax;
+            invoices[index].discount = discount;
+            invoices[index].total = total;
+            invoices[index].status = status;
+            showToast('✅ Invoice updated successfully', 'success');
         }
     } else {
-        const newId = invoices.length > 0 ? Math.max(...invoices.map(i => i.id)) + 1 : 1;
-        const invoiceNo = 'INV-' + new Date().getFullYear() + String(newId).padStart(5, '0');
+        var newId = 1;
+        for (var k = 0; k < invoices.length; k++) {
+            if (invoices[k].id >= newId) newId = invoices[k].id + 1;
+        }
+        var invoiceNo = 'INV-' + new Date().getFullYear() + String(newId).padStart(5, '0');
         invoices.push({
             id: newId,
-            invoiceNo,
-            ...invoiceData
+            invoiceNo: invoiceNo,
+            patientId: patientId,
+            patientName: patient ? patient.fullName : '',
+            type: type,
+            date: date,
+            dueDate: dueDate,
+            description: description,
+            amount: amount,
+            tax: tax,
+            discount: discount,
+            total: total,
+            status: status
         });
-        showToast('Invoice created successfully', 'success');
+        showToast('✅ Invoice created successfully', 'success');
     }
-    
     saveInvoices();
-    updateStats();
-    renderTable();
-    closeModal();
+    refreshUI();
+    closeModal('invoiceModal');
 }
 
-function viewInvoice(id) {
-    const invoice = invoices.find(i => i.id === id);
-    if (invoice) {
-        const patient = patients.find(p => p.id === invoice.patientId);
-        const printArea = document.getElementById('invoicePrintArea');
-        
-        printArea.innerHTML = `
-            <div class="text-center border-b pb-4 mb-4">
-                <h1 class="text-2xl font-bold text-[#1e293b]">MEDFLOW HOSPITAL</h1>
-                <p class="text-[#64748b] text-sm">123 Healthcare Ave, Medical District, Mumbai - 400001</p>
-                <p class="text-[#64748b] text-sm">Phone: +91 22 1234 5678 | Email: info@medflow.com</p>
-                <p class="text-[#64748b] text-sm">GST No: 27AAAAA0000A1Z</p>
-            </div>
-            
-            <div class="flex justify-between mb-6">
-                <div>
-                    <p class="text-sm"><strong class="text-[#1e293b]">Invoice No:</strong> <span class="text-[#475569]">${invoice.invoiceNo}</span></p>
-                    <p class="text-sm mt-1"><strong class="text-[#1e293b]">Date:</strong> <span class="text-[#475569]">${invoice.date}</span></p>
-                    <p class="text-sm mt-1"><strong class="text-[#1e293b]">Due Date:</strong> <span class="text-[#475569]">${invoice.dueDate || 'N/A'}</span></p>
-                </div>
-                <div class="text-right">
-                    <p class="text-sm"><strong class="text-[#1e293b]">Patient Name:</strong> <span class="text-[#475569]">${invoice.patientName}</span></p>
-                    <p class="text-sm mt-1"><strong class="text-[#1e293b]">Patient ID:</strong> <span class="text-[#475569]">P-${String(invoice.patientId).padStart(5, '0')}</span></p>
-                    <p class="text-sm mt-1"><strong class="text-[#1e293b]">Phone:</strong> <span class="text-[#475569]">${patient?.phone || 'N/A'}</span></p>
-                </div>
-            </div>
-            
-            <table class="w-full border-collapse mb-6">
-                <thead>
-                    <tr class="bg-[#f8fafc]">
-                        <th class="p-2 text-left text-sm font-medium text-[#1e293b]">Description</th>
-                        <th class="p-2 text-right text-sm font-medium text-[#1e293b]">Amount (₹)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="p-2 text-sm text-[#475569]">${invoice.type} - ${invoice.description || 'Consultation'}</td>
-                        <td class="p-2 text-right text-sm text-[#475569]">${invoice.amount.toFixed(2)}</td>
-                    </tr>
-                </tbody>
-                <tfoot class="border-t">
-                    <tr><td class="p-2 text-right text-sm"><strong>Subtotal:</strong></td><td class="p-2 text-right text-sm">₹${invoice.amount.toFixed(2)}</td></tr>
-                    <tr><td class="p-2 text-right text-sm"><strong>Tax (${invoice.tax}%):</strong></td><td class="p-2 text-right text-sm">₹${((invoice.amount * invoice.tax) / 100).toFixed(2)}</td></tr>
-                    <tr><td class="p-2 text-right text-sm"><strong>Discount:</strong></td><td class="p-2 text-right text-sm">₹${invoice.discount.toFixed(2)}</td></tr>
-                    <tr class="border-t"><td class="p-2 text-right font-bold text-[#1e293b]"><strong>Total:</strong></td><td class="p-2 text-right font-bold text-[#a8c49a]">₹${invoice.total.toFixed(2)}</td></tr>
-                </tfoot>
-            </table>
-            
-            <div class="text-center text-[#94a3b8] text-xs pt-4 border-t">
-                <p>Thank you for choosing MedFlow! This is a computer generated invoice.</p>
-                <p>For any queries, please contact our billing department.</p>
-            </div>
-        `;
-        
-        document.getElementById('viewInvoiceModal').classList.add('active');
+// ─── Record Payment ──────────────────────────────────
+
+function recordPayment(e) {
+    e.preventDefault();
+    if (!validatePaymentForm()) {
+        showToast('Please fill all required fields', 'error');
+        return;
     }
+    var invoiceId = parseInt(document.getElementById('paymentInvoiceId').value);
+    var paymentAmount = parseFloat(document.getElementById('paymentAmount').value);
+    var paymentMethod = document.getElementById('paymentMethod').value;
+    var transactionId = document.getElementById('transactionId').value.trim();
+    var invoice = null;
+    for (var i = 0; i < invoices.length; i++) {
+        if (invoices[i].id === invoiceId) { invoice = invoices[i]; break; }
+    }
+    if (invoice) {
+        if (paymentAmount >= invoice.total) {
+            invoice.status = 'Paid';
+            saveInvoices();
+            refreshUI();
+            closeModal('paymentModal');
+            showToast('✅ Payment recorded! Invoice marked as PAID.', 'success');
+            var payments = JSON.parse(localStorage.getItem('hms_payments') || '[]');
+            payments.push({
+                id: Date.now(),
+                invoiceId: invoiceId,
+                patientName: invoice.patientName,
+                amount: paymentAmount,
+                method: paymentMethod,
+                transactionId: transactionId || '',
+                date: new Date().toISOString().split('T')[0]
+            });
+            localStorage.setItem('hms_payments', JSON.stringify(payments));
+        } else {
+            showToast('Payment amount must be at least the invoice total.', 'error');
+        }
+    }
+}
+
+// ─── View Invoice ──────────────────────────────────
+
+function viewInvoice(id) {
+    var invoice = null;
+    for (var i = 0; i < invoices.length; i++) {
+        if (invoices[i].id === id) { invoice = invoices[i]; break; }
+    }
+    if (!invoice) return;
+    
+    var patient = null;
+    for (var j = 0; j < patients.length; j++) {
+        if (patients[j].id === invoice.patientId) { patient = patients[j]; break; }
+    }
+    
+    var printArea = document.getElementById('invoicePrintArea');
+    printArea.innerHTML = '';
+    
+    printArea.innerHTML += '<div style="text-align:center; border-bottom:1px solid var(--border-default); padding-bottom:1rem; margin-bottom:1rem;"><h2 style="font-size:1.25rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin:0;">MEDFLOW HOSPITAL</h2><p style="font-size:0.75rem; color:var(--color-brown-100); margin:0;">123 Healthcare Ave, Medical District, Mumbai - 400001</p><p style="font-size:0.75rem; color:var(--color-brown-100); margin:0;">Phone: +91 22 1234 5678 | Email: info@medflow.com</p><p style="font-size:0.75rem; color:var(--color-brown-100); margin:0;">GST No: 27AAAAA0000A1Z</p></div>';
+    printArea.innerHTML += '<div style="display:flex; justify-content:space-between; margin-bottom:1.5rem;"><div><p style="font-size:0.8125rem;"><strong style="color:var(--color-brown-700);">Invoice No:</strong> <span style="color:var(--color-brown-300);">' + invoice.invoiceNo + '</span></p><p style="font-size:0.8125rem; margin-top:0.25rem;"><strong style="color:var(--color-brown-700);">Date:</strong> <span style="color:var(--color-brown-300);">' + invoice.date + '</span></p><p style="font-size:0.8125rem; margin-top:0.25rem;"><strong style="color:var(--color-brown-700);">Due Date:</strong> <span style="color:var(--color-brown-300);">' + (invoice.dueDate || 'N/A') + '</span></p></div><div style="text-align:right;"><p style="font-size:0.8125rem;"><strong style="color:var(--color-brown-700);">Patient Name:</strong> <span style="color:var(--color-brown-300);">' + esc(invoice.patientName) + '</span></p><p style="font-size:0.8125rem; margin-top:0.25rem;"><strong style="color:var(--color-brown-700);">Patient ID:</strong> <span style="color:var(--color-brown-300);">P-' + String(invoice.patientId).padStart(5, '0') + '</span></p><p style="font-size:0.8125rem; margin-top:0.25rem;"><strong style="color:var(--color-brown-700);">Phone:</strong> <span style="color:var(--color-brown-300);">' + (patient ? patient.phone : 'N/A') + '</span></p></div></div>';
+    printArea.innerHTML += '<table style="width:100%; border-collapse:collapse; margin-bottom:1rem;"><thead><tr style="background:var(--bg-muted);"><th style="padding:0.5rem; text-align:left; font-size:0.75rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700);">Description</th><th style="padding:0.5rem; text-align:right; font-size:0.75rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700);">Amount (₹)</th></tr></thead><tbody><tr><td style="padding:0.5rem; font-size:0.8125rem; color:var(--color-brown-300);">' + invoice.type + ' - ' + (invoice.description || 'Consultation') + '</td><td style="padding:0.5rem; text-align:right; font-size:0.8125rem; color:var(--color-brown-300);">' + invoice.amount.toFixed(2) + '</td></tr></tbody><tfoot style="border-top:1px solid var(--border-default);"><tr><td style="padding:0.5rem; text-align:right; font-size:0.8125rem;"><strong>Subtotal:</strong></td><td style="padding:0.5rem; text-align:right; font-size:0.8125rem;">₹' + invoice.amount.toFixed(2) + '</td></tr><tr><td style="padding:0.5rem; text-align:right; font-size:0.8125rem;"><strong>Tax (' + invoice.tax + '%):</strong></td><td style="padding:0.5rem; text-align:right; font-size:0.8125rem;">₹' + ((invoice.amount * invoice.tax) / 100).toFixed(2) + '</td></tr><tr><td style="padding:0.5rem; text-align:right; font-size:0.8125rem;"><strong>Discount:</strong></td><td style="padding:0.5rem; text-align:right; font-size:0.8125rem;">₹' + invoice.discount.toFixed(2) + '</td></tr><tr style="border-top:1px solid var(--border-default);"><td style="padding:0.5rem; text-align:right; font-weight:var(--font-weight-semibold); font-size:0.875rem; color:var(--color-brown-700);">Total:</td><td style="padding:0.5rem; text-align:right; font-weight:var(--font-weight-semibold); font-size:0.875rem; color:var(--color-sage-dark);">₹' + invoice.total.toFixed(2) + '</td></tr></tfoot></table>';
+    printArea.innerHTML += '<div style="text-align:center; color:var(--color-brown-100); font-size:0.6875rem; padding-top:1rem; border-top:1px solid var(--border-default);"><p>Thank you for choosing MedFlow! This is a computer generated invoice.</p><p>For any queries, please contact our billing department.</p></div>';
+    
+    openModal('viewInvoiceModal');
 }
 
 function printInvoice() {
     window.print();
 }
 
-function openPaymentModal(invoiceId) {
-    const invoice = invoices.find(i => i.id === invoiceId);
+// ─── Delete ──────────────────────────────────────────
+
+function handleConfirmDelete() {
+    if (!deleteTargetId) return;
+    var invoice = null;
+    for (var i = 0; i < invoices.length; i++) {
+        if (invoices[i].id === deleteTargetId) { invoice = invoices[i]; break; }
+    }
+    invoices = invoices.filter(function(item) { return item.id !== deleteTargetId; });
+    saveInvoices();
+    refreshUI();
+    closeModal('deleteModal');
     if (invoice) {
-        document.getElementById('paymentInvoiceId').value = invoiceId;
-        document.getElementById('paymentAmount').value = invoice.total;
-        document.getElementById('paymentModal').classList.add('active');
-        
-        document.querySelectorAll('.error-text').forEach(el => el.classList.remove('show'));
-        document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
+        showToast('🗑️ Invoice ' + invoice.invoiceNo + ' deleted successfully', 'success');
     }
+    deleteTargetId = null;
 }
 
-function recordPayment(e) {
-    e.preventDefault();
-    
-    if (!validatePaymentForm()) {
-        showToast('Please fill all required fields', 'error');
-        return;
-    }
-    
-    const invoiceId = parseInt(document.getElementById('paymentInvoiceId').value);
-    const paymentAmount = parseFloat(document.getElementById('paymentAmount').value);
-    const paymentMethod = document.getElementById('paymentMethod').value;
-    const transactionId = document.getElementById('transactionId').value;
-    
-    const invoice = invoices.find(i => i.id === invoiceId);
-    if (invoice && paymentAmount >= invoice.total) {
-        invoice.status = 'Paid';
-        saveInvoices();
-        updateStats();
-        renderTable();
-        closePaymentModal();
-        showToast('Payment recorded successfully! Invoice marked as PAID.', 'success');
-        
-        let payments = JSON.parse(localStorage.getItem('hms_payments') || '[]');
-        payments.push({
-            id: Date.now(),
-            invoiceId,
-            patientName: invoice.patientName,
-            amount: paymentAmount,
-            method: paymentMethod,
-            transactionId: transactionId,
-            date: new Date().toISOString().split('T')[0]
-        });
-        localStorage.setItem('hms_payments', JSON.stringify(payments));
-    } else {
-        showToast('Payment amount must be at least the invoice total.', 'error');
-    }
-}
+// ─── Init ────────────────────────────────────────────
 
-function closeModal() {
-    document.getElementById('invoiceModal').classList.remove('active');
-    document.getElementById('invoiceForm').reset();
-    document.querySelectorAll('.error-text').forEach(el => el.classList.remove('show'));
-    document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
-}
-
-function closeViewModal() {
-    document.getElementById('viewInvoiceModal').classList.remove('active');
-}
-
-function closePaymentModal() {
-    document.getElementById('paymentModal').classList.remove('active');
-    document.getElementById('paymentForm').reset();
-    document.querySelectorAll('.error-text').forEach(el => el.classList.remove('show'));
-    document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
-}
-
-function closeDeleteModal() {
-    document.getElementById('deleteModal').classList.remove('active');
-    deleteId = null;
-}
-
-function showToast(message, type) {
-    const toast = document.createElement('div');
-    const colors = { success: '#10b981', error: '#ef4444', info: '#a8c49a' };
-    toast.className = `fixed bottom-6 right-6 z-50 px-5 py-3 rounded-lg shadow-lg text-white text-sm font-medium transition-all duration-300`;
-    toast.style.backgroundColor = colors[type] || colors.info;
-    toast.innerHTML = `<div class="flex items-center gap-2"><i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i><span>${message}</span></div>`;
-    document.body.appendChild(toast);
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
-function escapeHtml(str) {
-    if (!str) return '';
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-}
-
-document.addEventListener('DOMContentLoaded', () => {
+function initInvoicesModule() {
+    if (isInitialized) return;
+    isInitialized = true;
     loadData();
     
-    document.getElementById('createInvoiceBtn')?.addEventListener('click', openCreateModal);
-    document.getElementById('closeModalBtn')?.addEventListener('click', closeModal);
-    document.getElementById('cancelModalBtn')?.addEventListener('click', closeModal);
-    document.getElementById('closeViewModalBtn')?.addEventListener('click', closeViewModal);
-    document.getElementById('closeViewFooterBtn')?.addEventListener('click', closeViewModal);
-    document.getElementById('printInvoiceBtn')?.addEventListener('click', printInvoice);
-    document.getElementById('closePaymentModalBtn')?.addEventListener('click', closePaymentModal);
-    document.getElementById('cancelPaymentBtn')?.addEventListener('click', closePaymentModal);
-    document.getElementById('closeDeleteModalBtn')?.addEventListener('click', closeDeleteModal);
-    document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeDeleteModal);
-    document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
-    document.getElementById('invoiceForm')?.addEventListener('submit', saveInvoice);
-    document.getElementById('paymentForm')?.addEventListener('submit', recordPayment);
-    document.getElementById('searchInput')?.addEventListener('input', () => { currentPage = 1; renderTable(); });
-    document.getElementById('statusFilter')?.addEventListener('change', () => { currentPage = 1; renderTable(); });
-    document.getElementById('dateFrom')?.addEventListener('change', () => { currentPage = 1; renderTable(); });
-    document.getElementById('dateTo')?.addEventListener('change', () => { currentPage = 1; renderTable(); });
+    document.getElementById('createInvoiceBtn').addEventListener('click', openCreateModal);
+    document.getElementById('closeModalBtn').addEventListener('click', function() { closeModal('invoiceModal'); });
+    document.getElementById('cancelModalBtn').addEventListener('click', function() { closeModal('invoiceModal'); });
+    document.getElementById('closeViewModalBtn').addEventListener('click', function() { closeModal('viewInvoiceModal'); });
+    document.getElementById('closeViewFooterBtn').addEventListener('click', function() { closeModal('viewInvoiceModal'); });
+    document.getElementById('printInvoiceBtn').addEventListener('click', printInvoice);
+    document.getElementById('closePaymentModalBtn').addEventListener('click', function() { closeModal('paymentModal'); });
+    document.getElementById('cancelPaymentBtn').addEventListener('click', function() { closeModal('paymentModal'); });
+    document.getElementById('closeDeleteModalBtn').addEventListener('click', function() { closeModal('deleteModal'); });
+    document.getElementById('cancelDeleteBtn').addEventListener('click', function() { closeModal('deleteModal'); });
+    document.getElementById('confirmDeleteBtn').addEventListener('click', handleConfirmDelete);
+    document.getElementById('invoiceForm').addEventListener('submit', saveInvoice);
+    document.getElementById('paymentForm').addEventListener('submit', recordPayment);
     
-    // Real-time calculation
-    document.getElementById('amount')?.addEventListener('input', calculateTotal);
-    document.getElementById('tax')?.addEventListener('input', calculateTotal);
-    document.getElementById('discount')?.addEventListener('input', calculateTotal);
-    
-    // Real-time validation
-    document.getElementById('patientId')?.addEventListener('change', function() {
-        if(this.value) {
-            document.getElementById('patientIdError')?.classList.remove('show');
-            this.classList.remove('error');
-        }
+    document.getElementById('resetFilter').addEventListener('click', function() {
+        searchTerm = '';
+        statusFilter = '';
+        dateFrom = '';
+        dateTo = '';
+        document.getElementById('searchInput').value = '';
+        document.getElementById('statusFilter').value = '';
+        document.getElementById('dateFrom').value = '';
+        document.getElementById('dateTo').value = '';
+        currentPage = 1;
+        renderTable();
     });
     
-    document.getElementById('invoiceType')?.addEventListener('change', function() {
-        if(this.value) {
-            document.getElementById('invoiceTypeError')?.classList.remove('show');
-            this.classList.remove('error');
-        }
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        searchTerm = e.target.value;
+        currentPage = 1;
+        renderTable();
     });
     
-    document.getElementById('invoiceDate')?.addEventListener('input', function() {
-        if(this.value) {
-            document.getElementById('invoiceDateError')?.classList.remove('show');
-            this.classList.remove('error');
-        }
+    document.getElementById('statusFilter').addEventListener('change', function(e) {
+        statusFilter = e.target.value;
+        currentPage = 1;
+        renderTable();
     });
     
-    document.getElementById('amount')?.addEventListener('input', function() {
-        const val = parseFloat(this.value);
-        if(this.value && val > 0) {
-            document.getElementById('amountError')?.classList.remove('show');
-            this.classList.remove('error');
-        }
+    document.getElementById('dateFrom').addEventListener('change', function(e) {
+        dateFrom = e.target.value;
+        currentPage = 1;
+        renderTable();
     });
     
-    document.getElementById('status')?.addEventListener('change', function() {
-        if(this.value) {
-            document.getElementById('statusError')?.classList.remove('show');
-            this.classList.remove('error');
-        }
+    document.getElementById('dateTo').addEventListener('change', function(e) {
+        dateTo = e.target.value;
+        currentPage = 1;
+        renderTable();
     });
     
-    document.getElementById('paymentAmount')?.addEventListener('input', function() {
-        const val = parseFloat(this.value);
-        if(this.value && val > 0) {
-            document.getElementById('paymentAmountError')?.classList.remove('show');
-            this.classList.remove('error');
-        }
+    document.getElementById('amount').addEventListener('input', calculateTotal);
+    document.getElementById('tax').addEventListener('input', calculateTotal);
+    document.getElementById('discount').addEventListener('input', calculateTotal);
+    
+    document.getElementById('patientId').addEventListener('change', function() {
+        if (this.value) { document.getElementById('patientIdError').classList.remove('show'); this.classList.remove('error'); }
+    });
+    document.getElementById('invoiceType').addEventListener('change', function() {
+        if (this.value) { document.getElementById('invoiceTypeError').classList.remove('show'); this.classList.remove('error'); }
+    });
+    document.getElementById('invoiceDate').addEventListener('input', function() {
+        if (this.value) { document.getElementById('invoiceDateError').classList.remove('show'); this.classList.remove('error'); }
+    });
+    document.getElementById('amount').addEventListener('input', function() {
+        if (this.value && parseFloat(this.value) > 0) { document.getElementById('amountError').classList.remove('show'); this.classList.remove('error'); }
+    });
+    document.getElementById('status').addEventListener('change', function() {
+        if (this.value) { document.getElementById('statusError').classList.remove('show'); this.classList.remove('error'); }
+    });
+    document.getElementById('paymentAmount').addEventListener('input', function() {
+        if (this.value && parseFloat(this.value) > 0) { document.getElementById('paymentAmountError').classList.remove('show'); this.classList.remove('error'); }
+    });
+    document.getElementById('paymentMethod').addEventListener('change', function() {
+        if (this.value) { document.getElementById('paymentMethodError').classList.remove('show'); this.classList.remove('error'); }
     });
     
-    document.getElementById('paymentMethod')?.addEventListener('change', function() {
-        if(this.value) {
-            document.getElementById('paymentMethodError')?.classList.remove('show');
-            this.classList.remove('error');
+    document.getElementById('invoiceModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal('invoiceModal');
+    });
+    document.getElementById('viewInvoiceModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal('viewInvoiceModal');
+    });
+    document.getElementById('paymentModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal('paymentModal');
+    });
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal('deleteModal');
+    });
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModal('invoiceModal');
+            closeModal('viewInvoiceModal');
+            closeModal('paymentModal');
+            closeModal('deleteModal');
         }
     });
+}
+
+// ─── Wait ──────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
+    var checkInterval = setInterval(function() {
+        var sidebar = document.getElementById('mainSidebar');
+        if (sidebar) {
+            clearInterval(checkInterval);
+            setTimeout(initInvoicesModule, 100);
+        }
+    }, 50);
+    setTimeout(function() {
+        clearInterval(checkInterval);
+        initInvoicesModule();
+    }, 3000);
 });
 
-window.goToPage = goToPage;
+// ─── Expose ────────────────────────────────────────────
+
+window.goToPage = function(page) {
+    currentPage = page;
+    renderTable();
+};
 window.viewInvoice = viewInvoice;
-window.editInvoice = editInvoice;
-window.deleteInvoice = deleteInvoice;
+window.editInvoice = openEditModal;
+window.deleteInvoice = openDeleteModal;
 window.openPaymentModal = openPaymentModal;

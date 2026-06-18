@@ -5,154 +5,341 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Attendance | Staff Management | MedFlow</title>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- ✅ CENTRALIZED THEME CSS -->
+    
+    <!-- Theme CSS -->
     <link rel="stylesheet" href="../../css/theme.css">
 
     <style>
-        /* Additional page-specific styles that align with theme */
+        /* ============================================================
+           ATTENDANCE MODULE — Page-specific only
+           ============================================================ */
+
+        /* 🔥 FIX: Prevent layout shift */
+        .main-content {
+            margin-left: 260px !important;
+            margin-top: 70px !important;
+            padding: 1.25rem 1.5rem !important;
+            transition: margin-left 0.3s ease !important;
+            min-height: 100vh !important;
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
+        }
+        .main-content.loaded {
+            opacity: 1;
+        }
+        #mainSidebar[data-collapsed="true"] ~ .main-content,
+        #mainSidebar[data-collapsed="true"] + .main-content {
+            margin-left: 72px !important;
+        }
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 0 !important;
+                padding: 1rem !important;
+            }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 🔥 Page Header - Hidden */
+        .page-header {
+            display: none !important;
+        }
+
+        /* 🔥 Stats Cards - Perfect Spacing */
+        .grid-stats {
+            gap: 1rem !important;
+            margin-bottom: 1.25rem !important;
+        }
+        .stat-card {
+            padding: 1rem 1.25rem !important;
+            border-radius: var(--radius-lg) !important;
+        }
+        .stat-card .stat-value {
+            font-size: 1.5rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            margin-top: 0.125rem !important;
+        }
+        .stat-card .stat-label {
+            font-size: 0.625rem !important;
+            letter-spacing: 0.06em !important;
+            text-transform: uppercase !important;
+            color: var(--color-brown-200) !important;
+        }
+        .stat-card .stat-icon-bg {
+            width: 2.5rem !important;
+            height: 2.5rem !important;
+            border-radius: var(--radius-md) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: var(--bg-muted) !important;
+        }
+        .stat-card .stat-icon-bg i {
+            font-size: 1rem !important;
+        }
+
+        /* 🔥 Filter Bar - Perfect Alignment */
+        .filter-bar {
+            padding: 0.625rem 1rem !important;
+            gap: 0.625rem !important;
+            margin-bottom: 1.25rem !important;
+            border-radius: var(--radius-lg) !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            display: flex !important;
+            align-items: center !important;
+            flex-wrap: wrap !important;
+        }
+        .filter-bar .form-input {
+            min-width: 160px !important;
+            max-width: 200px !important;
+            padding: 0.375rem 0.75rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            border: 1px solid var(--border-input) !important;
+            border-radius: var(--radius-md) !important;
+            background-color: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
+            font-family: var(--font-family) !important;
+        }
+        .filter-bar .form-input:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+            outline: none !important;
+        }
+        .filter-bar .form-label {
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-200) !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
+            margin-bottom: 0.125rem !important;
+            display: block !important;
+        }
+        .filter-bar .btn-primary,
+        .filter-bar .btn-success {
+            flex: 0 0 auto !important;
+            padding: 0.375rem 0.875rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            border-radius: var(--radius-md) !important;
+            white-space: nowrap !important;
+            font-family: var(--font-family) !important;
+            cursor: pointer !important;
+            border: none !important;
+        }
+        .filter-bar .btn-primary {
+            background-color: var(--color-sage) !important;
+            color: white !important;
+        }
+        .filter-bar .btn-primary:hover {
+            background-color: var(--color-sage-dark) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+            transform: translateY(-1px) !important;
+        }
+        .filter-bar .btn-success {
+            background-color: var(--color-sage) !important;
+            color: white !important;
+        }
+        .filter-bar .btn-success:hover {
+            background-color: var(--color-sage-dark) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        @media (max-width: 768px) {
+            .filter-bar {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 0.5rem !important;
+                padding: 0.75rem !important;
+            }
+            .filter-bar .form-input {
+                width: 100% !important;
+                min-width: unset !important;
+                max-width: unset !important;
+            }
+            .filter-bar .btn-primary,
+            .filter-bar .btn-success {
+                justify-content: center !important;
+            }
+        }
+
+        /* 🔥 Table - Perfect Alignment */
+        .card-white {
+            border-radius: var(--radius-lg) !important;
+            border: 1px solid var(--border-default) !important;
+            overflow: hidden !important;
+            margin-top: 0 !important;
+        }
+        .table-wrapper {
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+        .data-table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            font-size: 0.8125rem !important;
+        }
+        .data-table thead {
+            background-color: var(--bg-muted) !important;
+            border-bottom: 1px solid var(--border-default) !important;
+        }
+        .data-table th {
+            padding: 0.625rem 1rem !important;
+            text-align: left !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-300) !important;
+            font-size: 0.625rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
+        }
+        .data-table td {
+            padding: 0.625rem 1rem !important;
+            color: var(--color-brown-700) !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid var(--border-default) !important;
+        }
+        .data-table tbody tr:last-child td {
+            border-bottom: none !important;
+        }
+
+        /* 🔥 Table Row */
         .attendance-row {
-            transition: var(--transition-base);
-            border-bottom: 1px solid var(--border-default);
+            transition: var(--transition-base) !important;
         }
-        
         .attendance-row:hover {
-            background-color: var(--bg-subtle);
+            background-color: var(--bg-subtle) !important;
         }
-        
-        /* Status badges */
+
+        /* 🔥 Status Badges */
         .status-present {
-            background: var(--color-success-bg);
-            color: var(--color-success-text);
-            padding: 0.2rem 0.75rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
+            background: var(--color-success-bg) !important;
+            color: var(--color-success-text) !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
         }
-        
         .status-absent {
-            background: var(--color-error-bg);
-            color: var(--color-error-text);
-            padding: 0.2rem 0.75rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
+            background: var(--color-error-bg) !important;
+            color: var(--color-error-text) !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
         }
-        
         .status-late {
-            background: var(--color-warning-bg);
-            color: var(--color-warning-text);
-            padding: 0.2rem 0.75rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
+            background: var(--color-warning-bg) !important;
+            color: var(--color-warning-text) !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
         }
-        
         .status-halfday {
-            background: var(--color-info-bg);
-            color: var(--color-info-text);
-            padding: 0.2rem 0.75rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
+            background: var(--color-info-bg) !important;
+            color: var(--color-info-text) !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
         }
-        
         .status-holiday {
-            background: var(--bg-muted);
-            color: var(--color-brown-400);
-            padding: 0.2rem 0.75rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
+            background: var(--bg-muted) !important;
+            color: var(--color-brown-400) !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
         }
-        
-        .btn-success {
-            background-color: var(--color-sage);
-            color: white;
-            border: none;
-        }
-        
-        .btn-success:hover {
-            background-color: var(--color-sage-dark);
-            transform: translateY(-1px);
-        }
-        
+
+        /* 🔥 Form Elements inside Table */
         .time-input {
-            width: 100px;
-            padding: 0.375rem 0.625rem;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-input);
-            font-size: 0.75rem;
-            font-family: var(--font-family);
-            background: var(--bg-card);
+            width: 90px !important;
+            padding: 0.3rem 0.5rem !important;
+            border-radius: var(--radius-sm) !important;
+            border: 1px solid var(--border-input) !important;
+            font-size: 0.75rem !important;
+            font-family: var(--font-family) !important;
+            background: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
         }
-        
         .time-input:focus {
-            outline: none;
-            border-color: var(--border-focus);
-            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.2);
+            outline: none !important;
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
         }
-        
+
         .notes-input {
-            width: 140px;
-            padding: 0.375rem 0.625rem;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-input);
-            font-size: 0.75rem;
-            font-family: var(--font-family);
-            background: var(--bg-card);
+            width: 130px !important;
+            padding: 0.3rem 0.5rem !important;
+            border-radius: var(--radius-sm) !important;
+            border: 1px solid var(--border-input) !important;
+            font-size: 0.75rem !important;
+            font-family: var(--font-family) !important;
+            background: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
         }
-        
         .notes-input:focus {
-            outline: none;
-            border-color: var(--border-focus);
-            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.2);
+            outline: none !important;
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
         }
-        
+
         .status-select {
-            padding: 0.375rem 0.625rem;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-input);
-            font-size: 0.75rem;
-            font-family: var(--font-family);
-            background: var(--bg-card);
-            cursor: pointer;
+            padding: 0.3rem 0.5rem !important;
+            border-radius: var(--radius-sm) !important;
+            border: 1px solid var(--border-input) !important;
+            font-size: 0.75rem !important;
+            font-family: var(--font-family) !important;
+            background: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
+            cursor: pointer !important;
         }
-        
         .status-select:focus {
-            outline: none;
-            border-color: var(--border-focus);
-            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.2);
+            outline: none !important;
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
         }
-        
-        .border-l-green-500 {
-            border-left-color: var(--color-success-text) !important;
+
+        /* 🔥 Cell Styles */
+        .staff-name {
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            font-size: 0.875rem !important;
         }
-        
-        .border-l-red-500 {
-            border-left-color: var(--color-error-text) !important;
+        .staff-id {
+            font-size: 0.625rem !important;
+            color: var(--color-brown-100) !important;
         }
-        
-        .border-l-yellow-500 {
-            border-left-color: var(--color-warning-text) !important;
+        .staff-role {
+            font-size: 0.8125rem !important;
+            color: var(--color-brown-300) !important;
         }
-        
-        .border-l-purple-500 {
-            border-left-color: #9333ea !important;
-        }
+
+        /* 🔥 Stat Card Border Colors */
+        .stat-card-green { border-left: 4px solid var(--color-success-text) !important; }
+        .stat-card-red { border-left: 4px solid var(--color-error-text) !important; }
+        .stat-card-yellow { border-left: 4px solid var(--color-warning-text) !important; }
+        .stat-card-purple { border-left: 4px solid #9333ea !important; }
+
+        /* 🔥 Text Colors */
+        .text-success-text { color: var(--color-success-text) !important; }
+        .text-error-text { color: var(--color-error-text) !important; }
+        .text-warning-text { color: var(--color-warning-text) !important; }
     </style>
 </head>
 <body class="bg-subtle">
@@ -160,105 +347,91 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+    <main class="main-content" id="mainContent">
         
-        <!-- Page Header matching theme -->
-        <div class="page-header mb-6">
-            <div class="page-header-left">
-                <div class="page-header-icon">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
-                <div>
-                    <h1 class="page-header-title">Staff Attendance</h1>
-                    <p class="page-header-subtitle">Mark daily attendance for staff members</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Stats Cards using theme classes -->
-        <div class="grid-stats mb-8">
-            <div class="stat-card" style="border-left: 4px solid var(--color-success-text);">
-                <div class="flex justify-between items-start">
+        <!-- Stats Cards -->
+        <div class="grid-stats">
+            <div class="stat-card stat-card-green">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Present</p>
                         <p class="stat-value text-success-text" id="presentCount">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-user-check text-sage text-lg"></i>
+                        <i class="fas fa-user-check" style="color:var(--color-success-text);"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid var(--color-error-text);">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-red">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Absent</p>
                         <p class="stat-value text-error-text" id="absentCount">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-user-slash text-sage text-lg"></i>
+                        <i class="fas fa-user-slash" style="color:var(--color-error-text);"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid var(--color-warning-text);">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-yellow">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Late</p>
                         <p class="stat-value text-warning-text" id="lateCount">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-clock text-sage text-lg"></i>
+                        <i class="fas fa-clock" style="color:var(--color-warning-text);"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="stat-card" style="border-left: 4px solid #9333ea;">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-purple">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Total Staff</p>
-                        <p class="stat-value" id="totalStaff">0</p>
+                        <p class="stat-value" style="color:#9333ea;" id="totalStaff">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-users text-sage text-lg"></i>
+                        <i class="fas fa-users" style="color:#9333ea;"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Date Selection & Actions -->
+        <!-- Filter Bar -->
         <div class="filter-bar">
             <div>
-                <label class="form-label text-xs mb-1">Select Date</label>
-                <input type="date" id="attendanceDate" class="form-input w-48">
+                <label class="form-label">Select Date</label>
+                <input type="date" id="attendanceDate" class="form-input">
             </div>
             <button id="loadAttendanceBtn" class="btn-primary">
-                <i class="fas fa-sync-alt mr-1"></i> Load Attendance
+                <i class="fas fa-sync-alt"></i>
+                <span>Load</span>
             </button>
             <button id="saveAttendanceBtn" class="btn-success">
-                <i class="fas fa-save mr-1"></i> Save Attendance
+                <i class="fas fa-save"></i>
+                <span>Save</span>
             </button>
         </div>
 
         <!-- Attendance Table -->
-        <div class="card-white overflow-hidden">
+        <div class="card-white">
             <div class="table-wrapper">
-                <table class="data-table w-full">
+                <table class="data-table">
                     <thead>
                         <tr>
-                            <th class="px-5 py-3">Staff Name</th>
-                            <th class="px-5 py-3">Role</th>
-                            <th class="px-5 py-3">Status</th>
-                            <th class="px-5 py-3">Check In</th>
-                            <th class="px-5 py-3">Check Out</th>
-                            <th class="px-5 py-3">Notes</th>
+                            <th style="min-width:140px;">Staff Name</th>
+                            <th style="width:120px;">Role</th>
+                            <th style="width:130px;">Status</th>
+                            <th style="width:110px;">Check In</th>
+                            <th style="width:110px;">Check Out</th>
+                            <th>Notes</th>
                         </tr>
                     </thead>
                     <tbody id="attendanceTable">
                         <tr>
-                            <td colspan="6" class="text-center py-12 text-brown-100">
-                                <i class="fas fa-spinner fa-pulse text-2xl mb-2 block"></i>
-                                <p class="font-light">Loading attendance...</p>
+                            <td colspan="6" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
+                                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
+                                <p style="font-weight:var(--font-weight-light);">Loading attendance...</p>
                             </td>
                         </tr>
                     </tbody>
@@ -269,6 +442,21 @@
 
     <script src="../../js/core/common.js"></script>
     <script src="attendance.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var checkSidebar = setInterval(function() {
+                var sidebar = document.getElementById('mainSidebar');
+                if (sidebar) {
+                    clearInterval(checkSidebar);
+                    document.getElementById('mainContent').classList.add('loaded');
+                }
+            }, 50);
+            setTimeout(function() {
+                document.getElementById('mainContent').classList.add('loaded');
+            }, 1000);
+        });
+    </script>
     
 </body>
 </html>

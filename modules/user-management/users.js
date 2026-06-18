@@ -83,11 +83,11 @@ function renderUsers() {
         return matchesSearch && matchesRole && matchesStatus;
     });
     
-    const tbody = document.getElementById('usersTable');
+    const tbody = document.getElementById('usersTableBody');
     if(!tbody) return;
     
     if(filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-[#d4c9bc]">No users found</td\(\)            </tbody>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-[#d4c9bc]"><i class="fas fa-users text-2xl block mb-2 opacity-50"></i><p class="font-light">No users found</p></td></tr>';
         return;
     }
     
@@ -103,30 +103,30 @@ function renderUsers() {
                         <p class="text-xs text-[#b8aa9a]">${user.phone || '-'}</p>
                     </div>
                 </div>
-              </td>
+            </td>
             <td class="px-5 py-4 text-sm text-[#6b5b4e]">${escapeHtml(user.email)}</td>
-            <td class="px-5 py-4"><span class="role-badge text-xs">${user.roleName}</span></td>
+            <td class="px-5 py-4"><span class="badge-neutral text-xs">${user.roleName}</span></td>
             <td class="px-5 py-4 text-sm text-[#6b5b4e]">${user.departmentName || '-'}</td>
             <td class="px-5 py-4">
-                <span class="${user.status === 'Active' ? 'status-badge-active' : 'status-badge-inactive'} text-xs">
+                <span class="${user.status === 'Active' ? 'badge-success' : 'badge-error'} text-xs">
                     ${user.status}
                 </span>
-             </td>
+            </td>
             <td class="px-5 py-4 text-sm text-[#b8aa9a]">${user.lastLogin || 'Never'}</td>
             <td class="px-5 py-4 text-center">
                 <div class="flex gap-2 justify-center">
-                    <button onclick="editUser(${user.id})" class="btn-icon text-[#a8c49a] hover:text-[#7a9a68] transition" title="Edit">
+                    <button onclick="editUser(${user.id})" class="action-icon text-[#a8c49a] hover:text-[#7a9a68]" title="Edit">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button onclick="resetUserPassword(${user.id})" class="btn-icon text-[#d4a853] hover:text-[#b8893a] transition" title="Reset Password">
+                    <button onclick="resetUserPassword(${user.id})" class="action-icon text-[#d4a853] hover:text-[#b8893a]" title="Reset Password">
                         <i class="fas fa-key"></i>
                     </button>
-                    <button onclick="deleteUser(${user.id})" class="btn-icon text-[#d8b48c] hover:text-[#c49a6c] transition" title="Delete">
+                    <button onclick="deleteUser(${user.id})" class="action-icon text-[#d8b48c] hover:text-[#c49a6c]" title="Delete">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
-             </td>
-          </tr>
+            </td>
+        </tr>
     `).join('');
 }
 
@@ -137,8 +137,10 @@ function openAddModal() {
     document.getElementById('userId').value = '';
     document.getElementById('modalTitle').innerText = 'Add New User';
     document.getElementById('password').required = true;
-    // FIXED: Use classList.add('active') instead of remove('hidden')
-    document.getElementById('userModal').classList.add('active');
+    document.getElementById('password').placeholder = 'Enter password *';
+    // FIXED: Using theme.css classes
+    document.getElementById('userModal').classList.add('opacity-100', 'visible');
+    document.getElementById('userModal').classList.remove('opacity-0', 'invisible');
 }
 
 function editUser(id) {
@@ -152,16 +154,19 @@ function editUser(id) {
         document.getElementById('phone').value = user.phone || '';
         document.getElementById('status').value = user.status;
         document.getElementById('password').required = false;
+        document.getElementById('password').placeholder = 'Leave blank to keep unchanged';
         document.getElementById('modalTitle').innerText = 'Edit User';
-        // FIXED: Use classList.add('active') instead of remove('hidden')
-        document.getElementById('userModal').classList.add('active');
+        // FIXED: Using theme.css classes
+        document.getElementById('userModal').classList.add('opacity-100', 'visible');
+        document.getElementById('userModal').classList.remove('opacity-0', 'invisible');
     }
 }
 
 function deleteUser(id) {
     deleteId = id;
-    // FIXED: Use classList.add('active') instead of remove('hidden')
-    document.getElementById('deleteModal').classList.add('active');
+    // FIXED: Using theme.css classes
+    document.getElementById('deleteModal').classList.add('opacity-100', 'visible');
+    document.getElementById('deleteModal').classList.remove('opacity-0', 'invisible');
 }
 
 function confirmDelete() {
@@ -173,8 +178,9 @@ function confirmDelete() {
         logAudit('DELETE_USER', `User ID ${deleteId} deleted`);
         showToast('User deleted successfully', 'success');
         deleteId = null;
-        // FIXED: Use classList.remove('active')
-        document.getElementById('deleteModal').classList.remove('active');
+        // FIXED: Using theme.css classes
+        document.getElementById('deleteModal').classList.remove('opacity-100', 'visible');
+        document.getElementById('deleteModal').classList.add('opacity-0', 'invisible');
     }
 }
 
@@ -186,8 +192,9 @@ function resetUserPassword(id) {
         document.getElementById('resetUserEmail').innerHTML = `Reset password for: <strong class="text-[#5a4a3a]">${user.email}</strong>`;
         document.getElementById('newPassword').value = '';
         document.getElementById('confirmPassword').value = '';
-        // FIXED: Use classList.add('active') instead of remove('hidden')
-        document.getElementById('resetPasswordModal').classList.add('active');
+        // FIXED: Using theme.css classes
+        document.getElementById('resetPasswordModal').classList.add('opacity-100', 'visible');
+        document.getElementById('resetPasswordModal').classList.remove('opacity-0', 'invisible');
     }
 }
 
@@ -211,10 +218,22 @@ function confirmResetPassword() {
         saveUsers();
         logAudit('RESET_PASSWORD', `Password reset for user ${user.email}`);
         showToast('Password reset successfully!', 'success');
-        // FIXED: Use classList.remove('active')
-        document.getElementById('resetPasswordModal').classList.remove('active');
+        // FIXED: Using theme.css classes
+        document.getElementById('resetPasswordModal').classList.remove('opacity-100', 'visible');
+        document.getElementById('resetPasswordModal').classList.add('opacity-0', 'invisible');
         resetUserId = null;
     }
+}
+
+// ==================== CLOSE MODAL - FIXED ====================
+function closeModal() {
+    // FIXED: Using theme.css classes
+    document.getElementById('userModal')?.classList.remove('opacity-100', 'visible');
+    document.getElementById('userModal')?.classList.add('opacity-0', 'invisible');
+    document.getElementById('deleteModal')?.classList.remove('opacity-100', 'visible');
+    document.getElementById('deleteModal')?.classList.add('opacity-0', 'invisible');
+    document.getElementById('resetPasswordModal')?.classList.remove('opacity-100', 'visible');
+    document.getElementById('resetPasswordModal')?.classList.add('opacity-0', 'invisible');
 }
 
 // ==================== SAVE USER ====================
@@ -228,14 +247,32 @@ function saveUser(e) {
     const department = departments.find(d => d.id === departmentId);
     const password = document.getElementById('password').value;
     
+    // Validation
+    if(!document.getElementById('fullName').value.trim()) {
+        showToast('Please enter full name', 'error');
+        return;
+    }
+    if(!document.getElementById('email').value.trim()) {
+        showToast('Please enter email', 'error');
+        return;
+    }
+    if(!roleId) {
+        showToast('Please select a role', 'error');
+        return;
+    }
+    if(!id && !password) {
+        showToast('Please enter a password', 'error');
+        return;
+    }
+    
     const userData = {
-        fullName: document.getElementById('fullName').value,
-        email: document.getElementById('email').value,
+        fullName: document.getElementById('fullName').value.trim(),
+        email: document.getElementById('email').value.trim(),
         roleId: roleId,
         roleName: role?.name || '',
         departmentId: departmentId,
         departmentName: department?.name || '',
-        phone: document.getElementById('phone').value,
+        phone: document.getElementById('phone').value.trim(),
         status: document.getElementById('status').value,
         updatedAt: new Date().toISOString()
     };
@@ -269,14 +306,7 @@ function saveUser(e) {
     closeModal();
 }
 
-// ==================== UTILITIES - FIXED ====================
-function closeModal() {
-    // FIXED: Use classList.remove('active') instead of add('hidden')
-    document.getElementById('userModal')?.classList.remove('active');
-    document.getElementById('deleteModal')?.classList.remove('active');
-    document.getElementById('resetPasswordModal')?.classList.remove('active');
-}
-
+// ==================== UTILITIES ====================
 function logAudit(action, details) {
     let auditLogs = JSON.parse(localStorage.getItem('audit_logs') || '[]');
     const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -293,15 +323,18 @@ function logAudit(action, details) {
 }
 
 function showToast(message, type) {
+    // Remove existing toast
+    const existingToast = document.querySelector('.toast-notification');
+    if(existingToast) existingToast.remove();
+    
     const toast = document.createElement('div');
-    const colors = { success: '#8aae7a', error: '#d8b48c', info: '#a8c49a' };
-    toast.className = `fixed bottom-6 right-6 z-50 px-5 py-3 rounded-xl shadow-lg text-white text-sm font-medium transition-all duration-300`;
-    toast.style.backgroundColor = colors[type] || colors.info;
-    toast.innerHTML = `<div class="flex items-center gap-2"><i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i><span>${message}</span></div>`;
+    toast.className = `toast-notification toast-${type}`;
+    const icons = { success: 'fa-check-circle', error: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+    toast.innerHTML = `<i class="fas ${icons[type] || icons.info} text-sm"></i><span>${message}</span>`;
     document.body.appendChild(toast);
+    
     setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
+        toast.classList.add('toast-fade-out');
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
@@ -333,6 +366,26 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('roleFilter').value = '';
         document.getElementById('statusFilter').value = '';
         renderUsers();
+    });
+    
+    // Close modal on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if(e.target === this) {
+                this.classList.remove('opacity-100', 'visible');
+                this.classList.add('opacity-0', 'invisible');
+            }
+        });
+    });
+    
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+        if(e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay.opacity-100').forEach(modal => {
+                modal.classList.remove('opacity-100', 'visible');
+                modal.classList.add('opacity-0', 'invisible');
+            });
+        }
     });
 });
 

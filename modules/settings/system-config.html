@@ -4,226 +4,343 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>System Configuration | Settings | MedFlow</title>
-    <!-- Google Fonts: Poppins Light + Regular + Medium -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Theme CSS -->
+    <link rel="stylesheet" href="../../css/theme.css">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Poppins', system-ui, -apple-system, sans-serif;
-            background: #fffdf9;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            font-weight: 400;
-        }
-        
-        .bg-subtle {
-            background-image: radial-gradient(circle at 10% 20%, rgba(155, 184, 139, 0.03) 0%, rgba(250, 242, 228, 0) 80%);
-        }
-        
-        ::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f0ebe4;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #d4c9bc;
-            border-radius: 10px;
-        }
-        
-        .card-white {
-            background: #ffffff;
-            border: 1px solid #f0e8e0;
-            border-radius: 20px;
-            transition: all 0.25s ease;
-        }
-        
-        .card-white:hover {
-            box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.06);
-        }
-        
-        h1 {
-            font-size: 1.5rem;
-            font-weight: 500;
-            color: #1e293b;
-            letter-spacing: -0.3px;
-        }
-        
-        h2 {
-            font-size: 1rem;
-            font-weight: 500;
-            color: #1e293b;
-        }
-        
-        .form-label {
-            font-size: 12px;
-            font-weight: 500;
-            color: #334155;
-            margin-bottom: 6px;
-            display: block;
-            letter-spacing: 0.3px;
-        }
-        
-        .form-input, .form-select {
-            border-radius: 8px;
-            border: 1px solid #cbd5e1;
-            transition: all 0.2s ease;
-            background: #ffffff;
-            padding: 10px 14px;
-            width: 100%;
-            font-size: 13px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 400;
-        }
-        
-        .form-input:focus, .form-select:focus {
-            outline: none;
-            border-color: #a8c49a;
-            box-shadow: 0 0 0 3px rgba(168, 196, 154, 0.2);
-        }
-        
-        .form-input.error, .form-select.error {
-            border-color: #ef4444;
-            background-color: #fef2f2;
-        }
-        
-        .error-text {
-            color: #ef4444;
-            font-size: 11px;
-            margin-top: 4px;
-            display: none;
-        }
-        
-        .error-text.show {
-            display: block;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #a8c49a 0%, #8aae7a 100%);
-            transition: all 0.2s ease;
-            border: none;
-            cursor: pointer;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 13px;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #9abb8a 0%, #7da06c 100%);
-            transform: translateY(-1px);
-        }
-        
-        .btn-secondary {
-            border: 1px solid #cbd5e1;
-            background: white;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 13px;
-            color: #334155;
-        }
-        
-        .btn-secondary:hover {
-            background: #f8fafc;
-            border-color: #94a3b8;
-        }
-        
-        .btn-success {
-            background: #10b981;
-            transition: all 0.2s ease;
-            border: none;
-            cursor: pointer;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 13px;
-        }
-        
-        .btn-success:hover {
-            background: #059669;
-            transform: translateY(-1px);
-        }
-        
-        .section-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 10px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        p, span, div, a {
-            font-weight: 400;
-        }
-        
-        /* Toggle Switch */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 24px;
-        }
-        
-        .toggle-switch input {
+        /* ============================================================
+           SYSTEM CONFIGURATION MODULE — Page-specific only
+           ============================================================ */
+
+        /* 🔥 FIX: Prevent layout shift */
+        .main-content {
+            margin-left: 260px !important;
+            margin-top: 70px !important;
+            padding: 1.25rem 1.5rem !important;
+            transition: margin-left 0.3s ease !important;
+            min-height: 100vh !important;
             opacity: 0;
-            width: 0;
-            height: 0;
+            animation: fadeIn 0.3s ease forwards;
         }
-        
+        .main-content.loaded {
+            opacity: 1;
+        }
+        #mainSidebar[data-collapsed="true"] ~ .main-content,
+        #mainSidebar[data-collapsed="true"] + .main-content {
+            margin-left: 72px !important;
+        }
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 0 !important;
+                padding: 1rem !important;
+            }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 🔥 Page Header - Hidden */
+        .page-header {
+            display: none !important;
+        }
+
+        /* 🔥 Cards */
+        .card-white {
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-lg) !important;
+            padding: 1.25rem !important;
+            transition: all 0.25s ease !important;
+        }
+        .card-white:hover {
+            box-shadow: var(--shadow-md) !important;
+        }
+
+        /* 🔥 Form Elements */
+        .form-label {
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-200) !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
+            margin-bottom: 0.25rem !important;
+            display: block !important;
+        }
+        .form-input, .form-select {
+            border-radius: var(--radius-md) !important;
+            border: 1px solid var(--border-input) !important;
+            transition: all 0.2s ease !important;
+            background: var(--bg-card) !important;
+            padding: 0.5rem 0.75rem !important;
+            width: 100% !important;
+            font-size: 0.8125rem !important;
+            font-family: var(--font-family) !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-700) !important;
+        }
+        .form-input:focus, .form-select:focus {
+            outline: none !important;
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+        }
+        .form-input.error, .form-select.error {
+            border-color: var(--color-error-text) !important;
+            background-color: var(--color-error-bg) !important;
+        }
+
+        /* 🔥 Error Text */
+        .error-text {
+            color: var(--color-error-text) !important;
+            font-size: 0.6875rem !important;
+            margin-top: 0.25rem !important;
+            display: none !important;
+            font-weight: var(--font-weight-light) !important;
+        }
+        .error-text.show {
+            display: block !important;
+        }
+
+        /* 🔥 Buttons */
+        .btn-primary {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            padding: 0.5rem 1.25rem !important;
+            font-size: 0.8125rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            border-radius: var(--radius-md) !important;
+            border: none !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            font-family: var(--font-family) !important;
+            background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%) !important;
+            color: white !important;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+        }
+        .btn-secondary {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            padding: 0.5rem 1.25rem !important;
+            font-size: 0.8125rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            border-radius: var(--radius-md) !important;
+            border: 1px solid var(--border-input) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            font-family: var(--font-family) !important;
+            background: transparent !important;
+            color: var(--color-brown-200) !important;
+        }
+        .btn-secondary:hover {
+            background: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+            border-color: var(--color-brown-100) !important;
+        }
+        .btn-success {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            padding: 0.5rem 1.25rem !important;
+            font-size: 0.8125rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            border-radius: var(--radius-md) !important;
+            border: none !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            font-family: var(--font-family) !important;
+            background: var(--color-sage) !important;
+            color: white !important;
+        }
+        .btn-success:hover {
+            background: var(--color-sage-dark) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+        }
+
+        /* 🔥 Section Icon */
+        .section-icon {
+            width: 2rem !important;
+            height: 2rem !important;
+            border-radius: var(--radius-md) !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+        }
+        .section-icon.bg-blue { background: #dbeafe !important; color: #2563eb !important; }
+        .section-icon.bg-green { background: #d1fae5 !important; color: #059669 !important; }
+        .section-icon.bg-purple { background: #e9d5ff !important; color: #7c3aed !important; }
+        .section-icon.bg-orange { background: #fed7aa !important; color: #ea580c !important; }
+
+        /* 🔥 Section Header */
+        .section-header {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.75rem !important;
+            padding-bottom: 0.5rem !important;
+            border-bottom: 1px solid var(--border-default) !important;
+            margin-bottom: 0.75rem !important;
+        }
+        .section-header h2 {
+            font-size: 0.875rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            margin: 0 !important;
+        }
+
+        /* 🔥 Toggle Switch */
+        .toggle-switch {
+            position: relative !important;
+            display: inline-block !important;
+            width: 44px !important;
+            height: 24px !important;
+            flex-shrink: 0 !important;
+        }
+        .toggle-switch input {
+            opacity: 0 !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
         .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #cbd5e1;
-            transition: 0.3s;
-            border-radius: 34px;
+            position: absolute !important;
+            cursor: pointer !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            background-color: var(--border-input) !important;
+            transition: 0.3s !important;
+            border-radius: 34px !important;
         }
-        
         .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: 0.3s;
-            border-radius: 50%;
+            position: absolute !important;
+            content: "" !important;
+            height: 18px !important;
+            width: 18px !important;
+            left: 3px !important;
+            bottom: 3px !important;
+            background-color: white !important;
+            transition: 0.3s !important;
+            border-radius: 50% !important;
         }
-        
         input:checked + .toggle-slider {
-            background-color: #a8c49a;
+            background-color: var(--color-sage) !important;
         }
-        
         input:checked + .toggle-slider:before {
-            transform: translateX(20px);
+            transform: translateX(20px) !important;
         }
-        
+
+        /* 🔥 Toggle Row */
+        .toggle-row {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 0.25rem 0 !important;
+        }
+        .toggle-row .label {
+            font-size: 0.8125rem !important;
+            color: var(--color-brown-300) !important;
+        }
+
+        /* 🔥 Backup Info */
         .backup-info {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 12px;
-            margin-top: 12px;
+            background: var(--bg-subtle) !important;
+            border-radius: var(--radius-md) !important;
+            padding: 0.75rem !important;
+            border: 1px solid var(--border-default) !important;
+        }
+        .backup-info p {
+            font-size: 0.75rem !important;
+            color: var(--color-brown-300) !important;
+            margin: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+        .backup-info p i {
+            color: var(--color-sage) !important;
+        }
+
+        /* 🔥 Grid */
+        .config-grid {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 1.25rem !important;
+            margin-bottom: 1.5rem !important;
+        }
+        @media (min-width: 1024px) {
+            .config-grid {
+                grid-template-columns: 1fr 1fr !important;
+            }
+        }
+
+        /* 🔥 Form Group */
+        .form-group {
+            margin-bottom: 0.75rem !important;
+        }
+        .form-group:last-child {
+            margin-bottom: 0 !important;
+        }
+
+        /* 🔥 Actions */
+        .actions-bar {
+            display: flex !important;
+            justify-content: flex-end !important;
+            gap: 0.75rem !important;
+            margin-top: 1.5rem !important;
+            padding-top: 1rem !important;
+            border-top: 1px solid var(--border-default) !important;
+        }
+
+        /* 🔥 Toast override */
+        .toast-notification {
+            position: fixed !important;
+            bottom: 1.5rem !important;
+            right: 1.5rem !important;
+            z-index: 9999 !important;
+            padding: 0.75rem 1.25rem !important;
+            border-radius: var(--radius-lg) !important;
+            background: var(--color-sage) !important;
+            color: white !important;
+            font-family: var(--font-family) !important;
+            font-size: 0.8125rem !important;
+            font-weight: var(--font-weight-light) !important;
+            box-shadow: var(--shadow-md) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+            animation: slideInRight 0.25s ease-out !important;
+        }
+        .toast-notification i {
+            font-size: 1rem !important;
+        }
+        .toast-notification.error {
+            background: var(--color-error-text) !important;
+        }
+        .toast-notification.success {
+            background: var(--color-sage) !important;
+        }
+        .toast-notification.info {
+            background: var(--color-info-text) !important;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* 🔥 Space between fields */
+        .mt-2 {
+            margin-top: 0.5rem !important;
         }
     </style>
 </head>
@@ -232,32 +349,25 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-5 md:p-7 transition-all duration-300 max-w-[1600px] mx-auto">
+    <main class="main-content" id="mainContent">
         
-        <div class="mb-6">
-            <h1 class="text-2xl md:text-3xl font-medium text-[#1e293b] mb-1">
-                <i class="fas fa-cogs text-[#a8c49a] mr-3"></i>System Configuration
-            </h1>
-            <p class="text-[#64748b] text-sm font-normal">Configure system settings, defaults, and preferences</p>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="config-grid">
             
-            <!-- General Settings Card -->
-            <div class="card-white p-6">
-                <div class="flex items-center gap-3 mb-4 pb-2 border-b border-[#f0e8e0]">
-                    <div class="section-icon bg-blue-50">
-                        <i class="fas fa-globe text-blue-500"></i>
+            <!-- General Settings -->
+            <div class="card-white">
+                <div class="section-header">
+                    <div class="section-icon bg-blue">
+                        <i class="fas fa-globe"></i>
                     </div>
-                    <h2 class="text-base font-medium">General Settings</h2>
+                    <h2>General Settings</h2>
                 </div>
-                <div class="space-y-4">
-                    <div>
+                <div>
+                    <div class="form-group">
                         <label class="form-label">System Name</label>
                         <input type="text" id="systemName" class="form-input" placeholder="MedFlow HMS">
-                        <div class="error-text" id="systemNameError">System name is required</div>
+                        <span class="error-text" id="systemNameError">System name is required</span>
                     </div>
-                    <div>
+                    <div class="form-group">
                         <label class="form-label">Time Zone</label>
                         <select id="timezone" class="form-select">
                             <option value="UTC-12:00">UTC-12:00 (International Date Line West)</option>
@@ -268,13 +378,13 @@
                             <option value="UTC-07:00">UTC-07:00 (Mountain Time)</option>
                             <option value="UTC-06:00">UTC-06:00 (Central Time)</option>
                             <option value="UTC-05:00">UTC-05:00 (Eastern Time)</option>
-                            <option value="UTC+05:30">UTC+05:30 (India Standard Time)</option>
+                            <option value="UTC+05:30" selected>UTC+05:30 (India Standard Time)</option>
                             <option value="UTC+08:00">UTC+08:00 (Singapore, Perth)</option>
                             <option value="UTC+09:00">UTC+09:00 (Tokyo, Seoul)</option>
                             <option value="UTC+10:00">UTC+10:00 (Sydney, Melbourne)</option>
                         </select>
                     </div>
-                    <div>
+                    <div class="form-group">
                         <label class="form-label">Date Format</label>
                         <select id="dateFormat" class="form-select">
                             <option value="DD/MM/YYYY">DD/MM/YYYY</option>
@@ -282,13 +392,13 @@
                             <option value="YYYY-MM-DD">YYYY-MM-DD</option>
                         </select>
                     </div>
-                    <div>
+                    <div class="form-group" style="margin-bottom:0;">
                         <label class="form-label">Currency Symbol</label>
                         <select id="currency" class="form-select">
                             <option value="$ USD">$ USD (US Dollar)</option>
                             <option value="€ EUR">€ EUR (Euro)</option>
                             <option value="£ GBP">£ GBP (British Pound)</option>
-                            <option value="₹ INR">₹ INR (Indian Rupee)</option>
+                            <option value="₹ INR" selected>₹ INR (Indian Rupee)</option>
                             <option value="¥ JPY">¥ JPY (Japanese Yen)</option>
                             <option value="A$ AUD">A$ AUD (Australian Dollar)</option>
                             <option value="C$ CAD">C$ CAD (Canadian Dollar)</option>
@@ -298,31 +408,31 @@
                 </div>
             </div>
 
-            <!-- Invoice Settings Card -->
-            <div class="card-white p-6">
-                <div class="flex items-center gap-3 mb-4 pb-2 border-b border-[#f0e8e0]">
-                    <div class="section-icon bg-green-50">
-                        <i class="fas fa-file-invoice-dollar text-green-500"></i>
+            <!-- Invoice Settings -->
+            <div class="card-white">
+                <div class="section-header">
+                    <div class="section-icon bg-green">
+                        <i class="fas fa-file-invoice-dollar"></i>
                     </div>
-                    <h2 class="text-base font-medium">Invoice Settings</h2>
+                    <h2>Invoice Settings</h2>
                 </div>
-                <div class="space-y-4">
-                    <div>
+                <div>
+                    <div class="form-group">
                         <label class="form-label">Tax Percentage (%)</label>
                         <input type="number" id="taxRate" step="0.1" class="form-input" placeholder="5">
-                        <div class="error-text" id="taxRateError">Tax rate must be between 0 and 100</div>
+                        <span class="error-text" id="taxRateError">Tax rate must be between 0 and 100</span>
                     </div>
-                    <div>
+                    <div class="form-group">
                         <label class="form-label">Invoice Prefix</label>
                         <input type="text" id="invoicePrefix" class="form-input" placeholder="INV-">
                     </div>
-                    <div>
+                    <div class="form-group">
                         <label class="form-label">Payment Due Days</label>
                         <input type="number" id="dueDays" class="form-input" placeholder="15">
-                        <div class="error-text" id="dueDaysError">Due days must be positive number</div>
+                        <span class="error-text" id="dueDaysError">Due days must be positive number</span>
                     </div>
-                    <div class="flex items-center justify-between pt-2">
-                        <span class="text-sm text-[#475569]">Auto-generate invoice on appointment</span>
+                    <div class="toggle-row" style="margin-top:0.5rem;">
+                        <span class="label">Auto-generate invoice on appointment</span>
                         <label class="toggle-switch">
                             <input type="checkbox" id="autoInvoice">
                             <span class="toggle-slider"></span>
@@ -331,69 +441,69 @@
                 </div>
             </div>
 
-            <!-- Security Settings Card -->
-            <div class="card-white p-6">
-                <div class="flex items-center gap-3 mb-4 pb-2 border-b border-[#f0e8e0]">
-                    <div class="section-icon bg-purple-50">
-                        <i class="fas fa-shield-alt text-purple-500"></i>
+            <!-- Security Settings -->
+            <div class="card-white">
+                <div class="section-header">
+                    <div class="section-icon bg-purple">
+                        <i class="fas fa-shield-alt"></i>
                     </div>
-                    <h2 class="text-base font-medium">Security Settings</h2>
+                    <h2>Security Settings</h2>
                 </div>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm text-[#475569]">Enable Two-Factor Authentication</span>
+                <div>
+                    <div class="toggle-row">
+                        <span class="label">Enable Two-Factor Authentication</span>
                         <label class="toggle-switch">
                             <input type="checkbox" id="twoFactorAuth">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-                    <div>
+                    <div class="form-group" style="margin-top:0.5rem;">
                         <label class="form-label">Session Timeout (minutes)</label>
                         <input type="number" id="sessionTimeout" class="form-input" placeholder="30">
-                        <div class="error-text" id="sessionTimeoutError">Session timeout must be at least 5 minutes</div>
+                        <span class="error-text" id="sessionTimeoutError">Session timeout must be at least 5 minutes</span>
                     </div>
-                    <div>
+                    <div class="form-group">
                         <label class="form-label">Password Expiry (days)</label>
                         <input type="number" id="passwordExpiry" class="form-input" placeholder="90">
-                        <div class="error-text" id="passwordExpiryError">Password expiry must be at least 30 days</div>
+                        <span class="error-text" id="passwordExpiryError">Password expiry must be at least 30 days</span>
                     </div>
-                    <div>
+                    <div class="form-group" style="margin-bottom:0;">
                         <label class="form-label">Max Login Attempts</label>
                         <input type="number" id="maxAttempts" class="form-input" placeholder="5">
-                        <div class="error-text" id="maxAttemptsError">Max attempts must be between 3 and 10</div>
+                        <span class="error-text" id="maxAttemptsError">Max attempts must be between 3 and 10</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Backup Settings Card -->
-            <div class="card-white p-6">
-                <div class="flex items-center gap-3 mb-4 pb-2 border-b border-[#f0e8e0]">
-                    <div class="section-icon bg-orange-50">
-                        <i class="fas fa-database text-orange-500"></i>
+            <!-- Backup Settings -->
+            <div class="card-white">
+                <div class="section-header">
+                    <div class="section-icon bg-orange">
+                        <i class="fas fa-database"></i>
                     </div>
-                    <h2 class="text-base font-medium">Backup Settings</h2>
+                    <h2>Backup Settings</h2>
                 </div>
-                <div class="space-y-4">
-                    <div>
+                <div>
+                    <div class="form-group">
                         <label class="form-label">Auto Backup Frequency</label>
                         <select id="backupFrequency" class="form-select">
                             <option value="Daily">Daily</option>
-                            <option value="Weekly">Weekly</option>
+                            <option value="Weekly" selected>Weekly</option>
                             <option value="Monthly">Monthly</option>
                             <option value="Never">Never</option>
                         </select>
                     </div>
-                    <div>
+                    <div class="form-group">
                         <label class="form-label">Backup Time</label>
-                        <input type="time" id="backupTime" class="form-input">
+                        <input type="time" id="backupTime" class="form-input" value="02:00">
                     </div>
                     <div class="backup-info">
-                        <div class="flex items-center gap-2 text-sm text-[#475569]">
-                            <i class="fas fa-info-circle text-[#a8c49a]"></i>
-                            <span>Backup includes: Patients, Doctors, Appointments, Invoices, Pharmacy data</span>
-                        </div>
+                        <p>
+                            <i class="fas fa-info-circle"></i>
+                            Backup includes: Patients, Doctors, Appointments, Invoices, Pharmacy data
+                        </p>
                     </div>
-                    <button id="backupNowBtn" class="btn-success w-full flex items-center justify-center gap-2">
+                    <button id="backupNowBtn" class="btn-success" style="width:100%; margin-top:0.75rem; justify-content:center;">
                         <i class="fas fa-database"></i> Backup Now
                     </button>
                 </div>
@@ -401,13 +511,33 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="mt-6 flex justify-end gap-3">
-            <button id="resetConfigBtn" class="btn-secondary">Reset to Default</button>
-            <button id="saveConfigBtn" class="btn-primary">Save Configuration</button>
+        <div class="actions-bar">
+            <button id="resetConfigBtn" class="btn-secondary">
+                <i class="fas fa-undo-alt"></i> Reset to Default
+            </button>
+            <button id="saveConfigBtn" class="btn-primary">
+                <i class="fas fa-save"></i> Save Configuration
+            </button>
         </div>
     </main>
 
     <script src="../../js/core/common.js"></script>
     <script src="system-config.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var checkSidebar = setInterval(function() {
+                var sidebar = document.getElementById('mainSidebar');
+                if (sidebar) {
+                    clearInterval(checkSidebar);
+                    document.getElementById('mainContent').classList.add('loaded');
+                }
+            }, 50);
+            setTimeout(function() {
+                document.getElementById('mainContent').classList.add('loaded');
+            }, 1000);
+        });
+    </script>
+    
 </body>
 </html>

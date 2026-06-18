@@ -5,23 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Financial Reports | Billing | MedFlow</title>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- ✅ CENTRALIZED THEME CSS -->
+    <!-- ✅ ONLY THEME CSS - NO TAILWIND -->
     <link rel="stylesheet" href="../../css/theme.css">
 
     <style>
-        /* Additional page-specific styles that align with theme */
+        /* ============================================================
+           FINANCIAL REPORTS MODULE — Page-specific only
+           All base styles come from theme.css
+           ============================================================ */
+
+        /* 🔥 FIX: Prevent layout shift */
+        .main-content {
+            margin-left: 260px !important;
+            margin-top: 70px !important;
+            padding: 1.25rem !important;
+            transition: margin-left 0.3s ease !important;
+            min-height: 100vh !important;
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
+        }
+        .main-content.loaded {
+            opacity: 1;
+        }
+        #mainSidebar[data-collapsed="true"] ~ .main-content,
+        #mainSidebar[data-collapsed="true"] + .main-content {
+            margin-left: 72px !important;
+        }
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 0 !important;
+                padding: 1rem !important;
+            }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Chart container */
         .chart-container {
             background: var(--bg-card);
             border-radius: var(--radius-md);
@@ -30,11 +57,11 @@
             box-shadow: var(--shadow-card);
             transition: var(--transition-base);
         }
-        
         .chart-container:hover {
             box-shadow: var(--shadow-md);
         }
-        
+
+        /* Revenue type items */
         .revenue-type-item {
             display: flex;
             justify-content: space-between;
@@ -42,23 +69,21 @@
             padding: 0.5rem 0.25rem;
             border-bottom: 1px solid var(--border-default);
         }
-        
         .revenue-type-item:last-child {
             border-bottom: none;
         }
-        
         .revenue-type-label {
             font-size: 0.75rem;
             font-weight: var(--font-weight-light);
             color: var(--color-brown-600);
         }
-        
         .revenue-type-value {
             font-size: 0.8125rem;
             font-weight: var(--font-weight-medium);
             color: var(--color-brown-700);
         }
-        
+
+        /* Monthly items */
         .monthly-item {
             display: flex;
             justify-content: space-between;
@@ -66,97 +91,204 @@
             padding: 0.5rem 0.25rem;
             border-bottom: 1px solid var(--border-default);
         }
-        
         .monthly-item:last-child {
             border-bottom: none;
         }
-        
         .monthly-month {
             font-size: 0.75rem;
             font-weight: var(--font-weight-light);
             color: var(--color-brown-600);
         }
-        
         .monthly-amount {
             font-size: 0.8125rem;
             font-weight: var(--font-weight-medium);
             color: var(--color-sage-dark);
         }
-        
-        .border-l-blue-500 {
-            border-left-color: #3b82f6 !important;
-        }
-        
-        .border-l-green-500 {
-            border-left-color: var(--color-success-text) !important;
-        }
-        
-        .border-l-purple-500 {
-            border-left-color: #9333ea !important;
-        }
-        
-        /* Smaller stat cards */
+
+        /* Stat card compact */
         .stat-card-sm {
             padding: 0.75rem !important;
         }
-        
         .stat-card-sm .stat-value {
             font-size: 1.25rem !important;
             margin-top: 0 !important;
             font-weight: var(--font-weight-medium) !important;
         }
-        
         .stat-card-sm .stat-label {
             font-size: 0.6rem !important;
             letter-spacing: 0.04em !important;
         }
-        
         .stat-card-sm .stat-icon-bg {
             width: 1.75rem !important;
             height: 1.75rem !important;
             border-radius: var(--radius-sm) !important;
         }
-        
         .stat-card-sm .stat-icon-bg i {
             font-size: 0.75rem !important;
         }
-        
+
         /* Section title */
         .section-title-sm {
             font-size: 0.75rem !important;
             font-weight: var(--font-weight-medium) !important;
             margin-bottom: 0.5rem !important;
             padding-bottom: 0.375rem !important;
+            border-bottom: 1px solid var(--border-default);
         }
-        
         .section-title-sm i {
             font-size: 0.75rem !important;
         }
-        
+
+        /* Revenue list container */
+        .revenue-list-container {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .revenue-list-container::-webkit-scrollbar {
+            width: 3px;
+        }
+        .revenue-list-container::-webkit-scrollbar-thumb {
+            background: var(--border-default);
+            border-radius: var(--radius-full);
+        }
+
+        /* Monthly list container */
+        .monthly-list-container {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .monthly-list-container::-webkit-scrollbar {
+            width: 3px;
+        }
+        .monthly-list-container::-webkit-scrollbar-thumb {
+            background: var(--border-default);
+            border-radius: var(--radius-full);
+        }
+
+        /* Empty state */
+        .empty-state-sm {
+            text-align: center;
+            padding: 2rem 0.5rem;
+            color: var(--color-brown-100);
+        }
+        .empty-state-sm i {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            display: block;
+            opacity: 0.4;
+        }
+        .empty-state-sm p {
+            font-size: 0.75rem;
+            font-weight: var(--font-weight-light);
+        }
+
+        /* Grid layouts */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+        @media (min-width: 640px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+        @media (min-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .revenue-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+        @media (min-width: 768px) {
+            .revenue-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Stat card border colors */
+        .stat-card-blue { border-left: 3px solid #3b82f6; }
+        .stat-card-green { border-left: 3px solid var(--color-success-text); }
+        .stat-card-purple { border-left: 3px solid #9333ea; }
+
+        /* Type colors */
+        .type-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            border-radius: var(--radius-md);
+            font-size: 0.75rem;
+        }
+        .type-badge.opd { background: #dbeafe; color: #2563eb; }
+        .type-badge.ipd { background: #e9d5ff; color: #7c3aed; }
+        .type-badge.pharmacy { background: #d1fae5; color: #059669; }
+        .type-badge.laboratory { background: #fef3c7; color: #d97706; }
+        .type-badge.radiology { background: #fed7aa; color: #ea580c; }
+        .type-badge.other { background: #f1f5f9; color: #64748b; }
+
+        /* Progress bar */
+        .progress-bar-track {
+            width: 100%;
+            height: 4px;
+            background: var(--bg-muted);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            margin-top: 0.25rem;
+        }
+        .progress-bar-track .fill {
+            height: 100%;
+            border-radius: var(--radius-full);
+            background: linear-gradient(90deg, var(--color-sage) 0%, var(--color-sage-dark) 100%);
+            transition: width 0.6s ease;
+        }
+
         /* Chart canvas */
         canvas {
             max-height: 140px;
             width: 100%;
         }
-        
-        /* Revenue by department container */
-        .revenue-list-container {
-            max-height: 200px;
-            overflow-y: auto;
+
+        /* Monthly progress bar */
+        .monthly-progress {
+            flex: 1;
+            margin: 0 0.75rem;
         }
-        
-        .revenue-list-container::-webkit-scrollbar {
-            width: 3px;
+        .monthly-progress .track {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-muted);
+            border-radius: var(--radius-full);
+            overflow: hidden;
         }
-        
-        /* Monthly summary container */
-        .monthly-list-container {
-            max-height: 200px;
-            overflow-y: auto;
+        .monthly-progress .track .fill {
+            height: 100%;
+            border-radius: var(--radius-full);
+            background: linear-gradient(90deg, var(--color-sage) 0%, var(--color-sage-dark) 100%);
+            transition: width 0.6s ease;
         }
-        
-        .monthly-list-container::-webkit-scrollbar {
-            width: 3px;
+
+        /* Page header - Hidden */
+        .page-header {
+            display: none !important;
+        }
+
+        /* Margin top adjustment when header removed */
+        .main-content {
+            margin-top: 70px !important;
         }
     </style>
 </head>
@@ -165,101 +297,88 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="lg:ml-64 mt-16 p-4 md:p-5 transition-all duration-300 max-w-[1600px] mx-auto">
+    <main class="main-content" id="mainContent">
         
-        <!-- Page Header - compact -->
-        <div class="page-header mb-4 py-3 px-4">
-            <div class="page-header-left">
-                <div class="page-header-icon w-8 h-8">
-                    <i class="fas fa-chart-pie text-sm"></i>
-                </div>
-                <div>
-                    <h1 class="page-header-title text-sm">Financial Reports</h1>
-                    <p class="page-header-subtitle text-xs">Revenue analytics and financial insights</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Stats Cards - Compact Size -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
-            <div class="stat-card stat-card-sm" style="border-left: 3px solid #3b82f6;">
-                <div class="flex justify-between items-start">
+        <!-- Stats Cards - Compact -->
+        <div class="stats-grid">
+            <div class="stat-card stat-card-sm stat-card-blue">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Total Revenue</p>
                         <p class="stat-value" id="reportTotal">₹0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-rupee-sign text-sage"></i>
+                        <i class="fas fa-rupee-sign" style="color:#3b82f6;"></i>
                     </div>
                 </div>
             </div>
             
-            <div class="stat-card stat-card-sm" style="border-left: 3px solid var(--color-success-text);">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-sm stat-card-green">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Average Transaction</p>
                         <p class="stat-value" id="avgTransaction">₹0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-chart-line text-sage"></i>
+                        <i class="fas fa-chart-line" style="color:var(--color-success-text);"></i>
                     </div>
                 </div>
             </div>
             
-            <div class="stat-card stat-card-sm" style="border-left: 3px solid #9333ea;">
-                <div class="flex justify-between items-start">
+            <div class="stat-card stat-card-sm stat-card-purple">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <p class="stat-label">Total Transactions</p>
                         <p class="stat-value" id="totalTransactions">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-receipt text-sage"></i>
+                        <i class="fas fa-receipt" style="color:#9333ea;"></i>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Charts Row - Compact -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-5">
+        <div class="charts-grid">
             <div class="chart-container">
-                <h3 class="section-title-sm flex items-center gap-1.5 border-b border-default pb-1.5 mb-2">
-                    <i class="fas fa-chart-line text-sage text-xs"></i> 
-                    <span class="text-xs font-medium text-brown-700">Revenue Trend (Last 7 Days)</span>
-                </h3>
+                <div class="section-title-sm">
+                    <i class="fas fa-chart-line" style="color:var(--color-sage);"></i>
+                    Revenue Trend (Last 7 Days)
+                </div>
                 <canvas id="revenueChart" height="130"></canvas>
             </div>
             <div class="chart-container">
-                <h3 class="section-title-sm flex items-center gap-1.5 border-b border-default pb-1.5 mb-2">
-                    <i class="fas fa-chart-pie text-sage text-xs"></i> 
-                    <span class="text-xs font-medium text-brown-700">Payment Method Distribution</span>
-                </h3>
+                <div class="section-title-sm">
+                    <i class="fas fa-chart-pie" style="color:var(--color-sage);"></i>
+                    Payment Method Distribution
+                </div>
                 <canvas id="paymentMethodChart" height="130"></canvas>
             </div>
         </div>
 
-        <!-- Revenue by Type / Department - Compact & Fixed -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <!-- Revenue by Type / Department -->
+        <div class="revenue-grid">
             <div class="chart-container">
-                <h3 class="section-title-sm flex items-center gap-1.5 border-b border-default pb-1.5 mb-2">
-                    <i class="fas fa-building text-sage text-xs"></i> 
-                    <span class="text-xs font-medium text-brown-700">Revenue by Department</span>
-                </h3>
+                <div class="section-title-sm">
+                    <i class="fas fa-building" style="color:var(--color-sage);"></i>
+                    Revenue by Department
+                </div>
                 <div id="revenueByType" class="revenue-list-container">
-                    <div class="empty-state-sm text-center py-4">
-                        <i class="fas fa-spinner fa-pulse text-brown-100 text-sm"></i>
-                        <p class="text-brown-100 text-xs mt-1">Loading data...</p>
+                    <div class="empty-state-sm">
+                        <i class="fas fa-spinner fa-pulse"></i>
+                        <p>Loading data...</p>
                     </div>
                 </div>
             </div>
             <div class="chart-container">
-                <h3 class="section-title-sm flex items-center gap-1.5 border-b border-default pb-1.5 mb-2">
-                    <i class="fas fa-calendar-week text-sage text-xs"></i> 
-                    <span class="text-xs font-medium text-brown-700">Monthly Summary</span>
-                </h3>
+                <div class="section-title-sm">
+                    <i class="fas fa-calendar-week" style="color:var(--color-sage);"></i>
+                    Monthly Summary
+                </div>
                 <div id="monthlySummary" class="monthly-list-container">
-                    <div class="empty-state-sm text-center py-4">
-                        <i class="fas fa-spinner fa-pulse text-brown-100 text-sm"></i>
-                        <p class="text-brown-100 text-xs mt-1">Loading data...</p>
+                    <div class="empty-state-sm">
+                        <i class="fas fa-spinner fa-pulse"></i>
+                        <p>Loading data...</p>
                     </div>
                 </div>
             </div>
@@ -268,27 +387,22 @@
 
     <script src="../../js/core/common.js"></script>
     <script src="financial-reports.js"></script>
-    
+
+    <!-- 🔥 FIX: Add loaded class after sidebar loads -->
     <script>
-        // Additional styling for revenue items when loaded
         document.addEventListener('DOMContentLoaded', function() {
-            // Monitor for when revenue data is loaded
-            const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.type === 'childList') {
-                        const revenueItems = document.querySelectorAll('.revenue-type-item');
-                        revenueItems.forEach(item => {
-                            item.classList.add('px-1');
-                        });
-                    }
-                });
-            });
-            
-            const revenueContainer = document.getElementById('revenueByType');
-            if (revenueContainer) {
-                observer.observe(revenueContainer, { childList: true, subtree: true });
-            }
+            const checkSidebar = setInterval(function() {
+                const sidebar = document.getElementById('mainSidebar');
+                if (sidebar) {
+                    clearInterval(checkSidebar);
+                    document.getElementById('mainContent').classList.add('loaded');
+                }
+            }, 50);
+            setTimeout(function() {
+                document.getElementById('mainContent').classList.add('loaded');
+            }, 1000);
         });
     </script>
+    
 </body>
 </html>
