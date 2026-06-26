@@ -103,6 +103,36 @@
             font-size: 0.6875rem;
             font-weight: var(--font-weight-medium);
         }
+        .status-badge-oncall {
+            background: #fef3dd;
+            color: #9a6a10;
+            padding: 0.15rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6875rem;
+            font-weight: var(--font-weight-medium);
+        }
+        .status-badge-unavailable {
+            background: #fee2e2;
+            color: #ef4444;
+            padding: 0.15rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6875rem;
+            font-weight: var(--font-weight-medium);
+        }
+
+        /* External badge */
+        .badge-external {
+            background: #7d9b6e;
+            color: white;
+            padding: 0.1rem 0.5rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6rem;
+            font-weight: var(--font-weight-medium);
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
 
         /* Empty state */
         .doctors-empty {
@@ -184,6 +214,18 @@
             transform: translateY(-1px) !important;
         }
 
+        /* Availability dot */
+        .availability-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+        .availability-dot.available { background: #4a8c3a; }
+        .availability-dot.oncall { background: #d4a853; }
+        .availability-dot.unavailable { background: #ef4444; }
+
         @media (max-width: 768px) {
             .filter-bar .form-select {
                 min-width: 120px !important;
@@ -223,6 +265,70 @@
             color: #dc2626;
             border-color: #fca5a5;
         }
+
+        /* Schedule item */
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f8f3ee;
+            font-size: 0.8rem;
+        }
+        .schedule-item:last-child {
+            border-bottom: none;
+        }
+
+        /* View doctor details styles */
+        .doctor-detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-default);
+        }
+        .doctor-detail-row:last-child {
+            border-bottom: none;
+        }
+        .doctor-detail-label {
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-300);
+            font-size: 0.75rem;
+        }
+        .doctor-detail-value {
+            font-weight: var(--font-weight-regular);
+            color: var(--color-brown-700);
+            font-size: 0.85rem;
+        }
+
+        /* Tabs */
+        .tab-bar {
+            display: flex;
+            gap: 0.25rem;
+            border-bottom: 1px solid var(--border-default);
+            margin-bottom: 1rem;
+            overflow-x: auto;
+        }
+        .tab-item {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-200);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: var(--transition-base);
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            font-family: var(--font-family);
+            white-space: nowrap;
+        }
+        .tab-item:hover {
+            color: var(--color-brown-600);
+        }
+        .tab-item.active {
+            color: var(--color-sage-dark);
+            border-bottom-color: var(--color-sage);
+        }
     </style>
 </head>
 <body class="bg-subtle">
@@ -261,8 +367,8 @@
             <div class="stat-card">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
-                        <p class="stat-label">Active Doctors</p>
-                        <p class="stat-value" id="activeDoctors">0</p>
+                        <p class="stat-label">Available Now</p>
+                        <p class="stat-value" id="availableDoctors">0</p>
                     </div>
                     <div class="stat-icon-bg">
                         <i class="fas fa-check-circle" style="color:var(--color-sage); font-size:1.125rem;"></i>
@@ -273,11 +379,11 @@
             <div class="stat-card">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
-                        <p class="stat-label">Avg Consultation Fee</p>
-                        <p class="stat-value" id="avgFees">₹0</p>
+                        <p class="stat-label">External Specialists</p>
+                        <p class="stat-value" id="externalDoctors">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-rupee-sign" style="color:var(--color-sage); font-size:1.125rem;"></i>
+                        <i class="fas fa-external-link-alt" style="color:var(--color-sage); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
@@ -292,6 +398,19 @@
             <select id="specFilter" class="form-select">
                 <option value="">All Specializations</option>
             </select>
+            <!-- NEW: Availability Filter -->
+            <select id="availabilityFilter" class="form-select">
+                <option value="">All Availability</option>
+                <option value="available">Available</option>
+                <option value="oncall">On Call</option>
+                <option value="unavailable">Unavailable</option>
+            </select>
+            <!-- NEW: Type Filter -->
+            <select id="typeFilter" class="form-select">
+                <option value="">All Types</option>
+                <option value="inhouse">In-House</option>
+                <option value="external">External</option>
+            </select>
             <button id="resetFilter" class="btn-secondary">
                 <i class="fas fa-undo-alt"></i>
                 <span>Reset</span>
@@ -300,6 +419,15 @@
                 <i class="fas fa-plus"></i>
                 <span>Add Doctor</span>
             </button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tab-bar" style="margin-top: 1rem;">
+            <button class="tab-item active" data-tab="all">All Doctors</button>
+            <button class="tab-item" data-tab="available">Available</button>
+            <button class="tab-item" data-tab="inhouse">In-House</button>
+            <button class="tab-item" data-tab="external">External</button>
+            <button class="tab-item" data-tab="schedule">Schedule</button>
         </div>
 
         <!-- Doctors Grid -->
@@ -319,6 +447,18 @@
                 <div class="loading-shimmer" style="height:2.5rem; width:2.5rem; border-radius:50%; margin-bottom:0.75rem;"></div>
                 <div class="loading-shimmer" style="height:1rem; width:75%; margin-bottom:0.5rem;"></div>
                 <div class="loading-shimmer" style="height:0.75rem; width:55%;"></div>
+            </div>
+        </div>
+
+        <!-- Schedule Section (hidden by default) -->
+        <div id="scheduleSection" style="display:none; margin-top:1.5rem;">
+            <div class="card-white" style="padding:1.25rem;">
+                <h3 style="font-weight:var(--font-weight-medium); margin-bottom:1rem;">
+                    <i class="fas fa-calendar-alt" style="color:var(--color-sage);"></i> Doctor Schedule
+                </h3>
+                <div id="scheduleContent">
+                    <!-- Rendered by JavaScript -->
+                </div>
             </div>
         </div>
     </main>
@@ -367,12 +507,32 @@
                             <label class="form-label">Experience (years)</label>
                             <input type="number" id="experience" class="form-input" placeholder="10">
                         </div>
+                        <!-- NEW: Doctor Type -->
+                        <div class="form-group">
+                            <label class="form-label">Doctor Type <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="doctorType" required class="form-select">
+                                <option value="inhouse">In-House</option>
+                                <option value="external">External Specialist</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Availability <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="availability" required class="form-select">
+                                <option value="available">Available</option>
+                                <option value="oncall">On Call</option>
+                                <option value="unavailable">Unavailable</option>
+                            </select>
+                        </div>
                         <div class="form-group">
                             <label class="form-label">Status</label>
                             <select id="status" class="form-select">
                                 <option value="Active">Active</option>
                                 <option value="Inactive">Inactive</option>
                             </select>
+                        </div>
+                        <div class="form-group" style="grid-column:1 / -1;">
+                            <label class="form-label">Notes</label>
+                            <textarea id="notes" rows="2" class="form-textarea" placeholder="Additional notes about the doctor..."></textarea>
                         </div>
                     </div>
                 </div>
@@ -384,6 +544,27 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- View Doctor Modal -->
+    <div id="viewDoctorModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="viewModalTitle">
+        <div class="form-card" style="max-width:48rem;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="viewModalTitle">
+                    <i class="fas fa-eye" style="color:var(--color-sage);"></i>
+                    Doctor Details
+                </h3>
+                <button class="close-btn" id="closeViewModalBtn" aria-label="Close view modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="viewDoctorContent">
+                <!-- Dynamically populated -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="closeViewModalFooterBtn" class="btn-secondary">Close</button>
+            </div>
         </div>
     </div>
 

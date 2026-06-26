@@ -1,43 +1,152 @@
 /**
  * Roles & Permissions JS - User Management Module
- * Professional UI, Fully Working
+ * Complete RBAC (Role-Based Access Control) System
  */
+
+// ─── Module Configuration ──────────────────────────────
+
+const MODULES = [
+    { id: 'dashboard', label: 'Dashboard', icon: 'fa-chart-pie' },
+    { id: 'patients', label: 'Patients', icon: 'fa-users' },
+    { id: 'appointments', label: 'Appointments', icon: 'fa-calendar-check' },
+    { id: 'opd', label: 'OPD', icon: 'fa-walking' },
+    { id: 'ipd', label: 'IPD', icon: 'fa-procedures' },
+    { id: 'pharmacy', label: 'Pharmacy', icon: 'fa-capsules' },
+    { id: 'laboratory', label: 'Laboratory', icon: 'fa-microscope' },
+    { id: 'radiology', label: 'Radiology', icon: 'fa-x-ray' },
+    { id: 'billing', label: 'Billing', icon: 'fa-file-invoice-dollar' },
+    { id: 'reports', label: 'Reports', icon: 'fa-chart-line' },
+    { id: 'users', label: 'User Management', icon: 'fa-users-cog' },
+    { id: 'roles', label: 'Roles & Permissions', icon: 'fa-shield-alt' },
+    { id: 'settings', label: 'Settings', icon: 'fa-cog' }
+];
+
+const PERMISSIONS = ['view', 'create', 'edit', 'delete', 'approve', 'export'];
+
+// ─── State ──────────────────────────────────────────────
 
 let roles = [];
 let selectedRoleId = null;
+let currentUserRole = null;
 
-const defaultPermissions = {
-    dashboard: ['view'],
-    patients: ['view', 'create', 'edit', 'delete'],
-    doctors: ['view', 'create', 'edit', 'delete'],
-    appointments: ['view', 'create', 'edit', 'delete'],
-    opd: ['view', 'create', 'edit'],
-    ipd: ['view', 'create', 'edit', 'discharge'],
-    pharmacy: ['view', 'create', 'edit', 'delete', 'issue'],
-    laboratory: ['view', 'create', 'edit', 'upload'],
-    radiology: ['view', 'create', 'edit', 'upload'],
-    billing: ['view', 'create', 'edit', 'payment'],
-    reports: ['view'],
-    settings: ['view', 'edit'],
-    users: ['view', 'create', 'edit', 'delete']
-};
+// ─── Load Data ──────────────────────────────────────────
 
-// ==================== LOAD ROLES ====================
 function loadRoles() {
     const stored = localStorage.getItem('system_roles');
-    if(stored) {
+    if (stored) {
         roles = JSON.parse(stored);
     } else {
-        // Default roles with Indian names
+        // Default roles with permissions
         roles = [
-            {id: 1, name: 'Administrator', description: 'Full system access - complete control over all modules', permissions: defaultPermissions},
-            {id: 2, name: 'Doctor', description: 'Access to clinical modules - patients, appointments, prescriptions', permissions: { dashboard:['view'], patients:['view','create','edit'], doctors:['view'], appointments:['view','create','edit'], opd:['view','create','edit'], ipd:['view','create','edit','discharge'], pharmacy:['view','issue'], laboratory:['view','create'], radiology:['view','create'], billing:['view'], reports:['view'], settings:[], users:[] }},
-            {id: 3, name: 'Nurse', description: 'IPD and OPD patient care - daily updates', permissions: { dashboard:['view'], patients:['view','edit'], doctors:[], appointments:['view'], opd:['view','edit'], ipd:['view','create','edit'], pharmacy:[], laboratory:[], radiology:[], billing:[], reports:['view'], settings:[], users:[] }},
-            {id: 4, name: 'Receptionist', description: 'Front desk operations - appointments, patient registration', permissions: { dashboard:['view'], patients:['view','create','edit'], doctors:['view'], appointments:['view','create','edit','delete'], opd:['view','create'], ipd:[], pharmacy:[], laboratory:[], radiology:[], billing:['view','create'], reports:['view'], settings:[], users:[] }},
-            {id: 5, name: 'Accountant', description: 'Billing and finance management', permissions: { dashboard:['view'], patients:['view'], doctors:[], appointments:[], opd:[], ipd:[], pharmacy:[], laboratory:[], radiology:[], billing:['view','create','edit','payment'], reports:['view'], settings:[], users:[] }}
+            {
+                id: 1,
+                name: 'Administrator',
+                description: 'Full system access - complete control over all modules',
+                status: 'active',
+                permissions: {
+                    dashboard: ['view', 'create', 'edit', 'delete'],
+                    patients: ['view', 'create', 'edit', 'delete', 'approve'],
+                    appointments: ['view', 'create', 'edit', 'delete', 'approve'],
+                    opd: ['view', 'create', 'edit', 'delete'],
+                    ipd: ['view', 'create', 'edit', 'delete', 'approve'],
+                    pharmacy: ['view', 'create', 'edit', 'delete', 'approve'],
+                    laboratory: ['view', 'create', 'edit', 'delete', 'approve'],
+                    radiology: ['view', 'create', 'edit', 'delete', 'approve'],
+                    billing: ['view', 'create', 'edit', 'delete', 'approve', 'export'],
+                    reports: ['view', 'create', 'edit', 'delete', 'export'],
+                    users: ['view', 'create', 'edit', 'delete'],
+                    roles: ['view', 'create', 'edit', 'delete'],
+                    settings: ['view', 'create', 'edit', 'delete']
+                }
+            },
+            {
+                id: 2,
+                name: 'Doctor',
+                description: 'Clinical access - patients, appointments, prescriptions',
+                status: 'active',
+                permissions: {
+                    dashboard: ['view'],
+                    patients: ['view', 'create', 'edit'],
+                    appointments: ['view', 'create', 'edit'],
+                    opd: ['view', 'create', 'edit'],
+                    ipd: ['view', 'create', 'edit'],
+                    pharmacy: ['view', 'create', 'edit'],
+                    laboratory: ['view', 'create'],
+                    radiology: ['view', 'create'],
+                    billing: ['view'],
+                    reports: ['view'],
+                    users: [],
+                    roles: [],
+                    settings: []
+                }
+            },
+            {
+                id: 3,
+                name: 'Nurse',
+                description: 'Patient care - IPD and OPD daily updates',
+                status: 'active',
+                permissions: {
+                    dashboard: ['view'],
+                    patients: ['view', 'edit'],
+                    appointments: ['view'],
+                    opd: ['view', 'edit'],
+                    ipd: ['view', 'create', 'edit'],
+                    pharmacy: ['view'],
+                    laboratory: ['view'],
+                    radiology: ['view'],
+                    billing: [],
+                    reports: ['view'],
+                    users: [],
+                    roles: [],
+                    settings: []
+                }
+            },
+            {
+                id: 4,
+                name: 'Receptionist',
+                description: 'Front desk - appointments, patient registration',
+                status: 'active',
+                permissions: {
+                    dashboard: ['view'],
+                    patients: ['view', 'create', 'edit'],
+                    appointments: ['view', 'create', 'edit', 'delete'],
+                    opd: ['view', 'create'],
+                    ipd: [],
+                    pharmacy: [],
+                    laboratory: [],
+                    radiology: [],
+                    billing: ['view', 'create'],
+                    reports: ['view'],
+                    users: [],
+                    roles: [],
+                    settings: []
+                }
+            },
+            {
+                id: 5,
+                name: 'Accountant',
+                description: 'Billing and finance management',
+                status: 'active',
+                permissions: {
+                    dashboard: ['view'],
+                    patients: ['view'],
+                    appointments: ['view'],
+                    opd: [],
+                    ipd: [],
+                    pharmacy: [],
+                    laboratory: [],
+                    radiology: [],
+                    billing: ['view', 'create', 'edit', 'approve', 'export'],
+                    reports: ['view', 'export'],
+                    users: [],
+                    roles: [],
+                    settings: []
+                }
+            }
         ];
         saveRoles();
     }
+    updateStats();
     renderRolesList();
 }
 
@@ -45,228 +154,415 @@ function saveRoles() {
     localStorage.setItem('system_roles', JSON.stringify(roles));
 }
 
-// ==================== RENDER ROLES LIST ====================
+// ─── Statistics ─────────────────────────────────────────
+
+function updateStats() {
+    const total = roles.length;
+    const active = roles.filter(r => r.status === 'active').length;
+    const totalPerms = roles.reduce((sum, r) => {
+        let count = 0;
+        Object.values(r.permissions || {}).forEach(p => count += p.length);
+        return sum + count;
+    }, 0);
+    
+    document.getElementById('totalRoles').textContent = total;
+    document.getElementById('activeRoles').textContent = active;
+    document.getElementById('totalPermissions').textContent = totalPerms;
+    document.getElementById('lastUpdated').textContent = 
+        new Date().toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+}
+
+// ─── Render Roles List ──────────────────────────────────
+
 function renderRolesList() {
     const container = document.getElementById('rolesList');
-    if(!container) return;
+    if (!container) return;
     
-    if(roles.length === 0) {
-        container.innerHTML = '<div class="text-center py-4 text-[#94a3b8]">No roles found. Click "Add Role" to create one.</div>';
+    const search = document.getElementById('searchInput')?.value?.toLowerCase() || '';
+    const statusFilter = document.getElementById('filterStatus')?.value || '';
+    
+    let filtered = roles;
+    if (search) {
+        filtered = filtered.filter(r => r.name.toLowerCase().includes(search));
+    }
+    if (statusFilter) {
+        filtered = filtered.filter(r => r.status === statusFilter);
+    }
+    
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state" style="padding: 2rem 1.25rem;">
+                <i class="fas fa-shield-alt"></i>
+                <p style="font-size:0.8125rem;">No roles found</p>
+            </div>
+        `;
         return;
     }
     
-    container.innerHTML = roles.map(role => `
-        <div class="role-item flex justify-between items-center p-3 rounded-lg transition ${selectedRoleId === role.id ? 'active bg-[#f0fdf4] border-l-[3px] border-l-[#a8c49a]' : 'hover:bg-[#f8fafc]'}" onclick="selectRole(${role.id})">
-            <div class="flex-1">
-                <p class="font-medium text-[#1e293b] text-sm">${escapeHtml(role.name)}</p>
-                <p class="text-xs text-[#64748b]">${escapeHtml(role.description || 'No description')}</p>
+    container.innerHTML = filtered.map(role => `
+        <div class="role-item ${selectedRoleId === role.id ? 'active' : ''}" data-id="${role.id}" onclick="selectRole(${role.id})">
+            <div>
+                <div class="role-name">${escapeHtml(role.name)} 
+                    <span class="role-badge">${role.status || 'active'}</span>
+                </div>
+                <div style="font-size:0.6875rem; color:var(--color-brown-100); margin-top:0.125rem;">
+                    ${role.description || 'No description'}
+                </div>
             </div>
-            <div class="flex gap-2">
-                <button onclick="event.stopPropagation(); editRole(${role.id})" class="text-[#a8c49a] hover:text-[#7a9a68] transition p-1" title="Edit Role">
-                    <i class="fas fa-edit"></i>
+            <div class="role-actions">
+                <button class="icon-btn-sm edit-role" data-id="${role.id}" title="Edit Role" onclick="event.stopPropagation(); editRole(${role.id})">
+                    <i class="fas fa-pen"></i>
                 </button>
-                <button onclick="event.stopPropagation(); deleteRole(${role.id})" class="text-[#d8b48c] hover:text-[#c49a6c] transition p-1" title="Delete Role">
+                <button class="icon-btn-sm delete delete-role" data-id="${role.id}" title="Delete Role" onclick="event.stopPropagation(); deleteRole(${role.id})">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </div>
         </div>
     `).join('');
+    
+    // Auto-select first role if none selected
+    if (!selectedRoleId && filtered.length > 0) {
+        selectRole(filtered[0].id);
+    }
 }
 
-// ==================== SELECT ROLE ====================
+// ─── Select Role ────────────────────────────────────────
+
 function selectRole(id) {
     selectedRoleId = id;
     renderRolesList();
     renderPermissionsEditor();
 }
 
-// ==================== RENDER PERMISSIONS EDITOR ====================
+// ─── Render Permissions Editor ──────────────────────────
+
 function renderPermissionsEditor() {
     const role = roles.find(r => r.id === selectedRoleId);
     const editor = document.getElementById('permissionsEditor');
     const saveBtn = document.getElementById('savePermissionsBtn');
     
-    if(!role || !editor) return;
+    if (!role || !editor) return;
     
-    document.getElementById('selectedRoleTitle').innerHTML = `<i class="fas fa-key text-[#a8c49a] mr-2"></i>Editing: ${escapeHtml(role.name)}`;
+    document.getElementById('selectedRoleTitle').innerHTML = `
+        <i class="fas fa-key" style="color:var(--color-sage);"></i>
+        ${escapeHtml(role.name)} - Permissions
+        <span class="user-count">${getUserCount(role.id)} users</span>
+    `;
     
-    editor.innerHTML = Object.keys(defaultPermissions).map(module => `
-        <div class="permission-group">
-            <div class="permission-group-title">
-                <i class="fas ${getModuleIcon(module)} mr-2 text-[#a8c49a]"></i>
-                ${module.charAt(0).toUpperCase() + module.slice(1)}
+    let html = '';
+    MODULES.forEach(module => {
+        const perms = role.permissions?.[module.id] || [];
+        const hasAnyPerm = perms.length > 0;
+        
+        html += `
+            <div class="permission-group">
+                <div class="permission-group-title">
+                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                        <i class="fas ${module.icon}" style="color:var(--color-sage);"></i>
+                        ${module.label}
+                        <span class="module-visibility">
+                            <span class="toggle-indicator ${hasAnyPerm ? 'visible' : 'hidden'}"></span>
+                            ${hasAnyPerm ? 'Visible' : 'Hidden'}
+                        </span>
+                    </div>
+                    <button class="select-all-btn" onclick="toggleModulePermissions(${role.id}, '${module.id}')">
+                        ${hasAnyPerm ? 'Deselect All' : 'Select All'}
+                    </button>
+                </div>
+                <div>
+                    ${PERMISSIONS.map(perm => `
+                        <label class="permission-checkbox">
+                            <input type="checkbox" 
+                                class="perm-checkbox" 
+                                data-module="${module.id}" 
+                                data-perm="${perm}"
+                                ${perms.includes(perm) ? 'checked' : ''}
+                                onchange="onPermissionChange(${role.id}, '${module.id}', '${perm}')">
+                            <span>${perm.charAt(0).toUpperCase() + perm.slice(1)}</span>
+                        </label>
+                    `).join('')}
+                </div>
             </div>
-            <div>
-                ${defaultPermissions[module].map(perm => `
-                    <label class="permission-checkbox">
-                        <input type="checkbox" class="perm-checkbox" data-module="${module}" data-perm="${perm}" ${role.permissions?.[module]?.includes(perm) ? 'checked' : ''}>
-                        <span>${perm.charAt(0).toUpperCase() + perm.slice(1)}</span>
-                    </label>
-                `).join('')}
-            </div>
-        </div>
-    `).join('');
+        `;
+    });
     
-    saveBtn.classList.remove('hidden');
+    editor.innerHTML = html;
+    saveBtn.style.display = 'block';
 }
 
-function getModuleIcon(module) {
-    const icons = {
-        dashboard: 'fa-chart-pie',
-        patients: 'fa-users',
-        doctors: 'fa-user-md',
-        appointments: 'fa-calendar-check',
-        opd: 'fa-walking',
-        ipd: 'fa-procedures',
-        pharmacy: 'fa-capsules',
-        laboratory: 'fa-microscope',
-        radiology: 'fa-x-ray',
-        billing: 'fa-file-invoice-dollar',
-        reports: 'fa-chart-line',
-        settings: 'fa-cog',
-        users: 'fa-users-cog'
-    };
-    return icons[module] || 'fa-circle';
-}
+// ─── Permission Change Handler ──────────────────────────
 
-// ==================== SAVE PERMISSIONS ====================
-function savePermissions() {
-    const role = roles.find(r => r.id === selectedRoleId);
-    if(role) {
-        const newPermissions = {};
-        document.querySelectorAll('.perm-checkbox').forEach(cb => {
-            const module = cb.dataset.module;
-            const perm = cb.dataset.perm;
-            if(!newPermissions[module]) newPermissions[module] = [];
-            if(cb.checked) newPermissions[module].push(perm);
-        });
-        role.permissions = newPermissions;
-        saveRoles();
-        logAudit('UPDATE_ROLE', `Permissions updated for role ${role.name}`);
-        showToast('Permissions saved successfully!', 'success');
+function onPermissionChange(roleId, moduleId, permission) {
+    const role = roles.find(r => r.id === roleId);
+    if (!role) return;
+    
+    if (!role.permissions) role.permissions = {};
+    if (!role.permissions[moduleId]) role.permissions[moduleId] = [];
+    
+    const checkbox = document.querySelector(`.perm-checkbox[data-module="${moduleId}"][data-perm="${permission}"]`);
+    if (!checkbox) return;
+    
+    if (checkbox.checked) {
+        if (!role.permissions[moduleId].includes(permission)) {
+            role.permissions[moduleId].push(permission);
+        }
+    } else {
+        role.permissions[moduleId] = role.permissions[moduleId].filter(p => p !== permission);
     }
+    
+    // Auto-save on change
+    saveRoles();
+    updateStats();
 }
 
-// ==================== ROLE CRUD OPERATIONS ====================
-function openRoleModal() {
+// ─── Toggle Module Permissions ──────────────────────────
+
+function toggleModulePermissions(roleId, moduleId) {
+    const role = roles.find(r => r.id === roleId);
+    if (!role) return;
+    
+    if (!role.permissions) role.permissions = {};
+    if (!role.permissions[moduleId]) role.permissions[moduleId] = [];
+    
+    const currentPerms = role.permissions[moduleId];
+    const hasAll = PERMISSIONS.every(p => currentPerms.includes(p));
+    
+    if (hasAll) {
+        role.permissions[moduleId] = [];
+    } else {
+        role.permissions[moduleId] = [...PERMISSIONS];
+    }
+    
+    saveRoles();
+    renderPermissionsEditor();
+    updateStats();
+}
+
+// ─── Save Permissions ────────────────────────────────────
+
+function savePermissions() {
+    // Permissions are auto-saved on change
+    showToast('✅ Permissions saved successfully', 'success');
+}
+
+// ─── Get User Count for Role ────────────────────────────
+
+function getUserCount(roleId) {
+    const users = JSON.parse(localStorage.getItem('system_users') || '[]');
+    return users.filter(u => u.roleId === roleId).length;
+}
+
+// ─── Role CRUD Operations ──────────────────────────────
+
+function openAddModal() {
     document.getElementById('roleForm').reset();
     document.getElementById('roleId').value = '';
-    document.getElementById('modalTitle').innerText = 'Add Role';
-    document.getElementById('roleModal').classList.add('active');
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Add Role';
+    document.querySelectorAll('.error-text').forEach(e => e.classList.remove('show'));
+    document.querySelectorAll('.form-input.error').forEach(e => e.classList.remove('error'));
+    openModal('roleModal');
 }
 
 function editRole(id) {
     const role = roles.find(r => r.id === id);
-    if(role) {
-        document.getElementById('roleId').value = role.id;
-        document.getElementById('roleName').value = role.name;
-        document.getElementById('roleDesc').value = role.description || '';
-        document.getElementById('modalTitle').innerText = 'Edit Role';
-        document.getElementById('roleModal').classList.add('active');
-    }
+    if (!role) return;
+    
+    document.getElementById('roleId').value = role.id;
+    document.getElementById('roleName').value = role.name;
+    document.getElementById('roleDesc').value = role.description || '';
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-pen"></i> Edit Role';
+    document.querySelectorAll('.error-text').forEach(e => e.classList.remove('show'));
+    document.querySelectorAll('.form-input.error').forEach(e => e.classList.remove('error'));
+    openModal('roleModal');
 }
 
 function deleteRole(id) {
-    if(confirm('⚠️ Delete this role? This action cannot be undone.')) {
+    if (confirm('⚠️ Delete this role? This action cannot be undone.')) {
+        const role = roles.find(r => r.id === id);
         roles = roles.filter(r => r.id !== id);
         saveRoles();
-        renderRolesList();
-        if(selectedRoleId === id) {
+        if (selectedRoleId === id) {
             selectedRoleId = null;
             document.getElementById('permissionsEditor').innerHTML = `
-                <div class="text-center py-8 text-[#94a3b8]">
-                    <i class="fas fa-hand-pointer text-3xl mb-2 block"></i>
+                <div class="empty-state">
+                    <i class="fas fa-hand-pointer"></i>
                     <p>Click on a role from the left panel to edit its permissions</p>
                 </div>
             `;
-            document.getElementById('savePermissionsBtn').classList.add('hidden');
-            document.getElementById('selectedRoleTitle').innerHTML = `<i class="fas fa-key text-[#a8c49a] mr-2"></i>Select a role to edit permissions`;
+            document.getElementById('savePermissionsBtn').style.display = 'none';
+            document.getElementById('selectedRoleTitle').innerHTML = `
+                <i class="fas fa-key" style="color:var(--color-sage);"></i>
+                Select a role to edit permissions
+            `;
         }
-        showToast('Role deleted successfully', 'success');
+        updateStats();
+        renderRolesList();
+        showToast(`🗑️ ${role?.name || 'Role'} deleted`, 'error');
     }
 }
+
+// ─── Save Role Form ──────────────────────────────────────
 
 function saveRole(e) {
     e.preventDefault();
     
+    const name = document.getElementById('roleName').value.trim();
+    const description = document.getElementById('roleDesc').value.trim();
     const id = document.getElementById('roleId').value;
-    const data = {
-        name: document.getElementById('roleName').value,
-        description: document.getElementById('roleDesc').value,
-        permissions: {}
-    };
     
-    if(id) {
+    if (!name) {
+        document.getElementById('roleNameError').classList.add('show');
+        document.getElementById('roleName').classList.add('error');
+        return;
+    }
+    document.getElementById('roleNameError').classList.remove('show');
+    document.getElementById('roleName').classList.remove('error');
+    
+    // Check for duplicate name
+    const duplicate = roles.some(r => r.name.toLowerCase() === name.toLowerCase() && r.id !== parseInt(id));
+    if (duplicate) {
+        showToast('A role with this name already exists!', 'error');
+        return;
+    }
+    
+    if (id) {
         const index = roles.findIndex(r => r.id === parseInt(id));
-        if(index !== -1) {
-            roles[index] = { ...roles[index], ...data };
-            showToast('Role updated successfully', 'success');
+        if (index !== -1) {
+            roles[index] = { ...roles[index], name, description };
+            showToast(`✅ ${name} updated successfully`, 'success');
         }
     } else {
         const newId = roles.length > 0 ? Math.max(...roles.map(r => r.id)) + 1 : 1;
-        roles.push({ id: newId, ...data });
-        showToast('Role added successfully', 'success');
+        roles.push({
+            id: newId,
+            name,
+            description,
+            status: 'active',
+            permissions: {}
+        });
+        showToast(`✅ ${name} added successfully`, 'success');
     }
     
     saveRoles();
+    closeModal('roleModal');
+    updateStats();
     renderRolesList();
-    closeRoleModal();
+    // Select the newly created/updated role
+    const role = roles.find(r => r.name === name);
+    if (role) selectRole(role.id);
 }
 
-// ==================== MODAL CONTROL ====================
+// ─── Modal Functions ────────────────────────────────────
+
+function openModal(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeModal(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
 function closeRoleModal() {
-    document.getElementById('roleModal').classList.remove('active');
+    closeModal('roleModal');
 }
 
-// ==================== UTILITIES ====================
-function logAudit(action, details) {
-    let auditLogs = JSON.parse(localStorage.getItem('audit_logs') || '[]');
-    const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-    auditLogs.unshift({
-        id: Date.now(),
-        action: action,
-        details: details,
-        user: currentUser.email || 'system',
-        timestamp: new Date().toLocaleString(),
-        ip: '127.0.0.1'
-    });
-    if(auditLogs.length > 500) auditLogs = auditLogs.slice(0, 500);
-    localStorage.setItem('audit_logs', JSON.stringify(auditLogs));
+function closeDeleteModal() {
+    closeModal('deleteModal');
 }
 
-function showToast(message, type) {
+// ─── Toast Notification ──────────────────────────────────
+
+function showToast(message, type = 'success') {
+    document.querySelectorAll('.toast-notification').forEach(t => t.remove());
+    
     const toast = document.createElement('div');
-    const colors = { success: '#10b981', error: '#ef4444', info: '#a8c49a' };
-    toast.className = `fixed bottom-6 right-6 z-50 px-5 py-3 rounded-lg shadow-lg text-white text-sm font-medium transition-all duration-300`;
-    toast.style.backgroundColor = colors[type] || colors.info;
-    toast.innerHTML = `<div class="flex items-center gap-2"><i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i><span>${message}</span></div>`;
+    toast.className = `toast-notification toast-${type}`;
+    const icons = { success: 'fa-check-circle', error: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+    toast.innerHTML = `<i class="fas ${icons[type] || icons.info}" style="font-size:0.875rem;"></i> ${escapeHtml(message)}`;
     document.body.appendChild(toast);
+    
     setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
+        toast.classList.add('toast-fade-out');
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
 
+// ─── Utilities ───────────────────────────────────────────
+
 function escapeHtml(str) {
-    if(!str) return '';
+    if (!str) return '';
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
 }
 
-// ==================== EVENT LISTENERS ====================
-document.addEventListener('DOMContentLoaded', () => {
+// ─── Event Listeners ─────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
     loadRoles();
     
-    document.getElementById('addRoleBtn')?.addEventListener('click', openRoleModal);
+    // Add Role button
+    document.getElementById('addRoleBtn')?.addEventListener('click', openAddModal);
+    
+    // Modal close buttons
     document.getElementById('closeRoleModalBtn')?.addEventListener('click', closeRoleModal);
     document.getElementById('cancelRoleModalBtn')?.addEventListener('click', closeRoleModal);
+    document.getElementById('closeDeleteModalBtn')?.addEventListener('click', closeDeleteModal);
+    document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeDeleteModal);
+    document.getElementById('confirmDeleteBtn')?.addEventListener('click', function() {
+        const id = parseInt(this.dataset.id);
+        if (id) deleteRole(id);
+        closeDeleteModal();
+    });
+    
+    // Form submit
     document.getElementById('roleForm')?.addEventListener('submit', saveRole);
+    
+    // Save Permissions button
     document.getElementById('savePermissionsBtn')?.addEventListener('click', savePermissions);
+    
+    // Search & Filter
+    document.getElementById('searchInput')?.addEventListener('input', renderRolesList);
+    document.getElementById('filterStatus')?.addEventListener('change', renderRolesList);
+    document.getElementById('resetFiltersBtn')?.addEventListener('click', function() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('filterStatus').value = '';
+        renderRolesList();
+    });
+    
+    // Close modals on overlay click
+    document.getElementById('roleModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeModal('roleModal');
+    });
+    document.getElementById('deleteModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeModal('deleteModal');
+    });
+    
+    // ESC key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModal('roleModal');
+            closeModal('deleteModal');
+        }
+    });
 });
 
-// Make functions global for onclick
+// ─── Make functions global for onclick ──────────────────
+
 window.selectRole = selectRole;
 window.editRole = editRole;
 window.deleteRole = deleteRole;
+window.openAddModal = openAddModal;
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.toggleModulePermissions = toggleModulePermissions;
+window.onPermissionChange = onPermissionChange;
+window.savePermissions = savePermissions;

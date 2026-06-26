@@ -62,7 +62,7 @@ const PAGE_CONFIG = {
     },
     'emergency': {
         url: '../../modules/emergency/emergency.html',
-        action: null
+        action: 'openEmergency'  // ← CHANGED: Now has action
     },
     'appointments': {
         url: '../../modules/clinical/appointments.html',
@@ -124,7 +124,7 @@ function checkAndExecuteAction() {
         // Wait for page to fully load
         setTimeout(function() {
             executeAction(action);
-        }, 500);
+        }, 800); // ← INCREASED to 800ms for emergency page
     }
 }
 
@@ -142,6 +142,10 @@ function executeAction(action) {
         case 'openCreateInvoice':
             openModal('invoiceModal', 'openCreateModal');
             break;
+        case 'openEmergency':  // ← NEW: Handle emergency
+            // Emergency uses a different modal name and function
+            openModal('emergencyModal', 'openEmergencyModal');
+            break;
         default:
             console.log('Unknown action:', action);
     }
@@ -150,18 +154,28 @@ function executeAction(action) {
 // ─── Generic Modal Opener ───────────────────────────
 
 function openModal(modalId, openFunction) {
+    console.log('openModal called with:', modalId, openFunction);
+    
     // Check if modal exists
     var modal = document.getElementById(modalId);
     if (modal) {
         // Try to call the open function
         if (typeof window[openFunction] === 'function') {
+            console.log('Calling window.' + openFunction + '()');
             window[openFunction]();
         } else {
+            console.log('Function ' + openFunction + ' not found, falling back to modal open');
             // Fallback: just open the modal
             modal.classList.add('active');
         }
     } else {
         console.log('Modal not found:', modalId);
+        // Last resort: try to click the button
+        var btn = document.getElementById('newEmergencyBtn') || document.getElementById('admitBtn') || document.getElementById('addPatientBtn') || document.getElementById('addAppointmentBtn');
+        if (btn) {
+            console.log('Clicking button as fallback');
+            btn.click();
+        }
     }
 }
 

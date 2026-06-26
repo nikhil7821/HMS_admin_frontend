@@ -10,26 +10,28 @@ let searchTerm = '';
 let priorityFilter = '';
 let statusFilter = '';
 let isInitialized = false;
+let isAutoOpenPending = false;
 
-// ─── 🔥 ADD THIS HERE - Auto-Open from Dashboard ───
+// ─── 🔥 AUTO-OPEN FROM DASHBOARD ────────────────────
+// This runs on DOMContentLoaded to check if we came from dashboard
 document.addEventListener('DOMContentLoaded', function() {
     var action = sessionStorage.getItem('dashboard_action');
     if (action === 'openEmergency') {
+        // Clear it immediately to prevent re-triggering
         sessionStorage.removeItem('dashboard_action');
-        setTimeout(function() {
-            if (typeof openEmergencyModal === 'function') {
+        
+        // Set flag that we need to auto-open
+        isAutoOpenPending = true;
+        
+        // Try to open immediately if module is ready
+        if (isInitialized && typeof openEmergencyModal === 'function') {
+            setTimeout(function() {
                 openEmergencyModal();
-            } else if (typeof window.openEmergencyModal === 'function') {
-                window.openEmergencyModal();
-            } else {
-                var addBtn = document.getElementById('newEmergencyBtn');
-                if (addBtn) addBtn.click();
-            }
-        }, 600);
+                isAutoOpenPending = false;
+            }, 300);
+        }
     }
 });
-// ─── 🔥 END OF AUTO-OPEN SECTION ────────────────────
-
 
 // ─── Utility Functions ──────────────────────────────
 
@@ -418,19 +420,52 @@ function populateDoctorSelects() {
 
 function openModal(id) {
     const el = document.getElementById(id);
-    if (el) el.classList.add('opacity-100', 'visible');
+    if (el) {
+        el.classList.add('active');
+        // Ensure body scroll is locked
+        document.body.style.overflow = 'hidden';
+    }
 }
 
 function closeModal(id) {
     const el = document.getElementById(id);
-    if (el) el.classList.remove('opacity-100', 'visible');
+    if (el) {
+        el.classList.remove('active');
+        // Restore body scroll
+        document.body.style.overflow = '';
+    }
 }
 
 function openEmergencyModal() {
-    document.getElementById('emergencyForm').reset();
-    document.querySelector('input[name="ambulance"][value="no"]').checked = true;
+    console.log('Opening Emergency Modal...');
+    
+    // Make sure the form exists
+    const form = document.getElementById('emergencyForm');
+    if (!form) {
+        console.error('Emergency form not found!');
+        return;
+    }
+    
+    // Reset form
+    form.reset();
+    
+    // Set default ambulance to No
+    const noAmbulance = document.querySelector('input[name="ambulance"][value="no"]');
+    if (noAmbulance) noAmbulance.checked = true;
+    
+    // Populate doctor select
     populateDoctorSelects();
+    
+    // Set modal title
+    const modalTitle = document.getElementById('modalTitle');
+    if (modalTitle) {
+        modalTitle.innerHTML = '<i class="fas fa-ambulance" style="color:var(--color-warm-tan);"></i> Emergency Registration';
+    }
+    
+    // Open the modal
     openModal('emergencyModal');
+    
+    console.log('Emergency Modal should be open now');
 }
 
 function openAssignModal(id) {
@@ -729,10 +764,15 @@ function initEmergencyModule() {
     if (isInitialized) return;
     isInitialized = true;
     
+    console.log('Initializing Emergency Module...');
+    
     loadData();
     
     // Event Listeners
-    document.getElementById('newEmergencyBtn')?.addEventListener('click', openEmergencyModal);
+    document.getElementById('newEmergencyBtn')?.addEventListener('click', function() {
+        console.log('New Emergency button clicked');
+        openEmergencyModal();
+    });
     document.getElementById('closeEmergencyModalBtn')?.addEventListener('click', () => closeModal('emergencyModal'));
     document.getElementById('cancelEmergencyModalBtn')?.addEventListener('click', () => closeModal('emergencyModal'));
     document.getElementById('closeAssignModalBtn')?.addEventListener('click', () => closeModal('assignModal'));
@@ -793,11 +833,32 @@ function initEmergencyModule() {
             closeModal('viewEmergencyModal');
         }
     });
+    
+    console.log('Emergency Module Initialized');
+    
+    // ─── 🔥 CHECK FOR AUTO-OPEN AFTER INIT ──────────────
+    if (isAutoOpenPending) {
+        console.log('Auto-open pending, opening emergency modal...');
+        setTimeout(function() {
+            openEmergencyModal();
+            isAutoOpenPending = false;
+        }, 500);
+    }
 }
+
+// ─── Expose for Auto-Open ──────────────────────────
+
+// Expose these functions globally so dashboard can call them
+window.openEmergencyModal = openEmergencyModal;
+window.openModal = openModal;
+window.closeModal = closeModal;
 
 // ─── Wait for DOM and Common.js ──────────────────────
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded - Emergency Module');
+    
+    // Check if common.js has loaded sidebar
     const checkInterval = setInterval(() => {
         const sidebar = document.getElementById('mainSidebar');
         if (sidebar) {
@@ -806,6 +867,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 50);
     
+    // Fallback: if sidebar doesn't load in 3 seconds, init anyway
     setTimeout(() => {
         clearInterval(checkInterval);
         initEmergencyModule();

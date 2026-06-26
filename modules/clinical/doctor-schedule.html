@@ -13,11 +13,9 @@
 
     <style>
         /* ============================================================
-           DOCTOR SCHEDULE MODULE — Page-specific only
-           All base styles come from theme.css
+           DOCTOR SCHEDULE MODULE — ADVANCE VERSION
            ============================================================ */
 
-        /* Schedule table row */
         .schedule-row {
             transition: var(--transition-base);
             border-bottom: 1px solid var(--border-default);
@@ -29,7 +27,6 @@
             border-bottom: none;
         }
 
-        /* Day badge */
         .day-badge {
             background: var(--bg-muted);
             color: var(--color-brown-600);
@@ -40,13 +37,11 @@
             display: inline-block;
         }
 
-        /* Table wrapper */
         .table-wrapper {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
         }
 
-        /* Data table */
         .data-table {
             width: 100%;
             border-collapse: collapse;
@@ -64,6 +59,7 @@
             font-size: 0.6875rem;
             text-transform: uppercase;
             letter-spacing: 0.04em;
+            white-space: nowrap;
         }
         .data-table td {
             padding: 0.75rem 1.25rem;
@@ -71,7 +67,15 @@
             vertical-align: middle;
         }
 
-        /* Action buttons */
+        .data-table .col-doctor { min-width: 180px; }
+        .data-table .col-day { min-width: 100px; }
+        .data-table .col-time { min-width: 140px; }
+        .data-table .col-room { min-width: 120px; }
+        .data-table .col-status { min-width: 100px; }
+        .data-table .col-availability { min-width: 100px; }
+        .data-table .col-slots { min-width: 100px; }
+        .data-table .col-actions { min-width: 180px; text-align: center; }
+
         .action-btn {
             color: var(--color-brown-100);
             transition: var(--transition-base);
@@ -88,8 +92,46 @@
         .action-btn.delete:hover {
             color: #dc2626;
         }
+        .action-btn.view:hover {
+            color: var(--color-gold);
+        }
+        .action-btn.unavailable:hover {
+            color: #dc2626;
+        }
+        .action-btn.available-btn:hover {
+            color: #4a8c3a;
+        }
 
-        /* Delete modal - danger variant */
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.15rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.65rem;
+            font-weight: var(--font-weight-medium);
+            white-space: nowrap;
+        }
+        .badge-active { background: #e8f5e2; color: #4a8c3a; }
+        .badge-cancelled { background: #fee2e2; color: #ef4444; }
+        .badge-replaced { background: #fef3dd; color: #9a6a10; }
+        .badge-completed { background: #f0e8e0; color: #9a8e82; }
+        .badge-booked { background: #fee2e2; color: #ef4444; }
+        .badge-available { background: #e8f5e2; color: #4a8c3a; }
+        .badge-blocked { background: #f0e8e0; color: #9a8e82; }
+
+        .status-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+        .status-dot.green { background: #4a8c3a; }
+        .status-dot.red { background: #ef4444; }
+        .status-dot.yellow { background: #d4a853; }
+        .status-dot.gray { background: #b8aa9a; }
+
         .modal-danger .modal-content {
             border-top-color: #ef4444;
         }
@@ -107,7 +149,6 @@
             font-size: 1.25rem;
         }
 
-        /* Danger button */
         .btn-danger {
             display: inline-flex;
             align-items: center;
@@ -128,7 +169,6 @@
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
         }
 
-        /* Override: Add button inside filter bar */
         .filter-bar .btn-primary {
             flex: 0 0 auto !important;
             padding: 0.4rem 0.85rem !important;
@@ -143,7 +183,6 @@
             color: white !important;
             border: none !important;
         }
-
         .filter-bar .btn-primary:hover {
             background-color: var(--color-sage-dark) !important;
             box-shadow: 0 4px 12px rgba(138, 174, 122, 0.35) !important;
@@ -159,14 +198,17 @@
                 padding: 0.5rem 0.75rem !important;
                 font-size: 0.75rem !important;
             }
+            .data-table .col-doctor { min-width: 120px; }
+            .data-table .col-day { min-width: 70px; }
+            .data-table .col-time { min-width: 90px; }
+            .data-table .col-room { min-width: 80px; }
+            .data-table .col-actions { min-width: 120px; }
         }
 
-        /* Modal overrides */
         .modal-content {
             border-top: 4px solid var(--color-sage);
         }
 
-        /* Empty state */
         .schedule-empty {
             text-align: center;
             padding: 3rem 1.25rem;
@@ -178,16 +220,287 @@
             display: block;
             opacity: 0.4;
         }
-        .schedule-empty p {
-            font-size: 0.875rem;
-            font-weight: var(--font-weight-light);
-        }
 
-        /* Time display */
         .time-display {
             font-family: monospace;
             font-size: 0.8125rem;
             color: var(--color-brown-600);
+        }
+
+        .detail-modal-content {
+            max-width: 500px;
+        }
+        .detail-row {
+            display: flex;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-default);
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-300);
+            font-size: 0.75rem;
+            width: 120px;
+            flex-shrink: 0;
+        }
+        .detail-value {
+            color: var(--color-brown-700);
+            font-size: 0.85rem;
+            flex: 1;
+        }
+
+        .replacement-info {
+            background: var(--bg-subtle);
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            border-left: 3px solid var(--color-gold);
+            margin-top: 0.5rem;
+        }
+
+        .availability-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.15rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6rem;
+            font-weight: var(--font-weight-medium);
+        }
+        .availability-available { background: #e8f5e2; color: #4a8c3a; }
+        .availability-unavailable { background: #fee2e2; color: #ef4444; }
+        .availability-oncall { background: #fef3dd; color: #9a6a10; }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .calendar-day {
+            background: var(--bg-card);
+            border: 1px solid var(--border-default);
+            border-radius: var(--radius-md);
+            padding: 0.75rem;
+            min-height: 100px;
+            transition: var(--transition-base);
+        }
+        .calendar-day:hover {
+            border-color: var(--color-sage);
+        }
+        .calendar-day .day-name {
+            font-size: 0.65rem;
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-300);
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .calendar-day .day-schedule {
+            font-size: 0.6rem;
+            padding: 0.15rem 0.3rem;
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.25rem;
+            background: var(--bg-muted);
+            color: var(--color-brown-600);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .calendar-day .day-schedule.active {
+            background: #e8f5e2;
+            color: #4a8c3a;
+        }
+        .calendar-day .day-schedule.replaced {
+            background: #fef3dd;
+            color: #9a6a10;
+        }
+        .calendar-day .day-schedule.cancelled {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+        .calendar-day .day-schedule.booked {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .slot-detail {
+            font-size: 0.55rem;
+            color: var(--color-brown-100);
+        }
+
+        .badge-recurring {
+            background: #e2f0fb;
+            color: #2a72b5;
+            padding: 0.1rem 0.4rem;
+            border-radius: var(--radius-full);
+            font-size: 0.55rem;
+            font-weight: var(--font-weight-medium);
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 0.25rem;
+            align-items: center;
+            background: var(--bg-muted);
+            border-radius: var(--radius-md);
+            padding: 0.2rem;
+        }
+        .view-toggle .toggle-btn {
+            padding: 0.25rem 0.7rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            color: var(--color-brown-200);
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-family: var(--font-family);
+            transition: var(--transition-base);
+        }
+        .view-toggle .toggle-btn.active {
+            background: var(--bg-card);
+            color: var(--color-sage-dark);
+            box-shadow: var(--shadow-sm);
+        }
+        .view-toggle .toggle-btn:hover {
+            color: var(--color-brown-600);
+        }
+
+        .doc-availability {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.65rem;
+        }
+        .doc-availability .avail-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .doc-availability .avail-dot.available { background: #4a8c3a; }
+        .doc-availability .avail-dot.unavailable { background: #ef4444; }
+        .doc-availability .avail-dot.oncall { background: #d4a853; }
+
+        #conflictWarning {
+            display: none;
+            background: #fee2e2;
+            color: #ef4444;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-md);
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        /* ─── UNAVAILABLE CONFIRMATION MODAL ─────────────────────── */
+        .unavailable-modal-content {
+            max-width: 460px !important;
+            border-top: 4px solid #ef4444 !important;
+        }
+        .unavailable-icon-circle {
+            width: 4rem;
+            height: 4rem;
+            border-radius: 50%;
+            background-color: #fee2e2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.75rem;
+            color: #dc2626;
+            font-size: 1.5rem;
+        }
+        .unavailable-doctor-name {
+            font-size: 1rem;
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-700);
+            text-align: center;
+        }
+        .unavailable-reason-input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-input);
+            border-radius: var(--radius-md);
+            font-family: var(--font-family);
+            font-size: 0.8125rem;
+            color: var(--color-brown-700);
+            outline: none;
+            transition: var(--transition-base);
+            margin-top: 0.25rem;
+        }
+        .unavailable-reason-input:focus {
+            border-color: var(--color-sage-light);
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.2);
+        }
+        .unavailable-replacement-info {
+            background: var(--bg-subtle);
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-md);
+            font-size: 0.75rem;
+            color: var(--color-brown-300);
+            margin-top: 0.5rem;
+        }
+        .unavailable-replacement-info strong {
+            color: var(--color-brown-700);
+        }
+        .unavailable-no-replacement {
+            background: #fee2e2;
+            color: #ef4444;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-md);
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        .unavailable-label {
+            font-size: 0.7rem;
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-200);
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+        /* Replacement dropdown styling */
+        .unavailable-select {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-input);
+            border-radius: var(--radius-md);
+            font-family: var(--font-family);
+            font-size: 0.8125rem;
+            color: var(--color-brown-700);
+            background: var(--bg-card);
+            outline: none;
+            transition: var(--transition-base);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b8aa9a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.625rem center;
+            background-size: 10px;
+            cursor: pointer;
+        }
+        .unavailable-select:focus {
+            border-color: var(--color-sage-light);
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.2);
+        }
+        .unavailable-select option:disabled {
+            color: var(--color-brown-100);
+        }
+
+        @media (max-width: 768px) {
+            .calendar-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.3rem;
+            }
+            .calendar-day {
+                min-height: 70px;
+                padding: 0.3rem;
+            }
+            .unavailable-modal-content {
+                max-width: 95% !important;
+            }
+        }
+        @media (max-width: 480px) {
+            .calendar-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
@@ -215,8 +528,20 @@
             <div class="stat-card">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
-                        <p class="stat-label">Doctors Scheduled</p>
-                        <p class="stat-value" id="doctorsScheduled">0</p>
+                        <p class="stat-label">Available Slots</p>
+                        <p class="stat-value" id="availableSlots">0</p>
+                    </div>
+                    <div class="stat-icon-bg">
+                        <i class="fas fa-check-circle" style="color:var(--color-sage); font-size:1.125rem;"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <p class="stat-label">Booked Slots</p>
+                        <p class="stat-value" id="bookedSlots">0</p>
                     </div>
                     <div class="stat-icon-bg">
                         <i class="fas fa-user-md" style="color:var(--color-sage); font-size:1.125rem;"></i>
@@ -227,29 +552,17 @@
             <div class="stat-card">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
-                        <p class="stat-label">Busiest Day</p>
-                        <p class="stat-value" id="busiestDay" style="font-size:1.125rem; margin-top:0.375rem;">-</p>
+                        <p class="stat-label">Holidays / Unavailable</p>
+                        <p class="stat-value" id="holidayCount">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-chart-bar" style="color:var(--color-sage); font-size:1.125rem;"></i>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="stat-card">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Active Rooms</p>
-                        <p class="stat-value" id="activeRooms">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-door-open" style="color:var(--color-sage); font-size:1.125rem;"></i>
+                        <i class="fas fa-calendar-times" style="color:var(--color-sage); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Filter Bar with Add Button -->
+        <!-- Filter Bar -->
         <div class="filter-bar">
             <div class="search-wrapper">
                 <i class="fas fa-search"></i>
@@ -265,33 +578,58 @@
                 <option value="Saturday">Saturday</option>
                 <option value="Sunday">Sunday</option>
             </select>
+            <select id="statusFilter" class="form-select">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="replaced">Replaced</option>
+                <option value="completed">Completed</option>
+                <option value="booked">Booked</option>
+                <option value="available">Available</option>
+            </select>
             <button id="resetFilterBtn" class="btn-secondary">
                 <i class="fas fa-undo-alt"></i>
                 <span>Reset</span>
             </button>
+            
+            <!-- View Toggle -->
+            <div class="view-toggle">
+                <button class="toggle-btn active" id="tableViewBtn" title="Table View">
+                    <i class="fas fa-table"></i>
+                </button>
+                <button class="toggle-btn" id="calendarViewBtn" title="Calendar View">
+                    <i class="fas fa-calendar-alt"></i>
+                </button>
+                <button class="toggle-btn" id="dayViewBtn" title="Day View">
+                    <i class="fas fa-calendar-day"></i>
+                </button>
+            </div>
+            
             <button id="addScheduleBtn" class="btn-primary">
                 <i class="fas fa-plus"></i>
                 <span>Add Schedule</span>
             </button>
         </div>
 
-        <!-- Schedule Table -->
-        <div class="card-white" style="margin-top: 1.5rem; overflow:hidden;">
+        <!-- Table View -->
+        <div id="tableView" class="card-white" style="margin-top: 1.5rem; overflow:hidden;">
             <div class="table-wrapper">
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Doctor</th>
-                            <th>Day</th>
-                            <th>Start Time</th>
-                            <th>End Time</th>
-                            <th>Room</th>
-                            <th style="text-align:center;">Actions</th>
+                            <th class="col-doctor">Doctor</th>
+                            <th class="col-day">Day</th>
+                            <th class="col-time">Time</th>
+                            <th class="col-room">Room</th>
+                            <th class="col-status">Status</th>
+                            <th class="col-availability">Availability</th>
+                            <th class="col-slots">Slots</th>
+                            <th class="col-actions">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="scheduleTable">
                         <tr>
-                            <td colspan="6" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
+                            <td colspan="8" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
                                 <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
                                 <p style="font-weight:var(--font-weight-light);">Loading schedules...</p>
                             </td>
@@ -300,11 +638,57 @@
                 </table>
             </div>
         </div>
+
+        <!-- Calendar View -->
+        <div id="calendarView" style="display:none; margin-top:1.5rem;">
+            <div class="card-white" style="padding:1.25rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+                    <h3 style="font-weight:var(--font-weight-medium);">
+                        <i class="fas fa-calendar-week" style="color:var(--color-sage);"></i> Weekly Schedule
+                    </h3>
+                    <div style="display:flex; gap:0.5rem;">
+                        <button class="btn-secondary" id="prevWeekBtn" style="padding:0.2rem 0.6rem; font-size:0.7rem;">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span id="weekLabel" style="font-size:0.8rem; color:var(--color-brown-300); padding:0.2rem 0.5rem;">This Week</span>
+                        <button class="btn-secondary" id="nextWeekBtn" style="padding:0.2rem 0.6rem; font-size:0.7rem;">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="calendarGrid" class="calendar-grid">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Day View -->
+        <div id="dayViewContainer" style="display:none; margin-top:1.5rem;">
+            <div class="card-white" style="padding:1.25rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+                    <h3 style="font-weight:var(--font-weight-medium);">
+                        <i class="fas fa-calendar-day" style="color:var(--color-sage);"></i> Day Schedule
+                    </h3>
+                    <div style="display:flex; gap:0.5rem;">
+                        <button class="btn-secondary" id="prevDayBtn" style="padding:0.2rem 0.6rem; font-size:0.7rem;">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span id="dayLabel" style="font-size:0.8rem; color:var(--color-brown-300); padding:0.2rem 0.5rem;">Today</span>
+                        <button class="btn-secondary" id="nextDayBtn" style="padding:0.2rem 0.6rem; font-size:0.7rem;">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="dayViewContent">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
+        </div>
     </main>
 
-    <!-- Add Schedule Modal - Using theme's modal system -->
+    <!-- Add/Edit Schedule Modal -->
     <div id="scheduleModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-        <div class="form-card" style="max-width:40rem;">
+        <div class="form-card" style="max-width:48rem;">
             <div class="modal-header">
                 <h3 class="modal-title" id="modalTitle">
                     <i class="fas fa-calendar-plus"></i>
@@ -315,38 +699,101 @@
                 </button>
             </div>
             <form id="scheduleForm">
+                <input type="hidden" id="editScheduleId">
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label class="form-label">Select Doctor <span style="color:var(--color-error-text);">*</span></label>
-                        <select id="doctorId" required class="form-select">
-                            <option value="">-- Select Doctor --</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Day <span style="color:var(--color-error-text);">*</span></label>
-                        <select id="day" required class="form-select">
-                            <option value="Monday">Monday</option>
-                            <option value="Tuesday">Tuesday</option>
-                            <option value="Wednesday">Wednesday</option>
-                            <option value="Thursday">Thursday</option>
-                            <option value="Friday">Friday</option>
-                            <option value="Saturday">Saturday</option>
-                            <option value="Sunday">Sunday</option>
-                        </select>
-                    </div>
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem 1.5rem;">
                         <div class="form-group">
+                            <label class="form-label">Select Doctor <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="doctorId" required class="form-select">
+                                <option value="">-- Select Doctor --</option>
+                            </select>
+                            <div id="doctorAvailabilityInfo" style="margin-top:0.25rem; font-size:0.7rem; color:var(--color-brown-100); display:none;">
+                                <i class="fas fa-circle" style="font-size:0.4rem;"></i> 
+                                <span id="doctorAvailText">Available</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Day <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="day" required class="form-select">
+                                <option value="Monday">Monday</option>
+                                <option value="Tuesday">Tuesday</option>
+                                <option value="Wednesday">Wednesday</option>
+                                <option value="Thursday">Thursday</option>
+                                <option value="Friday">Friday</option>
+                                <option value="Saturday">Saturday</option>
+                                <option value="Sunday">Sunday</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label class="form-label">Start Time <span style="color:var(--color-error-text);">*</span></label>
-                            <input type="time" id="startTime" required class="form-input">
+                            <input type="time" id="startTime" required class="form-input" step="1800">
                         </div>
                         <div class="form-group">
                             <label class="form-label">End Time <span style="color:var(--color-error-text);">*</span></label>
-                            <input type="time" id="endTime" required class="form-input">
+                            <input type="time" id="endTime" required class="form-input" step="1800">
                         </div>
-                    </div>
-                    <div class="form-group" style="margin-bottom:0;">
-                        <label class="form-label">Room Number</label>
-                        <input type="text" id="room" class="form-input" placeholder="e.g., Room 101, Clinic A">
+                        <div class="form-group">
+                            <label class="form-label">Slot Duration</label>
+                            <select id="slotDuration" class="form-select">
+                                <option value="15">15 mins</option>
+                                <option value="30" selected>30 mins</option>
+                                <option value="45">45 mins</option>
+                                <option value="60">60 mins</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Max Patients/Day</label>
+                            <input type="number" id="maxPatients" class="form-input" value="20" min="1" max="50">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Room Number</label>
+                            <input type="text" id="room" class="form-input" placeholder="e.g., Room 101">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select id="scheduleStatus" class="form-select">
+                                <option value="active">Active</option>
+                                <option value="cancelled">Cancelled</option>
+                                <option value="replaced">Replaced</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Recurring Pattern</label>
+                            <select id="recurringPattern" class="form-select">
+                                <option value="none">None (One-time)</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="biweekly">Bi-Weekly</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="recurringEndGroup" style="display:none;">
+                            <label class="form-label">End Date</label>
+                            <input type="date" id="recurringEnd" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Break Start</label>
+                            <input type="time" id="breakStart" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Break End</label>
+                            <input type="time" id="breakEnd" class="form-input">
+                        </div>
+                        <div class="form-group" id="replacementGroup" style="display:none;">
+                            <label class="form-label">Replacement Doctor</label>
+                            <select id="replacementDoctorId" class="form-select">
+                                <option value="">-- Select Replacement --</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column:1 / -1;">
+                            <label class="form-label">Notes</label>
+                            <textarea id="scheduleNotes" rows="2" class="form-textarea" placeholder="Special instructions..."></textarea>
+                        </div>
+                        <div class="form-group" style="grid-column:1 / -1;">
+                            <div id="conflictWarning" style="display:none; background:#fee2e2; color:#ef4444; padding:0.5rem 0.75rem; border-radius:var(--radius-md); font-size:0.75rem;">
+                                <i class="fas fa-exclamation-triangle"></i> 
+                                <span id="conflictMessage">This doctor already has a schedule on this day!</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -357,6 +804,111 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- View Schedule Detail Modal -->
+    <div id="viewScheduleModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="form-card detail-modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="viewModalTitle">
+                    <i class="fas fa-eye" style="color:var(--color-sage);"></i>
+                    Schedule Details
+                </h3>
+                <button class="close-btn" id="closeViewModalBtn" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="viewScheduleContent">
+                <!-- Dynamically populated -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="closeViewModalFooterBtn" class="btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Book Slot Modal -->
+    <div id="bookSlotModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="form-card" style="max-width:400px;">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-user-plus" style="color:var(--color-sage);"></i> Book Slot</h3>
+                <button class="close-btn" id="closeBookSlotBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="bookSlotForm">
+                    <input type="hidden" id="bookScheduleId">
+                    <input type="hidden" id="bookSlotIndex">
+                    <div style="background:var(--bg-subtle); padding:0.5rem 0.75rem; border-radius:var(--radius-md); margin-bottom:0.75rem;">
+                        <div style="font-size:0.75rem; color:var(--color-brown-300);">Doctor: <span id="bookDoctorName" style="font-weight:var(--font-weight-medium); color:var(--color-brown-700);"></span></div>
+                        <div style="font-size:0.75rem; color:var(--color-brown-300);">Date: <span id="bookDateDisplay" style="font-weight:var(--font-weight-medium); color:var(--color-brown-700);"></span></div>
+                        <div style="font-size:0.75rem; color:var(--color-brown-300);">Time: <span id="bookTimeDisplay" style="font-weight:var(--font-weight-medium); color:var(--color-brown-700);"></span></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Patient Name <span style="color:var(--color-error-text);">*</span></label>
+                        <input type="text" id="bookPatientName" required class="form-input" placeholder="Enter patient name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Patient Phone <span style="color:var(--color-error-text);">*</span></label>
+                        <input type="tel" id="bookPatientPhone" required class="form-input" placeholder="+91 98765 43210">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Reason</label>
+                        <input type="text" id="bookReason" class="form-input" placeholder="Reason for visit">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cancelBookSlotBtn" class="btn-secondary">Cancel</button>
+                <button type="button" id="confirmBookSlotBtn" class="btn-primary"><i class="fas fa-check"></i> Book Slot</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── UNAVAILABLE CONFIRMATION MODAL WITH REPLACEMENT DROPDOWN ─── -->
+    <div id="unavailableModal" class="modal-overlay modal-danger" role="dialog" aria-modal="true">
+        <div class="form-card unavailable-modal-content">
+            <div class="modal-header" style="border-bottom-color:#fee2e2;">
+                <h3 class="modal-title" style="color:#dc2626;">
+                    <i class="fas fa-ban" style="color:#dc2626;"></i>
+                    Mark Doctor Unavailable
+                </h3>
+                <button class="close-btn" id="closeUnavailableModalBtn" aria-label="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align:center;">
+                    <div class="unavailable-icon-circle">
+                        <i class="fas fa-user-slash"></i>
+                    </div>
+                    <div class="unavailable-doctor-name" id="unavailableDoctorName">Dr. Name</div>
+                    <p style="font-size:0.8rem; color:var(--color-brown-300); margin-top:0.25rem;">
+                        This will mark the doctor as unavailable and auto-reassign patients.
+                    </p>
+                </div>
+                
+                <!-- 🆕 Replacement Doctor Dropdown -->
+                <div style="margin-top:0.75rem;">
+                    <label class="unavailable-label">Replacement Doctor</label>
+                    <select id="unavailableReplacementDoctor" class="unavailable-select">
+                        <option value="">-- Select Replacement (Optional) --</option>
+                    </select>
+                    <small style="font-size:0.6rem; color:var(--color-brown-100);">If no replacement selected, patients will need manual reassignment.</small>
+                </div>
+                
+                <div style="margin-top:0.75rem;">
+                    <label class="unavailable-label">Reason <span style="color:var(--color-error-text);">*</span></label>
+                    <input type="text" id="unavailableReason" class="unavailable-reason-input" placeholder="e.g., Emergency leave, Vacation, Sick leave">
+                </div>
+            </div>
+            <div class="modal-footer" style="justify-content:center; border-top-color:#fee2e2;">
+                <button type="button" id="cancelUnavailableBtn" class="btn-secondary">Cancel</button>
+                <button type="button" id="confirmUnavailableBtn" class="btn-danger">
+                    <i class="fas fa-check"></i>
+                    Confirm Unavailable
+                </button>
+            </div>
         </div>
     </div>
 

@@ -87,41 +87,37 @@ function renderUsers() {
     if(!tbody) return;
     
     if(filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-[#d4c9bc]"><i class="fas fa-users text-2xl block mb-2 opacity-50"></i><p class="font-light">No users found</p></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:3rem 0; color:var(--color-brown-100);"><i class="fas fa-users" style="font-size:2rem; display:block; margin-bottom:0.75rem; opacity:0.4;"></i><p style="font-weight:var(--font-weight-light);">No users found</p></td></tr>';
         return;
     }
     
     tbody.innerHTML = filtered.map(user => `
-        <tr class="user-row">
-            <td class="px-5 py-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 bg-gradient-to-r from-[#a8c49a] to-[#8aae7a] rounded-full flex items-center justify-center text-white text-sm font-medium">
-                        ${user.fullName.charAt(0)}
-                    </div>
-                    <div>
-                        <p class="font-medium text-[#5a4a3a] text-sm">${escapeHtml(user.fullName)}</p>
-                        <p class="text-xs text-[#b8aa9a]">${user.phone || '-'}</p>
-                    </div>
+        <tr>
+            <td style="text-align: center !important; font-weight: 500; color: #5a4a3a;">${user.id}</td>
+            <td style="text-align: left !important;">
+                <div>
+                    <p class="user-name">${escapeHtml(user.fullName)}</p>
+                    <p class="user-phone">${user.phone || '-'}</p>
                 </div>
             </td>
-            <td class="px-5 py-4 text-sm text-[#6b5b4e]">${escapeHtml(user.email)}</td>
-            <td class="px-5 py-4"><span class="badge-neutral text-xs">${user.roleName}</span></td>
-            <td class="px-5 py-4 text-sm text-[#6b5b4e]">${user.departmentName || '-'}</td>
-            <td class="px-5 py-4">
-                <span class="${user.status === 'Active' ? 'badge-success' : 'badge-error'} text-xs">
+            <td style="text-align: center !important;">${escapeHtml(user.email)}</td>
+            <td style="text-align: center !important;"><span class="badge-neutral">${user.roleName}</span></td>
+            <td style="text-align: center !important;">${user.departmentName || '-'}</td>
+            <td style="text-align: center !important;">
+                <span class="${user.status === 'Active' ? 'badge-success' : 'badge-error'}">
                     ${user.status}
                 </span>
             </td>
-            <td class="px-5 py-4 text-sm text-[#b8aa9a]">${user.lastLogin || 'Never'}</td>
-            <td class="px-5 py-4 text-center">
-                <div class="flex gap-2 justify-center">
-                    <button onclick="editUser(${user.id})" class="action-icon text-[#a8c49a] hover:text-[#7a9a68]" title="Edit">
+            <td style="text-align: center !important;">${user.lastLogin || 'Never'}</td>
+            <td style="text-align: center !important;">
+                <div class="action-group">
+                    <button onclick="editUser(${user.id})" class="action-icon edit" title="Edit">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button onclick="resetUserPassword(${user.id})" class="action-icon text-[#d4a853] hover:text-[#b8893a]" title="Reset Password">
+                    <button onclick="resetUserPassword(${user.id})" class="action-icon key" title="Reset Password">
                         <i class="fas fa-key"></i>
                     </button>
-                    <button onclick="deleteUser(${user.id})" class="action-icon text-[#d8b48c] hover:text-[#c49a6c]" title="Delete">
+                    <button onclick="deleteUser(${user.id})" class="action-icon delete" title="Delete">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
@@ -131,16 +127,31 @@ function renderUsers() {
 }
 
 // ==================== MODAL CONTROLS - FIXED ====================
+function openModal(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeModal(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
 function openAddModal() {
     const form = document.getElementById('userForm');
     if(form) form.reset();
     document.getElementById('userId').value = '';
-    document.getElementById('modalTitle').innerText = 'Add New User';
+    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus"></i> Add New User';
     document.getElementById('password').required = true;
     document.getElementById('password').placeholder = 'Enter password *';
-    // FIXED: Using theme.css classes
-    document.getElementById('userModal').classList.add('opacity-100', 'visible');
-    document.getElementById('userModal').classList.remove('opacity-0', 'invisible');
+    document.querySelectorAll('.error-text').forEach(e => e.classList.remove('show'));
+    openModal('userModal');
 }
 
 function editUser(id) {
@@ -155,32 +166,28 @@ function editUser(id) {
         document.getElementById('status').value = user.status;
         document.getElementById('password').required = false;
         document.getElementById('password').placeholder = 'Leave blank to keep unchanged';
-        document.getElementById('modalTitle').innerText = 'Edit User';
-        // FIXED: Using theme.css classes
-        document.getElementById('userModal').classList.add('opacity-100', 'visible');
-        document.getElementById('userModal').classList.remove('opacity-0', 'invisible');
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-edit"></i> Edit User';
+        document.querySelectorAll('.error-text').forEach(e => e.classList.remove('show'));
+        openModal('userModal');
     }
 }
 
 function deleteUser(id) {
     deleteId = id;
-    // FIXED: Using theme.css classes
-    document.getElementById('deleteModal').classList.add('opacity-100', 'visible');
-    document.getElementById('deleteModal').classList.remove('opacity-0', 'invisible');
+    openModal('deleteModal');
 }
 
 function confirmDelete() {
     if(deleteId) {
+        const user = users.find(u => u.id === deleteId);
         users = users.filter(u => u.id !== deleteId);
         saveUsers();
         updateStats();
         renderUsers();
-        logAudit('DELETE_USER', `User ID ${deleteId} deleted`);
-        showToast('User deleted successfully', 'success');
+        logAudit('DELETE_USER', `User ${user?.email || 'ID ' + deleteId} deleted`);
+        showToast(`🗑️ ${user?.fullName || 'User'} deleted successfully`, 'success');
         deleteId = null;
-        // FIXED: Using theme.css classes
-        document.getElementById('deleteModal').classList.remove('opacity-100', 'visible');
-        document.getElementById('deleteModal').classList.add('opacity-0', 'invisible');
+        closeModal('deleteModal');
     }
 }
 
@@ -189,12 +196,10 @@ function resetUserPassword(id) {
     const user = users.find(u => u.id === id);
     if(user) {
         resetUserId = id;
-        document.getElementById('resetUserEmail').innerHTML = `Reset password for: <strong class="text-[#5a4a3a]">${user.email}</strong>`;
+        document.getElementById('resetUserEmail').innerHTML = `Reset password for: <strong style="color:var(--color-brown-700);">${escapeHtml(user.email)}</strong>`;
         document.getElementById('newPassword').value = '';
         document.getElementById('confirmPassword').value = '';
-        // FIXED: Using theme.css classes
-        document.getElementById('resetPasswordModal').classList.add('opacity-100', 'visible');
-        document.getElementById('resetPasswordModal').classList.remove('opacity-0', 'invisible');
+        openModal('resetPasswordModal');
     }
 }
 
@@ -218,22 +223,9 @@ function confirmResetPassword() {
         saveUsers();
         logAudit('RESET_PASSWORD', `Password reset for user ${user.email}`);
         showToast('Password reset successfully!', 'success');
-        // FIXED: Using theme.css classes
-        document.getElementById('resetPasswordModal').classList.remove('opacity-100', 'visible');
-        document.getElementById('resetPasswordModal').classList.add('opacity-0', 'invisible');
+        closeModal('resetPasswordModal');
         resetUserId = null;
     }
-}
-
-// ==================== CLOSE MODAL - FIXED ====================
-function closeModal() {
-    // FIXED: Using theme.css classes
-    document.getElementById('userModal')?.classList.remove('opacity-100', 'visible');
-    document.getElementById('userModal')?.classList.add('opacity-0', 'invisible');
-    document.getElementById('deleteModal')?.classList.remove('opacity-100', 'visible');
-    document.getElementById('deleteModal')?.classList.add('opacity-0', 'invisible');
-    document.getElementById('resetPasswordModal')?.classList.remove('opacity-100', 'visible');
-    document.getElementById('resetPasswordModal')?.classList.add('opacity-0', 'invisible');
 }
 
 // ==================== SAVE USER ====================
@@ -241,18 +233,23 @@ function saveUser(e) {
     e.preventDefault();
     
     const id = document.getElementById('userId').value;
+    const fullName = document.getElementById('fullName').value.trim();
+    const email = document.getElementById('email').value.trim();
     const roleId = parseInt(document.getElementById('roleId').value);
-    const role = roles.find(r => r.id === roleId);
     const departmentId = document.getElementById('departmentId').value ? parseInt(document.getElementById('departmentId').value) : null;
-    const department = departments.find(d => d.id === departmentId);
+    const phone = document.getElementById('phone').value.trim();
+    const status = document.getElementById('status').value;
     const password = document.getElementById('password').value;
     
+    const role = roles.find(r => r.id === roleId);
+    const department = departments.find(d => d.id === departmentId);
+    
     // Validation
-    if(!document.getElementById('fullName').value.trim()) {
+    if(!fullName) {
         showToast('Please enter full name', 'error');
         return;
     }
-    if(!document.getElementById('email').value.trim()) {
+    if(!email) {
         showToast('Please enter email', 'error');
         return;
     }
@@ -266,14 +263,14 @@ function saveUser(e) {
     }
     
     const userData = {
-        fullName: document.getElementById('fullName').value.trim(),
-        email: document.getElementById('email').value.trim(),
+        fullName: fullName,
+        email: email,
         roleId: roleId,
         roleName: role?.name || '',
         departmentId: departmentId,
         departmentName: department?.name || '',
-        phone: document.getElementById('phone').value.trim(),
-        status: document.getElementById('status').value,
+        phone: phone,
+        status: status,
         updatedAt: new Date().toISOString()
     };
     
@@ -285,7 +282,7 @@ function saveUser(e) {
             }
             users[index] = { ...users[index], ...userData };
             logAudit('UPDATE_USER', `User ${users[index].email} updated`);
-            showToast('User updated successfully', 'success');
+            showToast(`✅ ${fullName} updated successfully`, 'success');
         }
     } else {
         const newId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
@@ -296,14 +293,14 @@ function saveUser(e) {
             createdAt: new Date().toISOString(),
             lastLogin: null
         });
-        logAudit('CREATE_USER', `New user created: ${userData.email}`);
-        showToast('User created successfully', 'success');
+        logAudit('CREATE_USER', `New user created: ${email}`);
+        showToast(`✅ ${fullName} created successfully`, 'success');
     }
     
     saveUsers();
     updateStats();
     renderUsers();
-    closeModal();
+    closeModal('userModal');
 }
 
 // ==================== UTILITIES ====================
@@ -322,15 +319,14 @@ function logAudit(action, details) {
     localStorage.setItem('audit_logs', JSON.stringify(auditLogs));
 }
 
-function showToast(message, type) {
-    // Remove existing toast
-    const existingToast = document.querySelector('.toast-notification');
-    if(existingToast) existingToast.remove();
+function showToast(message, type = 'success') {
+    // Remove existing toasts
+    document.querySelectorAll('.toast-notification').forEach(t => t.remove());
     
     const toast = document.createElement('div');
     toast.className = `toast-notification toast-${type}`;
     const icons = { success: 'fa-check-circle', error: 'fa-exclamation-triangle', info: 'fa-info-circle' };
-    toast.innerHTML = `<i class="fas ${icons[type] || icons.info} text-sm"></i><span>${message}</span>`;
+    toast.innerHTML = `<i class="fas ${icons[type] || icons.info}" style="font-size:0.875rem;"></i> <span>${escapeHtml(message)}</span>`;
     document.body.appendChild(toast);
     
     setTimeout(() => {
@@ -347,20 +343,27 @@ function escapeHtml(str) {
 }
 
 // ==================== EVENT LISTENERS ====================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
     loadData();
     
+    // Add button
     document.getElementById('addUserBtn')?.addEventListener('click', openAddModal);
-    document.getElementById('closeModalBtn')?.addEventListener('click', closeModal);
-    document.getElementById('cancelModalBtn')?.addEventListener('click', closeModal);
-    document.getElementById('cancelDeleteBtn')?.addEventListener('click', closeModal);
+    
+    // Modal close buttons
+    document.getElementById('closeModalBtn')?.addEventListener('click', () => closeModal('userModal'));
+    document.getElementById('cancelModalBtn')?.addEventListener('click', () => closeModal('userModal'));
+    document.getElementById('cancelDeleteBtn')?.addEventListener('click', () => closeModal('deleteModal'));
+    document.getElementById('cancelDeleteModalBtn')?.addEventListener('click', () => closeModal('deleteModal'));
     document.getElementById('confirmDeleteBtn')?.addEventListener('click', confirmDelete);
-    document.getElementById('cancelResetBtn')?.addEventListener('click', closeModal);
+    document.getElementById('cancelResetBtn')?.addEventListener('click', () => closeModal('resetPasswordModal'));
+    document.getElementById('cancelResetModalBtn')?.addEventListener('click', () => closeModal('resetPasswordModal'));
     document.getElementById('confirmResetBtn')?.addEventListener('click', confirmResetPassword);
     document.getElementById('userForm')?.addEventListener('submit', saveUser);
-    document.getElementById('searchInput')?.addEventListener('input', () => renderUsers());
-    document.getElementById('roleFilter')?.addEventListener('change', () => renderUsers());
-    document.getElementById('statusFilter')?.addEventListener('change', () => renderUsers());
+    
+    // Search & Filter
+    document.getElementById('searchInput')?.addEventListener('input', renderUsers);
+    document.getElementById('roleFilter')?.addEventListener('change', renderUsers);
+    document.getElementById('statusFilter')?.addEventListener('change', renderUsers);
     document.getElementById('resetFilter')?.addEventListener('click', () => {
         document.getElementById('searchInput').value = '';
         document.getElementById('roleFilter').value = '';
@@ -368,23 +371,23 @@ document.addEventListener('DOMContentLoaded', () => {
         renderUsers();
     });
     
-    // Close modal on overlay click
-    document.querySelectorAll('.modal-overlay').forEach(overlay => {
-        overlay.addEventListener('click', function(e) {
-            if(e.target === this) {
-                this.classList.remove('opacity-100', 'visible');
-                this.classList.add('opacity-0', 'invisible');
-            }
-        });
+    // Close modals on overlay click
+    document.getElementById('userModal')?.addEventListener('click', function(e) {
+        if(e.target === this) closeModal('userModal');
+    });
+    document.getElementById('deleteModal')?.addEventListener('click', function(e) {
+        if(e.target === this) closeModal('deleteModal');
+    });
+    document.getElementById('resetPasswordModal')?.addEventListener('click', function(e) {
+        if(e.target === this) closeModal('resetPasswordModal');
     });
     
-    // Close modal on Escape key
+    // ESC key
     document.addEventListener('keydown', function(e) {
         if(e.key === 'Escape') {
-            document.querySelectorAll('.modal-overlay.opacity-100').forEach(modal => {
-                modal.classList.remove('opacity-100', 'visible');
-                modal.classList.add('opacity-0', 'invisible');
-            });
+            closeModal('userModal');
+            closeModal('deleteModal');
+            closeModal('resetPasswordModal');
         }
     });
 });
@@ -393,3 +396,6 @@ document.addEventListener('DOMContentLoaded', () => {
 window.editUser = editUser;
 window.deleteUser = deleteUser;
 window.resetUserPassword = resetUserPassword;
+window.openAddModal = openAddModal;
+window.openModal = openModal;
+window.closeModal = closeModal;

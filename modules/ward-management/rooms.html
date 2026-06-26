@@ -13,244 +13,555 @@
 
     <style>
         /* ============================================================
-           ROOMS MODULE — Page-specific only
-           All base styles come from theme.css
+           ROOMS MODULE — COMPLETE PROFESSIONAL VERSION
            ============================================================ */
 
-        /* Room table row */
-        .room-row {
-            transition: var(--transition-base);
-            border-bottom: 1px solid var(--border-default);
+        .main-content {
+            margin-left: 260px !important;
+            margin-top: 70px !important;
+            padding: 1.25rem 1.5rem !important;
+            transition: margin-left 0.3s ease !important;
+            min-height: 100vh !important;
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
         }
-        .room-row:hover {
-            background-color: var(--bg-subtle);
+        .main-content.loaded { opacity: 1; }
+        #mainSidebar[data-collapsed="true"] ~ .main-content,
+        #mainSidebar[data-collapsed="true"] + .main-content {
+            margin-left: 72px !important;
         }
-        .room-row:last-child {
-            border-bottom: none;
+        @media (max-width: 1024px) {
+            .main-content { margin-left: 0 !important; padding: 1rem !important; }
         }
-
-        /* Table wrapper */
-        .table-wrapper {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        /* Data table */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8125rem;
-        }
-        .data-table thead {
-            background-color: var(--bg-muted);
-            border-bottom: 1px solid var(--border-default);
-        }
-        .data-table th {
-            text-align: left;
-            padding: 0.75rem 1.25rem;
-            font-weight: var(--font-weight-medium);
-            color: var(--color-brown-300);
-            font-size: 0.6875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-        .data-table td {
-            padding: 0.75rem 1.25rem;
-            color: var(--color-brown-700);
-            vertical-align: middle;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Room type badge */
-        .room-type-badge {
-            padding: 0.1rem 0.625rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            background: var(--bg-muted);
-            color: var(--color-brown-300);
+        /* ─── Page Header ─── */
+        .page-header-custom {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 1.25rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.75rem !important;
         }
+        .page-header-custom h1 {
+            font-size: 1.375rem !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-700) !important;
+            margin: 0 !important;
+        }
+        .page-header-custom h1 i { color: var(--color-sage) !important; margin-right: 0.5rem !important; }
+        .page-header-custom p { font-size: 0.75rem !important; color: var(--color-brown-100) !important; margin: 0 !important; }
 
-        /* Status badges */
-        .status-available {
-            background: var(--color-success-bg);
-            color: var(--color-success-text);
-            padding: 0.1rem 0.625rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-        }
-        .status-full {
-            background: var(--color-error-bg);
-            color: var(--color-error-text);
-            padding: 0.1rem 0.625rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-        }
-
-        /* Action buttons */
-        .action-btn {
-            color: var(--color-brown-100);
-            transition: var(--transition-base);
-            padding: 0.25rem 0.375rem;
-            border-radius: var(--radius-sm);
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 0.875rem;
-        }
-        .action-btn:hover {
-            color: var(--color-sage-dark);
-        }
-        .action-btn.delete:hover {
-            color: #dc2626;
-        }
-
-        /* Delete modal - danger variant */
-        .modal-danger .form-card {
-            border-top-color: #ef4444;
-        }
-
-        .delete-icon-circle {
-            width: 3.5rem;
-            height: 3.5rem;
-            border-radius: 50%;
-            background-color: #fee2e2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            color: #dc2626;
-            font-size: 1.25rem;
-        }
-
-        /* Danger button */
-        .btn-danger {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.375rem;
-            background-color: #ef4444;
-            color: white;
-            font-family: var(--font-family);
-            font-size: 0.8125rem;
-            font-weight: var(--font-weight-light);
-            padding: 0.5rem 1.25rem;
-            border: none;
-            border-radius: var(--radius-lg);
-            cursor: pointer;
-            transition: var(--transition-base);
-        }
-        .btn-danger:hover {
-            background-color: #dc2626;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-        }
-
-        /* Override: Add button inside filter bar */
-        .filter-bar .btn-primary {
-            flex: 0 0 auto !important;
+        .header-actions { display: flex !important; gap: 0.5rem !important; flex-wrap: wrap !important; }
+        .btn-header {
             padding: 0.4rem 0.85rem !important;
-            font-size: 0.8125rem !important;
-            height: 38px !important;
+            font-size: 0.8rem !important;
+            border-radius: var(--radius-md) !important;
+            font-family: var(--font-family) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
             display: inline-flex !important;
             align-items: center !important;
-            gap: 0.35rem !important;
+            gap: 0.375rem !important;
+            border: none !important;
+        }
+        .btn-header-primary {
+            background: var(--color-sage) !important;
+            color: white !important;
+        }
+        .btn-header-primary:hover {
+            background: var(--color-sage-dark) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+        }
+        .btn-header-secondary {
+            background: var(--bg-card) !important;
+            color: var(--color-brown-200) !important;
+            border: 1px solid var(--border-input) !important;
+        }
+        .btn-header-secondary:hover {
+            background: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+        }
+
+        /* ─── Stats ─── */
+        .grid-stats {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 1rem !important;
+            margin-bottom: 1.25rem !important;
+        }
+        .stat-card {
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-lg) !important;
+            padding: 1rem 1.25rem !important;
+            transition: all 0.2s ease !important;
+        }
+        .stat-card:hover { transform: translateY(-2px) !important; box-shadow: var(--shadow-md) !important; }
+        .stat-card .stat-value {
+            font-size: 1.5rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            margin-top: 0.125rem !important;
+        }
+        .stat-card .stat-label {
+            font-size: 0.625rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
+            color: var(--color-brown-200) !important;
+        }
+        .stat-card .stat-icon-bg {
+            width: 2.5rem !important;
+            height: 2.5rem !important;
+            border-radius: var(--radius-md) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: var(--bg-muted) !important;
+        }
+        .stat-card .stat-icon-bg i { font-size: 1rem !important; }
+        .stat-card-blue { border-left: 4px solid #3b82f6 !important; }
+        .stat-card-green { border-left: 4px solid var(--color-success-text) !important; }
+        .stat-card-purple { border-left: 4px solid #9333ea !important; }
+        .stat-card-orange { border-left: 4px solid var(--color-warning-text) !important; }
+
+        /* ─── Filter Bar ─── */
+        .filter-bar {
+            display: flex !important;
+            align-items: center !important;
+            flex-wrap: nowrap !important;
+            gap: 0.625rem !important;
+            padding: 0.625rem 1rem !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-lg) !important;
+            margin-bottom: 1.25rem !important;
+        }
+        .filter-bar .search-wrapper {
+            flex: 1 1 200px !important;
+            min-width: 150px !important;
+            max-width: 320px !important;
+            position: relative !important;
+        }
+        .filter-bar .search-wrapper i {
+            position: absolute !important;
+            left: 0.75rem !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            color: var(--color-brown-100) !important;
+            font-size: 0.8125rem !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
+        }
+        .filter-bar .search-input {
+            width: 100% !important;
+            padding: 0.375rem 0.75rem 0.375rem 2.25rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            border: 1px solid var(--border-input) !important;
+            border-radius: var(--radius-md) !important;
+            background: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
+            font-family: var(--font-family) !important;
+            outline: none !important;
+            transition: all 0.2s ease !important;
+        }
+        .filter-bar .search-input:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+        }
+        .filter-bar .form-select {
+            min-width: 120px !important;
+            max-width: 180px !important;
+            padding: 0.375rem 1.75rem 0.375rem 0.75rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            border: 1px solid var(--border-input) !important;
+            border-radius: var(--radius-md) !important;
+            background: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
+            font-family: var(--font-family) !important;
+            outline: none !important;
+            cursor: pointer !important;
+            appearance: none !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b8aa9a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 0.625rem center !important;
+            background-size: 10px !important;
+        }
+        .filter-bar .form-select:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+        }
+        .filter-bar .btn-primary,
+        .filter-bar .btn-secondary {
+            flex: 0 0 auto !important;
+            padding: 0.375rem 0.875rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
             border-radius: var(--radius-md) !important;
             white-space: nowrap !important;
-            background-color: var(--color-sage) !important;
+            font-family: var(--font-family) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+        .filter-bar .btn-primary {
+            background: var(--color-sage) !important;
             color: white !important;
             border: none !important;
         }
         .filter-bar .btn-primary:hover {
-            background-color: var(--color-sage-dark) !important;
-            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.35) !important;
+            background: var(--color-sage-dark) !important;
             transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
         }
-
-        /* Filter bar select width */
-        .filter-bar .form-select {
-            min-width: 160px !important;
+        .filter-bar .btn-secondary {
+            background: transparent !important;
+            color: var(--color-brown-200) !important;
+            border: 1px solid var(--border-input) !important;
+        }
+        .filter-bar .btn-secondary:hover {
+            background: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+            border-color: var(--color-brown-100) !important;
         }
 
         @media (max-width: 768px) {
-            .filter-bar .form-select {
-                min-width: 120px !important;
-            }
-            .filter-bar .btn-primary span {
-                display: none !important;
-            }
-            .data-table th,
-            .data-table td {
-                padding: 0.5rem 0.75rem !important;
-                font-size: 0.75rem !important;
-            }
+            .filter-bar { flex-wrap: wrap !important; gap: 0.5rem !important; padding: 0.5rem 0.75rem !important; }
+            .filter-bar .search-wrapper { flex: 1 1 100% !important; min-width: 100px !important; max-width: 100% !important; }
+            .filter-bar .form-select { min-width: 90px !important; max-width: 140px !important; font-size: 0.75rem !important; height: 32px !important; }
+            .filter-bar .btn-primary span,
+            .filter-bar .btn-secondary span { display: none !important; }
+            .filter-bar .btn-primary,
+            .filter-bar .btn-secondary { padding: 0.3rem 0.6rem !important; font-size: 0.75rem !important; height: 32px !important; }
+            .grid-stats { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 480px) { .grid-stats { grid-template-columns: 1fr !important; } }
+
+        /* ─── Table ─── */
+        .card-white {
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-lg) !important;
+            overflow: hidden !important;
+            margin-top: 1.25rem !important;
+        }
+        .table-wrapper { overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; }
+        .data-table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            font-size: 0.8125rem !important;
+        }
+        .data-table thead {
+            background: var(--bg-muted) !important;
+            border-bottom: 1px solid var(--border-default) !important;
+        }
+        .data-table th {
+            padding: 0.625rem 1rem !important;
+            text-align: left !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-300) !important;
+            font-size: 0.625rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
+            white-space: nowrap !important;
+        }
+        .data-table td {
+            padding: 0.625rem 1rem !important;
+            color: var(--color-brown-700) !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid var(--border-default) !important;
+        }
+        .data-table tbody tr:last-child td { border-bottom: none !important; }
+        .data-table tbody tr:hover td { background: var(--bg-subtle) !important; }
+
+        /* ─── Room Type Badges ─── */
+        .room-type-badge {
+            padding: 0.1rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
+        .type-general { background: #dbeafe !important; color: #2563eb !important; }
+        .type-private { background: #e9d5ff !important; color: #7c3aed !important; }
+        .type-icu { background: #fee2e2 !important; color: #dc2626 !important; }
+        .type-deluxe { background: #fef3dd !important; color: #d97706 !important; }
+        .type-suite { background: #d1fae5 !important; color: #059669 !important; }
+
+        /* ─── Status Badges ─── */
+        .status-available {
+            background: #e8f5e2 !important;
+            color: #4a8c3a !important;
+            padding: 0.1rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
+        .status-full {
+            background: #fee2e2 !important;
+            color: #ef4444 !important;
+            padding: 0.1rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
+        .status-maintenance {
+            background: #f0e8e0 !important;
+            color: #9a8e82 !important;
+            padding: 0.1rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
         }
 
-        /* Modal overrides */
+        /* ─── Action Buttons ─── */
+        .action-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 2rem !important;
+            height: 2rem !important;
+            border-radius: var(--radius-sm) !important;
+            border: 1px solid var(--border-default) !important;
+            background: var(--bg-card) !important;
+            color: var(--color-brown-200) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            font-size: 0.75rem !important;
+        }
+        .action-btn:hover {
+            background: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+            border-color: var(--color-brown-100) !important;
+        }
+        .action-btn.view:hover { color: var(--color-gold) !important; border-color: var(--color-gold) !important; background: #fefce8 !important; }
+        .action-btn.edit:hover { color: var(--color-sage) !important; border-color: var(--color-sage) !important; background: #eef7ea !important; }
+        .action-btn.delete:hover { color: #dc2626 !important; border-color: #dc2626 !important; background: #fee2e2 !important; }
+        .action-btn.beds:hover { color: #8b5cf6 !important; border-color: #8b5cf6 !important; background: #f5f3ff !important; }
+
+        /* ─── Cell Styles ─── */
+        .room-number { font-weight: var(--font-weight-medium) !important; color: var(--color-brown-700) !important; font-size: 0.875rem !important; }
+        .room-ward { color: var(--color-brown-300) !important; font-size: 0.8125rem !important; }
+        .beds-available { color: #16a34a !important; font-weight: var(--font-weight-medium) !important; }
+        .beds-full { color: #ef4444 !important; font-weight: var(--font-weight-medium) !important; }
+
+        /* ─── Empty State ─── */
+        .empty-state {
+            text-align: center !important;
+            padding: 3rem 1.25rem !important;
+            color: var(--color-brown-100) !important;
+        }
+        .empty-state i {
+            font-size: 2rem !important;
+            margin-bottom: 0.75rem !important;
+            display: block !important;
+            opacity: 0.4 !important;
+        }
+
+        /* ─── Modal ─── */
+        .modal-overlay {
+            position: fixed !important;
+            inset: 0 !important;
+            background: rgba(0, 0, 0, 0.5) !important;
+            backdrop-filter: blur(4px) !important;
+            display: none !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 9999 !important;
+            padding: 1rem !important;
+        }
+        .modal-overlay.active { display: flex !important; }
         .form-card {
-            border-top-color: var(--color-sage);
+            background: var(--bg-card) !important;
+            border-radius: var(--radius-lg) !important;
+            box-shadow: var(--shadow-lg) !important;
+            max-width: 560px !important;
+            width: 100% !important;
+            max-height: 90vh !important;
+            overflow-y: auto !important;
+            padding: 1.5rem !important;
+            border-top: 4px solid var(--color-sage) !important;
+        }
+        .form-card-wide { max-width: 720px !important; }
+        .modal-header {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 1.25rem !important;
+            padding-bottom: 0.75rem !important;
+            border-bottom: 1px solid var(--border-default) !important;
+        }
+        .modal-title {
+            font-size: 1rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+        .close-btn {
+            background: none !important;
+            border: none !important;
+            color: var(--color-brown-100) !important;
+            font-size: 1.125rem !important;
+            cursor: pointer !important;
+            padding: 0.25rem !important;
+            transition: all 0.2s ease !important;
+        }
+        .close-btn:hover { color: var(--color-brown-600) !important; transform: rotate(90deg) !important; }
+        .modal-body { margin-bottom: 1.25rem !important; }
+        .modal-footer {
+            display: flex !important;
+            justify-content: flex-end !important;
+            gap: 0.75rem !important;
+            padding-top: 0.75rem !important;
+            border-top: 1px solid var(--border-default) !important;
         }
 
-        /* Empty state */
-        .rooms-empty {
-            text-align: center;
-            padding: 3rem 1.25rem;
-            color: var(--color-brown-100);
+        /* ─── Form ─── */
+        .form-group { margin-bottom: 1rem !important; }
+        .form-label {
+            display: block !important;
+            font-size: 0.6875rem !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-200) !important;
+            letter-spacing: 0.03em !important;
+            margin-bottom: 0.25rem !important;
         }
-        .rooms-empty i {
-            font-size: 2rem;
-            margin-bottom: 0.75rem;
-            display: block;
-            opacity: 0.4;
+        .form-input, .form-select, .form-textarea {
+            width: 100% !important;
+            padding: 0.625rem 1rem !important;
+            border: 1px solid var(--border-input) !important;
+            border-radius: var(--radius-md) !important;
+            font-family: var(--font-family) !important;
+            font-size: 0.875rem !important;
+            color: var(--color-brown-700) !important;
+            background: var(--bg-card) !important;
+            outline: none !important;
+            transition: all 0.2s ease !important;
         }
-        .rooms-empty p {
-            font-size: 0.875rem;
-            font-weight: var(--font-weight-light);
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
         }
+        .form-textarea { resize: vertical !important; min-height: 80px !important; }
+        .form-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 1rem 1.5rem !important;
+        }
+        .form-grid .full-width { grid-column: 1 / -1 !important; }
+        @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr !important; } }
 
-        /* Error text */
-        .error-text {
-            display: none;
-            font-size: 0.6875rem;
-            color: var(--color-error-text);
-            margin-top: 0.25rem;
-        }
-        .error-text.show {
-            display: block;
-        }
+        /* ─── Error Text ─── */
+        .error-text { color: var(--color-error-text) !important; font-size: 0.6875rem !important; margin-top: 0.25rem !important; display: none !important; font-weight: var(--font-weight-light) !important; }
+        .error-text.show { display: block !important; }
+        .form-input.error, .form-select.error { border-color: var(--color-error-text) !important; }
 
-        .form-input.error,
-        .form-select.error {
-            border-color: var(--color-error-text);
+        /* ─── Delete Modal ─── */
+        .delete-icon-circle {
+            width: 3.5rem !important;
+            height: 3.5rem !important;
+            border-radius: 50% !important;
+            background: #fee2e2 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 auto 1rem !important;
+            color: #dc2626 !important;
+            font-size: 1.25rem !important;
         }
-        .form-input.error:focus,
-        .form-select.error:focus {
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+        .btn-danger {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            background: #ef4444 !important;
+            color: white !important;
+            font-family: var(--font-family) !important;
+            font-size: 0.8125rem !important;
+            font-weight: var(--font-weight-light) !important;
+            padding: 0.5rem 1.25rem !important;
+            border: none !important;
+            border-radius: var(--radius-lg) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
         }
+        .btn-danger:hover {
+            background: #dc2626 !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
+        }
+        .modal-danger .form-card { border-top-color: #ef4444 !important; }
 
-        /* Available beds count color */
-        .beds-available {
-            color: #16a34a;
-            font-weight: var(--font-weight-medium);
+        /* ─── View Modal Styles ─── */
+        .detail-section {
+            margin-bottom: 1rem !important;
+            padding-bottom: 0.75rem !important;
+            border-bottom: 1px solid var(--border-default) !important;
         }
-        .beds-full {
-            color: #ef4444;
-            font-weight: var(--font-weight-medium);
+        .detail-section:last-child {
+            border-bottom: none !important;
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
         }
+        .detail-label {
+            font-size: 0.6875rem !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-200) !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
+            margin-bottom: 0.25rem !important;
+        }
+        .detail-value {
+            font-size: 0.875rem !important;
+            font-weight: var(--font-weight-regular) !important;
+            color: var(--color-brown-700) !important;
+            line-height: 1.5 !important;
+        }
+        .detail-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 0.75rem 1.5rem !important;
+        }
+        @media (max-width: 640px) { .detail-grid { grid-template-columns: 1fr !important; } }
 
-        /* Stat card border colors */
-        .stat-card-blue {
-            border-left: 4px solid #3b82f6;
+        /* ─── Bed Item ─── */
+        .bed-item {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.25rem !important;
+            padding: 0.15rem 0.5rem !important;
+            border-radius: var(--radius-sm) !important;
+            border: 1px solid var(--border-default) !important;
+            font-size: 0.6rem !important;
+            margin: 0.15rem !important;
         }
-        .stat-card-green {
-            border-left: 4px solid var(--color-success-text);
+        .bed-item.occupied {
+            background: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #ef4444 !important;
         }
-        .stat-card-purple {
-            border-left: 4px solid #9333ea;
+        .bed-item.available {
+            background: #e8f5e2 !important;
+            border-color: #4a8c3a !important;
+            color: #4a8c3a !important;
         }
-        .stat-card-orange {
-            border-left: 4px solid var(--color-warning-text);
+        .bed-item.maintenance {
+            background: #f0e8e0 !important;
+            border-color: #9a8e82 !important;
+            color: #9a8e82 !important;
         }
     </style>
 </head>
@@ -259,60 +570,56 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="main-content">
+    <main class="main-content" id="mainContent">
         
-        <!-- Stats Cards -->
-        <div class="grid-stats" style="margin-bottom: 1.5rem;">
+        <!-- Page Header -->
+        <div class="page-header-custom">
+            <div>
+                <h1><i class="fas fa-door-open"></i> Rooms Management</h1>
+                <p>Manage hospital rooms, bed allocation, and occupancy</p>
+            </div>
+            <div class="header-actions">
+                <button id="refreshBtn" class="btn-header btn-header-secondary">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button id="viewBedsBtn" class="btn-header btn-header-secondary">
+                    <i class="fas fa-bed"></i> View Beds
+                </button>
+                <button id="addRoomBtn" class="btn-header btn-header-primary">
+                    <i class="fas fa-plus"></i> Add Room
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid-stats">
             <div class="stat-card stat-card-blue">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Total Wards</p>
-                        <p class="stat-value" id="totalWards">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-building" style="color:#3b82f6; font-size:1.125rem;"></i>
-                    </div>
+                    <div><p class="stat-label">Total Rooms</p><p class="stat-value" id="totalRooms">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-door-open" style="color:#3b82f6;"></i></div>
                 </div>
             </div>
-            
             <div class="stat-card stat-card-green">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Total Rooms</p>
-                        <p class="stat-value" id="totalRooms">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-door-open" style="color:var(--color-success-text); font-size:1.125rem;"></i>
-                    </div>
+                    <div><p class="stat-label">Total Beds</p><p class="stat-value" id="totalBeds">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-bed" style="color:var(--color-success-text);"></i></div>
                 </div>
             </div>
-            
-            <div class="stat-card stat-card-purple">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Total Beds</p>
-                        <p class="stat-value" id="totalBeds">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-bed" style="color:#9333ea; font-size:1.125rem;"></i>
-                    </div>
-                </div>
-            </div>
-            
             <div class="stat-card stat-card-orange">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Available Beds</p>
-                        <p class="stat-value" id="availableBeds">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-bed-pulse" style="color:var(--color-warning-text); font-size:1.125rem;"></i>
-                    </div>
+                    <div><p class="stat-label">Available Beds</p><p class="stat-value" id="availableBeds">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-bed-pulse" style="color:var(--color-warning-text);"></i></div>
+                </div>
+            </div>
+            <div class="stat-card stat-card-purple">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div><p class="stat-label">Occupancy Rate</p><p class="stat-value" id="occupancyRate">0%</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-chart-line" style="color:#9333ea;"></i></div>
                 </div>
             </div>
         </div>
 
-        <!-- Filter Bar with Add Button -->
+        <!-- Filter Bar -->
         <div class="filter-bar">
             <select id="wardFilter" class="form-select">
                 <option value="">All Wards</option>
@@ -321,36 +628,45 @@
                 <i class="fas fa-search"></i>
                 <input type="text" id="searchInput" class="search-input" placeholder="Search room number...">
             </div>
+            <select id="typeFilter" class="form-select">
+                <option value="">All Types</option>
+                <option value="General">General</option>
+                <option value="Private">Private</option>
+                <option value="ICU">ICU</option>
+                <option value="Deluxe">Deluxe</option>
+                <option value="Suite">Suite</option>
+            </select>
+            <select id="statusFilter" class="form-select">
+                <option value="">All Status</option>
+                <option value="available">Available</option>
+                <option value="full">Full</option>
+                <option value="maintenance">Maintenance</option>
+            </select>
             <button id="resetFilter" class="btn-secondary">
-                <i class="fas fa-undo-alt"></i>
-                <span>Reset</span>
-            </button>
-            <button id="addRoomBtn" class="btn-primary">
-                <i class="fas fa-plus"></i>
-                <span>Add Room</span>
+                <i class="fas fa-undo-alt"></i> <span>Reset</span>
             </button>
         </div>
 
         <!-- Rooms Table -->
-        <div class="card-white" style="margin-top: 1.5rem; overflow:hidden;">
+        <div class="card-white">
             <div class="table-wrapper">
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Room No.</th>
-                            <th>Ward</th>
-                            <th>Room Type</th>
-                            <th style="text-align:center;">Beds</th>
-                            <th style="text-align:center;">Available</th>
-                            <th>Status</th>
-                            <th style="text-align:center;">Actions</th>
+                            <th style="width:100px;">Room No.</th>
+                            <th style="min-width:140px;">Ward</th>
+                            <th style="width:100px;">Type</th>
+                            <th style="width:80px; text-align:center;">Beds</th>
+                            <th style="width:80px; text-align:center;">Available</th>
+                            <th style="width:100px;">Status</th>
+                            <th style="width:240px; text-align:center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="roomsTable">
                         <tr>
-                            <td colspan="7" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
-                                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
-                                <p style="font-weight:var(--font-weight-light);">Loading rooms...</p>
+                            <td colspan="7" class="empty-state">
+                                <i class="fas fa-spinner fa-pulse"></i>
+                                <p>Loading rooms...</p>
                             </td>
                         </tr>
                     </tbody>
@@ -360,32 +676,29 @@
     </main>
 
     <!-- Add/Edit Room Modal -->
-    <div id="roomModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-        <div class="form-card" style="max-width:44rem;">
+    <div id="roomModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="form-card form-card-wide">
             <div class="modal-header">
                 <h3 class="modal-title" id="modalTitle">
-                    <i class="fas fa-door-open"></i>
-                    Add Room
+                    <i class="fas fa-door-open" style="color:var(--color-sage);"></i> Add Room
                 </h3>
-                <button class="close-btn" id="closeModalBtn" aria-label="Close modal">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button class="close-btn" id="closeModalBtn"><i class="fas fa-times"></i></button>
             </div>
             <form id="roomForm">
                 <input type="hidden" id="roomId">
                 <div class="modal-body">
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem 1.5rem;">
+                    <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label">Select Ward <span style="color:var(--color-error-text);">*</span></label>
                             <select id="wardId" required class="form-select">
                                 <option value="">-- Select Ward --</option>
                             </select>
-                            <div class="error-text" id="wardIdError">Please select a ward</div>
+                            <span class="error-text" id="wardIdError">Please select a ward</span>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Room Number <span style="color:var(--color-error-text);">*</span></label>
                             <input type="text" id="roomNumber" required class="form-input" placeholder="e.g., 101, 201, G01">
-                            <div class="error-text" id="roomNumberError">Room number is required</div>
+                            <span class="error-text" id="roomNumberError">Room number is required</span>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Room Type <span style="color:var(--color-error-text);">*</span></label>
@@ -397,59 +710,71 @@
                                 <option value="Deluxe">Deluxe</option>
                                 <option value="Suite">Suite</option>
                             </select>
-                            <div class="error-text" id="roomTypeError">Please select a room type</div>
+                            <span class="error-text" id="roomTypeError">Please select a room type</span>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Number of Beds</label>
-                            <input type="number" id="bedCount" class="form-input" value="1" min="1">
-                            <div class="error-text" id="bedCountError">Number of beds must be at least 1</div>
+                            <label class="form-label">Number of Beds <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="number" id="bedCount" required class="form-input" value="1" min="1">
+                            <span class="error-text" id="bedCountError">Number of beds must be at least 1</span>
                         </div>
-                        <div class="form-group" style="grid-column:1 / -1; margin-bottom:0;">
+                        <div class="form-group full-width">
                             <label class="form-label">Amenities</label>
-                            <textarea id="amenities" rows="3" class="form-textarea" placeholder="AC, TV, Attached bathroom, etc."></textarea>
+                            <textarea id="amenities" rows="2" class="form-textarea" placeholder="AC, TV, Attached bathroom, etc."></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">Status</label>
+                            <select id="roomStatus" class="form-select">
+                                <option value="available">Available</option>
+                                <option value="maintenance">Maintenance</option>
+                            </select>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
                     <button type="submit" class="btn-primary">
-                        <i class="fas fa-save"></i>
-                        Save Room
+                        <i class="fas fa-save"></i> Save Room
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="modal-overlay modal-danger" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
-        <div class="form-card" style="max-width:26rem; border-top-color:#ef4444;">
+    <!-- View Room Modal -->
+    <div id="viewModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="form-card" style="max-width:44rem;">
             <div class="modal-header">
-                <h3 class="modal-title" id="deleteModalTitle" style="color:var(--color-brown-700);">
-                    <i class="fas fa-triangle-exclamation" style="color:#ef4444;"></i>
-                    Confirm Delete
+                <h3 class="modal-title" id="viewModalTitle">
+                    <i class="fas fa-eye" style="color:var(--color-sage);"></i> Room Details
                 </h3>
-                <button class="close-btn" id="closeDeleteModalBtn" aria-label="Close delete modal">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button class="close-btn" id="closeViewModalBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="viewContent">
+                <!-- Dynamically populated -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="closeViewFooterBtn" class="btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal-overlay modal-danger" role="dialog" aria-modal="true">
+        <div class="form-card" style="max-width:26rem;">
+            <div class="modal-header">
+                <h3 class="modal-title" style="color:#dc2626;">
+                    <i class="fas fa-triangle-exclamation" style="color:#dc2626;"></i> Confirm Delete
+                </h3>
+                <button class="close-btn" id="closeDeleteModalBtn"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body" style="text-align:center; padding:1.75rem 1.25rem;">
-                <div class="delete-icon-circle">
-                    <i class="fas fa-trash-alt"></i>
-                </div>
-                <p style="font-size:0.9375rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin-bottom:0.5rem;">
-                    Delete Room?
-                </p>
-                <p style="font-size:0.8125rem; color:var(--color-brown-300); font-weight:var(--font-weight-light); line-height:1.6;">
-                    This action cannot be undone. All beds in this room will also be deleted.
-                </p>
+                <div class="delete-icon-circle"><i class="fas fa-trash-alt"></i></div>
+                <p style="font-size:0.9375rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin-bottom:0.5rem;">Delete Room?</p>
+                <p style="font-size:0.8125rem; color:var(--color-brown-300);">This action cannot be undone.</p>
             </div>
             <div class="modal-footer" style="justify-content:center;">
                 <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
-                <button id="confirmDeleteBtn" class="btn-danger">
-                    <i class="fas fa-trash-alt"></i>
-                    Delete
-                </button>
+                <button id="confirmDeleteBtn" class="btn-danger"><i class="fas fa-trash-alt"></i> Delete</button>
             </div>
         </div>
     </div>
@@ -457,6 +782,21 @@
     <script src="../../js/core/common.js"></script>
     <script src="../../js/core/form-validation.js"></script>
     <script src="rooms.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var checkSidebar = setInterval(function() {
+                var sidebar = document.getElementById('mainSidebar');
+                if (sidebar) {
+                    clearInterval(checkSidebar);
+                    document.getElementById('mainContent').classList.add('loaded');
+                }
+            }, 50);
+            setTimeout(function() {
+                document.getElementById('mainContent').classList.add('loaded');
+            }, 1000);
+        });
+    </script>
     
 </body>
 </html>

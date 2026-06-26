@@ -13,10 +13,9 @@
 
     <style>
         /* ============================================================
-           PAYMENTS MODULE — Page-specific only
+           PAYMENTS MODULE — PROFESSIONAL VERSION
            ============================================================ */
 
-        /* 🔥 FIX: Prevent layout shift */
         .main-content {
             margin-left: 260px !important;
             margin-top: 70px !important;
@@ -26,47 +25,102 @@
             opacity: 0;
             animation: fadeIn 0.3s ease forwards;
         }
-        .main-content.loaded {
-            opacity: 1;
-        }
+        .main-content.loaded { opacity: 1; }
         #mainSidebar[data-collapsed="true"] ~ .main-content,
         #mainSidebar[data-collapsed="true"] + .main-content {
             margin-left: 72px !important;
         }
         @media (max-width: 1024px) {
-            .main-content {
-                margin-left: 0 !important;
-                padding: 1rem !important;
-            }
+            .main-content { margin-left: 0 !important; padding: 1rem !important; }
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 🔥 Page Header - Hidden */
-        .page-header {
-            display: none !important;
+        /* ─── Page Header ─── */
+        .page-header-custom {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 1.25rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.75rem !important;
+        }
+        .page-header-custom h1 {
+            font-size: 1.375rem !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-700) !important;
+            margin: 0 !important;
+        }
+        .page-header-custom h1 i { color: var(--color-sage) !important; margin-right: 0.5rem !important; }
+        .page-header-custom p { font-size: 0.75rem !important; color: var(--color-brown-100) !important; margin: 0 !important; }
+
+        .header-actions { display: flex !important; gap: 0.5rem !important; flex-wrap: wrap !important; }
+        .btn-header {
+            padding: 0.4rem 0.85rem !important;
+            font-size: 0.8rem !important;
+            border-radius: var(--radius-md) !important;
+            font-family: var(--font-family) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            border: none !important;
+        }
+        .btn-header-primary {
+            background: var(--color-sage) !important;
+            color: white !important;
+        }
+        .btn-header-primary:hover {
+            background: var(--color-sage-dark) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+        }
+        .btn-header-secondary {
+            background: var(--bg-card) !important;
+            color: var(--color-brown-200) !important;
+            border: 1px solid var(--border-input) !important;
+        }
+        .btn-header-secondary:hover {
+            background: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+        }
+        .btn-header-success {
+            background: #10b981 !important;
+            color: white !important;
+        }
+        .btn-header-success:hover {
+            background: #059669 !important;
+            transform: translateY(-1px) !important;
         }
 
-        /* 🔥 Stats Cards - Perfect Spacing */
+        /* ─── Stats ─── */
         .grid-stats {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
             gap: 1rem !important;
             margin-bottom: 1.25rem !important;
         }
         .stat-card {
-            padding: 1rem 1.25rem !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
             border-radius: var(--radius-lg) !important;
+            padding: 1rem 1.25rem !important;
+            transition: all 0.2s ease !important;
         }
+        .stat-card:hover { transform: translateY(-2px) !important; box-shadow: var(--shadow-md) !important; }
         .stat-card .stat-value {
             font-size: 1.5rem !important;
             font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
             margin-top: 0.125rem !important;
         }
         .stat-card .stat-label {
             font-size: 0.625rem !important;
-            letter-spacing: 0.06em !important;
             text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
             color: var(--color-brown-200) !important;
         }
         .stat-card .stat-icon-bg {
@@ -78,28 +132,162 @@
             justify-content: center !important;
             background: var(--bg-muted) !important;
         }
-        .stat-card .stat-icon-bg i {
-            font-size: 1rem !important;
+        .stat-card .stat-icon-bg i { font-size: 1rem !important; }
+        .stat-card-blue { border-left: 4px solid #3b82f6 !important; }
+        .stat-card-green { border-left: 4px solid var(--color-success-text) !important; }
+        .stat-card-orange { border-left: 4px solid var(--color-warning-text) !important; }
+        .stat-card-purple { border-left: 4px solid #9333ea !important; }
+
+        /* ─── Filter Bar ─── */
+        .filter-bar {
+            display: flex !important;
+            align-items: center !important;
+            flex-wrap: nowrap !important;
+            gap: 0.625rem !important;
+            padding: 0.625rem 1rem !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-lg) !important;
+            margin-bottom: 1.25rem !important;
+        }
+        .filter-bar .search-wrapper {
+            flex: 1 1 200px !important;
+            min-width: 150px !important;
+            max-width: 320px !important;
+            position: relative !important;
+        }
+        .filter-bar .search-wrapper i {
+            position: absolute !important;
+            left: 0.75rem !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            color: var(--color-brown-100) !important;
+            font-size: 0.8125rem !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
+        }
+        .filter-bar .search-input {
+            width: 100% !important;
+            padding: 0.375rem 0.75rem 0.375rem 2.25rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            border: 1px solid var(--border-input) !important;
+            border-radius: var(--radius-md) !important;
+            background: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
+            font-family: var(--font-family) !important;
+            outline: none !important;
+            transition: all 0.2s ease !important;
+        }
+        .filter-bar .search-input:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+        }
+        .filter-bar .form-select {
+            min-width: 120px !important;
+            max-width: 180px !important;
+            padding: 0.375rem 1.75rem 0.375rem 0.75rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            border: 1px solid var(--border-input) !important;
+            border-radius: var(--radius-md) !important;
+            background: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
+            font-family: var(--font-family) !important;
+            outline: none !important;
+            cursor: pointer !important;
+            appearance: none !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b8aa9a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 0.625rem center !important;
+            background-size: 10px !important;
+        }
+        .filter-bar .form-select:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+        }
+        .filter-bar .form-input {
+            min-width: 120px !important;
+            max-width: 160px !important;
+            padding: 0.375rem 0.75rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            border: 1px solid var(--border-input) !important;
+            border-radius: var(--radius-md) !important;
+            background: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
+            font-family: var(--font-family) !important;
+            outline: none !important;
+        }
+        .filter-bar .form-input:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+        }
+        .filter-bar .btn-primary,
+        .filter-bar .btn-secondary {
+            flex: 0 0 auto !important;
+            padding: 0.375rem 0.875rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            border-radius: var(--radius-md) !important;
+            white-space: nowrap !important;
+            font-family: var(--font-family) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+        .filter-bar .btn-primary {
+            background: var(--color-sage) !important;
+            color: white !important;
+            border: none !important;
+        }
+        .filter-bar .btn-primary:hover {
+            background: var(--color-sage-dark) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+        }
+        .filter-bar .btn-secondary {
+            background: transparent !important;
+            color: var(--color-brown-200) !important;
+            border: 1px solid var(--border-input) !important;
+        }
+        .filter-bar .btn-secondary:hover {
+            background: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+            border-color: var(--color-brown-100) !important;
         }
 
-        /* 🔥 Table - Perfect Alignment */
+        @media (max-width: 768px) {
+            .filter-bar { flex-wrap: wrap !important; gap: 0.5rem !important; padding: 0.5rem 0.75rem !important; }
+            .filter-bar .search-wrapper { flex: 1 1 100% !important; min-width: 100px !important; max-width: 100% !important; }
+            .filter-bar .form-select,
+            .filter-bar .form-input { min-width: 90px !important; max-width: 140px !important; font-size: 0.75rem !important; height: 32px !important; }
+            .filter-bar .btn-primary span,
+            .filter-bar .btn-secondary span { display: none !important; }
+            .filter-bar .btn-primary,
+            .filter-bar .btn-secondary { padding: 0.3rem 0.6rem !important; font-size: 0.75rem !important; height: 32px !important; }
+            .grid-stats { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 480px) { .grid-stats { grid-template-columns: 1fr !important; } }
+
+        /* ─── Table ─── */
         .card-white {
-            border-radius: var(--radius-lg) !important;
+            background: var(--bg-card) !important;
             border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-lg) !important;
             overflow: hidden !important;
-            margin-top: 0 !important;
+            margin-top: 1.25rem !important;
         }
-        .table-wrapper {
-            overflow-x: auto !important;
-            -webkit-overflow-scrolling: touch !important;
-        }
+        .table-wrapper { overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; }
         .data-table {
             width: 100% !important;
             border-collapse: collapse !important;
             font-size: 0.8125rem !important;
         }
         .data-table thead {
-            background-color: var(--bg-muted) !important;
+            background: var(--bg-muted) !important;
             border-bottom: 1px solid var(--border-default) !important;
         }
         .data-table th {
@@ -110,6 +298,7 @@
             font-size: 0.625rem !important;
             text-transform: uppercase !important;
             letter-spacing: 0.06em !important;
+            white-space: nowrap !important;
         }
         .data-table td {
             padding: 0.625rem 1rem !important;
@@ -117,19 +306,10 @@
             vertical-align: middle !important;
             border-bottom: 1px solid var(--border-default) !important;
         }
-        .data-table tbody tr:last-child td {
-            border-bottom: none !important;
-        }
+        .data-table tbody tr:last-child td { border-bottom: none !important; }
+        .data-table tbody tr:hover td { background: var(--bg-subtle) !important; }
 
-        /* 🔥 Table Row */
-        .payment-row {
-            transition: var(--transition-base) !important;
-        }
-        .payment-row:hover {
-            background-color: var(--bg-subtle) !important;
-        }
-
-        /* 🔥 Payment Method Badge */
+        /* ─── Payment Method Badges ─── */
         .payment-method-badge {
             padding: 0.15rem 0.625rem !important;
             border-radius: var(--radius-full) !important;
@@ -137,70 +317,30 @@
             font-weight: var(--font-weight-medium) !important;
             display: inline-block !important;
         }
-        .payment-method-badge.cash {
-            background: var(--color-success-bg) !important;
-            color: var(--color-success-text) !important;
-        }
-        .payment-method-badge.card {
-            background: var(--color-info-bg) !important;
-            color: var(--color-info-text) !important;
-        }
-        .payment-method-badge.upi {
-            background: #f3e8ff !important;
-            color: #7c3aed !important;
-        }
-        .payment-method-badge.insurance {
-            background: var(--color-warning-bg) !important;
-            color: var(--color-warning-text) !important;
-        }
-        .payment-method-badge.bank-transfer {
-            background: #e0e7ff !important;
-            color: #4338ca !important;
-        }
-        .payment-method-badge.other {
-            background: var(--bg-muted) !important;
-            color: var(--color-brown-300) !important;
-        }
+        .badge-cash { background: #e8f5e2 !important; color: #4a8c3a !important; }
+        .badge-card { background: #e2f0fb !important; color: #2a72b5 !important; }
+        .badge-upi { background: #f3e8ff !important; color: #7c3aed !important; }
+        .badge-insurance { background: #fef3dd !important; color: #9a6a10 !important; }
+        .badge-bank-transfer { background: #e0e7ff !important; color: #4338ca !important; }
+        .badge-other { background: var(--bg-muted) !important; color: var(--color-brown-300) !important; }
 
-        /* 🔥 Cell Styles */
-        .payment-date {
-            color: var(--color-brown-300) !important;
-            font-size: 0.8125rem !important;
-        }
-        .payment-patient {
-            font-weight: var(--font-weight-medium) !important;
-            color: var(--color-brown-700) !important;
-            font-size: 0.875rem !important;
-        }
-        .payment-invoice {
-            font-family: 'Courier New', monospace !important;
-            font-size: 0.75rem !important;
-            color: var(--color-brown-600) !important;
-        }
-        .payment-amount {
-            font-weight: var(--font-weight-semibold) !important;
-            color: var(--color-sage-dark) !important;
-            font-size: 0.875rem !important;
-        }
-        .payment-transaction {
-            font-family: 'Courier New', monospace !important;
-            font-size: 0.6875rem !important;
+        /* ─── Cell Styles ─── */
+        .payment-date { color: var(--color-brown-300) !important; font-size: 0.8125rem !important; }
+        .payment-patient { font-weight: var(--font-weight-medium) !important; color: var(--color-brown-700) !important; font-size: 0.875rem !important; }
+        .payment-invoice { font-family: 'Courier New', monospace !important; font-size: 0.75rem !important; color: var(--color-brown-600) !important; }
+        .payment-amount { font-weight: var(--font-weight-semibold) !important; color: var(--color-sage-dark) !important; font-size: 0.875rem !important; }
+        .payment-transaction { font-family: 'Courier New', monospace !important; font-size: 0.6875rem !important; color: var(--color-brown-100) !important; }
+
+        .empty-state {
+            text-align: center !important;
+            padding: 3rem 1.25rem !important;
             color: var(--color-brown-100) !important;
         }
-
-        /* 🔥 Stat Card Border Colors */
-        .stat-card-blue { border-left: 4px solid #3b82f6 !important; }
-        .stat-card-green { border-left: 4px solid var(--color-success-text) !important; }
-        .stat-card-orange { border-left: 4px solid var(--color-warning-text) !important; }
-        .stat-card-purple { border-left: 4px solid #9333ea !important; }
-
-        /* 🔥 Responsive */
-        @media (max-width: 768px) {
-            .data-table th,
-            .data-table td {
-                padding: 0.5rem 0.5rem !important;
-                font-size: 0.6875rem !important;
-            }
+        .empty-state i {
+            font-size: 2rem !important;
+            margin-bottom: 0.75rem !important;
+            display: block !important;
+            opacity: 0.4 !important;
         }
     </style>
 </head>
@@ -211,52 +351,66 @@
 
     <main class="main-content" id="mainContent">
         
-        <!-- Stats Cards -->
+        <!-- Page Header -->
+        <div class="page-header-custom">
+            <div>
+                <h1><i class="fas fa-credit-card"></i> Payments</h1>
+                <p>Track all patient payments and financial transactions</p>
+            </div>
+            <div class="header-actions">
+                <button id="refreshBtn" class="btn-header btn-header-secondary">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats -->
         <div class="grid-stats">
             <div class="stat-card stat-card-blue">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Total Collected</p>
-                        <p class="stat-value" id="totalCollected">₹0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-rupee-sign" style="color:#3b82f6;"></i>
-                    </div>
+                    <div><p class="stat-label">Total Collected</p><p class="stat-value" id="totalCollected">₹0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-rupee-sign" style="color:#3b82f6;"></i></div>
                 </div>
             </div>
             <div class="stat-card stat-card-green">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">This Month</p>
-                        <p class="stat-value" id="monthCollected">₹0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-calendar-alt" style="color:var(--color-success-text);"></i>
-                    </div>
+                    <div><p class="stat-label">This Month</p><p class="stat-value" id="monthCollected">₹0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-calendar-alt" style="color:var(--color-success-text);"></i></div>
                 </div>
             </div>
             <div class="stat-card stat-card-orange">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Today</p>
-                        <p class="stat-value text-warning-text" id="todayCollected">₹0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-sun" style="color:var(--color-warning-text);"></i>
-                    </div>
+                    <div><p class="stat-label">Today</p><p class="stat-value" id="todayCollected">₹0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-sun" style="color:var(--color-warning-text);"></i></div>
                 </div>
             </div>
             <div class="stat-card stat-card-purple">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Transactions</p>
-                        <p class="stat-value" style="color:#9333ea;" id="totalTransactions">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-receipt" style="color:#9333ea;"></i>
-                    </div>
+                    <div><p class="stat-label">Transactions</p><p class="stat-value" id="totalTransactions">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-receipt" style="color:#9333ea;"></i></div>
                 </div>
             </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by patient or invoice...">
+            </div>
+            <select id="methodFilter" class="form-select">
+                <option value="">All Methods</option>
+                <option value="Cash">Cash</option>
+                <option value="Card">Card</option>
+                <option value="UPI">UPI</option>
+                <option value="Insurance">Insurance</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+            </select>
+            <input type="date" id="dateFrom" class="form-input" placeholder="From Date">
+            <input type="date" id="dateTo" class="form-input" placeholder="To Date">
+            <button id="resetFilter" class="btn-secondary">
+                <i class="fas fa-undo-alt"></i> <span>Reset</span>
+            </button>
         </div>
 
         <!-- Payments Table -->
@@ -275,9 +429,9 @@
                     </thead>
                     <tbody id="paymentsTable">
                         <tr>
-                            <td colspan="6" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
-                                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
-                                <p style="font-weight:var(--font-weight-light);">Loading payments...</p>
+                            <td colspan="6" class="empty-state">
+                                <i class="fas fa-spinner fa-pulse"></i>
+                                <p>Loading payments...</p>
                             </td>
                         </tr>
                     </tbody>

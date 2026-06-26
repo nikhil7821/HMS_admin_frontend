@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Emergency Cases | Emergency | MedFlow</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/theme.css">
+
+    <style>
+        .case-row { transition: var(--transition-base); border-bottom: 1px solid var(--border-default); }
+        .case-row:hover { background-color: var(--bg-subtle); }
+        .case-row:last-child { border-bottom: none; }
+        .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+        .data-table thead { background-color: var(--bg-muted); border-bottom: 1px solid var(--border-default); }
+        .data-table th { text-align: left; padding: 0.75rem 1.25rem; font-weight: var(--font-weight-medium); color: var(--color-brown-300); font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.04em; }
+        .data-table td { padding: 0.75rem 1.25rem; color: var(--color-brown-700); vertical-align: middle; }
+        .action-btn { color: var(--color-brown-100); transition: var(--transition-base); padding: 0.25rem 0.375rem; border-radius: var(--radius-sm); background: none; border: none; cursor: pointer; font-size: 0.875rem; }
+        .action-btn:hover { color: var(--color-sage-dark); }
+        .action-btn.view:hover { color: var(--color-gold); }
+        .action-btn.delete:hover { color: #dc2626; }
+        .filter-bar .btn-primary { flex: 0 0 auto !important; padding: 0.4rem 0.85rem !important; font-size: 0.8125rem !important; height: 38px !important; display: inline-flex !important; align-items: center !important; gap: 0.35rem !important; border-radius: var(--radius-md) !important; white-space: nowrap !important; background-color: var(--color-sage) !important; color: white !important; border: none !important; }
+        .filter-bar .btn-primary:hover { background-color: var(--color-sage-dark) !important; box-shadow: 0 4px 12px rgba(138, 174, 122, 0.35) !important; transform: translateY(-1px) !important; }
+        @media (max-width: 768px) { .filter-bar .btn-primary span { display: none !important; } .data-table th, .data-table td { padding: 0.5rem 0.75rem !important; font-size: 0.75rem !important; } }
+        .badge-priority {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.15rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6rem;
+            font-weight: var(--font-weight-medium);
+            white-space: nowrap;
+        }
+        .badge-critical { background: #fee2e2; color: #ef4444; }
+        .badge-high { background: #fef3dd; color: #9a6a10; }
+        .badge-medium { background: #e2f0fb; color: #2a72b5; }
+        .badge-low { background: #e8f5e2; color: #4a8c3a; }
+        .badge-status { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.15rem 0.625rem; border-radius: var(--radius-full); font-size: 0.6rem; font-weight: var(--font-weight-medium); white-space: nowrap; }
+        .badge-active { background: #e8f5e2; color: #4a8c3a; }
+        .badge-stabilized { background: #e2f0fb; color: #2a72b5; }
+        .badge-referred { background: #fef3dd; color: #9a6a10; }
+        .badge-discharged { background: #f0e8e0; color: #9a8e82; }
+        .empty-state { text-align: center; padding: 3rem 1.25rem; color: var(--color-brown-100); }
+        .empty-state i { font-size: 2rem; margin-bottom: 0.75rem; display: block; opacity: 0.4; }
+        .grid-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+        .stat-icon-bg { width: 2.5rem; height: 2.5rem; border-radius: var(--radius-md); background: var(--bg-muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        @media (max-width: 1024px) { .grid-stats { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 640px) { .grid-stats { grid-template-columns: 1fr; } }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 1rem; }
+        .modal-overlay.active { display: flex !important; }
+        .form-card { background: var(--bg-card); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); max-width: 560px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 1.5rem; border-top: 4px solid var(--color-sage); }
+        .form-card-wide { max-width: 720px !important; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-default); }
+        .modal-title { font-size: 1rem; font-weight: var(--font-weight-medium); color: var(--color-brown-700); display: flex; align-items: center; gap: 0.5rem; }
+        .close-btn { background: none; border: none; color: var(--color-brown-100); font-size: 1.125rem; cursor: pointer; padding: 0.25rem; transition: var(--transition-base); }
+        .close-btn:hover { color: var(--color-brown-600); transform: rotate(90deg); }
+        .modal-body { margin-bottom: 1.25rem; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-default); }
+        .detail-section { margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-default); }
+        .detail-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .detail-label { font-size: 0.6875rem; font-weight: var(--font-weight-light); color: var(--color-brown-200); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.25rem; }
+        .detail-value { font-size: 0.875rem; font-weight: var(--font-weight-regular); color: var(--color-brown-700); line-height: 1.5; }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem 1.5rem; }
+        @media (max-width: 640px) { .detail-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body class="bg-subtle">
+
+    <div id="sidebar-container"></div>
+    <div id="header-container"></div>
+
+    <main class="main-content">
+        
+        <!-- Stats -->
+        <div class="grid-stats" style="margin-bottom: 1.5rem;">
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div><p class="stat-label">Total Cases</p><p class="stat-value" id="totalCases">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-ambulance" style="color:var(--color-sage); font-size:1.125rem;"></i></div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div><p class="stat-label">Active</p><p class="stat-value" id="activeCases">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-circle" style="color:#4a8c3a; font-size:1.125rem;"></i></div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div><p class="stat-label">Critical</p><p class="stat-value" id="criticalCases">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-exclamation-triangle" style="color:#ef4444; font-size:1.125rem;"></i></div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div><p class="stat-label">Stabilized</p><p class="stat-value" id="stabilizedCases">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-check-circle" style="color:#2a72b5; font-size:1.125rem;"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by patient, doctor, or condition...">
+            </div>
+            <select id="priorityFilter" class="form-select">
+                <option value="">All Priorities</option>
+                <option value="critical">Critical</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+            </select>
+            <select id="statusFilter" class="form-select">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="stabilized">Stabilized</option>
+                <option value="referred">Referred</option>
+                <option value="discharged">Discharged</option>
+            </select>
+            <button id="resetFilterBtn" class="btn-secondary"><i class="fas fa-undo-alt"></i> <span>Reset</span></button>
+            <button id="addCaseBtn" class="btn-primary"><i class="fas fa-plus"></i> <span>Add Case</span></button>
+        </div>
+
+        <!-- Table -->
+        <div class="card-white" style="margin-top:1.5rem; overflow:hidden;">
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Condition</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th style="text-align:center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="caseTable">
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
+                                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
+                                <p style="font-weight:var(--font-weight-light);">Loading emergency cases...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Case Modal -->
+    <div id="caseModal" class="modal-overlay">
+        <div class="form-card form-card-wide">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle"><i class="fas fa-ambulance"></i> Add Emergency Case</h3>
+                <button class="close-btn" id="closeModalBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="caseForm">
+                <input type="hidden" id="editCaseId">
+                <div class="modal-body">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem 1.5rem;">
+                        <div class="form-group">
+                            <label class="form-label">Patient <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="patientId" required class="form-select"><option value="">-- Select --</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Doctor <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="doctorId" required class="form-select"><option value="">-- Select --</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Condition <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="text" id="condition" required class="form-input" placeholder="e.g., Cardiac Arrest">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Priority <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="priority" required class="form-select">
+                                <option value="critical">Critical</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select id="caseStatus" class="form-select">
+                                <option value="active">Active</option>
+                                <option value="stabilized">Stabilized</option>
+                                <option value="referred">Referred</option>
+                                <option value="discharged">Discharged</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date</label>
+                            <input type="date" id="caseDate" class="form-input">
+                        </div>
+                        <div class="form-group" style="grid-column:1 / -1;">
+                            <label class="form-label">Treatment Given</label>
+                            <textarea id="treatment" rows="2" class="form-textarea" placeholder="Describe treatment provided..."></textarea>
+                        </div>
+                        <div class="form-group" style="grid-column:1 / -1;">
+                            <label class="form-label">Notes</label>
+                            <textarea id="notes" rows="2" class="form-textarea" placeholder="Additional notes..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Save Case</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Case Modal -->
+    <div id="viewModal" class="modal-overlay">
+        <div class="form-card">
+            <div class="modal-header">
+                <h3 class="modal-title" id="viewModalTitle"><i class="fas fa-eye" style="color:var(--color-sage);"></i> Case Details</h3>
+                <button class="close-btn" id="closeViewModalBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="viewContent"></div>
+            <div class="modal-footer">
+                <button type="button" id="closeViewFooterBtn" class="btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div id="deleteModal" class="modal-overlay modal-danger">
+        <div class="form-card" style="max-width:26rem; border-top-color:#ef4444;">
+            <div class="modal-header">
+                <h3 class="modal-title" style="color:#dc2626;"><i class="fas fa-triangle-exclamation" style="color:#dc2626;"></i> Confirm Delete</h3>
+                <button class="close-btn" id="closeDeleteModalBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" style="text-align:center; padding:1.75rem 1.25rem;">
+                <div style="width:3.5rem; height:3.5rem; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; color:#dc2626; font-size:1.25rem;">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                <p style="font-size:0.9375rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin-bottom:0.5rem;">Delete Case?</p>
+                <p style="font-size:0.8125rem; color:var(--color-brown-300);">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer" style="justify-content:center;">
+                <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
+                <button id="confirmDeleteBtn" class="btn-danger"><i class="fas fa-trash-alt"></i> Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/core/common.js"></script>
+    <script src="emergency-cases.js"></script>
+</body>
+</html>

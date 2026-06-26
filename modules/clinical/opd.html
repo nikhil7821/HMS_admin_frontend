@@ -8,248 +8,582 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <!-- ✅ ONLY THEME CSS - NO TAILWIND -->
     <link rel="stylesheet" href="../../css/theme.css">
 
     <style>
         /* ============================================================
-           OPD MODULE — Page-specific only
+           OPD MODULE — PROFESSIONAL VERSION
            All base styles come from theme.css
            ============================================================ */
 
-        /* OPD table row */
-        .opd-row {
-            transition: var(--transition-base);
-            border-bottom: 1px solid var(--border-default);
+        .main-content {
+            margin-left: 260px !important;
+            margin-top: 70px !important;
+            padding: 1.25rem 1.5rem !important;
+            transition: margin-left 0.3s ease !important;
+            min-height: 100vh !important;
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
         }
-        .opd-row:hover {
-            background-color: var(--bg-subtle);
+        .main-content.loaded { opacity: 1; }
+        #mainSidebar[data-collapsed="true"] ~ .main-content,
+        #mainSidebar[data-collapsed="true"] + .main-content {
+            margin-left: 72px !important;
         }
-        .opd-row:last-child {
-            border-bottom: none;
+        @media (max-width: 1024px) {
+            .main-content { margin-left: 0 !important; padding: 1rem !important; }
         }
-
-        /* Status badges */
-        .status-waiting {
-            background: var(--color-warning-bg);
-            color: var(--color-warning-text);
-            padding: 0.15rem 0.625rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-        }
-        .status-completed {
-            background: var(--color-success-bg);
-            color: var(--color-success-text);
-            padding: 0.15rem 0.625rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-        }
-        .status-in-progress {
-            background: var(--color-info-bg);
-            color: var(--color-info-text);
-            padding: 0.15rem 0.625rem;
-            border-radius: var(--radius-full);
-            font-size: 0.6875rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Token badge */
-        .token-badge {
-            background: var(--bg-muted);
-            color: var(--color-brown-600);
-            padding: 0.2rem 0.625rem;
-            border-radius: var(--radius-full);
-            font-size: 0.75rem;
-            font-weight: var(--font-weight-medium);
-            display: inline-block;
-            font-family: monospace;
+        /* ─── Page Header ─── */
+        .page-header-custom {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 1.25rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.75rem !important;
         }
+        .page-header-custom h1 {
+            font-size: 1.375rem !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-700) !important;
+            margin: 0 !important;
+        }
+        .page-header-custom h1 i { color: var(--color-sage) !important; margin-right: 0.5rem !important; }
+        .page-header-custom p { font-size: 0.75rem !important; color: var(--color-brown-100) !important; margin: 0 !important; }
 
-        /* Table wrapper */
-        .table-wrapper {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        /* Data table */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8125rem;
-        }
-        .data-table thead {
-            background-color: var(--bg-muted);
-            border-bottom: 1px solid var(--border-default);
-        }
-        .data-table th {
-            text-align: left;
-            padding: 0.75rem 1.25rem;
-            font-weight: var(--font-weight-medium);
-            color: var(--color-brown-300);
-            font-size: 0.6875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-        .data-table td {
-            padding: 0.75rem 1.25rem;
-            color: var(--color-brown-700);
-            vertical-align: middle;
-        }
-
-        /* Action buttons */
-        .action-btn {
-            color: var(--color-brown-100);
-            transition: var(--transition-base);
-            padding: 0.25rem 0.375rem;
-            border-radius: var(--radius-sm);
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 0.875rem;
-        }
-        .action-btn:hover {
-            color: var(--color-sage-dark);
-        }
-        .action-btn.complete:hover {
-            color: #10b981;
-        }
-        .action-btn.delete:hover {
-            color: #dc2626;
-        }
-
-        /* Delete modal - danger variant */
-        .modal-danger .modal-content {
-            border-top-color: #ef4444;
-        }
-
-        .delete-icon-circle {
-            width: 3.5rem;
-            height: 3.5rem;
-            border-radius: 50%;
-            background-color: #fee2e2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            color: #dc2626;
-            font-size: 1.25rem;
-        }
-
-        /* Danger button */
-        .btn-danger {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.375rem;
-            background-color: #ef4444;
-            color: white;
-            font-family: var(--font-family);
-            font-size: 0.8125rem;
-            font-weight: var(--font-weight-light);
-            padding: 0.5rem 1.25rem;
-            border: none;
-            border-radius: var(--radius-lg);
-            cursor: pointer;
-            transition: var(--transition-base);
-        }
-        .btn-danger:hover {
-            background-color: #dc2626;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-        }
-
-        /* Override: Add button inside filter bar */
-        .filter-bar .btn-primary {
-            flex: 0 0 auto !important;
+        .header-actions { display: flex !important; gap: 0.5rem !important; flex-wrap: wrap !important; }
+        .btn-header {
             padding: 0.4rem 0.85rem !important;
-            font-size: 0.8125rem !important;
-            height: 38px !important;
+            font-size: 0.8rem !important;
+            border-radius: var(--radius-md) !important;
+            font-family: var(--font-family) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
             display: inline-flex !important;
             align-items: center !important;
-            gap: 0.35rem !important;
+            gap: 0.375rem !important;
+            border: none !important;
+        }
+        .btn-header-primary {
+            background: var(--color-sage) !important;
+            color: white !important;
+        }
+        .btn-header-primary:hover {
+            background: var(--color-sage-dark) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+        }
+        .btn-header-secondary {
+            background: var(--bg-card) !important;
+            color: var(--color-brown-200) !important;
+            border: 1px solid var(--border-input) !important;
+        }
+        .btn-header-secondary:hover {
+            background: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+        }
+
+        /* ─── Stats ─── */
+        .grid-stats {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 1rem !important;
+            margin-bottom: 1.25rem !important;
+        }
+        .stat-card {
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-lg) !important;
+            padding: 1rem 1.25rem !important;
+            transition: all 0.2s ease !important;
+        }
+        .stat-card:hover { transform: translateY(-2px) !important; box-shadow: var(--shadow-md) !important; }
+        .stat-card .stat-value {
+            font-size: 1.5rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            margin-top: 0.125rem !important;
+        }
+        .stat-card .stat-label {
+            font-size: 0.625rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
+            color: var(--color-brown-200) !important;
+        }
+        .stat-card .stat-icon-bg {
+            width: 2.5rem !important;
+            height: 2.5rem !important;
+            border-radius: var(--radius-md) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: var(--bg-muted) !important;
+        }
+        .stat-card .stat-icon-bg i { font-size: 1rem !important; }
+        .stat-card-blue { border-left: 4px solid #3b82f6 !important; }
+        .stat-card-green { border-left: 4px solid var(--color-success-text) !important; }
+        .stat-card-orange { border-left: 4px solid var(--color-warning-text) !important; }
+        .stat-card-purple { border-left: 4px solid #9333ea !important; }
+
+        /* ─── Filter Bar ─── */
+        .filter-bar {
+            display: flex !important;
+            align-items: center !important;
+            flex-wrap: nowrap !important;
+            gap: 0.625rem !important;
+            padding: 0.625rem 1rem !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-lg) !important;
+            margin-bottom: 1.25rem !important;
+        }
+        .filter-bar .search-wrapper {
+            flex: 1 1 200px !important;
+            min-width: 150px !important;
+            max-width: 320px !important;
+            position: relative !important;
+        }
+        .filter-bar .search-wrapper i {
+            position: absolute !important;
+            left: 0.75rem !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            color: var(--color-brown-100) !important;
+            font-size: 0.8125rem !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
+        }
+        .filter-bar .search-input {
+            width: 100% !important;
+            padding: 0.375rem 0.75rem 0.375rem 2.25rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            border: 1px solid var(--border-input) !important;
+            border-radius: var(--radius-md) !important;
+            background: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
+            font-family: var(--font-family) !important;
+            outline: none !important;
+            transition: all 0.2s ease !important;
+        }
+        .filter-bar .search-input:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+        }
+        .filter-bar .form-select {
+            min-width: 120px !important;
+            max-width: 180px !important;
+            padding: 0.375rem 1.75rem 0.375rem 0.75rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            border: 1px solid var(--border-input) !important;
+            border-radius: var(--radius-md) !important;
+            background: var(--bg-card) !important;
+            color: var(--color-brown-700) !important;
+            font-family: var(--font-family) !important;
+            outline: none !important;
+            cursor: pointer !important;
+            appearance: none !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b8aa9a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 0.625rem center !important;
+            background-size: 10px !important;
+        }
+        .filter-bar .form-select:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+        }
+        .filter-bar .btn-primary,
+        .filter-bar .btn-secondary {
+            flex: 0 0 auto !important;
+            padding: 0.375rem 0.875rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
             border-radius: var(--radius-md) !important;
             white-space: nowrap !important;
-            background-color: var(--color-sage) !important;
+            font-family: var(--font-family) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+        .filter-bar .btn-primary {
+            background: var(--color-sage) !important;
             color: white !important;
             border: none !important;
         }
-
         .filter-bar .btn-primary:hover {
-            background-color: var(--color-sage-dark) !important;
-            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.35) !important;
+            background: var(--color-sage-dark) !important;
             transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+        }
+        .filter-bar .btn-secondary {
+            background: transparent !important;
+            color: var(--color-brown-200) !important;
+            border: 1px solid var(--border-input) !important;
+        }
+        .filter-bar .btn-secondary:hover {
+            background: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+            border-color: var(--color-brown-100) !important;
         }
 
-        /* Filter bar select width */
-        .filter-bar .form-select {
-            min-width: 140px !important;
+        /* ─── Token Badge ─── */
+        .token-badge {
+            background: var(--bg-muted) !important;
+            color: var(--color-brown-600) !important;
+            padding: 0.2rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.75rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+            font-family: monospace !important;
+            min-width: 50px !important;
+            text-align: center !important;
+        }
+        .token-badge.urgent {
+            background: #fee2e2 !important;
+            color: #dc2626 !important;
+        }
+        .token-badge.completed {
+            background: #e8f5e2 !important;
+            color: #4a8c3a !important;
         }
 
+        /* ─── Status Badges ─── */
+        .status-waiting {
+            background: #fef3dd !important;
+            color: #9a6a10 !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
+        .status-in-progress {
+            background: #e2f0fb !important;
+            color: #2a72b5 !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
+        .status-completed {
+            background: #e8f5e2 !important;
+            color: #4a8c3a !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
+        .status-cancelled {
+            background: #fee2e2 !important;
+            color: #ef4444 !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
+
+        /* ─── Table ─── */
+        .card-white {
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-lg) !important;
+            overflow: hidden !important;
+            margin-top: 1.25rem !important;
+        }
+        .table-wrapper { overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; }
+        .data-table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            font-size: 0.8125rem !important;
+        }
+        .data-table thead {
+            background: var(--bg-muted) !important;
+            border-bottom: 1px solid var(--border-default) !important;
+        }
+        .data-table th {
+            padding: 0.625rem 1rem !important;
+            text-align: left !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-300) !important;
+            font-size: 0.625rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
+            white-space: nowrap !important;
+        }
+        .data-table td {
+            padding: 0.625rem 1rem !important;
+            color: var(--color-brown-700) !important;
+            vertical-align: middle !important;
+            border-bottom: 1px solid var(--border-default) !important;
+        }
+        .data-table tbody tr:last-child td { border-bottom: none !important; }
+        .data-table tbody tr:hover td { background: var(--bg-subtle) !important; }
+
+        /* ─── Action Buttons ─── */
+        .action-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 2rem !important;
+            height: 2rem !important;
+            border-radius: var(--radius-sm) !important;
+            border: 1px solid var(--border-default) !important;
+            background: var(--bg-card) !important;
+            color: var(--color-brown-200) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            font-size: 0.75rem !important;
+        }
+        .action-btn:hover {
+            background: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+            border-color: var(--color-brown-100) !important;
+        }
+        .action-btn.complete:hover { color: #10b981 !important; border-color: #10b981 !important; background: #ecfdf5 !important; }
+        .action-btn.delete:hover { color: #dc2626 !important; border-color: #dc2626 !important; background: #fee2e2 !important; }
+        .action-btn.view:hover { color: var(--color-gold) !important; border-color: var(--color-gold) !important; background: #fefce8 !important; }
+        .action-btn.consult:hover { color: #8b5cf6 !important; border-color: #8b5cf6 !important; background: #f5f3ff !important; }
+
+        /* ─── Patient Cell ─── */
+        .patient-name { font-weight: var(--font-weight-medium) !important; color: var(--color-brown-700) !important; }
+        .patient-phone { font-size: 0.65rem !important; color: var(--color-brown-100) !important; }
+
+        /* ─── Doctor Cell ─── */
+        .doctor-name { color: var(--color-brown-300) !important; font-size: 0.8125rem !important; }
+
+        /* ─── Time Cell ─── */
+        .visit-time { color: var(--color-brown-300) !important; font-size: 0.75rem !important; }
+
+        /* ─── Empty State ─── */
+        .empty-state {
+            text-align: center !important;
+            padding: 3rem 1.25rem !important;
+            color: var(--color-brown-100) !important;
+        }
+        .empty-state i {
+            font-size: 2rem !important;
+            margin-bottom: 0.75rem !important;
+            display: block !important;
+            opacity: 0.4 !important;
+        }
+
+        /* ─── Modal ─── */
+        .modal-overlay {
+            position: fixed !important;
+            inset: 0 !important;
+            background: rgba(0, 0, 0, 0.5) !important;
+            backdrop-filter: blur(4px) !important;
+            display: none !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 9999 !important;
+            padding: 1rem !important;
+        }
+        .modal-overlay.active { display: flex !important; }
+        .form-card {
+            background: var(--bg-card) !important;
+            border-radius: var(--radius-lg) !important;
+            box-shadow: var(--shadow-lg) !important;
+            max-width: 560px !important;
+            width: 100% !important;
+            max-height: 90vh !important;
+            overflow-y: auto !important;
+            padding: 1.5rem !important;
+            border-top: 4px solid var(--color-sage) !important;
+        }
+        .form-card-wide { max-width: 720px !important; }
+        .modal-header {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 1.25rem !important;
+            padding-bottom: 0.75rem !important;
+            border-bottom: 1px solid var(--border-default) !important;
+        }
+        .modal-title {
+            font-size: 1rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+        .close-btn {
+            background: none !important;
+            border: none !important;
+            color: var(--color-brown-100) !important;
+            font-size: 1.125rem !important;
+            cursor: pointer !important;
+            padding: 0.25rem !important;
+            transition: all 0.2s ease !important;
+        }
+        .close-btn:hover { color: var(--color-brown-600) !important; transform: rotate(90deg) !important; }
+        .modal-body { margin-bottom: 1.25rem !important; }
+        .modal-footer {
+            display: flex !important;
+            justify-content: flex-end !important;
+            gap: 0.75rem !important;
+            padding-top: 0.75rem !important;
+            border-top: 1px solid var(--border-default) !important;
+        }
+
+        /* ─── Form ─── */
+        .form-group { margin-bottom: 1rem !important; }
+        .form-label {
+            display: block !important;
+            font-size: 0.6875rem !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-200) !important;
+            letter-spacing: 0.03em !important;
+            margin-bottom: 0.25rem !important;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100% !important;
+            padding: 0.625rem 1rem !important;
+            border: 1px solid var(--border-input) !important;
+            border-radius: var(--radius-md) !important;
+            font-family: var(--font-family) !important;
+            font-size: 0.875rem !important;
+            color: var(--color-brown-700) !important;
+            background: var(--bg-card) !important;
+            outline: none !important;
+            transition: all 0.2s ease !important;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+        }
+        .form-textarea { resize: vertical !important; min-height: 80px !important; }
+        .form-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 1rem 1.5rem !important;
+        }
+        .form-grid .full-width { grid-column: 1 / -1 !important; }
+        @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr !important; } }
+
+        /* ─── Error Text ─── */
+        .error-text { color: var(--color-error-text) !important; font-size: 0.6875rem !important; margin-top: 0.25rem !important; display: none !important; font-weight: var(--font-weight-light) !important; }
+        .error-text.show { display: block !important; }
+        .form-input.error, .form-select.error { border-color: var(--color-error-text) !important; }
+
+        /* ─── Delete Modal ─── */
+        .delete-icon-circle {
+            width: 3.5rem !important;
+            height: 3.5rem !important;
+            border-radius: 50% !important;
+            background: #fee2e2 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 auto 1rem !important;
+            color: #dc2626 !important;
+            font-size: 1.25rem !important;
+        }
+        .btn-danger {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            background: #ef4444 !important;
+            color: white !important;
+            font-family: var(--font-family) !important;
+            font-size: 0.8125rem !important;
+            font-weight: var(--font-weight-light) !important;
+            padding: 0.5rem 1.25rem !important;
+            border: none !important;
+            border-radius: var(--radius-lg) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+        }
+        .btn-danger:hover {
+            background: #dc2626 !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
+        }
+        .modal-danger .form-card { border-top-color: #ef4444 !important; }
+
+        /* ─── Responsive ─── */
         @media (max-width: 768px) {
-            .filter-bar .form-select {
-                min-width: 100px !important;
-            }
-            .filter-bar .btn-primary span {
-                display: none !important;
-            }
+            .filter-bar { flex-wrap: wrap !important; gap: 0.5rem !important; padding: 0.5rem 0.75rem !important; }
+            .filter-bar .search-wrapper { flex: 1 1 100% !important; min-width: 100px !important; max-width: 100% !important; }
+            .filter-bar .form-select,
+            .filter-bar .form-input { min-width: 90px !important; max-width: 140px !important; font-size: 0.75rem !important; height: 32px !important; }
+            .filter-bar .btn-primary span,
+            .filter-bar .btn-secondary span { display: none !important; }
+            .filter-bar .btn-primary,
+            .filter-bar .btn-secondary { padding: 0.3rem 0.6rem !important; font-size: 0.75rem !important; height: 32px !important; }
+            .grid-stats { grid-template-columns: repeat(2, 1fr) !important; }
             .data-table th,
-            .data-table td {
-                padding: 0.5rem 0.75rem !important;
-                font-size: 0.75rem !important;
-            }
+            .data-table td { padding: 0.5rem 0.5rem !important; font-size: 0.6875rem !important; }
         }
+        @media (max-width: 480px) { .grid-stats { grid-template-columns: 1fr !important; } }
 
-        /* Modal overrides */
-        .modal-content {
-            border-top: 4px solid var(--color-sage);
+        /* ─── View Modal Styles ─── */
+        .detail-section {
+            margin-bottom: 1rem !important;
+            padding-bottom: 0.75rem !important;
+            border-bottom: 1px solid var(--border-default) !important;
         }
+        .detail-section:last-child {
+            border-bottom: none !important;
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        .detail-label {
+            font-size: 0.6875rem !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-200) !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
+            margin-bottom: 0.25rem !important;
+        }
+        .detail-value {
+            font-size: 0.875rem !important;
+            font-weight: var(--font-weight-regular) !important;
+            color: var(--color-brown-700) !important;
+            line-height: 1.5 !important;
+        }
+        .detail-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 0.75rem 1.5rem !important;
+        }
+        @media (max-width: 640px) { .detail-grid { grid-template-columns: 1fr !important; } }
 
-        /* Empty state */
-        .opd-empty {
-            text-align: center;
-            padding: 3rem 1.25rem;
-            color: var(--color-brown-100);
+        /* ─── Chart Container ─── */
+        .chart-container {
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-md) !important;
+            padding: 0.75rem !important;
+            margin-top: 0.75rem !important;
         }
-        .opd-empty i {
-            font-size: 2rem;
-            margin-bottom: 0.75rem;
-            display: block;
-            opacity: 0.4;
+        .chart-container canvas { max-height: 100px !important; }
+        .chart-title {
+            font-size: 0.7rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-300) !important;
+            margin-bottom: 0.5rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
         }
-        .opd-empty p {
-            font-size: 0.875rem;
-            font-weight: var(--font-weight-light);
-        }
-
-        /* Quick filter row */
-        .filter-row {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        .filter-btn {
-            padding: 0.25rem 0.75rem;
-            border-radius: var(--radius-full);
-            font-size: 0.75rem;
-            font-weight: var(--font-weight-light);
-            border: 1px solid var(--border-default);
-            background: var(--bg-card);
-            color: var(--color-brown-300);
-            cursor: pointer;
-            transition: var(--transition-base);
-        }
-        .filter-btn:hover {
-            background: var(--bg-hover);
-            color: var(--color-brown-600);
-        }
-        .filter-btn.active {
-            background: var(--color-sage);
-            color: white;
-            border-color: var(--color-sage);
-        }
+        .chart-title i { color: var(--color-sage) !important; margin-right: 0.25rem !important; }
     </style>
 </head>
 <body class="bg-subtle">
@@ -257,48 +591,53 @@
     <div id="sidebar-container"></div>
     <div id="header-container"></div>
 
-    <main class="main-content">
+    <main class="main-content" id="mainContent">
         
-        <!-- Stats Cards -->
-        <div class="grid-stats" style="margin-bottom: 1.5rem;">
-            <div class="stat-card">
+        <!-- Page Header -->
+        <div class="page-header-custom">
+            <div>
+                <h1><i class="fas fa-walking"></i> OPD Management</h1>
+                <p>Manage outpatient department visits and consultations</p>
+            </div>
+            <div class="header-actions">
+                <button id="refreshBtn" class="btn-header btn-header-secondary">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button id="newVisitBtn" class="btn-header btn-header-primary">
+                    <i class="fas fa-plus"></i> New Visit
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid-stats">
+            <div class="stat-card stat-card-blue">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Today's OPD</p>
-                        <p class="stat-value" id="todayOpd">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-calendar-day" style="color:var(--color-sage); font-size:1.125rem;"></i>
-                    </div>
+                    <div><p class="stat-label">Today's OPD</p><p class="stat-value" id="todayOpd">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-calendar-day" style="color:#3b82f6;"></i></div>
                 </div>
             </div>
-            
-            <div class="stat-card">
+            <div class="stat-card stat-card-orange">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Waiting Queue</p>
-                        <p class="stat-value" id="waitingQueue">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-hourglass-half" style="color:var(--color-sage); font-size:1.125rem;"></i>
-                    </div>
+                    <div><p class="stat-label">Waiting Queue</p><p class="stat-value" id="waitingQueue">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-hourglass-half" style="color:var(--color-warning-text);"></i></div>
                 </div>
             </div>
-            
-            <div class="stat-card">
+            <div class="stat-card stat-card-green">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Completed</p>
-                        <p class="stat-value" id="completedOpd">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-check-circle" style="color:var(--color-sage); font-size:1.125rem;"></i>
-                    </div>
+                    <div><p class="stat-label">Completed</p><p class="stat-value" id="completedOpd">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-check-circle" style="color:var(--color-success-text);"></i></div>
+                </div>
+            </div>
+            <div class="stat-card stat-card-purple">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div><p class="stat-label">Avg Wait Time</p><p class="stat-value" id="avgWaitTime">0 min</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-clock" style="color:#9333ea;"></i></div>
                 </div>
             </div>
         </div>
 
-        <!-- Filter Bar with Add Button -->
+        <!-- Filter Bar -->
         <div class="filter-bar">
             <div class="search-wrapper">
                 <i class="fas fa-search"></i>
@@ -309,36 +648,35 @@
                 <option value="Waiting">Waiting</option>
                 <option value="In Progress">In Progress</option>
                 <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+            </select>
+            <select id="doctorFilter" class="form-select">
+                <option value="">All Doctors</option>
             </select>
             <button id="resetFilterBtn" class="btn-secondary">
-                <i class="fas fa-undo-alt"></i>
-                <span>Reset</span>
-            </button>
-            <button id="newVisitBtn" class="btn-primary">
-                <i class="fas fa-plus"></i>
-                <span>New Visit</span>
+                <i class="fas fa-undo-alt"></i> <span>Reset</span>
             </button>
         </div>
 
         <!-- OPD Table -->
-        <div class="card-white" style="margin-top: 1.5rem; overflow:hidden;">
+        <div class="card-white">
             <div class="table-wrapper">
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Token</th>
-                            <th>Patient</th>
+                            <th style="width:70px;">Token</th>
+                            <th style="min-width:140px;">Patient</th>
                             <th>Doctor</th>
-                            <th>Time</th>
-                            <th>Status</th>
-                            <th style="text-align:center;">Actions</th>
+                            <th style="width:100px;">Time</th>
+                            <th style="width:100px;">Status</th>
+                            <th style="width:170px; text-align:center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="opdTable">
                         <tr>
-                            <td colspan="6" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
-                                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
-                                <p style="font-weight:var(--font-weight-light);">Loading OPD visits...</p>
+                            <td colspan="6" class="empty-state">
+                                <i class="fas fa-spinner fa-pulse"></i>
+                                <p>Loading OPD visits...</p>
                             </td>
                         </tr>
                     </tbody>
@@ -347,77 +685,100 @@
         </div>
     </main>
 
-    <!-- New OPD Visit Modal - Using theme's modal system -->
-    <div id="opdModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-        <div class="form-card" style="max-width:40rem;">
+    <!-- New OPD Visit Modal -->
+    <div id="opdModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="form-card form-card-wide">
             <div class="modal-header">
                 <h3 class="modal-title" id="modalTitle">
-                    <i class="fas fa-walking"></i>
-                    New OPD Visit
+                    <i class="fas fa-walking" style="color:var(--color-sage);"></i> New OPD Visit
                 </h3>
-                <button class="close-btn" id="closeOpdModalBtn" aria-label="Close modal">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button class="close-btn" id="closeOpdModalBtn"><i class="fas fa-times"></i></button>
             </div>
             <form id="opdForm">
+                <input type="hidden" id="editOpdId">
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label class="form-label">Select Patient <span style="color:var(--color-error-text);">*</span></label>
-                        <select id="patientId" required class="form-select">
-                            <option value="">-- Select Patient --</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Select Doctor <span style="color:var(--color-error-text);">*</span></label>
-                        <select id="doctorId" required class="form-select">
-                            <option value="">-- Select Doctor --</option>
-                        </select>
-                    </div>
-                    <div class="form-group" style="margin-bottom:0;">
-                        <label class="form-label">Chief Complaint</label>
-                        <textarea id="complaint" rows="3" class="form-textarea" placeholder="Describe the patient's symptoms or reason for visit..."></textarea>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Select Patient <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="patientId" required class="form-select">
+                                <option value="">-- Select Patient --</option>
+                            </select>
+                            <span class="error-text" id="patientIdError">Please select a patient</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Select Doctor <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="doctorId" required class="form-select">
+                                <option value="">-- Select Doctor --</option>
+                            </select>
+                            <span class="error-text" id="doctorIdError">Please select a doctor</span>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">Chief Complaint / Symptoms</label>
+                            <textarea id="complaint" rows="3" class="form-textarea" placeholder="Describe the patient's symptoms or reason for visit..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Priority</label>
+                            <select id="priority" class="form-select">
+                                <option value="normal">Normal</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select id="status" class="form-select">
+                                <option value="Waiting">Waiting</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" id="cancelOpdModalBtn" class="btn-secondary">Cancel</button>
                     <button type="submit" class="btn-primary">
-                        <i class="fas fa-plus-circle"></i>
-                        Create Visit
+                        <i class="fas fa-save"></i> Save Visit
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="modal-overlay modal-danger" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
-        <div class="form-card" style="max-width:26rem; border-top-color:#ef4444;">
+    <!-- View OPD Visit Modal -->
+    <div id="viewModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="form-card" style="max-width:40rem;">
             <div class="modal-header">
-                <h3 class="modal-title" id="deleteModalTitle" style="color:var(--color-brown-700);">
-                    <i class="fas fa-triangle-exclamation" style="color:#ef4444;"></i>
-                    Confirm Delete
+                <h3 class="modal-title" id="viewModalTitle">
+                    <i class="fas fa-eye" style="color:var(--color-sage);"></i> Visit Details
                 </h3>
-                <button class="close-btn" id="closeDeleteModalBtn" aria-label="Close delete modal">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button class="close-btn" id="closeViewModalBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="viewContent">
+                <!-- Dynamically populated -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="closeViewFooterBtn" class="btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal-overlay modal-danger" role="dialog" aria-modal="true">
+        <div class="form-card" style="max-width:26rem;">
+            <div class="modal-header">
+                <h3 class="modal-title" style="color:#dc2626;">
+                    <i class="fas fa-triangle-exclamation" style="color:#dc2626;"></i> Confirm Delete
+                </h3>
+                <button class="close-btn" id="closeDeleteModalBtn"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body" style="text-align:center; padding:1.75rem 1.25rem;">
-                <div class="delete-icon-circle">
-                    <i class="fas fa-trash-alt"></i>
-                </div>
-                <p style="font-size:0.9375rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin-bottom:0.5rem;">
-                    Delete OPD Visit?
-                </p>
-                <p style="font-size:0.8125rem; color:var(--color-brown-300); font-weight:var(--font-weight-light); line-height:1.6;">
-                    This action cannot be undone. This visit record will be permanently removed.
-                </p>
+                <div class="delete-icon-circle"><i class="fas fa-trash-alt"></i></div>
+                <p style="font-size:0.9375rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin-bottom:0.5rem;">Delete OPD Visit?</p>
+                <p style="font-size:0.8125rem; color:var(--color-brown-300);">This action cannot be undone.</p>
             </div>
             <div class="modal-footer" style="justify-content:center;">
                 <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
-                <button id="confirmDeleteBtn" class="btn-danger">
-                    <i class="fas fa-trash-alt"></i>
-                    Delete
-                </button>
+                <button id="confirmDeleteBtn" class="btn-danger"><i class="fas fa-trash-alt"></i> Delete</button>
             </div>
         </div>
     </div>
@@ -425,6 +786,21 @@
     <script src="../../js/core/common.js"></script>
     <script src="../../js/core/form-validation.js"></script>
     <script src="opd.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var checkSidebar = setInterval(function() {
+                var sidebar = document.getElementById('mainSidebar');
+                if (sidebar) {
+                    clearInterval(checkSidebar);
+                    document.getElementById('mainContent').classList.add('loaded');
+                }
+            }, 50);
+            setTimeout(function() {
+                document.getElementById('mainContent').classList.add('loaded');
+            }, 1000);
+        });
+    </script>
     
 </body>
 </html>

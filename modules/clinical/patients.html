@@ -17,7 +17,6 @@
            All base styles come from theme.css
            ============================================================ */
 
-        /* Patient table row */
         .patient-row {
             transition: var(--transition-base);
             border-bottom: 1px solid var(--border-default);
@@ -29,7 +28,6 @@
             border-bottom: none;
         }
 
-        /* Patient avatar - small circle */
         .patient-avatar {
             width: 2rem;
             height: 2rem;
@@ -44,7 +42,6 @@
             flex-shrink: 0;
         }
 
-        /* Pagination */
         .pagination-btn {
             padding: 0.25rem 0.75rem;
             border-radius: var(--radius-md);
@@ -66,13 +63,11 @@
             border-color: var(--color-sage);
         }
 
-        /* Table wrapper for overflow */
         .table-wrapper {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
         }
 
-        /* Data table - extends theme */
         .data-table {
             width: 100%;
             border-collapse: collapse;
@@ -97,7 +92,6 @@
             vertical-align: middle;
         }
 
-        /* Action buttons in table */
         .action-btn {
             color: var(--color-brown-100);
             transition: var(--transition-base);
@@ -118,7 +112,6 @@
             color: var(--color-gold);
         }
 
-        /* Delete modal - danger variant */
         .modal-danger .modal-content {
             border-top-color: #ef4444;
         }
@@ -136,7 +129,6 @@
             font-size: 1.25rem;
         }
 
-        /* Danger button */
         .btn-danger {
             display: inline-flex;
             align-items: center;
@@ -157,12 +149,10 @@
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
         }
 
-        /* Override: Filter bar select width */
         .filter-bar .form-select {
             min-width: 140px !important;
         }
 
-        /* Override: Add button inside filter bar */
         .filter-bar .btn-primary {
             flex: 0 0 auto !important;
             padding: 0.4rem 0.85rem !important;
@@ -177,11 +167,117 @@
             color: white !important;
             border: none !important;
         }
-
         .filter-bar .btn-primary:hover {
             background-color: var(--color-sage-dark) !important;
             box-shadow: 0 4px 12px rgba(138, 174, 122, 0.35) !important;
             transform: translateY(-1px) !important;
+        }
+
+        .badge-condition {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.2rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.65rem;
+            font-weight: var(--font-weight-medium);
+            line-height: 1.4;
+            white-space: nowrap;
+        }
+        .badge-critical { background: #fee2e2; color: #ef4444; }
+        .badge-stable { background: #e8f5e2; color: #4a8c3a; }
+        .badge-serious { background: #fef3dd; color: #9a6a10; }
+        .badge-recovering { background: #e2f0fb; color: #2a72b5; }
+
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.2rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.65rem;
+            font-weight: var(--font-weight-medium);
+            line-height: 1.4;
+            white-space: nowrap;
+        }
+        .badge-admitted { background: #e8f5e2; color: #4a8c3a; }
+        .badge-treatment { background: #e2f0fb; color: #2a72b5; }
+        .badge-discharged { background: #f0e8e0; color: #9a8e82; }
+        .badge-consultation { background: #fef3dd; color: #9a6a10; }
+
+        .badge-category {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.2rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.65rem;
+            font-weight: var(--font-weight-medium);
+            line-height: 1.4;
+            white-space: nowrap;
+        }
+        .badge-ipd { background: #f0e8e0; color: #5a4a3a; }
+        .badge-opd { background: #e2f0fb; color: #2a72b5; }
+        .badge-emergency { background: #fee2e2; color: #ef4444; animation: pulse-badge 2s infinite; }
+        .badge-surgery { background: #fef3dd; color: #9a6a10; }
+
+        .status-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-right: 4px;
+        }
+        .status-dot.green { background: #4a8c3a; }
+        .status-dot.yellow { background: #d4a853; }
+        .status-dot.red { background: #ef4444; }
+        .status-dot.gray { background: #b8aa9a; }
+        .status-dot.blue { background: #2a72b5; }
+
+        .badge-package {
+            background: linear-gradient(135deg, #d4a853, #e8c87a);
+            color: white;
+            padding: 0.15rem 0.5rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6rem;
+            font-weight: var(--font-weight-medium);
+            white-space: nowrap;
+        }
+
+        @keyframes pulse-badge {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .patient-detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-default);
+        }
+        .patient-detail-row:last-child {
+            border-bottom: none;
+        }
+        .patient-detail-label {
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-300);
+            font-size: 0.75rem;
+        }
+        .patient-detail-value {
+            font-weight: var(--font-weight-regular);
+            color: var(--color-brown-700);
+            font-size: 0.85rem;
+        }
+
+        .external-consult-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.375rem 0;
+            border-bottom: 1px solid #f8f3ee;
+            font-size: 0.8rem;
+        }
+        .external-consult-item:last-child {
+            border-bottom: none;
         }
 
         @media (max-width: 768px) {
@@ -196,14 +292,15 @@
                 padding: 0.5rem 0.75rem !important;
                 font-size: 0.75rem !important;
             }
+            .data-table .hide-mobile {
+                display: none !important;
+            }
         }
 
-        /* Modal overrides - using theme's modal system */
         .modal-content {
             border-top: 4px solid var(--color-sage);
         }
 
-        /* Patient ID badge */
         .patient-id {
             font-size: 0.75rem;
             font-weight: var(--font-weight-medium);
@@ -214,14 +311,12 @@
             display: inline-block;
         }
 
-        /* Pagination info text */
         .pagination-info {
             font-size: 0.75rem;
             color: var(--color-brown-100);
             font-weight: var(--font-weight-light);
         }
 
-        /* Empty state */
         .patients-empty {
             text-align: center;
             padding: 3rem 1.25rem;
@@ -232,6 +327,122 @@
             margin-bottom: 0.75rem;
             display: block;
             opacity: 0.4;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 1rem;
+        }
+        .modal-overlay.active {
+            display: flex !important;
+        }
+        .form-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            max-width: 560px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 1.5rem;
+            border-top: 4px solid var(--color-sage);
+        }
+        .form-card-wide {
+            max-width: 720px !important;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-default);
+        }
+        .modal-title {
+            font-size: 1rem;
+            font-weight: var(--font-weight-medium);
+            color: var(--color-brown-700);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--color-brown-100);
+            font-size: 1.125rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            transition: var(--transition-base);
+        }
+        .close-btn:hover {
+            color: var(--color-brown-600);
+            transform: rotate(90deg);
+        }
+        .modal-body {
+            margin-bottom: 1.25rem;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border-default);
+        }
+
+        .grid-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+        .stat-icon-bg {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: var(--radius-md);
+            background: var(--bg-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .grid-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 640px) {
+            .grid-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* NEW: Progress bar in table */
+        .progress-bar-mini {
+            width: 60px;
+            height: 4px;
+            background: var(--border-default);
+            border-radius: 4px;
+            overflow: hidden;
+            display: inline-block;
+        }
+        .progress-bar-mini .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-sage), var(--color-sage-dark));
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+        .progress-text {
+            font-size: 0.6rem;
+            color: var(--color-brown-100);
+            margin-left: 0.5rem;
         }
     </style>
 </head>
@@ -271,11 +482,11 @@
             <div class="stat-card">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
-                        <p class="stat-label">This Month</p>
-                        <p class="stat-value" id="thisMonth">0</p>
+                        <p class="stat-label">Under Treatment</p>
+                        <p class="stat-value" id="treatmentCount">0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-chart-line" style="color:var(--color-sage); font-size:1.125rem;"></i>
+                        <i class="fas fa-clock" style="color:var(--color-sage); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
@@ -283,17 +494,17 @@
             <div class="stat-card">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
-                        <p class="stat-label">Male/Female</p>
-                        <p class="stat-value" id="genderRatio">0/0</p>
+                        <p class="stat-label">Admitted / Discharged</p>
+                        <p class="stat-value" id="admitDischargeRatio">0/0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-venus-mars" style="color:var(--color-sage); font-size:1.125rem;"></i>
+                        <i class="fas fa-hospital-user" style="color:var(--color-sage); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Filter Bar with Add Button -->
+        <!-- Filter Bar -->
         <div class="filter-bar">
             <div class="search-wrapper">
                 <i class="fas fa-search"></i>
@@ -304,6 +515,20 @@
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
                 <option value="Other">Other</option>
+            </select>
+            <select id="conditionFilter" class="form-select">
+                <option value="">All Conditions</option>
+                <option value="critical">Critical</option>
+                <option value="stable">Stable</option>
+                <option value="serious">Serious</option>
+                <option value="recovering">Recovering</option>
+            </select>
+            <select id="statusFilter" class="form-select">
+                <option value="">All Status</option>
+                <option value="admitted">Admitted</option>
+                <option value="treatment">Under Treatment</option>
+                <option value="discharged">Discharged</option>
+                <option value="consultation">Consultation</option>
             </select>
             <button id="resetFilterBtn" class="btn-secondary">
                 <i class="fas fa-undo-alt"></i>
@@ -323,15 +548,17 @@
                         <tr>
                             <th>Patient ID</th>
                             <th>Name</th>
-                            <th class="hidden md:table-cell">Age/Gender</th>
-                            <th class="hidden lg:table-cell">Phone</th>
-                            <th class="hidden lg:table-cell">Email</th>
+                            <th class="hide-mobile">Category</th>
+                            <th class="hide-mobile">Condition</th>
+                            <th class="hide-mobile">Status</th>
+                            <th class="hide-mobile">Doctor</th>
+                            <th class="hide-mobile">Progress</th>
                             <th style="text-align:center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="patientsTableBody">
                         <tr>
-                            <td colspan="6" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
+                            <td colspan="8" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
                                 <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
                                 <p style="font-weight:var(--font-weight-light);">Loading patients...</p>
                             </td>
@@ -346,9 +573,9 @@
         </div>
     </main>
 
-    <!-- Add/Edit Modal - Using theme's modal system -->
+    <!-- Add/Edit Modal -->
     <div id="patientModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-        <div class="form-card" style="max-width:48rem;">
+        <div class="form-card form-card-wide">
             <div class="modal-header">
                 <h3 class="modal-title" id="modalTitle">
                     <i class="fas fa-user-plus"></i>
@@ -362,6 +589,7 @@
                 <input type="hidden" id="patientId">
                 <div class="modal-body">
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem 1.5rem;">
+                        <!-- Personal Info -->
                         <div class="form-group">
                             <label class="form-label">Full Name <span style="color:var(--color-error-text);">*</span></label>
                             <input type="text" id="fullName" required class="form-input" placeholder="Rajesh Kumar">
@@ -395,9 +623,89 @@
                             <label class="form-label">Email</label>
                             <input type="email" id="email" class="form-input" placeholder="patient@medflow.com">
                         </div>
+                        
+                        <!-- Tracking Fields -->
+                        <div class="form-group">
+                            <label class="form-label">Patient Category <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="patientCategory" required class="form-select">
+                                <option value="inpatient">IPD (Inpatient)</option>
+                                <option value="outpatient">OPD (Outpatient)</option>
+                                <option value="emergency">Emergency</option>
+                                <option value="consultation">Consultation</option>
+                                <option value="surgery">Surgery</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Condition <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="patientCondition" required class="form-select">
+                                <option value="stable">Stable</option>
+                                <option value="critical">Critical</option>
+                                <option value="serious">Serious</option>
+                                <option value="recovering">Recovering</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="patientStatus" required class="form-select">
+                                <option value="admitted">Admitted</option>
+                                <option value="treatment">Under Treatment</option>
+                                <option value="discharged">Discharged</option>
+                                <option value="consultation">Consultation</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Department</label>
+                            <select id="patientDepartment" class="form-select">
+                                <option value="general">General Medicine</option>
+                                <option value="cardiology">Cardiology</option>
+                                <option value="neurology">Neurology</option>
+                                <option value="orthopedics">Orthopedics</option>
+                                <option value="pediatrics">Pediatrics</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Assigned Doctor</label>
+                            <select id="patientDoctor" class="form-select">
+                                <option value="">Select Doctor</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Treatment Package</label>
+                            <select id="patientPackage" class="form-select">
+                                <option value="">Select Package</option>
+                            </select>
+                        </div>
+                        
+                        <!-- NEW: Treatment Progress Fields -->
+                        <div class="form-group">
+                            <label class="form-label">Treatment Progress (%)</label>
+                            <input type="number" id="treatmentProgress" class="form-input" min="0" max="100" placeholder="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Package Status</label>
+                            <select id="packageStatus" class="form-select">
+                                <option value="not_started">Not Started</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="completed">Completed</option>
+                                <option value="expired">Expired</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Treatment Start Date</label>
+                            <input type="date" id="treatmentStartDate" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Treatment End Date</label>
+                            <input type="date" id="treatmentEndDate" class="form-input">
+                        </div>
+                        
                         <div class="form-group" style="grid-column:1 / -1;">
                             <label class="form-label">Address</label>
                             <textarea id="address" rows="2" class="form-textarea" placeholder="Enter full address..."></textarea>
+                        </div>
+                        <div class="form-group" style="grid-column:1 / -1;">
+                            <label class="form-label">Medical Notes</label>
+                            <textarea id="medicalNotes" rows="2" class="form-textarea" placeholder="Enter medical notes, diagnosis, treatment plan..."></textarea>
                         </div>
                     </div>
                 </div>
@@ -409,6 +717,27 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- View Patient Details Modal -->
+    <div id="viewPatientModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="viewModalTitle">
+        <div class="form-card form-card-wide">
+            <div class="modal-header">
+                <h3 class="modal-title" id="viewModalTitle">
+                    <i class="fas fa-eye" style="color:var(--color-sage);"></i>
+                    Patient Details
+                </h3>
+                <button class="close-btn" id="closeViewModalBtn" aria-label="Close view modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="viewPatientContent">
+                <!-- Dynamically populated -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="closeViewModalFooterBtn" class="btn-secondary">Close</button>
+            </div>
         </div>
     </div>
 

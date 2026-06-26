@@ -27,7 +27,7 @@
         
         .login-container {
             width: 100%;
-            max-width: 460px;
+            max-width: 440px;
         }
         
         .login-card {
@@ -201,7 +201,7 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
         }
         
         .demo-badge {
@@ -211,10 +211,24 @@
             font-size: 10px;
             font-family: monospace;
             color: #334155;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
         }
         
+        .demo-badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .demo-badge.super-admin { background: #ede9fe; color: #5b21b6; }
+        .demo-badge.admin { background: #dbeafe; color: #1d4ed8; }
+        .demo-badge.doctor { background: #d1fae5; color: #065f46; }
+        .demo-badge.receptionist { background: #fef3c7; color: #92400e; }
+        .demo-badge.nurse { background: #fce7f3; color: #9d174d; }
+        .demo-badge.accountant { background: #dbeafe; color: #1e40af; }
+        
         .demo-badge span {
-            color: #a8c49a;
             font-weight: 600;
         }
         
@@ -243,6 +257,10 @@
             background: #ef4444;
         }
         
+        .toast-info {
+            background: #3b82f6;
+        }
+        
         @keyframes slideInRight {
             from {
                 transform: translateX(100%);
@@ -267,16 +285,6 @@
             animation: fadeOut 0.3s ease-out forwards;
         }
         
-        .role-select {
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 16px;
-        }
-        
-        /* Loading state */
         .btn-login.loading {
             opacity: 0.7;
             cursor: not-allowed;
@@ -289,6 +297,18 @@
         @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
+        }
+        
+        /* Detected role badge */
+        .detected-role {
+            text-align: center;
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 8px;
+            min-height: 20px;
+        }
+        .detected-role strong {
+            color: #8aae7a;
         }
     </style>
 </head>
@@ -310,7 +330,7 @@
                     <label class="form-label">Email Address</label>
                     <div class="input-wrapper">
                         <i class="fas fa-envelope input-icon"></i>
-                        <input type="email" id="email" class="form-input" placeholder="admin@medflow.com" value="admin@medflow.com">
+                        <input type="email" id="email" class="form-input" placeholder="Enter your email" value="admin@medflow.com" autofocus>
                     </div>
                     <div class="error-text" id="emailError">Please enter a valid email address</div>
                 </div>
@@ -327,17 +347,8 @@
                     <div class="error-text" id="passwordError">Password must be at least 6 characters</div>
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">Login As</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-user-tag input-icon"></i>
-                        <select id="role" class="form-input role-select">
-                            <option value="admin">Administrator</option>
-                            <option value="doctor">Doctor</option>
-                            <option value="receptionist">Receptionist</option>
-                        </select>
-                    </div>
-                </div>
+                <!-- 🔥 Detected Role will show here -->
+                <div class="detected-role" id="detectedRole"></div>
                 
                 <button type="submit" id="loginBtn" class="btn-login">
                     <i class="fas fa-sign-in-alt"></i>
@@ -346,10 +357,26 @@
             </form>
             
             <div class="demo-section">
-                <p class="demo-title">DEMO CREDENTIALS</p>
+                <p class="demo-title">⚡ QUICK LOGIN</p>
                 <div class="demo-credentials">
-                    <span class="demo-badge">📧 <span>admin@medflow.com</span></span>
-                    <span class="demo-badge">🔑 <span>admin123</span></span>
+                    <button onclick="quickLogin('super_admin')" class="demo-badge super-admin">
+                        ⭐ <span>Super Admin</span>
+                    </button>
+                    <button onclick="quickLogin('admin')" class="demo-badge admin">
+                        👑 <span>Admin</span>
+                    </button>
+                    <button onclick="quickLogin('doctor')" class="demo-badge doctor">
+                        🩺 <span>Doctor</span>
+                    </button>
+                    <button onclick="quickLogin('receptionist')" class="demo-badge receptionist">
+                        📋 <span>Receptionist</span>
+                    </button>
+                    <button onclick="quickLogin('nurse')" class="demo-badge nurse">
+                        💉 <span>Nurse</span>
+                    </button>
+                    <button onclick="quickLogin('accountant')" class="demo-badge accountant">
+                        💰 <span>Accountant</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -357,17 +384,97 @@
 </div>
 
 <script>
-    // DOM Elements
+    // ─── DOM Elements ──────────────────────────────────────
     const loginForm = document.getElementById('loginForm');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
-    const roleSelect = document.getElementById('role');
     const togglePasswordBtn = document.getElementById('togglePassword');
     const loginBtn = document.getElementById('loginBtn');
     const emailError = document.getElementById('emailError');
     const passwordError = document.getElementById('passwordError');
+    const detectedRole = document.getElementById('detectedRole');
     
-    // Toggle Password Visibility
+    // ─── 🔥 USER DATABASE (Email → Role Mapping) ──────────────
+    const USER_DATABASE = {
+        'admin@medflow.com': {
+            role: 'super_admin',
+            label: 'Super Administrator',
+            password: 'admin123',
+            roleId: 999
+        },
+        'superadmin@medflow.com': {
+            role: 'super_admin',
+            label: 'Super Administrator',
+            password: 'admin123',
+            roleId: 999
+        },
+        'doctor@medflow.com': {
+            role: 'doctor',
+            label: 'Doctor',
+            password: 'doctor123',
+            roleId: 2
+        },
+        'reception@medflow.com': {
+            role: 'receptionist',
+            label: 'Receptionist',
+            password: 'reception123',
+            roleId: 4
+        },
+        'nurse@medflow.com': {
+            role: 'nurse',
+            label: 'Nurse',
+            password: 'nurse123',
+            roleId: 3
+        },
+        'accountant@medflow.com': {
+            role: 'accountant',
+            label: 'Accountant',
+            password: 'accountant123',
+            roleId: 5
+        }
+    };
+    
+    // ─── 🔥 Role Display Names ──────────────────────────────────
+    const ROLE_DISPLAY = {
+        super_admin: '⭐ Super Administrator',
+        admin: '👑 Administrator',
+        doctor: '🩺 Doctor',
+        nurse: '💉 Nurse',
+        receptionist: '📋 Receptionist',
+        accountant: '💰 Accountant'
+    };
+    
+    // ─── 🔥 Detect Role from Email ─────────────────────────────
+    function detectRole(email) {
+        const user = USER_DATABASE[email.toLowerCase()];
+        if (user) {
+            return user;
+        }
+        return null;
+    }
+    
+    // ─── 🔥 Show Detected Role ──────────────────────────────────
+    function showDetectedRole(email) {
+        const user = detectRole(email);
+        if (user) {
+            detectedRole.innerHTML = `🔍 Detected: <strong>${ROLE_DISPLAY[user.role] || user.label}</strong>`;
+            detectedRole.style.color = '#64748b';
+        } else {
+            detectedRole.innerHTML = '';
+        }
+    }
+    
+    // ─── Email Input Listener ──────────────────────────────────
+    emailInput.addEventListener('input', function() {
+        const email = this.value.trim();
+        if (email) {
+            showDetectedRole(email);
+        } else {
+            detectedRole.innerHTML = '';
+        }
+    });
+    
+    // ─── Toggle Password ──────────────────────────────────────
     if (togglePasswordBtn) {
         togglePasswordBtn.addEventListener('click', function() {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -378,7 +485,7 @@
         });
     }
     
-    // Real-time validation
+    // ─── Real-time Validation ──────────────────────────────────
     emailInput.addEventListener('input', function() {
         if (validateEmail(this.value)) {
             emailError.classList.remove('show');
@@ -393,19 +500,18 @@
         }
     });
     
-    // Validate Email
+    // ─── Validate Email ────────────────────────────────────────
     function validateEmail(email) {
         const re = /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/;
         return re.test(email);
     }
     
-    // Validate Form
+    // ─── Validate Form ─────────────────────────────────────────
     function validateForm() {
         let isValid = true;
         const email = emailInput.value.trim();
         const password = passwordInput.value;
         
-        // Email validation
         if (!email) {
             emailError.textContent = 'Email is required';
             emailError.classList.add('show');
@@ -421,7 +527,6 @@
             emailInput.classList.remove('error');
         }
         
-        // Password validation
         if (!password) {
             passwordError.textContent = 'Password is required';
             passwordError.classList.add('show');
@@ -440,31 +545,31 @@
         return isValid;
     }
     
-    // Show Toast Notification
+    // ─── Show Toast ────────────────────────────────────────────
     function showToast(message, type = 'success') {
-        // Remove existing toast
         const existingToast = document.querySelector('.toast-message');
-        if (existingToast) {
-            existingToast.remove();
-        }
+        if (existingToast) existingToast.remove();
         
         const toast = document.createElement('div');
-        toast.className = `toast-message ${type === 'success' ? 'toast-success' : 'toast-error'}`;
+        toast.className = `toast-message toast-${type}`;
+        const iconMap = {
+            success: 'fa-check-circle',
+            error: 'fa-exclamation-circle',
+            info: 'fa-info-circle'
+        };
         toast.innerHTML = `
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+            <i class="fas ${iconMap[type] || iconMap.info}"></i>
             <span>${message}</span>
         `;
         document.body.appendChild(toast);
         
         setTimeout(() => {
             toast.classList.add('toast-fade-out');
-            setTimeout(() => {
-                toast.remove();
-            }, 300);
+            setTimeout(() => toast.remove(), 300);
         }, 3000);
     }
     
-    // Set Loading State
+    // ─── Set Loading State ────────────────────────────────────
     function setLoading(isLoading) {
         if (isLoading) {
             loginBtn.classList.add('loading');
@@ -479,59 +584,135 @@
         }
     }
     
-    // Handle Login
+    // ─── 🔥 SUPER ADMIN: Give All Permissions ──────────────────
+    function giveSuperAdminPermissions() {
+        let roles = JSON.parse(localStorage.getItem('system_roles') || '[]');
+        
+        let superAdminRole = roles.find(r => r.name === 'Super Administrator');
+        
+        if (!superAdminRole) {
+            const allModules = [
+                'dashboard', 'users', 'roles', 'departments', 'doctors',
+                'patients', 'appointments', 'opd', 'ipd', 'emergency',
+                'wards', 'pharmacy', 'laboratory', 'radiology', 'billing',
+                'staff', 'reports', 'documents', 'settings'
+            ];
+            
+            const permissions = {};
+            allModules.forEach(module => {
+                permissions[module] = ['view', 'create', 'edit', 'delete', 'approve', 'export'];
+            });
+            
+            superAdminRole = {
+                id: 999,
+                name: 'Super Administrator',
+                description: 'Full system access - Super Admin',
+                status: 'active',
+                permissions: permissions
+            };
+            
+            roles.push(superAdminRole);
+            localStorage.setItem('system_roles', JSON.stringify(roles));
+            console.log('✅ Super Admin role created with all permissions!');
+        }
+        
+        // Update current user's roleId
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        user.roleId = 999;
+        user.isSuperAdmin = true;
+        localStorage.setItem('user', JSON.stringify(user));
+    }
+    
+    // ─── 🔥 MAIN: Handle Login ─────────────────────────────────
     function handleLogin(e) {
         e.preventDefault();
         
-        if (!validateForm()) {
-            return;
-        }
+        if (!validateForm()) return;
         
         setLoading(true);
         
-        const email = emailInput.value.trim();
+        const email = emailInput.value.trim().toLowerCase();
         const password = passwordInput.value;
-        const role = roleSelect.value;
         
-        // Simulate API call delay
-        setTimeout(() => {
-            // Demo validation - In production, this would be an API call
-            if (email === 'admin@medflow.com' && password === 'admin123') {
-                // Store user data
-                const userData = {
-                    name: role === 'admin' ? 'Administrator' : role === 'doctor' ? 'Dr. Anjali Nair' : 'Priya Sharma',
-                    email: email,
-                    role: role,
-                    loginTime: new Date().toISOString()
-                };
-                
-                localStorage.setItem('auth_token', 'medflow_token_' + Date.now());
-                localStorage.setItem('user', JSON.stringify(userData));
-                
-                showToast('Login successful! Redirecting to dashboard...', 'success');
-                
-                // Add audit log
-                addAuditLog('LOGIN', `User ${email} logged in as ${role}`);
-                
-                setTimeout(() => {
-                    window.location.href = 'modules/dashboard/dashboard.html';
-                }, 1000);
-            } else {
-                setLoading(false);
-                showToast('Invalid email or password. Please try again.', 'error');
-                
-                // Shake effect on form
-                const loginCard = document.querySelector('.login-card');
-                loginCard.style.transform = 'translateX(0)';
-                loginCard.style.animation = 'shake 0.5s ease-in-out';
-                setTimeout(() => {
-                    loginCard.style.animation = '';
-                }, 500);
+        // ─── 🔥 CHECK IN USER DATABASE ────────────────────────────
+        const userRecord = USER_DATABASE[email];
+        
+        if (userRecord && userRecord.password === password) {
+            // ─── ✅ LOGIN SUCCESS ──────────────────────────────────
+            const roleKey = userRecord.role;
+            const roleLabel = userRecord.label;
+            const roleId = userRecord.roleId;
+            const isSuperAdmin = roleKey === 'super_admin';
+            
+            // Store user data
+            const userData = {
+                id: Date.now(),
+                name: roleLabel,
+                email: email,
+                role: roleKey,
+                roleId: roleId,
+                isSuperAdmin: isSuperAdmin,
+                loginTime: new Date().toISOString()
+            };
+            
+            localStorage.setItem('auth_token', 'medflow_token_' + Date.now());
+            localStorage.setItem('user', JSON.stringify(userData));
+            
+            // ─── 🔥 IF SUPER ADMIN, GIVE ALL PERMISSIONS ──────────
+            if (isSuperAdmin) {
+                giveSuperAdminPermissions();
             }
-        }, 800);
+            
+            showToast(`✅ Welcome ${roleLabel}! Redirecting...`, 'success');
+            addAuditLog('LOGIN', `User ${email} logged in as ${roleLabel}`);
+            
+            setTimeout(() => {
+                window.location.href = '../../modules/dashboard/dashboard.html';
+            }, 1000);
+            
+        } else {
+            // ─── ❌ LOGIN FAILED ──────────────────────────────────
+            setLoading(false);
+            showToast('❌ Invalid email or password. Please try again.', 'error');
+            
+            const loginCard = document.querySelector('.login-card');
+            loginCard.style.transform = 'translateX(0)';
+            loginCard.style.animation = 'shake 0.5s ease-in-out';
+            setTimeout(() => {
+                loginCard.style.animation = '';
+            }, 500);
+        }
     }
     
-    // Add audit log
+    // ─── 🔥 Quick Login ─────────────────────────────────────────
+    function quickLogin(role) {
+        // Find user with this role
+        let userEmail = null;
+        let userPassword = null;
+        
+        for (const [email, data] of Object.entries(USER_DATABASE)) {
+            if (data.role === role) {
+                userEmail = email;
+                userPassword = data.password;
+                break;
+            }
+        }
+        
+        if (userEmail) {
+            emailInput.value = userEmail;
+            passwordInput.value = userPassword;
+            showDetectedRole(userEmail);
+            showToast(`🔍 Logging in as ${ROLE_DISPLAY[role]}...`, 'info');
+            
+            setTimeout(() => {
+                loginForm.dispatchEvent(new Event('submit'));
+            }, 500);
+        } else {
+            showToast('❌ User not found for this role', 'error');
+        }
+    }
+    
+    // ─── Add Audit Log ─────────────────────────────────────────
     function addAuditLog(action, details) {
         let auditLogs = JSON.parse(localStorage.getItem('audit_logs') || '[]');
         auditLogs.unshift({
@@ -546,7 +727,7 @@
         localStorage.setItem('audit_logs', JSON.stringify(auditLogs));
     }
     
-    // Add shake animation
+    // ─── Shake Animation ──────────────────────────────────────
     const style = document.createElement('style');
     style.textContent = `
         @keyframes shake {
@@ -557,23 +738,30 @@
     `;
     document.head.appendChild(style);
     
-    // Check if already logged in
+    // ─── Check if already logged in ──────────────────────────
     const token = localStorage.getItem('auth_token');
     if (token && window.location.pathname.includes('login.html')) {
-        window.location.href = 'modules/dashboard/dashboard.html';
+        window.location.href = '../../modules/dashboard/dashboard.html';
     }
     
-    // Event listener
+    // ─── Event Listeners ─────────────────────────────────────
     if (loginForm) {
         loginForm.addEventListener('submit', handleLogin);
     }
     
-    // Enter key submit
     passwordInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             loginForm.dispatchEvent(new Event('submit'));
         }
     });
+    
+    // ─── Show detected role on load ──────────────────────────
+    if (emailInput.value) {
+        showDetectedRole(emailInput.value);
+    }
+    
+    // ─── Make functions global ──────────────────────────────
+    window.quickLogin = quickLogin;
 </script>
 
 </body>

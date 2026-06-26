@@ -13,10 +13,9 @@
 
     <style>
         /* ============================================================
-           PRESCRIPTIONS MODULE — Page-specific only
+           PRESCRIPTIONS MODULE — COMPLETE PROFESSIONAL VERSION
            ============================================================ */
 
-        /* 🔥 FIX: Prevent layout shift */
         .main-content {
             margin-left: 260px !important;
             margin-top: 70px !important;
@@ -26,47 +25,94 @@
             opacity: 0;
             animation: fadeIn 0.3s ease forwards;
         }
-        .main-content.loaded {
-            opacity: 1;
-        }
+        .main-content.loaded { opacity: 1; }
         #mainSidebar[data-collapsed="true"] ~ .main-content,
         #mainSidebar[data-collapsed="true"] + .main-content {
             margin-left: 72px !important;
         }
         @media (max-width: 1024px) {
-            .main-content {
-                margin-left: 0 !important;
-                padding: 1rem !important;
-            }
+            .main-content { margin-left: 0 !important; padding: 1rem !important; }
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 🔥 Page Header - Hidden */
-        .page-header {
-            display: none !important;
+        /* ─── Page Header ─── */
+        .page-header-custom {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 1.25rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.75rem !important;
+        }
+        .page-header-custom h1 {
+            font-size: 1.375rem !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-700) !important;
+            margin: 0 !important;
+        }
+        .page-header-custom h1 i { color: var(--color-sage) !important; margin-right: 0.5rem !important; }
+        .page-header-custom p { font-size: 0.75rem !important; color: var(--color-brown-100) !important; margin: 0 !important; }
+
+        .header-actions { display: flex !important; gap: 0.5rem !important; flex-wrap: wrap !important; }
+        .btn-header {
+            padding: 0.4rem 0.85rem !important;
+            font-size: 0.8rem !important;
+            border-radius: var(--radius-md) !important;
+            font-family: var(--font-family) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            border: none !important;
+        }
+        .btn-header-primary {
+            background: var(--color-sage) !important;
+            color: white !important;
+        }
+        .btn-header-primary:hover {
+            background: var(--color-sage-dark) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+        }
+        .btn-header-secondary {
+            background: var(--bg-card) !important;
+            color: var(--color-brown-200) !important;
+            border: 1px solid var(--border-input) !important;
+        }
+        .btn-header-secondary:hover {
+            background: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
         }
 
-        /* 🔥 Stats Cards - Perfect Spacing */
+        /* ─── Stats ─── */
         .grid-stats {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
             gap: 1rem !important;
             margin-bottom: 1.25rem !important;
         }
         .stat-card {
-            padding: 1rem 1.25rem !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
             border-radius: var(--radius-lg) !important;
+            padding: 1rem 1.25rem !important;
+            transition: all 0.2s ease !important;
         }
+        .stat-card:hover { transform: translateY(-2px) !important; box-shadow: var(--shadow-md) !important; }
         .stat-card .stat-value {
             font-size: 1.5rem !important;
             font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
             margin-top: 0.125rem !important;
         }
         .stat-card .stat-label {
             font-size: 0.625rem !important;
-            letter-spacing: 0.06em !important;
             text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
             color: var(--color-brown-200) !important;
         }
         .stat-card .stat-icon-bg {
@@ -78,25 +124,30 @@
             justify-content: center !important;
             background: var(--bg-muted) !important;
         }
-        .stat-card .stat-icon-bg i {
-            font-size: 1rem !important;
-        }
+        .stat-card .stat-icon-bg i { font-size: 1rem !important; }
+        .stat-card-sage { border-left: 4px solid var(--color-sage) !important; }
+        .stat-card-sage-dark { border-left: 4px solid var(--color-sage-dark) !important; }
+        .stat-card-gold { border-left: 4px solid var(--color-gold) !important; }
+        .stat-card-tan { border-left: 4px solid var(--color-warm-tan) !important; }
+        .text-sage-dark { color: var(--color-sage-dark) !important; }
+        .text-gold { color: var(--color-gold) !important; }
+        .text-tan { color: var(--color-warm-tan) !important; }
 
-        /* 🔥 Filter Bar - Perfect Alignment */
+        /* ─── Filter Bar ─── */
         .filter-bar {
-            padding: 0.625rem 1rem !important;
-            gap: 0.625rem !important;
-            margin-bottom: 1.25rem !important;
-            border-radius: var(--radius-lg) !important;
-            background: var(--bg-card) !important;
-            border: 1px solid var(--border-default) !important;
             display: flex !important;
             align-items: center !important;
             flex-wrap: nowrap !important;
+            gap: 0.625rem !important;
+            padding: 0.625rem 1rem !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-lg) !important;
+            margin-bottom: 1.25rem !important;
         }
         .filter-bar .search-wrapper {
-            flex: 1 1 220px !important;
-            min-width: 160px !important;
+            flex: 1 1 200px !important;
+            min-width: 150px !important;
             max-width: 320px !important;
             position: relative !important;
         }
@@ -105,7 +156,7 @@
             left: 0.75rem !important;
             top: 50% !important;
             transform: translateY(-50%) !important;
-            color: var(--color-brown-100);
+            color: var(--color-brown-100) !important;
             font-size: 0.8125rem !important;
             pointer-events: none !important;
             z-index: 1 !important;
@@ -115,34 +166,40 @@
             padding: 0.375rem 0.75rem 0.375rem 2.25rem !important;
             font-size: 0.8125rem !important;
             height: 36px !important;
-            border-radius: var(--radius-md) !important;
             border: 1px solid var(--border-input) !important;
-            background-color: var(--bg-card) !important;
+            border-radius: var(--radius-md) !important;
+            background: var(--bg-card) !important;
             color: var(--color-brown-700) !important;
             font-family: var(--font-family) !important;
+            outline: none !important;
+            transition: all 0.2s ease !important;
         }
         .filter-bar .search-input:focus {
             border-color: var(--color-sage-light) !important;
             box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
-            outline: none !important;
         }
         .filter-bar .form-select {
-            min-width: 130px !important;
+            min-width: 120px !important;
             max-width: 180px !important;
             padding: 0.375rem 1.75rem 0.375rem 0.75rem !important;
             font-size: 0.8125rem !important;
             height: 36px !important;
             border: 1px solid var(--border-input) !important;
             border-radius: var(--radius-md) !important;
-            background-color: var(--bg-card) !important;
+            background: var(--bg-card) !important;
             color: var(--color-brown-700) !important;
-            cursor: pointer !important;
             font-family: var(--font-family) !important;
+            outline: none !important;
+            cursor: pointer !important;
+            appearance: none !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b8aa9a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 0.625rem center !important;
+            background-size: 10px !important;
         }
         .filter-bar .form-select:focus {
             border-color: var(--color-sage-light) !important;
             box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
-            outline: none !important;
         }
         .filter-bar .btn-secondary {
             flex: 0 0 auto !important;
@@ -156,51 +213,50 @@
             white-space: nowrap !important;
             font-family: var(--font-family) !important;
             cursor: pointer !important;
-            background-color: transparent !important;
+            transition: all 0.2s ease !important;
+            background: transparent !important;
             color: var(--color-brown-200) !important;
             border: 1px solid var(--border-input) !important;
         }
         .filter-bar .btn-secondary:hover {
-            background-color: var(--bg-hover) !important;
+            background: var(--bg-hover) !important;
             color: var(--color-brown-600) !important;
             border-color: var(--color-brown-100) !important;
         }
 
         @media (max-width: 768px) {
-            .filter-bar {
-                flex-wrap: wrap !important;
-                gap: 0.5rem !important;
-                padding: 0.5rem 0.75rem !important;
-            }
-            .filter-bar .search-wrapper {
-                flex: 1 1 100% !important;
-                min-width: 100px !important;
-                max-width: 100% !important;
-            }
-            .filter-bar .form-select {
-                min-width: 90px !important;
-                max-width: 140px !important;
-                font-size: 0.75rem !important;
-                height: 32px !important;
-            }
-            .filter-bar .btn-secondary span {
-                display: none !important;
-            }
-            .filter-bar .btn-secondary {
-                padding: 0.3rem 0.6rem !important;
-                font-size: 0.75rem !important;
-                height: 32px !important;
-            }
+            .filter-bar { flex-wrap: wrap !important; gap: 0.5rem !important; padding: 0.5rem 0.75rem !important; }
+            .filter-bar .search-wrapper { flex: 1 1 100% !important; min-width: 100px !important; max-width: 100% !important; }
+            .filter-bar .form-select { min-width: 90px !important; max-width: 140px !important; font-size: 0.75rem !important; height: 32px !important; }
+            .filter-bar .btn-secondary span { display: none !important; }
+            .filter-bar .btn-secondary { padding: 0.3rem 0.6rem !important; font-size: 0.75rem !important; height: 32px !important; }
+            .grid-stats { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 480px) { .grid-stats { grid-template-columns: 1fr !important; } }
+
+        /* ─── Prescription Cards ─── */
+        .prescriptions-grid {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+        }
+        @media (min-width: 640px) {
+            .prescriptions-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (min-width: 1024px) {
+            .prescriptions-grid { grid-template-columns: repeat(3, 1fr) !important; }
+        }
+        @media (min-width: 1280px) {
+            .prescriptions-grid { grid-template-columns: repeat(4, 1fr) !important; }
         }
 
-        /* 🔥 Prescription Card */
         .prescription-card {
-            transition: all 0.25s ease !important;
-            border-radius: var(--radius-md) !important;
             background: var(--bg-card) !important;
             border: 1px solid var(--border-default) !important;
-            border-left: 3px solid var(--color-sage) !important;
+            border-radius: var(--radius-lg) !important;
+            border-left: 4px solid var(--color-sage) !important;
             padding: 1rem 1.25rem !important;
+            transition: all 0.25s ease !important;
             box-shadow: var(--shadow-card) !important;
         }
         .prescription-card:hover {
@@ -209,15 +265,16 @@
             border-color: var(--color-sage-pale) !important;
             border-left-color: var(--color-sage-dark) !important;
         }
-
-        /* 🔥 Prescription Card Content */
         .prescription-card .patient-name {
-            font-size: 0.8125rem !important;
             font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            font-size: 0.8125rem !important;
+            margin: 0 !important;
         }
         .prescription-card .doctor-name {
             font-size: 0.6875rem !important;
             color: var(--color-brown-300) !important;
+            margin: 0 !important;
         }
         .prescription-card .date-text {
             font-size: 0.625rem !important;
@@ -230,6 +287,7 @@
             -webkit-line-clamp: 1;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            margin: 0 !important;
         }
         .prescription-card .medicines-text {
             font-size: 0.6875rem !important;
@@ -238,10 +296,23 @@
             -webkit-line-clamp: 1;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            margin: 0 !important;
         }
 
-        /* 🔥 Card Button - Print */
-        .card-btn-print {
+        /* ─── Medicine Tag ─── */
+        .medicine-tag {
+            display: inline-block !important;
+            padding: 0.1rem 0.5rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            background: var(--color-success-bg) !important;
+            color: var(--color-success-text) !important;
+            margin: 0.1rem !important;
+        }
+
+        /* ─── Card Buttons ─── */
+        .card-btn {
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
@@ -254,71 +325,141 @@
             cursor: pointer !important;
             transition: all 0.2s ease !important;
             font-family: var(--font-family) !important;
-            width: 100% !important;
-            background-color: var(--color-warm-tan) !important;
+            flex: 1 !important;
+        }
+        .card-btn-primary {
+            background: var(--color-sage) !important;
+            color: white !important;
+        }
+        .card-btn-primary:hover {
+            background: var(--color-sage-dark) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+        }
+        .card-btn-print {
+            background: var(--color-warm-tan) !important;
             color: white !important;
         }
         .card-btn-print:hover {
-            background-color: var(--color-warm-tan-dark) !important;
+            background: var(--color-warm-tan-dark) !important;
             transform: translateY(-1px) !important;
             box-shadow: 0 4px 12px rgba(216, 180, 140, 0.3) !important;
         }
-
-        /* 🔥 Medicine Tag */
-        .medicine-tag {
-            display: inline-block !important;
-            padding: 0.1rem 0.5rem !important;
-            border-radius: var(--radius-full) !important;
-            font-size: 0.625rem !important;
-            font-weight: var(--font-weight-medium) !important;
-            background: var(--color-success-bg) !important;
-            color: var(--color-success-text) !important;
+        .card-btn-danger {
+            background: var(--color-error-text) !important;
+            color: white !important;
+        }
+        .card-btn-danger:hover {
+            background: #dc2626 !important;
+            transform: translateY(-1px) !important;
         }
 
-        /* 🔥 Prescriptions Grid */
-        .prescriptions-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem !important;
+        /* ─── Empty State ─── */
+        .empty-state {
+            grid-column: 1 / -1 !important;
+            text-align: center !important;
+            padding: 3rem 1.25rem !important;
+            color: var(--color-brown-100) !important;
         }
-        @media (min-width: 640px) {
-            .prescriptions-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        @media (min-width: 1024px) {
-            .prescriptions-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        @media (min-width: 1280px) {
-            .prescriptions-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-        @media (min-width: 1536px) {
-            .prescriptions-grid {
-                grid-template-columns: repeat(5, 1fr);
-            }
+        .empty-state i {
+            font-size: 2rem !important;
+            margin-bottom: 0.75rem !important;
+            display: block !important;
+            opacity: 0.4 !important;
         }
 
-        /* 🔥 Modal */
+        /* ─── Modals ─── */
+        .modal-overlay {
+            position: fixed !important;
+            inset: 0 !important;
+            background: rgba(0, 0, 0, 0.5) !important;
+            backdrop-filter: blur(4px) !important;
+            display: none !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 9999 !important;
+            padding: 1rem !important;
+        }
+        .modal-overlay.active { display: flex !important; }
         .form-card {
+            background: var(--bg-card) !important;
+            border-radius: var(--radius-lg) !important;
+            box-shadow: var(--shadow-lg) !important;
+            max-width: 720px !important;
+            width: 100% !important;
+            max-height: 90vh !important;
+            overflow-y: auto !important;
             border-top: 4px solid var(--color-sage) !important;
         }
-        .modal-body {
-            padding: 1.25rem !important;
+        .modal-header {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 1.25rem 1.5rem !important;
+            border-bottom: 1px solid var(--border-default) !important;
         }
+        .modal-title {
+            font-size: 1rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+        .close-btn {
+            background: none !important;
+            border: none !important;
+            color: var(--color-brown-100) !important;
+            font-size: 1.125rem !important;
+            cursor: pointer !important;
+            padding: 0.25rem !important;
+            transition: all 0.2s ease !important;
+        }
+        .close-btn:hover { color: var(--color-brown-600) !important; transform: rotate(90deg) !important; }
+        .modal-body { padding: 1.5rem !important; }
         .modal-footer {
-            padding: 0.75rem 1.25rem !important;
-            background-color: var(--bg-subtle) !important;
-            border-top: 1px solid var(--border-default) !important;
             display: flex !important;
             justify-content: flex-end !important;
             gap: 0.75rem !important;
+            padding: 0.75rem 1.5rem !important;
+            background: var(--bg-subtle) !important;
+            border-top: 1px solid var(--border-default) !important;
         }
 
-        /* 🔥 Print Button in Modal */
+        /* ─── Prescription Content ─── */
+        .prescription-content {
+            white-space: pre-wrap !important;
+            font-family: 'Courier New', monospace !important;
+            font-size: 0.8125rem !important;
+            line-height: 1.8 !important;
+            color: var(--color-brown-700) !important;
+            margin: 0 !important;
+        }
+        .prescription-detail-section {
+            margin-bottom: 1.5rem !important;
+        }
+        .prescription-detail-section:last-child { margin-bottom: 0 !important; }
+        .prescription-detail-label {
+            font-size: 0.6875rem !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-200) !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
+            margin-bottom: 0.25rem !important;
+        }
+        .prescription-detail-value {
+            font-size: 0.875rem !important;
+            color: var(--color-brown-700) !important;
+        }
+        .prescription-detail-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 0.75rem 1.5rem !important;
+            margin-bottom: 1rem !important;
+        }
+        @media (max-width: 640px) { .prescription-detail-grid { grid-template-columns: 1fr !important; } }
+
+        /* ─── Print Button ─── */
         .btn-print {
             display: inline-flex !important;
             align-items: center !important;
@@ -331,40 +472,71 @@
             cursor: pointer !important;
             transition: all 0.2s ease !important;
             font-family: var(--font-family) !important;
-            background-color: var(--color-warm-tan) !important;
+            background: var(--color-warm-tan) !important;
             color: white !important;
         }
         .btn-print:hover {
-            background-color: var(--color-warm-tan-dark) !important;
+            background: var(--color-warm-tan-dark) !important;
             transform: translateY(-1px) !important;
         }
 
-        /* 🔥 Prescription content in modal */
-        .prescription-content {
-            white-space: pre-wrap !important;
-            font-family: 'Courier New', monospace !important;
-            font-size: 0.8125rem !important;
-            line-height: 1.8 !important;
-            color: var(--color-brown-700) !important;
-            margin: 0 !important;
-        }
-
-        /* 🔥 Stat Card Border Colors */
-        .stat-card-sage { border-left: 4px solid var(--color-sage) !important; }
-        .stat-card-sage-dark { border-left: 4px solid var(--color-sage-dark) !important; }
-        .stat-card-gold { border-left: 4px solid var(--color-gold) !important; }
-        .stat-card-tan { border-left: 4px solid var(--color-warm-tan) !important; }
-
-        .text-sage-dark { color: var(--color-sage-dark) !important; }
-        .text-gold { color: var(--color-gold) !important; }
-        .text-tan { color: var(--color-warm-tan) !important; }
-
-        /* 🔥 Print styles */
+        /* ─── Print Styles ─── */
         @media print {
             .no-print { display: none !important; }
             body { background: white !important; margin: 0 !important; padding: 0 !important; }
-            #printablePrescription { padding: 20px !important; }
+            .print-prescription { padding: 20px !important; }
             .modal-overlay { display: none !important; }
+        }
+        .print-prescription {
+            font-family: 'Poppins', Arial, sans-serif !important;
+            max-width: 800px !important;
+            margin: 0 auto !important;
+            padding: 40px !important;
+            background: white !important;
+        }
+        .print-prescription .print-header {
+            text-align: center !important;
+            border-bottom: 2px solid var(--color-sage) !important;
+            padding-bottom: 20px !important;
+            margin-bottom: 30px !important;
+        }
+        .print-prescription .print-header h1 {
+            color: var(--color-brown-700) !important;
+            margin: 0 !important;
+        }
+        .print-prescription .print-footer {
+            text-align: center !important;
+            margin-top: 50px !important;
+            padding-top: 20px !important;
+            border-top: 1px solid var(--border-default) !important;
+            color: var(--color-brown-100) !important;
+            font-size: 12px !important;
+        }
+        .print-prescription table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            margin-bottom: 20px !important;
+        }
+        .print-prescription table td {
+            padding: 8px 12px !important;
+            border: 1px solid var(--border-default) !important;
+        }
+        .print-prescription table .label-cell {
+            background: var(--bg-subtle) !important;
+            font-weight: 600 !important;
+        }
+        .print-prescription .content-box {
+            background: var(--bg-subtle) !important;
+            padding: 15px !important;
+            border-radius: 8px !important;
+            border: 1px solid var(--border-default) !important;
+        }
+        .print-prescription .follow-up-badge {
+            background: #fef5e8 !important;
+            color: var(--color-warning-text) !important;
+            padding: 8px 16px !important;
+            border-radius: 8px !important;
+            display: inline-block !important;
         }
     </style>
 </head>
@@ -375,50 +547,46 @@
 
     <main class="main-content" id="mainContent">
         
-        <!-- Stats Cards -->
+        <!-- Page Header -->
+        <div class="page-header-custom">
+            <div>
+                <h1><i class="fas fa-prescription-bottle"></i> Prescriptions</h1>
+                <p>Manage patient prescriptions, medications, and treatment history</p>
+            </div>
+            <div class="header-actions">
+                <button id="refreshBtn" class="btn-header btn-header-secondary">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button id="addPrescriptionBtn" class="btn-header btn-header-primary">
+                    <i class="fas fa-plus"></i> Add Prescription
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats -->
         <div class="grid-stats">
             <div class="stat-card stat-card-sage">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Total Prescriptions</p>
-                        <p class="stat-value" id="totalPrescriptions">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-prescription-bottle" style="color:var(--color-sage);"></i>
-                    </div>
+                    <div><p class="stat-label">Total Prescriptions</p><p class="stat-value" id="totalPrescriptions">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-prescription-bottle" style="color:var(--color-sage);"></i></div>
                 </div>
             </div>
             <div class="stat-card stat-card-sage-dark">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">This Month</p>
-                        <p class="stat-value text-sage-dark" id="monthPrescriptions">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-calendar-alt" style="color:var(--color-sage-dark);"></i>
-                    </div>
+                    <div><p class="stat-label">This Month</p><p class="stat-value text-sage-dark" id="monthPrescriptions">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-calendar-alt" style="color:var(--color-sage-dark);"></i></div>
                 </div>
             </div>
             <div class="stat-card stat-card-gold">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Active Patients</p>
-                        <p class="stat-value text-gold" id="activePatients">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-user-check" style="color:var(--color-gold);"></i>
-                    </div>
+                    <div><p class="stat-label">Active Patients</p><p class="stat-value text-gold" id="activePatients">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-user-check" style="color:var(--color-gold);"></i></div>
                 </div>
             </div>
             <div class="stat-card stat-card-tan">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Unique Medicines</p>
-                        <p class="stat-value text-tan" id="uniqueMedicines">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-capsules" style="color:var(--color-warm-tan);"></i>
-                    </div>
+                    <div><p class="stat-label">Unique Medicines</p><p class="stat-value text-tan" id="uniqueMedicines">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-capsules" style="color:var(--color-warm-tan);"></i></div>
                 </div>
             </div>
         </div>
@@ -432,45 +600,141 @@
             <select id="patientFilter" class="form-select">
                 <option value="">All Patients</option>
             </select>
+            <select id="doctorFilter" class="form-select">
+                <option value="">All Doctors</option>
+            </select>
             <button id="resetFilter" class="btn-secondary">
-                <i class="fas fa-undo-alt"></i>
-                <span>Reset</span>
+                <i class="fas fa-undo-alt"></i> <span>Reset</span>
             </button>
         </div>
 
         <!-- Prescriptions Grid -->
         <div class="prescriptions-grid" id="prescriptionsGrid">
-            <div style="grid-column:1/-1; text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
-                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
-                <p style="font-weight:var(--font-weight-light);">Loading prescriptions...</p>
+            <div class="empty-state">
+                <i class="fas fa-spinner fa-pulse"></i>
+                <p>Loading prescriptions...</p>
             </div>
         </div>
     </main>
 
-    <!-- Prescription Details Modal -->
+    <!-- Add/Edit Prescription Modal -->
     <div id="prescriptionModal" class="modal-overlay" role="dialog" aria-modal="true">
-        <div class="form-card" style="max-width:44rem;">
+        <div class="form-card" style="max-width:720px;">
             <div class="modal-header">
-                <h3 class="modal-title">
-                    <i class="fas fa-prescription-bottle"></i> Prescription Details
+                <h3 class="modal-title" id="modalTitle">
+                    <i class="fas fa-prescription-bottle" style="color:var(--color-sage);"></i> Add Prescription
                 </h3>
-                <div style="display:flex; gap:0.5rem;">
-                    <button id="printModalBtn" class="btn-print">
-                        <i class="fas fa-print"></i> Print
-                    </button>
-                    <button class="close-btn" id="closeModalBtn" aria-label="Close modal">
-                        <i class="fas fa-times"></i>
+                <button class="close-btn" id="closeModalBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="prescriptionForm">
+                <input type="hidden" id="prescriptionId">
+                <div class="modal-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Patient <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="patientId" class="form-select" required>
+                                <option value="">-- Select Patient --</option>
+                            </select>
+                            <span class="error-text" id="patientError">Please select a patient</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Doctor <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="doctorId" class="form-select" required>
+                                <option value="">-- Select Doctor --</option>
+                            </select>
+                            <span class="error-text" id="doctorError">Please select a doctor</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="date" id="prescriptionDate" class="form-input" required>
+                            <span class="error-text" id="dateError">Please select a date</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Follow-up</label>
+                            <select id="followUp" class="form-select">
+                                <option value="">No follow-up</option>
+                                <option value="3 days">3 days</option>
+                                <option value="5 days">5 days</option>
+                                <option value="7 days">7 days</option>
+                                <option value="10 days">10 days</option>
+                                <option value="15 days">15 days</option>
+                                <option value="1 month">1 month</option>
+                                <option value="2 months">2 months</option>
+                                <option value="3 months">3 months</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">Diagnosis <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="text" id="diagnosis" class="form-input" placeholder="e.g., Type 2 Diabetes with Hypertension" required>
+                            <span class="error-text" id="diagnosisError">Diagnosis is required</span>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">Prescription / Medicines <span style="color:var(--color-error-text);">*</span></label>
+                            <textarea id="prescriptionText" rows="6" class="form-textarea" placeholder="Tab. Metformin 500mg - 1 tablet twice daily after meals&#10;Tab. Telmisartan 40mg - 1 tablet once daily&#10;Tab. Atorvastatin 10mg - 1 tablet at night" required></textarea>
+                            <span class="error-text" id="prescriptionError">Prescription is required</span>
+                            <p style="font-size:0.6875rem; color:var(--color-brown-100); margin-top:0.25rem;"><i class="fas fa-info-circle"></i> Enter each medicine on a new line</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Save Prescription
                     </button>
                 </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Prescription Modal -->
+    <div id="viewModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="form-card" style="max-width:720px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="viewModalTitle">
+                    <i class="fas fa-prescription-bottle" style="color:var(--color-sage);"></i> Prescription Details
+                </h3>
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    <button id="printViewBtn" class="btn-print">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                    <button id="editFromViewBtn" class="btn-header btn-header-secondary" style="padding:0.3rem 0.75rem; font-size:0.75rem;">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="close-btn" id="closeViewModalBtn"><i class="fas fa-times"></i></button>
+                </div>
             </div>
-            <div id="prescriptionDetails" class="modal-body"></div>
+            <div id="viewContent" class="modal-body"></div>
             <div class="modal-footer">
-                <button type="button" id="closeFooterBtn" class="btn-secondary">Close</button>
+                <button type="button" id="closeViewFooterBtn" class="btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal-overlay modal-danger" role="dialog" aria-modal="true">
+        <div class="form-card" style="max-width:26rem; border-top-color:#ef4444;">
+            <div class="modal-header">
+                <h3 class="modal-title" style="color:#dc2626;">
+                    <i class="fas fa-triangle-exclamation" style="color:#dc2626;"></i> Confirm Delete
+                </h3>
+                <button class="close-btn" id="closeDeleteModalBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" style="text-align:center; padding:1.75rem 1.25rem;">
+                <div style="width:3.5rem; height:3.5rem; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; color:#dc2626; font-size:1.25rem;">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                <p style="font-size:0.9375rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin-bottom:0.5rem;">Delete Prescription?</p>
+                <p style="font-size:0.8125rem; color:var(--color-brown-300);">This action cannot be undone. This prescription will be permanently removed.</p>
+            </div>
+            <div class="modal-footer" style="justify-content:center;">
+                <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
+                <button id="confirmDeleteBtn" class="btn-danger"><i class="fas fa-trash-alt"></i> Delete</button>
             </div>
         </div>
     </div>
 
     <script src="../../js/core/common.js"></script>
+    <script src="../../js/core/form-validation.js"></script>
     <script src="prescriptions.js"></script>
 
     <script>

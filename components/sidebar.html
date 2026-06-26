@@ -746,26 +746,35 @@
         
         <div class="sidebar-nav-wrapper">
             <nav>
+                <!-- Dashboard -->
                 <a href="../../modules/dashboard/dashboard.html" class="nav-item" data-page="dashboard">
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
                 
+                <!-- User Management -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
-                            <i class="fas fa-users"></i>
+                            <i class="fas fa-users-cog"></i>
                             <span>User Management</span>
                         </div>
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     <div class="nav-dropdown-content hidden">
-                        <a href="../../modules/user-management/users.html" class="dropdown-link">📋 Users</a>
-                        <a href="../../modules/user-management/roles.html" class="dropdown-link">🔐 Roles &amp; Permissions</a>
-                        <a href="../../modules/user-management/departments.html" class="dropdown-link">🏢 Departments</a>
+                        <a href="../../modules/user-management/users.html" class="dropdown-link">
+                            <i class="fas fa-user-circle"></i> Users
+                        </a>
+                        <a href="../../modules/user-management/roles.html" class="dropdown-link">
+                            <i class="fas fa-shield-alt"></i> Roles &amp; Permissions
+                        </a>
+                        <a href="../../modules/user-management/departments.html" class="dropdown-link">
+                            <i class="fas fa-building"></i> Departments
+                        </a>
                     </div>
                 </div>
                 
+                <!-- Clinical -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -775,17 +784,40 @@
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     <div class="nav-dropdown-content hidden">
-                        <a href="../../modules/clinical/doctors.html" class="dropdown-link">👨‍⚕️ Doctors</a>
-                        <a href="../../modules/clinical/patients.html" class="dropdown-link">👥 Patients</a>
-                        <a href="../../modules/clinical/patient-profile.html" class="dropdown-link">📄 Patient Profile</a>
-                        <a href="../../modules/clinical/opd.html" class="dropdown-link">🚪 OPD</a>
-                        <a href="../../modules/clinical/ipd.html" class="dropdown-link">🛏️ IPD</a>
-                        <a href="../../modules/clinical/appointments.html" class="dropdown-link">📅 Appointments</a>
-                        <a href="../../modules/clinical/consultation.html" class="dropdown-link">💊 Consultation</a>
-                        <a href="../../modules/clinical/doctor-schedule.html" class="dropdown-link">📆 Doctor Schedule</a>
+                        <a href="../../modules/clinical/doctors.html" class="dropdown-link">
+                            <i class="fas fa-user-md"></i> Doctors
+                        </a>
+                        <a href="../../modules/clinical/patients.html" class="dropdown-link">
+                            <i class="fas fa-users"></i> Patients
+                        </a>
+                        <a href="../../modules/clinical/consultation.html" class="dropdown-link">
+                            <i class="fas fa-prescription-bottle"></i> Consultation
+                        </a>
+                        <a href="../../modules/clinical/surgeries.html" class="dropdown-link">
+                            <i class="fas fa-scalpel"></i> Surgeries
+                        </a>
+                        <a href="../../modules/clinical/doctor-schedule.html" class="dropdown-link">
+                            <i class="fas fa-calendar-alt"></i> Doctor Schedule
+                        </a>
+                        <a href="../../modules/clinical/doctor-salary.html" class="dropdown-link">
+                            <i class="fas fa-money-bill-wave"></i> Doctor Salary
+                        </a>
+                        <a href="../../modules/clinical/external-visits.html" class="dropdown-link">
+                            <i class="fas fa-ambulance"></i> External Visits
+                        </a>
+                        <a href="../../modules/clinical/opd.html" class="dropdown-link">
+                            <i class="fas fa-walking"></i> OPD
+                        </a>
+                        <a href="../../modules/clinical/ipd.html" class="dropdown-link">
+                            <i class="fas fa-procedures"></i> IPD
+                        </a>
+                        <a href="../../modules/clinical/appointments.html" class="dropdown-link">
+                            <i class="fas fa-calendar-check"></i> Appointments
+                        </a>
                     </div>
                 </div>
                 
+                <!-- Emergency -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -795,12 +827,24 @@
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     <div class="nav-dropdown-content hidden">
-                        <a href="../../modules/emergency/emergency.html" class="dropdown-link">🚨 Emergency Register</a>
-                        <a href="../../modules/emergency/emergency-queue.html" class="dropdown-link">⏳ Emergency Queue</a>
-                        <a href="../../modules/emergency/ambulance.html" class="dropdown-link">🚑 Ambulance Request</a>
+                        <a href="../../modules/emergency/emergency.html" class="dropdown-link">
+                            <i class="fas fa-notes-medical"></i> Emergency Register
+                        </a>
+                        <a href="../../modules/emergency/emergency-cases.html" class="dropdown-link">
+                            <i class="fas fa-heartbeat"></i> Emergency Cases
+                        </a>
+                        <!--
+                        <a href="../../modules/emergency/emergency-queue.html" class="dropdown-link">
+                            <i class="fas fa-hourglass-half"></i> Emergency Queue
+                        </a>
+                        <a href="../../modules/emergency/ambulance-request.html" class="dropdown-link">
+                            <i class="fas fa-truck"></i> Ambulance Request
+                        </a>
+                        -->
                     </div>
                 </div>
                 
+                <!-- Ward Management -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -810,31 +854,60 @@
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     <div class="nav-dropdown-content hidden">
-                        <a href="../../modules/ward-management/wards.html" class="dropdown-link">🏥 Wards</a>
-                        <a href="../../modules/ward-management/rooms.html" class="dropdown-link">🚪 Rooms</a>
-                        <a href="../../modules/ward-management/beds.html" class="dropdown-link">🛏️ Beds</a>
+                        <a href="../../modules/ward-management/wards.html" class="dropdown-link">
+                            <i class="fas fa-hospital"></i> Wards
+                        </a>
+                        <a href="../../modules/ward-management/rooms.html" class="dropdown-link">
+                            <i class="fas fa-door-open"></i> Rooms
+                        </a>
+                        <a href="../../modules/ward-management/beds.html" class="dropdown-link">
+                            <i class="fas fa-bed"></i> Beds
+                        </a>
                     </div>
                 </div>
                 
+                <!-- ============================================================
+                     🚫 PHARMACY - COMMENTED OUT
+                     ============================================================ -->
+                <!--
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
-                            <i class="fas fa-capsules"></i>
+                            <i class="fas fa-pills"></i>
                             <span>Pharmacy</span>
                         </div>
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     <div class="nav-dropdown-content hidden">
-                        <a href="../../modules/pharmacy/categories.html" class="dropdown-link">📁 Categories</a>
-                        <a href="../../modules/pharmacy/units.html" class="dropdown-link">⚖️ Units</a>
-                        <a href="../../modules/pharmacy/medicines.html" class="dropdown-link">💊 Medicines</a>
-                        <a href="../../modules/pharmacy/suppliers.html" class="dropdown-link">🚚 Suppliers</a>
-                        <a href="../../modules/pharmacy/purchases.html" class="dropdown-link">🛒 Purchases</a>
-                        <a href="../../modules/pharmacy/issue-medicines.html" class="dropdown-link">📤 Issue Medicines</a>
-                        <a href="../../modules/pharmacy/stock-adjustments.html" class="dropdown-link">📊 Stock Adjustments</a>
+                        <a href="../../modules/pharmacy/categories.html" class="dropdown-link">
+                            <i class="fas fa-tags"></i> Categories
+                        </a>
+                        <a href="../../modules/pharmacy/units.html" class="dropdown-link">
+                            <i class="fas fa-ruler"></i> Units
+                        </a>
+                        <a href="../../modules/pharmacy/medicines.html" class="dropdown-link">
+                            <i class="fas fa-capsules"></i> Medicines
+                        </a>
+                        <a href="../../modules/pharmacy/suppliers.html" class="dropdown-link">
+                            <i class="fas fa-truck"></i> Suppliers
+                        </a>
+                        <a href="../../modules/pharmacy/purchases.html" class="dropdown-link">
+                            <i class="fas fa-shopping-cart"></i> Purchases
+                        </a>
+                        <a href="../../modules/pharmacy/issue-medicines.html" class="dropdown-link">
+                            <i class="fas fa-hand-holding-heart"></i> Issue Medicines
+                        </a>
+                        <a href="../../modules/pharmacy/stock-adjustments.html" class="dropdown-link">
+                            <i class="fas fa-balance-scale"></i> Stock Adjustments
+                        </a>
                     </div>
                 </div>
+                -->
                 
+                <!-- ============================================================
+                     🚫 LABORATORY - COMMENTED OUT
+                     ============================================================ -->
+                <!--
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -844,12 +917,23 @@
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     <div class="nav-dropdown-content hidden">
-                        <a href="../../modules/laboratory/lab-categories.html" class="dropdown-link">📁 Test Categories</a>
-                        <a href="../../modules/laboratory/lab-tests.html" class="dropdown-link">🔬 Lab Tests</a>
-                        <a href="../../modules/laboratory/lab-requests.html" class="dropdown-link">📋 Test Requests</a>
+                        <a href="../../modules/laboratory/lab-categories.html" class="dropdown-link">
+                            <i class="fas fa-tag"></i> Test Categories
+                        </a>
+                        <a href="../../modules/laboratory/lab-tests.html" class="dropdown-link">
+                            <i class="fas fa-flask"></i> Lab Tests
+                        </a>
+                        <a href="../../modules/laboratory/lab-requests.html" class="dropdown-link">
+                            <i class="fas fa-file-medical"></i> Test Requests
+                        </a>
                     </div>
                 </div>
+                -->
                 
+                <!-- ============================================================
+                     🚫 RADIOLOGY - COMMENTED OUT
+                     ============================================================ -->
+                <!--
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -859,12 +943,20 @@
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     <div class="nav-dropdown-content hidden">
-                        <a href="../../modules/radiology/radio-categories.html" class="dropdown-link">📁 Scan Categories</a>
-                        <a href="../../modules/radiology/radio-tests.html" class="dropdown-link">🩻 Radiology Tests</a>
-                        <a href="../../modules/radiology/radio-requests.html" class="dropdown-link">📋 Scan Requests</a>
+                        <a href="../../modules/radiology/radio-categories.html" class="dropdown-link">
+                            <i class="fas fa-tag"></i> Scan Categories
+                        </a>
+                        <a href="../../modules/radiology/radio-tests.html" class="dropdown-link">
+                            <i class="fas fa-scan"></i> Radiology Tests
+                        </a>
+                        <a href="../../modules/radiology/radio-requests.html" class="dropdown-link">
+                            <i class="fas fa-file-medical"></i> Scan Requests
+                        </a>
                     </div>
                 </div>
+                -->
                 
+                <!-- Billing & Finance -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -874,12 +966,19 @@
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     <div class="nav-dropdown-content hidden">
-                        <a href="../../modules/billing/invoices.html" class="dropdown-link">🧾 Invoices</a>
-                        <a href="../../modules/billing/payments.html" class="dropdown-link">💳 Payments</a>
-                        <a href="../../modules/billing/financial-reports.html" class="dropdown-link">📊 Financial Reports</a>
+                        <a href="../../modules/billing/invoices.html" class="dropdown-link">
+                            <i class="fas fa-file-invoice"></i> Invoices
+                        </a>
+                        <a href="../../modules/billing/payments.html" class="dropdown-link">
+                            <i class="fas fa-credit-card"></i> Payments
+                        </a>
+                        <a href="../../modules/billing/financial-reports.html" class="dropdown-link">
+                            <i class="fas fa-chart-bar"></i> Financial Reports
+                        </a>
                     </div>
                 </div>
                 
+                <!-- Documents -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -889,27 +988,41 @@
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     <div class="nav-dropdown-content hidden">
-                        <a href="../../modules/documents/patient-documents.html" class="dropdown-link">📄 Patient Documents</a>
-                        <a href="../../modules/documents/reports-storage.html" class="dropdown-link">📁 Reports Storage</a>
-                        <a href="../../modules/documents/prescriptions.html" class="dropdown-link">📋 Prescriptions</a>
+                        <a href="../../modules/documents/patient-documents.html" class="dropdown-link">
+                            <i class="fas fa-file-pdf"></i> Patient Documents
+                        </a>
+                        <a href="../../modules/documents/reports-storage.html" class="dropdown-link">
+                            <i class="fas fa-archive"></i> Reports Storage
+                        </a>
+                        <a href="../../modules/documents/prescriptions.html" class="dropdown-link">
+                            <i class="fas fa-prescription"></i> Prescriptions
+                        </a>
                     </div>
                 </div>
                 
+                <!-- Staff Management -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
-                            <i class="fas fa-user-md"></i>
+                            <i class="fas fa-id-badge"></i>
                             <span>Staff Management</span>
                         </div>
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     <div class="nav-dropdown-content hidden">
-                        <a href="../../modules/staff/staff-list.html" class="dropdown-link">👥 Staff List</a>
-                        <a href="../../modules/staff/shifts.html" class="dropdown-link">🕒 Shift Scheduling</a>
-                        <a href="../../modules/staff/attendance.html" class="dropdown-link">📅 Attendance</a>
+                        <a href="../../modules/staff/staff-list.html" class="dropdown-link">
+                            <i class="fas fa-id-card"></i> Staff List
+                        </a>
+                        <a href="../../modules/staff/shifts.html" class="dropdown-link">
+                            <i class="fas fa-clock"></i> Shift Scheduling
+                        </a>
+                        <a href="../../modules/staff/attendance.html" class="dropdown-link">
+                            <i class="fas fa-clipboard-list"></i> Attendance
+                        </a>
                     </div>
                 </div>
                 
+                <!-- Reports & Analytics -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -919,14 +1032,25 @@
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     <div class="nav-dropdown-content hidden">
-                        <a href="../../modules/reports/patient-reports.html" class="dropdown-link">📊 Patient Reports</a>
-                        <a href="../../modules/reports/doctor-performance.html" class="dropdown-link">👨‍⚕️ Doctor Performance</a>
-                        <a href="../../modules/reports/revenue-reports.html" class="dropdown-link">💰 Revenue Reports</a>
-                        <a href="../../modules/reports/bed-occupancy.html" class="dropdown-link">🛏️ Bed Occupancy</a>
-                        <a href="../../modules/reports/lab-reports.html" class="dropdown-link">🔬 Lab Activity</a>
+                        <a href="../../modules/reports/patient-reports.html" class="dropdown-link">
+                            <i class="fas fa-user-chart"></i> Patient Reports
+                        </a>
+                        <a href="../../modules/reports/doctor-performance.html" class="dropdown-link">
+                            <i class="fas fa-user-md-chart"></i> Doctor Performance
+                        </a>
+                        <a href="../../modules/reports/revenue-reports.html" class="dropdown-link">
+                            <i class="fas fa-rupee-sign"></i> Revenue Reports
+                        </a>
+                        <a href="../../modules/reports/bed-occupancy.html" class="dropdown-link">
+                            <i class="fas fa-bed"></i> Bed Occupancy
+                        </a>
+                        <a href="../../modules/reports/lab-reports.html" class="dropdown-link">
+                            <i class="fas fa-microscope"></i> Lab Activity
+                        </a>
                     </div>
                 </div>
                 
+                <!-- Settings -->
                 <div class="nav-dropdown nav-module">
                     <div class="nav-dropdown-btn">
                         <div class="dropdown-left">
@@ -936,9 +1060,15 @@
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     <div class="nav-dropdown-content hidden">
-                        <a href="../../modules/settings/hospital-profile.html" class="dropdown-link">🏥 Hospital Profile</a>
-                        <a href="../../modules/settings/system-config.html" class="dropdown-link">⚙️ System Config</a>
-                        <a href="../../modules/settings/notification-settings.html" class="dropdown-link">🔔 Notification Settings</a>
+                        <a href="../../modules/settings/hospital-profile.html" class="dropdown-link">
+                            <i class="fas fa-hospital"></i> Hospital Profile
+                        </a>
+                        <a href="../../modules/settings/system-config.html" class="dropdown-link">
+                            <i class="fas fa-sliders-h"></i> System Config
+                        </a>
+                        <a href="../../modules/settings/notification-settings.html" class="dropdown-link">
+                            <i class="fas fa-bell"></i> Notification Settings
+                        </a>
                     </div>
                 </div>
             </nav>

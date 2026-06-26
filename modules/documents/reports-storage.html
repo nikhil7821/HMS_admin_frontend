@@ -13,10 +13,9 @@
 
     <style>
         /* ============================================================
-           REPORTS STORAGE MODULE — Page-specific only
+           REPORTS STORAGE MODULE — COMPLETE PROFESSIONAL VERSION
            ============================================================ */
 
-        /* 🔥 FIX: Prevent layout shift */
         .main-content {
             margin-left: 260px !important;
             margin-top: 70px !important;
@@ -26,47 +25,94 @@
             opacity: 0;
             animation: fadeIn 0.3s ease forwards;
         }
-        .main-content.loaded {
-            opacity: 1;
-        }
+        .main-content.loaded { opacity: 1; }
         #mainSidebar[data-collapsed="true"] ~ .main-content,
         #mainSidebar[data-collapsed="true"] + .main-content {
             margin-left: 72px !important;
         }
         @media (max-width: 1024px) {
-            .main-content {
-                margin-left: 0 !important;
-                padding: 1rem !important;
-            }
+            .main-content { margin-left: 0 !important; padding: 1rem !important; }
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 🔥 Page Header - Hidden */
-        .page-header {
-            display: none !important;
+        /* ─── Page Header ─── */
+        .page-header-custom {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 1.25rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.75rem !important;
+        }
+        .page-header-custom h1 {
+            font-size: 1.375rem !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-700) !important;
+            margin: 0 !important;
+        }
+        .page-header-custom h1 i { color: var(--color-sage) !important; margin-right: 0.5rem !important; }
+        .page-header-custom p { font-size: 0.75rem !important; color: var(--color-brown-100) !important; margin: 0 !important; }
+
+        .header-actions { display: flex !important; gap: 0.5rem !important; flex-wrap: wrap !important; }
+        .btn-header {
+            padding: 0.4rem 0.85rem !important;
+            font-size: 0.8rem !important;
+            border-radius: var(--radius-md) !important;
+            font-family: var(--font-family) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            border: none !important;
+        }
+        .btn-header-primary {
+            background: var(--color-sage) !important;
+            color: white !important;
+        }
+        .btn-header-primary:hover {
+            background: var(--color-sage-dark) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+        }
+        .btn-header-secondary {
+            background: var(--bg-card) !important;
+            color: var(--color-brown-200) !important;
+            border: 1px solid var(--border-input) !important;
+        }
+        .btn-header-secondary:hover {
+            background: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
         }
 
-        /* 🔥 Stats Cards - Perfect Spacing */
+        /* ─── Stats ─── */
         .grid-stats {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
             gap: 1rem !important;
             margin-bottom: 1.25rem !important;
         }
         .stat-card {
-            padding: 1rem 1.25rem !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
             border-radius: var(--radius-lg) !important;
+            padding: 1rem 1.25rem !important;
+            transition: all 0.2s ease !important;
         }
+        .stat-card:hover { transform: translateY(-2px) !important; box-shadow: var(--shadow-md) !important; }
         .stat-card .stat-value {
             font-size: 1.5rem !important;
             font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
             margin-top: 0.125rem !important;
         }
         .stat-card .stat-label {
             font-size: 0.625rem !important;
-            letter-spacing: 0.06em !important;
             text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
             color: var(--color-brown-200) !important;
         }
         .stat-card .stat-icon-bg {
@@ -78,25 +124,30 @@
             justify-content: center !important;
             background: var(--bg-muted) !important;
         }
-        .stat-card .stat-icon-bg i {
-            font-size: 1rem !important;
-        }
+        .stat-card .stat-icon-bg i { font-size: 1rem !important; }
+        .stat-card-sage { border-left: 4px solid var(--color-sage) !important; }
+        .stat-card-sage-dark { border-left: 4px solid var(--color-sage-dark) !important; }
+        .stat-card-gold { border-left: 4px solid var(--color-gold) !important; }
+        .stat-card-tan { border-left: 4px solid var(--color-warm-tan) !important; }
+        .text-sage-dark { color: var(--color-sage-dark) !important; }
+        .text-gold { color: var(--color-gold) !important; }
+        .text-tan { color: var(--color-warm-tan) !important; }
 
-        /* 🔥 Filter Bar - Perfect Alignment */
+        /* ─── Filter Bar ─── */
         .filter-bar {
-            padding: 0.625rem 1rem !important;
-            gap: 0.625rem !important;
-            margin-bottom: 1.25rem !important;
-            border-radius: var(--radius-lg) !important;
-            background: var(--bg-card) !important;
-            border: 1px solid var(--border-default) !important;
             display: flex !important;
             align-items: center !important;
             flex-wrap: nowrap !important;
+            gap: 0.625rem !important;
+            padding: 0.625rem 1rem !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-lg) !important;
+            margin-bottom: 1.25rem !important;
         }
         .filter-bar .search-wrapper {
-            flex: 1 1 220px !important;
-            min-width: 160px !important;
+            flex: 1 1 200px !important;
+            min-width: 150px !important;
             max-width: 320px !important;
             position: relative !important;
         }
@@ -105,7 +156,7 @@
             left: 0.75rem !important;
             top: 50% !important;
             transform: translateY(-50%) !important;
-            color: var(--color-brown-100);
+            color: var(--color-brown-100) !important;
             font-size: 0.8125rem !important;
             pointer-events: none !important;
             z-index: 1 !important;
@@ -115,34 +166,40 @@
             padding: 0.375rem 0.75rem 0.375rem 2.25rem !important;
             font-size: 0.8125rem !important;
             height: 36px !important;
-            border-radius: var(--radius-md) !important;
             border: 1px solid var(--border-input) !important;
-            background-color: var(--bg-card) !important;
+            border-radius: var(--radius-md) !important;
+            background: var(--bg-card) !important;
             color: var(--color-brown-700) !important;
             font-family: var(--font-family) !important;
+            outline: none !important;
+            transition: all 0.2s ease !important;
         }
         .filter-bar .search-input:focus {
             border-color: var(--color-sage-light) !important;
             box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
-            outline: none !important;
         }
         .filter-bar .form-select {
-            min-width: 130px !important;
+            min-width: 120px !important;
             max-width: 180px !important;
             padding: 0.375rem 1.75rem 0.375rem 0.75rem !important;
             font-size: 0.8125rem !important;
             height: 36px !important;
             border: 1px solid var(--border-input) !important;
             border-radius: var(--radius-md) !important;
-            background-color: var(--bg-card) !important;
+            background: var(--bg-card) !important;
             color: var(--color-brown-700) !important;
-            cursor: pointer !important;
             font-family: var(--font-family) !important;
+            outline: none !important;
+            cursor: pointer !important;
+            appearance: none !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b8aa9a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 0.625rem center !important;
+            background-size: 10px !important;
         }
         .filter-bar .form-select:focus {
             border-color: var(--color-sage-light) !important;
             box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
-            outline: none !important;
         }
         .filter-bar .btn-primary,
         .filter-bar .btn-secondary {
@@ -157,65 +214,64 @@
             white-space: nowrap !important;
             font-family: var(--font-family) !important;
             cursor: pointer !important;
+            transition: all 0.2s ease !important;
         }
         .filter-bar .btn-primary {
-            background-color: var(--color-sage) !important;
+            background: var(--color-sage) !important;
             color: white !important;
             border: none !important;
         }
         .filter-bar .btn-primary:hover {
-            background-color: var(--color-sage-dark) !important;
-            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+            background: var(--color-sage-dark) !important;
             transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
         }
         .filter-bar .btn-secondary {
-            background-color: transparent !important;
+            background: transparent !important;
             color: var(--color-brown-200) !important;
             border: 1px solid var(--border-input) !important;
         }
         .filter-bar .btn-secondary:hover {
-            background-color: var(--bg-hover) !important;
+            background: var(--bg-hover) !important;
             color: var(--color-brown-600) !important;
             border-color: var(--color-brown-100) !important;
         }
 
         @media (max-width: 768px) {
-            .filter-bar {
-                flex-wrap: wrap !important;
-                gap: 0.5rem !important;
-                padding: 0.5rem 0.75rem !important;
-            }
-            .filter-bar .search-wrapper {
-                flex: 1 1 100% !important;
-                min-width: 100px !important;
-                max-width: 100% !important;
-            }
-            .filter-bar .form-select {
-                min-width: 90px !important;
-                max-width: 140px !important;
-                font-size: 0.75rem !important;
-                height: 32px !important;
-            }
+            .filter-bar { flex-wrap: wrap !important; gap: 0.5rem !important; padding: 0.5rem 0.75rem !important; }
+            .filter-bar .search-wrapper { flex: 1 1 100% !important; min-width: 100px !important; max-width: 100% !important; }
+            .filter-bar .form-select { min-width: 90px !important; max-width: 140px !important; font-size: 0.75rem !important; height: 32px !important; }
             .filter-bar .btn-primary span,
-            .filter-bar .btn-secondary span {
-                display: none !important;
-            }
+            .filter-bar .btn-secondary span { display: none !important; }
             .filter-bar .btn-primary,
-            .filter-bar .btn-secondary {
-                padding: 0.3rem 0.6rem !important;
-                font-size: 0.75rem !important;
-                height: 32px !important;
-            }
+            .filter-bar .btn-secondary { padding: 0.3rem 0.6rem !important; font-size: 0.75rem !important; height: 32px !important; }
+            .grid-stats { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 480px) { .grid-stats { grid-template-columns: 1fr !important; } }
+
+        /* ─── Report Cards ─── */
+        .reports-grid {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+        }
+        @media (min-width: 640px) {
+            .reports-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (min-width: 1024px) {
+            .reports-grid { grid-template-columns: repeat(3, 1fr) !important; }
+        }
+        @media (min-width: 1280px) {
+            .reports-grid { grid-template-columns: repeat(4, 1fr) !important; }
         }
 
-        /* 🔥 Report Card */
         .report-card {
-            transition: all 0.25s ease !important;
-            border-radius: var(--radius-lg) !important;
             background: var(--bg-card) !important;
             border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-lg) !important;
             border-left: 4px solid var(--color-sage) !important;
             padding: 1rem 1.25rem !important;
+            transition: all 0.25s ease !important;
             box-shadow: var(--shadow-card) !important;
         }
         .report-card:hover {
@@ -224,8 +280,32 @@
             border-color: var(--color-sage-pale) !important;
             border-left-color: var(--color-sage-dark) !important;
         }
+        .report-card .report-title {
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            font-size: 0.8125rem !important;
+            margin: 0 !important;
+        }
+        .report-card .report-patient {
+            font-size: 0.6875rem !important;
+            color: var(--color-brown-100) !important;
+            margin: 0 !important;
+        }
+        .report-card .report-preview {
+            font-size: 0.75rem !important;
+            color: var(--color-brown-300) !important;
+            margin: 0.5rem 0 0 0 !important;
+            line-height: 1.4 !important;
+        }
+        .report-card .report-meta {
+            display: flex !important;
+            justify-content: space-between !important;
+            color: var(--color-brown-100) !important;
+            font-size: 0.6875rem !important;
+            margin-top: 0.5rem !important;
+        }
 
-        /* 🔥 Report Type Badges */
+        /* ─── Badges ─── */
         .badge-lab {
             background: var(--color-success-bg) !important;
             color: var(--color-success-text) !important;
@@ -253,8 +333,17 @@
             font-weight: var(--font-weight-medium) !important;
             display: inline-block !important;
         }
+        .badge-pathology {
+            background: var(--color-info-bg) !important;
+            color: var(--color-info-text) !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
 
-        /* 🔥 Card Button */
+        /* ─── Card Buttons ─── */
         .card-btn {
             display: inline-flex !important;
             align-items: center !important;
@@ -271,77 +360,97 @@
             width: 100% !important;
         }
         .card-btn-primary {
-            background-color: var(--color-sage) !important;
+            background: var(--color-sage) !important;
             color: white !important;
         }
         .card-btn-primary:hover {
-            background-color: var(--color-sage-dark) !important;
+            background: var(--color-sage-dark) !important;
             transform: translateY(-1px) !important;
             box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
         }
-
-        /* 🔥 Reports Grid */
-        .reports-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem !important;
+        .card-btn-outline {
+            background: transparent !important;
+            color: var(--color-sage) !important;
+            border: 1px solid var(--color-sage) !important;
         }
-        @media (min-width: 640px) {
-            .reports-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        @media (min-width: 1024px) {
-            .reports-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        @media (min-width: 1280px) {
-            .reports-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-        @media (min-width: 1536px) {
-            .reports-grid {
-                grid-template-columns: repeat(5, 1fr);
-            }
+        .card-btn-outline:hover {
+            background: var(--color-sage) !important;
+            color: white !important;
         }
 
-        /* 🔥 Modal */
+        /* ─── Empty State ─── */
+        .empty-state {
+            grid-column: 1 / -1 !important;
+            text-align: center !important;
+            padding: 3rem 1.25rem !important;
+            color: var(--color-brown-100) !important;
+        }
+        .empty-state i {
+            font-size: 2rem !important;
+            margin-bottom: 0.75rem !important;
+            display: block !important;
+            opacity: 0.4 !important;
+        }
+
+        /* ─── Modals ─── */
+        .modal-overlay {
+            position: fixed !important;
+            inset: 0 !important;
+            background: rgba(0, 0, 0, 0.5) !important;
+            backdrop-filter: blur(4px) !important;
+            display: none !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 9999 !important;
+            padding: 1rem !important;
+        }
+        .modal-overlay.active { display: flex !important; }
         .form-card {
+            background: var(--bg-card) !important;
+            border-radius: var(--radius-lg) !important;
+            box-shadow: var(--shadow-lg) !important;
+            max-width: 720px !important;
+            width: 100% !important;
+            max-height: 90vh !important;
+            overflow-y: auto !important;
             border-top: 4px solid var(--color-sage) !important;
         }
-        .modal-body {
-            padding: 1.25rem !important;
+        .modal-header {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 1.25rem 1.5rem !important;
+            border-bottom: 1px solid var(--border-default) !important;
         }
+        .modal-title {
+            font-size: 1rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+        .close-btn {
+            background: none !important;
+            border: none !important;
+            color: var(--color-brown-100) !important;
+            font-size: 1.125rem !important;
+            cursor: pointer !important;
+            padding: 0.25rem !important;
+            transition: all 0.2s ease !important;
+        }
+        .close-btn:hover { color: var(--color-brown-600) !important; transform: rotate(90deg) !important; }
+        .modal-body { padding: 1.5rem !important; }
         .modal-footer {
-            padding: 0.75rem 1.25rem !important;
-            background-color: var(--bg-subtle) !important;
-            border-top: 1px solid var(--border-default) !important;
             display: flex !important;
             justify-content: flex-end !important;
             gap: 0.75rem !important;
+            padding: 0.75rem 1.5rem !important;
+            background: var(--bg-subtle) !important;
+            border-top: 1px solid var(--border-default) !important;
         }
 
-        /* 🔥 Print styles */
-        @media print {
-            .no-print { display: none !important; }
-            body { background: white !important; margin: 0 !important; padding: 0 !important; }
-            .print-report { padding: 20px !important; }
-            .modal-overlay { display: none !important; }
-        }
-
-        /* 🔥 Stat Card Border Colors */
-        .stat-card-sage { border-left: 4px solid var(--color-sage) !important; }
-        .stat-card-sage-dark { border-left: 4px solid var(--color-sage-dark) !important; }
-        .stat-card-gold { border-left: 4px solid var(--color-gold) !important; }
-        .stat-card-tan { border-left: 4px solid var(--color-warm-tan) !important; }
-
-        .text-sage-dark { color: var(--color-sage-dark) !important; }
-        .text-gold { color: var(--color-gold) !important; }
-        .text-tan { color: var(--color-warm-tan) !important; }
-
-        /* 🔥 Report content in modal */
+        /* ─── Report Content ─── */
         .report-content {
             white-space: pre-wrap !important;
             font-family: 'Courier New', monospace !important;
@@ -349,6 +458,75 @@
             line-height: 1.6 !important;
             color: var(--color-brown-700) !important;
             margin: 0 !important;
+        }
+        .report-detail-section {
+            margin-bottom: 1.5rem !important;
+        }
+        .report-detail-section:last-child { margin-bottom: 0 !important; }
+        .report-detail-label {
+            font-size: 0.6875rem !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-200) !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
+            margin-bottom: 0.25rem !important;
+        }
+        .report-detail-value {
+            font-size: 0.875rem !important;
+            color: var(--color-brown-700) !important;
+        }
+        .report-detail-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 0.75rem 1.5rem !important;
+            margin-bottom: 1rem !important;
+        }
+        @media (max-width: 640px) { .report-detail-grid { grid-template-columns: 1fr !important; } }
+
+        /* ─── Print Styles ─── */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; margin: 0 !important; padding: 0 !important; }
+            .print-report { padding: 20px !important; }
+            .modal-overlay { display: none !important; }
+        }
+        .print-report {
+            font-family: 'Poppins', Arial, sans-serif !important;
+            max-width: 800px !important;
+            margin: 0 auto !important;
+            padding: 40px !important;
+            background: white !important;
+        }
+        .print-report h1 {
+            color: var(--color-brown-700) !important;
+            margin: 0 !important;
+        }
+        .print-report .print-header {
+            text-align: center !important;
+            border-bottom: 2px solid var(--color-sage) !important;
+            padding-bottom: 20px !important;
+            margin-bottom: 30px !important;
+        }
+        .print-report .print-footer {
+            text-align: center !important;
+            margin-top: 50px !important;
+            padding-top: 20px !important;
+            border-top: 1px solid var(--border-default) !important;
+            color: var(--color-brown-100) !important;
+            font-size: 12px !important;
+        }
+        .print-report table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            margin-bottom: 20px !important;
+        }
+        .print-report table td {
+            padding: 10px 12px !important;
+            border: 1px solid var(--border-default) !important;
+        }
+        .print-report table .label-cell {
+            background: var(--bg-subtle) !important;
+            font-weight: 600 !important;
         }
     </style>
 </head>
@@ -359,50 +537,46 @@
 
     <main class="main-content" id="mainContent">
         
-        <!-- Stats Cards -->
+        <!-- Page Header -->
+        <div class="page-header-custom">
+            <div>
+                <h1><i class="fas fa-chart-bar"></i> Reports Storage</h1>
+                <p>Store and manage all diagnostic reports, lab results, and radiology findings</p>
+            </div>
+            <div class="header-actions">
+                <button id="refreshBtn" class="btn-header btn-header-secondary">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button id="addReportBtn" class="btn-header btn-header-primary">
+                    <i class="fas fa-plus"></i> Add Report
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats -->
         <div class="grid-stats">
             <div class="stat-card stat-card-sage">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Total Reports</p>
-                        <p class="stat-value" id="totalReports">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-chart-bar" style="color:var(--color-sage);"></i>
-                    </div>
+                    <div><p class="stat-label">Total Reports</p><p class="stat-value" id="totalReports">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-chart-bar" style="color:var(--color-sage);"></i></div>
                 </div>
             </div>
             <div class="stat-card stat-card-sage-dark">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Lab Reports</p>
-                        <p class="stat-value text-sage-dark" id="labCount">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-microscope" style="color:var(--color-sage-dark);"></i>
-                    </div>
+                    <div><p class="stat-label">Lab Reports</p><p class="stat-value text-sage-dark" id="labCount">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-microscope" style="color:var(--color-sage-dark);"></i></div>
                 </div>
             </div>
             <div class="stat-card stat-card-gold">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Radiology</p>
-                        <p class="stat-value text-gold" id="radiologyCount">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-x-ray" style="color:var(--color-gold);"></i>
-                    </div>
+                    <div><p class="stat-label">Radiology</p><p class="stat-value text-gold" id="radiologyCount">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-x-ray" style="color:var(--color-gold);"></i></div>
                 </div>
             </div>
             <div class="stat-card stat-card-tan">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">This Month</p>
-                        <p class="stat-value text-tan" id="monthCount">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-calendar-alt" style="color:var(--color-warm-tan);"></i>
-                    </div>
+                    <div><p class="stat-label">This Month</p><p class="stat-value text-tan" id="monthCount">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-calendar-alt" style="color:var(--color-warm-tan);"></i></div>
                 </div>
             </div>
         </div>
@@ -417,47 +591,136 @@
                 <option value="">All Types</option>
                 <option value="Lab">Lab Report</option>
                 <option value="Radiology">Radiology Report</option>
+                <option value="Pathology">Pathology Report</option>
                 <option value="Discharge">Discharge Summary</option>
             </select>
             <button id="resetFilter" class="btn-secondary">
-                <i class="fas fa-undo-alt"></i>
-                <span>Reset</span>
+                <i class="fas fa-undo-alt"></i> <span>Reset</span>
             </button>
         </div>
 
         <!-- Reports Grid -->
         <div class="reports-grid" id="reportsGrid">
-            <div style="grid-column:1/-1; text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
-                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
-                <p style="font-weight:var(--font-weight-light);">Loading reports...</p>
+            <div class="empty-state">
+                <i class="fas fa-spinner fa-pulse"></i>
+                <p>Loading reports...</p>
             </div>
         </div>
     </main>
 
-    <!-- View Report Modal -->
+    <!-- Add/Edit Report Modal -->
     <div id="reportModal" class="modal-overlay" role="dialog" aria-modal="true">
-        <div class="form-card" style="max-width:44rem;">
+        <div class="form-card" style="max-width:720px;">
             <div class="modal-header">
-                <h3 class="modal-title">
-                    <i class="fas fa-file-alt"></i> Report Details
+                <h3 class="modal-title" id="modalTitle">
+                    <i class="fas fa-file-medical" style="color:var(--color-sage);"></i> Add Report
                 </h3>
-                <div style="display:flex; gap:0.5rem;">
-                    <button id="printReportBtn" class="btn-secondary" style="padding:0.3rem 0.75rem; font-size:0.75rem;">
-                        <i class="fas fa-print"></i> Print
-                    </button>
-                    <button class="close-btn" id="closeModalBtn" aria-label="Close modal">
-                        <i class="fas fa-times"></i>
+                <button class="close-btn" id="closeModalBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="reportForm">
+                <input type="hidden" id="reportId">
+                <div class="modal-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Patient Name <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="text" id="patientName" class="form-input" placeholder="Enter patient name" required>
+                            <span class="error-text" id="patientError">Patient name is required</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Report Type <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="reportType" class="form-select" required>
+                                <option value="">-- Select Type --</option>
+                                <option value="Lab">Lab Report</option>
+                                <option value="Radiology">Radiology Report</option>
+                                <option value="Pathology">Pathology Report</option>
+                                <option value="Discharge">Discharge Summary</option>
+                            </select>
+                            <span class="error-text" id="typeError">Please select report type</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Test/Report Name <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="text" id="testName" class="form-input" placeholder="e.g., Complete Blood Count" required>
+                            <span class="error-text" id="testError">Test name is required</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Report Date <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="date" id="reportDate" class="form-input" required>
+                            <span class="error-text" id="dateError">Report date is required</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Requested By</label>
+                            <input type="text" id="requestedBy" class="form-input" placeholder="Doctor's name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Authorized By</label>
+                            <input type="text" id="authorizedBy" class="form-input" placeholder="Lab technician or radiologist">
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">Report Content / Findings <span style="color:var(--color-error-text);">*</span></label>
+                            <textarea id="reportContent" rows="6" class="form-textarea" placeholder="Enter detailed report findings or results..." required></textarea>
+                            <span class="error-text" id="contentError">Report content is required</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Save Report
                     </button>
                 </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Report Modal -->
+    <div id="viewModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="form-card" style="max-width:720px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="viewModalTitle">
+                    <i class="fas fa-file-alt" style="color:var(--color-sage);"></i> Report Details
+                </h3>
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    <button id="printReportBtn" class="btn-header btn-header-secondary" style="padding:0.3rem 0.75rem; font-size:0.75rem;">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                    <button id="editFromViewBtn" class="btn-header btn-header-secondary" style="padding:0.3rem 0.75rem; font-size:0.75rem;">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="close-btn" id="closeViewModalBtn"><i class="fas fa-times"></i></button>
+                </div>
             </div>
-            <div id="reportDetails" class="modal-body"></div>
+            <div id="viewContent" class="modal-body"></div>
             <div class="modal-footer">
-                <button type="button" id="closeFooterBtn" class="btn-secondary">Close</button>
+                <button type="button" id="closeViewFooterBtn" class="btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal-overlay modal-danger" role="dialog" aria-modal="true">
+        <div class="form-card" style="max-width:26rem; border-top-color:#ef4444;">
+            <div class="modal-header">
+                <h3 class="modal-title" style="color:#dc2626;">
+                    <i class="fas fa-triangle-exclamation" style="color:#dc2626;"></i> Confirm Delete
+                </h3>
+                <button class="close-btn" id="closeDeleteModalBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" style="text-align:center; padding:1.75rem 1.25rem;">
+                <div style="width:3.5rem; height:3.5rem; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; color:#dc2626; font-size:1.25rem;">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                <p style="font-size:0.9375rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin-bottom:0.5rem;">Delete Report?</p>
+                <p style="font-size:0.8125rem; color:var(--color-brown-300);">This action cannot be undone. This report will be permanently removed.</p>
+            </div>
+            <div class="modal-footer" style="justify-content:center;">
+                <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
+                <button id="confirmDeleteBtn" class="btn-danger"><i class="fas fa-trash-alt"></i> Delete</button>
             </div>
         </div>
     </div>
 
     <script src="../../js/core/common.js"></script>
+    <script src="../../js/core/form-validation.js"></script>
     <script src="reports-storage.js"></script>
 
     <script>

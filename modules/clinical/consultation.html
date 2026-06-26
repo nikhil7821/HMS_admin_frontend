@@ -17,7 +17,6 @@
            All base styles come from theme.css
            ============================================================ */
 
-        /* Consultation table row */
         .consult-row {
             transition: var(--transition-base);
             border-bottom: 1px solid var(--border-default);
@@ -29,13 +28,11 @@
             border-bottom: none;
         }
 
-        /* Table wrapper */
         .table-wrapper {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
         }
 
-        /* Data table */
         .data-table {
             width: 100%;
             border-collapse: collapse;
@@ -60,7 +57,6 @@
             vertical-align: middle;
         }
 
-        /* Action buttons */
         .action-btn {
             color: var(--color-brown-100);
             transition: var(--transition-base);
@@ -78,7 +74,6 @@
             color: var(--color-gold);
         }
 
-        /* Override: Add button inside filter bar */
         .filter-bar .btn-primary {
             flex: 0 0 auto !important;
             padding: 0.4rem 0.85rem !important;
@@ -93,7 +88,6 @@
             color: white !important;
             border: none !important;
         }
-
         .filter-bar .btn-primary:hover {
             background-color: var(--color-sage-dark) !important;
             box-shadow: 0 4px 12px rgba(138, 174, 122, 0.35) !important;
@@ -111,12 +105,10 @@
             }
         }
 
-        /* Modal overrides */
         .modal-content {
             border-top: 4px solid var(--color-sage);
         }
 
-        /* Empty state */
         .consult-empty {
             text-align: center;
             padding: 3rem 1.25rem;
@@ -133,7 +125,6 @@
             font-weight: var(--font-weight-light);
         }
 
-        /* View modal styles */
         .detail-section {
             margin-bottom: 1.25rem;
             padding-bottom: 1rem;
@@ -187,6 +178,22 @@
             line-height: 1.6;
             margin: 0;
         }
+
+        /* Badge for consultation type */
+        .badge-consult-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.15rem 0.625rem;
+            border-radius: var(--radius-full);
+            font-size: 0.6rem;
+            font-weight: var(--font-weight-medium);
+            white-space: nowrap;
+        }
+        .badge-opd { background: #e2f0fb; color: #2a72b5; }
+        .badge-ipd { background: #f0e8e0; color: #5a4a3a; }
+        .badge-emergency { background: #fee2e2; color: #ef4444; }
+        .badge-followup { background: #fef3dd; color: #9a6a10; }
     </style>
 </head>
 <body class="bg-subtle">
@@ -225,11 +232,11 @@
             <div class="stat-card">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
-                        <p class="stat-label">This Month</p>
-                        <p class="stat-value" id="monthConsults">0</p>
+                        <p class="stat-label">OPD / IPD</p>
+                        <p class="stat-value" id="opdIpdCount">0/0</p>
                     </div>
                     <div class="stat-icon-bg">
-                        <i class="fas fa-calendar-alt" style="color:var(--color-sage); font-size:1.125rem;"></i>
+                        <i class="fas fa-procedures" style="color:var(--color-sage); font-size:1.125rem;"></i>
                     </div>
                 </div>
             </div>
@@ -253,6 +260,13 @@
                 <i class="fas fa-search"></i>
                 <input type="text" id="searchInput" class="search-input" placeholder="Search by patient, doctor, or diagnosis...">
             </div>
+            <select id="typeFilter" class="form-select">
+                <option value="">All Types</option>
+                <option value="opd">OPD</option>
+                <option value="ipd">IPD</option>
+                <option value="emergency">Emergency</option>
+                <option value="followup">Follow-up</option>
+            </select>
             <button id="resetFilterBtn" class="btn-secondary">
                 <i class="fas fa-undo-alt"></i>
                 <span>Reset</span>
@@ -272,13 +286,14 @@
                             <th>Patient</th>
                             <th>Doctor</th>
                             <th>Date</th>
+                            <th>Type</th>
                             <th>Diagnosis</th>
                             <th style="text-align:center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="consultTable">
                         <tr>
-                            <td colspan="5" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
+                            <td colspan="6" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
                                 <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
                                 <p style="font-weight:var(--font-weight-light);">Loading consultations...</p>
                             </td>
@@ -289,7 +304,7 @@
         </div>
     </main>
 
-    <!-- New Consultation Modal - Using theme's modal system -->
+    <!-- New Consultation Modal -->
     <div id="consultModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <div class="form-card" style="max-width:48rem;">
             <div class="modal-header">
@@ -302,6 +317,7 @@
                 </button>
             </div>
             <form id="consultForm">
+                <input type="hidden" id="editConsultId">
                 <div class="modal-body">
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem 1.5rem;">
                         <div class="form-group">
@@ -315,6 +331,19 @@
                             <select id="doctorId" required class="form-select">
                                 <option value="">-- Select Doctor --</option>
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Consultation Type <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="consultType" required class="form-select">
+                                <option value="opd">OPD (Outpatient)</option>
+                                <option value="ipd">IPD (Inpatient)</option>
+                                <option value="emergency">Emergency</option>
+                                <option value="followup">Follow-up</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Consultation Fee (₹)</label>
+                            <input type="number" id="consultFee" class="form-input" placeholder="0" value="500" step="50">
                         </div>
                         <div class="form-group" style="grid-column:1 / -1;">
                             <label class="form-label">Symptoms / Chief Complaints</label>

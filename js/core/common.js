@@ -1,6 +1,7 @@
 /**
  * MedFlow HMS - Common JS
  * Loads sidebar, header, and handles layout
+ * Version: 2.0 - Production Ready with RBAC
  */
 
 // ─── Page Title Data ─────────────────────────────────────────
@@ -29,6 +30,8 @@ function getPageTitleData() {
         'doctor-schedule': { main: 'Clinical', sub: 'Doctor Schedule' },
         
         'emergency': { main: 'Emergency', sub: 'Emergency Register' },
+        'emergency-queue': { main: 'Emergency', sub: 'Emergency Queue' },
+        'ambulance-request': { main: 'Emergency', sub: 'Ambulance Request' },
         
         'wards': { main: 'Ward Management', sub: 'Wards' },
         'rooms': { main: 'Ward Management', sub: 'Rooms' },
@@ -120,6 +123,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     setupMobileMenu();
     setActiveMenu();
     reinitDropdowns();
+    
+    // 🔥 Apply permissions after everything loads
+    setTimeout(applyPermissions, 300);
 });
 
 async function loadComponents(pageTitleData) {
@@ -133,11 +139,77 @@ async function loadSidebar() {
     try {
         const sidebarPath = getCorrectPath('components/sidebar.html');
         const response = await fetch(sidebarPath);
-        const html = await response.text();
+        let html = await response.text();
+        
+        // ─── 🔥 RBAC: Filter sidebar items based on permissions ───
+        html = filterSidebarByPermissions(html);
+        
         document.body.insertAdjacentHTML('afterbegin', html);
     } catch (error) {
         console.error('Error loading sidebar:', error);
     }
+}
+
+// ─── 🔥 RBAC: Filter Sidebar Items ─────────────────────────
+
+function filterSidebarByPermissions(html) {
+    const visibleModules = getVisibleModules();
+    const visibleModuleIds = visibleModules.map(m => m.id);
+    
+    console.log('🔍 Filtering sidebar. Visible modules:', visibleModuleIds);
+    
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    
+    // ─── Handle main nav items ──────────────────────────────
+    const navItems = tempDiv.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        const moduleId = item.getAttribute('data-module');
+        if (moduleId && !visibleModuleIds.includes(moduleId)) {
+            item.style.display = 'none';
+            item.classList.add('hidden-permission');
+        }
+    });
+    
+    // ─── Handle dropdown containers ──────────────────────────
+    const dropdowns = tempDiv.querySelectorAll('.nav-dropdown');
+    dropdowns.forEach(dropdown => {
+        const moduleId = dropdown.getAttribute('data-module');
+        if (moduleId && !visibleModuleIds.includes(moduleId)) {
+            dropdown.style.display = 'none';
+            dropdown.classList.add('hidden-permission');
+        }
+    });
+    
+    // ─── Handle dropdown links ──────────────────────────────
+    const dropdownLinks = tempDiv.querySelectorAll('.dropdown-link');
+    dropdownLinks.forEach(link => {
+        const moduleId = link.getAttribute('data-module');
+        if (moduleId && !visibleModuleIds.includes(moduleId)) {
+            link.style.display = 'none';
+            link.classList.add('hidden-permission');
+        }
+    });
+    
+    // ─── Unhide parent dropdowns if any child is visible ──
+    dropdowns.forEach(dropdown => {
+        const hiddenLinks = dropdown.querySelectorAll('.dropdown-link.hidden-permission');
+        const allLinks = dropdown.querySelectorAll('.dropdown-link');
+        
+        if (allLinks.length > 0 && allLinks.length === hiddenLinks.length) {
+            dropdown.style.display = 'none';
+            dropdown.classList.add('hidden-permission');
+        } else if (dropdown.style.display === 'none') {
+            const visibleLinks = dropdown.querySelectorAll('.dropdown-link:not(.hidden-permission)');
+            if (visibleLinks.length > 0) {
+                dropdown.style.display = '';
+                dropdown.classList.remove('hidden-permission');
+            }
+        }
+    });
+    
+    console.log('✅ Sidebar filtering complete');
+    return tempDiv.innerHTML;
 }
 
 async function loadHeader(pageTitleData) {
@@ -154,7 +226,7 @@ async function loadHeader(pageTitleData) {
             
             if (pageTitleData.main !== 'Home') {
                 let parentLink = getParentLink(pageTitleData.main);
-                const breadcrumbHtml = `<a href="${parentLink}" class="breadcrumb-link">${pageTitleData.main}</a><span class="breadcrumb-separator">/</span><span class="breadcrumb-current">${pageTitleData.sub}</span>`;
+                const breadcrumbHtml = `<a href="${parentLink}" class="breadcrumb-link">${pageTitleData.main}</a><span class="breadcrumb-separator">/</span><span class="breadcrumb-current" id="breadcrumbCurrent">${pageTitleData.sub}</span>`;
                 html = html.replace('<span>Home</span><span class="breadcrumb-separator">/</span><span class="breadcrumb-current" id="breadcrumbCurrent">Loading...</span>', breadcrumbHtml);
             }
         }
@@ -204,12 +276,10 @@ function initSidebar() {
             return;
         }
         
-        // Add classes for CSS
         if (mainContent) {
             mainContent.classList.add('main-content');
         }
         
-        // Load saved state
         const savedState = localStorage.getItem('sidebarCollapsed');
         
         if (savedState === 'true') {
@@ -232,7 +302,6 @@ function initSidebar() {
             updateLayout(false);
         }
         
-        // Toggle sidebar
         collapseBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             e.preventDefault();
@@ -240,7 +309,6 @@ function initSidebar() {
             const isCollapsed = sidebar.getAttribute('data-collapsed') === 'true';
             
             if (isCollapsed) {
-                // Expand
                 sidebar.setAttribute('data-collapsed', 'false');
                 localStorage.setItem('sidebarCollapsed', 'false');
                 if (mainContent) {
@@ -254,7 +322,6 @@ function initSidebar() {
                 sidebar.style.width = '';
                 updateLayout(false);
             } else {
-                // Collapse
                 sidebar.setAttribute('data-collapsed', 'true');
                 localStorage.setItem('sidebarCollapsed', 'true');
                 if (mainContent) {
@@ -418,19 +485,386 @@ window.logout = function() {
 };
 
 window.showToast = function(message, type) {
+    document.querySelectorAll('.toast-notification').forEach(t => t.remove());
+    
     const toast = document.createElement('div');
-    toast.className = `fixed bottom-5 right-5 z-50 px-5 py-3 rounded-lg shadow-lg text-white ${
-        type === 'success' ? 'bg-green-500' : 
-        type === 'error' ? 'bg-red-500' : 
-        'bg-blue-500'
-    } transition-all duration-300`;
-    toast.innerHTML = `<div class="flex items-center gap-2">
-        <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+    toast.className = `toast-notification toast-${type}`;
+    const icons = { 
+        success: 'fa-check-circle', 
+        error: 'fa-exclamation-triangle', 
+        info: 'fa-info-circle' 
+    };
+    const colors = {
+        success: '#10b981',
+        error: '#ef4444',
+        info: '#3b82f6'
+    };
+    
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 99999;
+        padding: 0.75rem 1.25rem;
+        border-radius: 12px;
+        background: ${colors[type] || colors.info};
+        color: white;
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.8125rem;
+        font-weight: 400;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        max-width: 400px;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    
+    toast.innerHTML = `
+        <i class="fas ${icons[type] || icons.info}" style="font-size:0.875rem;"></i>
         <span>${message}</span>
-    </div>`;
+    `;
+    
     document.body.appendChild(toast);
+    
     setTimeout(() => {
         toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        toast.style.transition = 'all 0.3s ease';
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 };
+
+// ─── 🔥 RBAC - Role Based Access Control Functions ────────
+
+/**
+ * ALL MODULES - Complete list of all modules in the system
+ */
+const ALL_MODULES = [
+    // Dashboard
+    { id: 'dashboard', label: 'Dashboard', icon: 'fa-chart-pie' },
+    
+    // User Management
+    { id: 'users', label: 'User Management', icon: 'fa-users-cog' },
+    { id: 'roles', label: 'Roles & Permissions', icon: 'fa-shield-alt' },
+    { id: 'departments', label: 'Departments', icon: 'fa-building' },
+    { id: 'audit-logs', label: 'Audit Logs', icon: 'fa-history' },
+    
+    // Clinical
+    { id: 'doctors', label: 'Doctors', icon: 'fa-user-md' },
+    { id: 'patients', label: 'Patients', icon: 'fa-users' },
+    { id: 'patient-profile', label: 'Patient Profile', icon: 'fa-id-card' },
+    { id: 'opd', label: 'OPD', icon: 'fa-walking' },
+    { id: 'ipd', label: 'IPD', icon: 'fa-procedures' },
+    { id: 'appointments', label: 'Appointments', icon: 'fa-calendar-check' },
+    { id: 'consultation', label: 'Consultation', icon: 'fa-prescription-bottle' },
+    { id: 'doctor-schedule', label: 'Doctor Schedule', icon: 'fa-clock' },
+    
+    // Emergency
+    { id: 'emergency', label: 'Emergency Register', icon: 'fa-ambulance' },
+    { id: 'emergency-queue', label: 'Emergency Queue', icon: 'fa-hourglass-half' },
+    { id: 'ambulance-request', label: 'Ambulance Request', icon: 'fa-truck' },
+    
+    // Ward Management
+    { id: 'wards', label: 'Wards', icon: 'fa-bed' },
+    { id: 'rooms', label: 'Rooms', icon: 'fa-door-open' },
+    { id: 'beds', label: 'Beds', icon: 'fa-bed' },
+    
+    // Pharmacy
+    { id: 'categories', label: 'Categories', icon: 'fa-tags' },
+    { id: 'units', label: 'Units', icon: 'fa-ruler' },
+    { id: 'medicines', label: 'Medicines', icon: 'fa-pills' },
+    { id: 'suppliers', label: 'Suppliers', icon: 'fa-truck' },
+    { id: 'purchases', label: 'Purchases', icon: 'fa-shopping-cart' },
+    { id: 'issue-medicines', label: 'Issue Medicines', icon: 'fa-hand-holding-heart' },
+    { id: 'stock-adjustments', label: 'Stock Adjustments', icon: 'fa-balance-scale' },
+    
+    // Laboratory
+    { id: 'lab-categories', label: 'Test Categories', icon: 'fa-tag' },
+    { id: 'lab-tests', label: 'Lab Tests', icon: 'fa-flask' },
+    { id: 'lab-requests', label: 'Test Requests', icon: 'fa-file-medical' },
+    
+    // Radiology
+    { id: 'radio-categories', label: 'Scan Categories', icon: 'fa-tag' },
+    { id: 'radio-tests', label: 'Radiology Tests', icon: 'fa-scan' },
+    { id: 'radio-requests', label: 'Scan Requests', icon: 'fa-file-medical' },
+    
+    // Billing & Finance
+    { id: 'invoices', label: 'Invoices', icon: 'fa-file-invoice' },
+    { id: 'payments', label: 'Payments', icon: 'fa-credit-card' },
+    { id: 'financial-reports', label: 'Financial Reports', icon: 'fa-chart-bar' },
+    
+    // Staff Management
+    { id: 'staff-list', label: 'Staff List', icon: 'fa-id-badge' },
+    { id: 'shifts', label: 'Shift Scheduling', icon: 'fa-clock' },
+    { id: 'attendance', label: 'Attendance', icon: 'fa-clipboard-list' },
+    
+    // Reports & Analytics
+    { id: 'patient-reports', label: 'Patient Reports', icon: 'fa-user-chart' },
+    { id: 'doctor-performance', label: 'Doctor Performance', icon: 'fa-user-md-chart' },
+    { id: 'revenue-reports', label: 'Revenue Reports', icon: 'fa-rupee-sign' },
+    { id: 'bed-occupancy', label: 'Bed Occupancy', icon: 'fa-bed' },
+    { id: 'lab-reports', label: 'Lab Activity', icon: 'fa-microscope' },
+    
+    // Documents
+    { id: 'documents', label: 'Patient Documents', icon: 'fa-folder-open' },
+    { id: 'reports-storage', label: 'Reports Storage', icon: 'fa-archive' },
+    { id: 'prescriptions', label: 'Prescriptions', icon: 'fa-prescription' },
+    
+    // Settings
+    { id: 'hospital-profile', label: 'Hospital Profile', icon: 'fa-hospital' },
+    { id: 'system-config', label: 'System Configuration', icon: 'fa-sliders-h' },
+    { id: 'notification-settings', label: 'Notification Settings', icon: 'fa-bell' }
+];
+
+/**
+ * Check if current user has a specific permission
+ */
+function hasPermission(module, action) {
+    try {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        // Super Admin → ALLOW EVERYTHING
+        if (user.isSuperAdmin === true) return true;
+        if (!user || !user.roleId) return true;
+        
+        const roles = JSON.parse(localStorage.getItem('system_roles') || '[]');
+        if (!roles || roles.length === 0) return true;
+        
+        const role = roles.find(r => r.id === user.roleId);
+        if (!role) return true;
+        if (role.name === 'Super Administrator' || role.id === 999) return true;
+        
+        return role.permissions?.[module]?.includes(action) || false;
+    } catch (error) {
+        console.error('Error checking permission:', error);
+        return true;
+    }
+}
+
+/**
+ * Get all modules visible to current user
+ */
+function getVisibleModules() {
+    try {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        // 🔥 SUPER ADMIN - SAB KUCH DIKHAO
+        if (user.isSuperAdmin === true) {
+            console.log('⭐ Super Admin - ALL modules visible');
+            return ALL_MODULES;
+        }
+        
+        if (!user || !user.roleId) {
+            console.log('⚠️ No user - showing all modules');
+            return ALL_MODULES;
+        }
+        
+        const roles = JSON.parse(localStorage.getItem('system_roles') || '[]');
+        if (!roles || roles.length === 0) {
+            console.log('⚠️ No roles - showing all modules');
+            return ALL_MODULES;
+        }
+        
+        const role = roles.find(r => r.id === user.roleId);
+        if (!role) {
+            console.log('⚠️ Role not found - showing all modules');
+            return ALL_MODULES;
+        }
+        
+        if (role.name === 'Super Administrator' || role.id === 999) {
+            console.log('⭐ Super Admin role - ALL modules visible');
+            return ALL_MODULES;
+        }
+        
+        // Filter modules based on permissions
+        const visible = ALL_MODULES.filter(m => {
+            const perms = role.permissions?.[m.id] || [];
+            return perms.length > 0;
+        });
+        
+        if (visible.length === 0) {
+            console.log('⚠️ No visible modules - showing all');
+            return ALL_MODULES;
+        }
+        
+        console.log('🔐 Visible modules:', visible.length);
+        return visible;
+    } catch (error) {
+        console.error('Error getting visible modules:', error);
+        return ALL_MODULES;
+    }
+}
+
+/**
+ * Check if user has ANY permission for a module
+ */
+function hasModuleAccess(module) {
+    try {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user.isSuperAdmin === true) return true;
+        if (!user || !user.roleId) return true;
+        
+        const roles = JSON.parse(localStorage.getItem('system_roles') || '[]');
+        if (!roles || roles.length === 0) return true;
+        
+        const role = roles.find(r => r.id === user.roleId);
+        if (!role) return true;
+        if (role.name === 'Super Administrator' || role.id === 999) return true;
+        
+        const perms = role.permissions?.[module] || [];
+        return perms.length > 0;
+    } catch (error) {
+        console.error('Error checking module access:', error);
+        return true;
+    }
+}
+
+/**
+ * Get current user's role
+ */
+function getCurrentUserRole() {
+    try {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (!user || !user.roleId) return null;
+        
+        const roles = JSON.parse(localStorage.getItem('system_roles') || '[]');
+        return roles.find(r => r.id === user.roleId) || null;
+    } catch (error) {
+        console.error('Error getting user role:', error);
+        return null;
+    }
+}
+
+/**
+ * Check if current user is Admin
+ */
+function isAdmin() {
+    try {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user.isSuperAdmin === true) return true;
+        
+        const role = getCurrentUserRole();
+        return role && (role.name === 'Administrator' || role.name === 'Super Administrator' || role.id === 999);
+    } catch (error) {
+        return false;
+    }
+}
+
+// ─── 🔥 Apply Permissions to All Elements ────────────────────
+
+function applyPermissions() {
+    try {
+        const elements = document.querySelectorAll('[data-perm]');
+        let hiddenCount = 0;
+        let visibleCount = 0;
+        
+        elements.forEach(el => {
+            const perm = el.getAttribute('data-perm').split(':');
+            if (perm.length !== 2) {
+                console.warn('Invalid data-perm format:', el.getAttribute('data-perm'));
+                return;
+            }
+            
+            const module = perm[0].trim();
+            const action = perm[1].trim();
+            
+            const hasPerm = hasPermission(module, action);
+            
+            if (!hasPerm) {
+                el.style.display = 'none';
+                el.classList.add('permission-hidden');
+                hiddenCount++;
+            } else {
+                el.style.display = '';
+                el.classList.remove('permission-hidden');
+                visibleCount++;
+            }
+        });
+        
+        if (elements.length > 0) {
+            console.log(`🔐 Permissions applied: ${visibleCount} visible, ${hiddenCount} hidden`);
+        }
+    } catch (error) {
+        console.error('Error applying permissions:', error);
+    }
+}
+
+// ─── 🔥 Auto-apply permissions on DOM changes ──────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(applyPermissions, 200);
+});
+
+document.addEventListener('permissionsUpdated', function() {
+    setTimeout(applyPermissions, 100);
+});
+
+if (window.MutationObserver) {
+    const observer = new MutationObserver(function(mutations) {
+        let shouldUpdate = false;
+        mutations.forEach(mutation => {
+            if (mutation.addedNodes.length > 0) {
+                mutation.addedNodes.forEach(node => {
+                    if (node.nodeType === 1) {
+                        if (node.querySelector && node.querySelector('[data-perm]')) {
+                            shouldUpdate = true;
+                        }
+                        if (node.hasAttribute && node.hasAttribute('data-perm')) {
+                            shouldUpdate = true;
+                        }
+                    }
+                });
+            }
+        });
+        if (shouldUpdate) {
+            setTimeout(applyPermissions, 50);
+        }
+    });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
+}
+
+// ─── 🔥 Expose RBAC functions globally ────────────────────
+
+window.ALL_MODULES = ALL_MODULES;
+window.hasPermission = hasPermission;
+window.getVisibleModules = getVisibleModules;
+window.hasModuleAccess = hasModuleAccess;
+window.getCurrentUserRole = getCurrentUserRole;
+window.isAdmin = isAdmin;
+window.applyPermissions = applyPermissions;
+window.filterSidebarByPermissions = filterSidebarByPermissions;
+
+// ─── 🔥 Inject CSS for toast animations ─────────────────────
+
+(function injectToastStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        .toast-notification {
+            animation: slideInRight 0.3s ease-out;
+        }
+        .permission-hidden {
+            display: none !important;
+        }
+    `;
+    document.head.appendChild(style);
+})();
+
+console.log('✅ MedFlow HMS Common JS loaded successfully!');
+console.log('🔐 RBAC System ready with', ALL_MODULES.length, 'modules');

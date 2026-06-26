@@ -13,10 +13,9 @@
 
     <style>
         /* ============================================================
-           INVOICES MODULE — Page-specific only
+           INVOICES MODULE — FULL PROFESSIONAL VERSION (A+B)
            ============================================================ */
 
-        /* 🔥 FIX: Prevent layout shift */
         .main-content {
             margin-left: 260px !important;
             margin-top: 70px !important;
@@ -26,47 +25,102 @@
             opacity: 0;
             animation: fadeIn 0.3s ease forwards;
         }
-        .main-content.loaded {
-            opacity: 1;
-        }
+        .main-content.loaded { opacity: 1; }
         #mainSidebar[data-collapsed="true"] ~ .main-content,
         #mainSidebar[data-collapsed="true"] + .main-content {
             margin-left: 72px !important;
         }
         @media (max-width: 1024px) {
-            .main-content {
-                margin-left: 0 !important;
-                padding: 1rem !important;
-            }
+            .main-content { margin-left: 0 !important; padding: 1rem !important; }
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 🔥 Page Header - Hidden */
-        .page-header {
-            display: none !important;
+        /* ─── Page Header ─── */
+        .page-header-custom {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 1.25rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.75rem !important;
+        }
+        .page-header-custom h1 {
+            font-size: 1.375rem !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-700) !important;
+            margin: 0 !important;
+        }
+        .page-header-custom h1 i { color: var(--color-sage) !important; margin-right: 0.5rem !important; }
+        .page-header-custom p { font-size: 0.75rem !important; color: var(--color-brown-100) !important; margin: 0 !important; }
+
+        .header-actions { display: flex !important; gap: 0.5rem !important; flex-wrap: wrap !important; }
+        .btn-header {
+            padding: 0.4rem 0.85rem !important;
+            font-size: 0.8rem !important;
+            border-radius: var(--radius-md) !important;
+            font-family: var(--font-family) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            border: none !important;
+        }
+        .btn-header-primary {
+            background: var(--color-sage) !important;
+            color: white !important;
+        }
+        .btn-header-primary:hover {
+            background: var(--color-sage-dark) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+        }
+        .btn-header-secondary {
+            background: var(--bg-card) !important;
+            color: var(--color-brown-200) !important;
+            border: 1px solid var(--border-input) !important;
+        }
+        .btn-header-secondary:hover {
+            background: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+        }
+        .btn-header-success {
+            background: #10b981 !important;
+            color: white !important;
+        }
+        .btn-header-success:hover {
+            background: #059669 !important;
+            transform: translateY(-1px) !important;
         }
 
-        /* 🔥 Stats Cards - Perfect Spacing */
+        /* ─── Stats ─── */
         .grid-stats {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
             gap: 1rem !important;
             margin-bottom: 1.25rem !important;
         }
         .stat-card {
-            padding: 1rem 1.25rem !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
             border-radius: var(--radius-lg) !important;
+            padding: 1rem 1.25rem !important;
+            transition: all 0.2s ease !important;
         }
+        .stat-card:hover { transform: translateY(-2px) !important; box-shadow: var(--shadow-md) !important; }
         .stat-card .stat-value {
             font-size: 1.5rem !important;
             font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
             margin-top: 0.125rem !important;
         }
         .stat-card .stat-label {
             font-size: 0.625rem !important;
-            letter-spacing: 0.06em !important;
             text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
             color: var(--color-brown-200) !important;
         }
         .stat-card .stat-icon-bg {
@@ -78,25 +132,27 @@
             justify-content: center !important;
             background: var(--bg-muted) !important;
         }
-        .stat-card .stat-icon-bg i {
-            font-size: 1rem !important;
-        }
+        .stat-card .stat-icon-bg i { font-size: 1rem !important; }
+        .stat-card-blue { border-left: 4px solid #3b82f6 !important; }
+        .stat-card-green { border-left: 4px solid var(--color-success-text) !important; }
+        .stat-card-orange { border-left: 4px solid var(--color-warning-text) !important; }
+        .stat-card-purple { border-left: 4px solid #9333ea !important; }
 
-        /* 🔥 Filter Bar - Perfect Alignment */
+        /* ─── Filter Bar ─── */
         .filter-bar {
-            padding: 0.625rem 1rem !important;
-            gap: 0.625rem !important;
-            margin-bottom: 1.25rem !important;
-            border-radius: var(--radius-lg) !important;
-            background: var(--bg-card) !important;
-            border: 1px solid var(--border-default) !important;
             display: flex !important;
             align-items: center !important;
             flex-wrap: nowrap !important;
+            gap: 0.625rem !important;
+            padding: 0.625rem 1rem !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-lg) !important;
+            margin-bottom: 1.25rem !important;
         }
         .filter-bar .search-wrapper {
-            flex: 1 1 220px !important;
-            min-width: 160px !important;
+            flex: 1 1 200px !important;
+            min-width: 150px !important;
             max-width: 320px !important;
             position: relative !important;
         }
@@ -105,7 +161,7 @@
             left: 0.75rem !important;
             top: 50% !important;
             transform: translateY(-50%) !important;
-            color: var(--color-brown-100);
+            color: var(--color-brown-100) !important;
             font-size: 0.8125rem !important;
             pointer-events: none !important;
             z-index: 1 !important;
@@ -115,34 +171,40 @@
             padding: 0.375rem 0.75rem 0.375rem 2.25rem !important;
             font-size: 0.8125rem !important;
             height: 36px !important;
-            border-radius: var(--radius-md) !important;
             border: 1px solid var(--border-input) !important;
-            background-color: var(--bg-card) !important;
+            border-radius: var(--radius-md) !important;
+            background: var(--bg-card) !important;
             color: var(--color-brown-700) !important;
             font-family: var(--font-family) !important;
+            outline: none !important;
+            transition: all 0.2s ease !important;
         }
         .filter-bar .search-input:focus {
             border-color: var(--color-sage-light) !important;
             box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
-            outline: none !important;
         }
         .filter-bar .form-select {
-            min-width: 130px !important;
+            min-width: 120px !important;
             max-width: 180px !important;
             padding: 0.375rem 1.75rem 0.375rem 0.75rem !important;
             font-size: 0.8125rem !important;
             height: 36px !important;
             border: 1px solid var(--border-input) !important;
             border-radius: var(--radius-md) !important;
-            background-color: var(--bg-card) !important;
+            background: var(--bg-card) !important;
             color: var(--color-brown-700) !important;
-            cursor: pointer !important;
             font-family: var(--font-family) !important;
+            outline: none !important;
+            cursor: pointer !important;
+            appearance: none !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b8aa9a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 0.625rem center !important;
+            background-size: 10px !important;
         }
         .filter-bar .form-select:focus {
             border-color: var(--color-sage-light) !important;
             box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
-            outline: none !important;
         }
         .filter-bar .form-input {
             min-width: 120px !important;
@@ -152,14 +214,14 @@
             height: 36px !important;
             border: 1px solid var(--border-input) !important;
             border-radius: var(--radius-md) !important;
-            background-color: var(--bg-card) !important;
+            background: var(--bg-card) !important;
             color: var(--color-brown-700) !important;
             font-family: var(--font-family) !important;
+            outline: none !important;
         }
         .filter-bar .form-input:focus {
             border-color: var(--color-sage-light) !important;
             box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
-            outline: none !important;
         }
         .filter-bar .btn-primary,
         .filter-bar .btn-secondary {
@@ -174,76 +236,58 @@
             white-space: nowrap !important;
             font-family: var(--font-family) !important;
             cursor: pointer !important;
+            transition: all 0.2s ease !important;
         }
         .filter-bar .btn-primary {
-            background-color: var(--color-sage) !important;
+            background: var(--color-sage) !important;
             color: white !important;
             border: none !important;
         }
         .filter-bar .btn-primary:hover {
-            background-color: var(--color-sage-dark) !important;
-            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+            background: var(--color-sage-dark) !important;
             transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
         }
         .filter-bar .btn-secondary {
-            background-color: transparent !important;
+            background: transparent !important;
             color: var(--color-brown-200) !important;
             border: 1px solid var(--border-input) !important;
         }
         .filter-bar .btn-secondary:hover {
-            background-color: var(--bg-hover) !important;
+            background: var(--bg-hover) !important;
             color: var(--color-brown-600) !important;
             border-color: var(--color-brown-100) !important;
         }
 
         @media (max-width: 768px) {
-            .filter-bar {
-                flex-wrap: wrap !important;
-                gap: 0.5rem !important;
-                padding: 0.5rem 0.75rem !important;
-            }
-            .filter-bar .search-wrapper {
-                flex: 1 1 100% !important;
-                min-width: 100px !important;
-                max-width: 100% !important;
-            }
+            .filter-bar { flex-wrap: wrap !important; gap: 0.5rem !important; padding: 0.5rem 0.75rem !important; }
+            .filter-bar .search-wrapper { flex: 1 1 100% !important; min-width: 100px !important; max-width: 100% !important; }
             .filter-bar .form-select,
-            .filter-bar .form-input {
-                min-width: 90px !important;
-                max-width: 140px !important;
-                font-size: 0.75rem !important;
-                height: 32px !important;
-            }
+            .filter-bar .form-input { min-width: 90px !important; max-width: 140px !important; font-size: 0.75rem !important; height: 32px !important; }
             .filter-bar .btn-primary span,
-            .filter-bar .btn-secondary span {
-                display: none !important;
-            }
+            .filter-bar .btn-secondary span { display: none !important; }
             .filter-bar .btn-primary,
-            .filter-bar .btn-secondary {
-                padding: 0.3rem 0.6rem !important;
-                font-size: 0.75rem !important;
-                height: 32px !important;
-            }
+            .filter-bar .btn-secondary { padding: 0.3rem 0.6rem !important; font-size: 0.75rem !important; height: 32px !important; }
+            .grid-stats { grid-template-columns: repeat(2, 1fr) !important; }
         }
+        @media (max-width: 480px) { .grid-stats { grid-template-columns: 1fr !important; } }
 
-        /* 🔥 Table - Perfect Alignment */
+        /* ─── Table ─── */
         .card-white {
-            border-radius: var(--radius-lg) !important;
+            background: var(--bg-card) !important;
             border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-lg) !important;
             overflow: hidden !important;
             margin-top: 1.25rem !important;
         }
-        .table-wrapper {
-            overflow-x: auto !important;
-            -webkit-overflow-scrolling: touch !important;
-        }
+        .table-wrapper { overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; }
         .data-table {
             width: 100% !important;
             border-collapse: collapse !important;
             font-size: 0.8125rem !important;
         }
         .data-table thead {
-            background-color: var(--bg-muted) !important;
+            background: var(--bg-muted) !important;
             border-bottom: 1px solid var(--border-default) !important;
         }
         .data-table th {
@@ -254,6 +298,7 @@
             font-size: 0.625rem !important;
             text-transform: uppercase !important;
             letter-spacing: 0.06em !important;
+            white-space: nowrap !important;
         }
         .data-table td {
             padding: 0.625rem 1rem !important;
@@ -261,40 +306,18 @@
             vertical-align: middle !important;
             border-bottom: 1px solid var(--border-default) !important;
         }
-        .data-table tbody tr:last-child td {
-            border-bottom: none !important;
-        }
+        .data-table tbody tr:last-child td { border-bottom: none !important; }
+        .data-table tbody tr:hover td { background: var(--bg-subtle) !important; }
 
-        /* 🔥 Status Badges - Perfect */
-        .status-paid {
-            background: var(--color-success-bg) !important;
-            color: var(--color-success-text) !important;
-            padding: 0.15rem 0.625rem !important;
-            border-radius: var(--radius-full) !important;
-            font-size: 0.625rem !important;
-            font-weight: var(--font-weight-medium) !important;
-            display: inline-block !important;
-        }
-        .status-pending {
-            background: var(--color-warning-bg) !important;
-            color: var(--color-warning-text) !important;
-            padding: 0.15rem 0.625rem !important;
-            border-radius: var(--radius-full) !important;
-            font-size: 0.625rem !important;
-            font-weight: var(--font-weight-medium) !important;
-            display: inline-block !important;
-        }
-        .status-cancelled {
-            background: var(--color-error-bg) !important;
-            color: var(--color-error-text) !important;
-            padding: 0.15rem 0.625rem !important;
-            border-radius: var(--radius-full) !important;
-            font-size: 0.625rem !important;
-            font-weight: var(--font-weight-medium) !important;
-            display: inline-block !important;
-        }
+        /* ─── Status Badges ─── */
+        .status-paid { background: #e8f5e2 !important; color: #4a8c3a !important; padding: 0.15rem 0.625rem !important; border-radius: var(--radius-full) !important; font-size: 0.625rem !important; font-weight: var(--font-weight-medium) !important; display: inline-block !important; }
+        .status-pending { background: #fef3dd !important; color: #9a6a10 !important; padding: 0.15rem 0.625rem !important; border-radius: var(--radius-full) !important; font-size: 0.625rem !important; font-weight: var(--font-weight-medium) !important; display: inline-block !important; }
+        .status-partial { background: #e2f0fb !important; color: #2a72b5 !important; padding: 0.15rem 0.625rem !important; border-radius: var(--radius-full) !important; font-size: 0.625rem !important; font-weight: var(--font-weight-medium) !important; display: inline-block !important; }
+        .status-cancelled { background: #fee2e2 !important; color: #ef4444 !important; padding: 0.15rem 0.625rem !important; border-radius: var(--radius-full) !important; font-size: 0.625rem !important; font-weight: var(--font-weight-medium) !important; display: inline-block !important; }
+        .status-overdue { background: #fee2e2 !important; color: #dc2626 !important; padding: 0.15rem 0.625rem !important; border-radius: var(--radius-full) !important; font-size: 0.625rem !important; font-weight: var(--font-weight-medium) !important; display: inline-block !important; animation: pulse-status 2s infinite !important; }
+        @keyframes pulse-status { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
-        /* 🔥 Action Buttons - Perfect */
+        /* ─── Action Buttons ─── */
         .action-btn {
             display: inline-flex !important;
             align-items: center !important;
@@ -309,144 +332,181 @@
             transition: all 0.2s ease !important;
             font-size: 0.75rem !important;
         }
-        .action-btn i {
-            font-size: 0.75rem !important;
-        }
         .action-btn:hover {
-            background-color: var(--bg-hover) !important;
+            background: var(--bg-hover) !important;
             color: var(--color-brown-600) !important;
             border-color: var(--color-brown-100) !important;
         }
-        .action-btn.view:hover {
-            color: var(--color-gold) !important;
-            border-color: var(--color-gold) !important;
-            background: #fefce8 !important;
-        }
-        .action-btn.pay:hover {
-            color: #10b981 !important;
-            border-color: #10b981 !important;
-            background: #ecfdf5 !important;
-        }
-        .action-btn.edit:hover {
-            color: var(--color-sage) !important;
-            border-color: var(--color-sage) !important;
-            background: #eef7ea !important;
-        }
-        .action-btn.delete:hover {
-            color: #dc2626 !important;
-            border-color: #dc2626 !important;
-            background: #fee2e2 !important;
-        }
+        .action-btn.view:hover { color: var(--color-gold) !important; border-color: var(--color-gold) !important; background: #fefce8 !important; }
+        .action-btn.pay:hover { color: #10b981 !important; border-color: #10b981 !important; background: #ecfdf5 !important; }
+        .action-btn.edit:hover { color: var(--color-sage) !important; border-color: var(--color-sage) !important; background: #eef7ea !important; }
+        .action-btn.delete:hover { color: #dc2626 !important; border-color: #dc2626 !important; background: #fee2e2 !important; }
+        .action-btn.print:hover { color: #6366f1 !important; border-color: #6366f1 !important; background: #eef2ff !important; }
+        .action-btn.email:hover { color: #8b5cf6 !important; border-color: #8b5cf6 !important; background: #f5f3ff !important; }
 
-        /* 🔥 Cell Styles */
-        .invoice-no {
-            font-family: 'Courier New', monospace !important;
-            font-size: 0.75rem !important;
-            font-weight: var(--font-weight-medium) !important;
-            color: var(--color-brown-600) !important;
-        }
-        .patient-name {
-            font-weight: var(--font-weight-medium) !important;
-            color: var(--color-brown-700) !important;
-            font-size: 0.8125rem !important;
-        }
-        .total-amount {
-            font-weight: var(--font-weight-semibold) !important;
-            color: var(--color-sage-dark) !important;
-            font-size: 0.8125rem !important;
-        }
-        .type-badge {
-            padding: 0.1rem 0.5rem !important;
-            border-radius: var(--radius-full) !important;
-            font-size: 0.625rem !important;
-            font-weight: var(--font-weight-medium) !important;
-            background: var(--bg-muted) !important;
-            color: var(--color-brown-300) !important;
-            display: inline-block !important;
-        }
+        /* ─── Cell Styles ─── */
+        .invoice-no { font-family: 'Courier New', monospace !important; font-size: 0.75rem !important; font-weight: var(--font-weight-medium) !important; color: var(--color-brown-600) !important; }
+        .patient-name { font-weight: var(--font-weight-medium) !important; color: var(--color-brown-700) !important; font-size: 0.8125rem !important; }
+        .total-amount { font-weight: var(--font-weight-semibold) !important; color: var(--color-sage-dark) !important; font-size: 0.8125rem !important; }
+        .type-badge { padding: 0.1rem 0.5rem !important; border-radius: var(--radius-full) !important; font-size: 0.625rem !important; font-weight: var(--font-weight-medium) !important; background: var(--bg-muted) !important; color: var(--color-brown-300) !important; display: inline-block !important; }
 
-        /* 🔥 Pagination - Perfect */
-        .pagination-info {
-            font-size: 0.75rem !important;
-            color: var(--color-brown-100) !important;
-            font-weight: var(--font-weight-light) !important;
-        }
+        /* ─── Pagination ─── */
+        .pagination-info { font-size: 0.75rem !important; color: var(--color-brown-100) !important; font-weight: var(--font-weight-light) !important; }
         .pagination-btn {
             padding: 0.25rem 0.75rem !important;
             border-radius: var(--radius-md) !important;
             font-size: 0.8125rem !important;
             font-weight: var(--font-weight-light) !important;
             border: 1px solid var(--border-default) !important;
-            background-color: var(--bg-card) !important;
+            background: var(--bg-card) !important;
             color: var(--color-brown-300) !important;
             cursor: pointer !important;
             transition: all 0.2s ease !important;
         }
-        .pagination-btn:hover {
-            background-color: var(--bg-hover) !important;
-            color: var(--color-brown-600) !important;
-        }
-        .pagination-btn.active {
-            background-color: var(--color-sage) !important;
-            color: white !important;
-            border-color: var(--color-sage) !important;
-        }
+        .pagination-btn:hover { background: var(--bg-hover) !important; color: var(--color-brown-600) !important; }
+        .pagination-btn.active { background: var(--color-sage) !important; color: white !important; border-color: var(--color-sage) !important; }
 
-        /* 🔥 Stat Card Border Colors */
-        .stat-card-blue { border-left: 4px solid #3b82f6 !important; }
-        .stat-card-green { border-left: 4px solid var(--color-success-text) !important; }
-        .stat-card-orange { border-left: 4px solid var(--color-warning-text) !important; }
-        .stat-card-purple { border-left: 4px solid #9333ea !important; }
-
-        /* 🔥 Delete Icon */
-        .delete-icon-circle {
-            width: 3.5rem !important;
-            height: 3.5rem !important;
-            border-radius: 50% !important;
-            background-color: #fee2e2 !important;
-            display: flex !important;
+        /* ─── Modal ─── */
+        .modal-overlay {
+            position: fixed !important;
+            inset: 0 !important;
+            background: rgba(0, 0, 0, 0.5) !important;
+            backdrop-filter: blur(4px) !important;
+            display: none !important;
             align-items: center !important;
             justify-content: center !important;
-            margin: 0 auto 1rem !important;
-            color: #dc2626 !important;
-            font-size: 1.25rem !important;
+            z-index: 9999 !important;
+            padding: 1rem !important;
         }
-
-        /* 🔥 Error Text */
-        .error-text {
-            color: var(--color-error-text) !important;
-            font-size: 0.6875rem !important;
-            margin-top: 0.25rem !important;
-            display: none !important;
-            font-weight: var(--font-weight-light) !important;
-        }
-        .error-text.show {
-            display: block !important;
-        }
-        .form-input.error,
-        .form-select.error {
-            border-color: var(--color-error-text) !important;
-        }
-
-        /* 🔥 Modal */
+        .modal-overlay.active { display: flex !important; }
         .form-card {
+            background: var(--bg-card) !important;
+            border-radius: var(--radius-lg) !important;
+            box-shadow: var(--shadow-lg) !important;
+            max-width: 780px !important;
+            width: 100% !important;
+            max-height: 90vh !important;
+            overflow-y: auto !important;
+            padding: 1.5rem !important;
             border-top: 4px solid var(--color-sage) !important;
         }
-        .modal-body {
-            padding: 1.25rem !important;
+        .form-card-wide { max-width: 860px !important; }
+        .modal-header {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 1.25rem !important;
+            padding-bottom: 0.75rem !important;
+            border-bottom: 1px solid var(--border-default) !important;
         }
+        .modal-title {
+            font-size: 1rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+        .close-btn {
+            background: none !important;
+            border: none !important;
+            color: var(--color-brown-100) !important;
+            font-size: 1.125rem !important;
+            cursor: pointer !important;
+            padding: 0.25rem !important;
+            transition: all 0.2s ease !important;
+        }
+        .close-btn:hover { color: var(--color-brown-600) !important; transform: rotate(90deg) !important; }
+        .modal-body { margin-bottom: 1.25rem !important; }
         .modal-footer {
-            padding: 0.75rem 1.25rem !important;
-            background-color: var(--bg-subtle) !important;
-            border-top: 1px solid var(--border-default) !important;
             display: flex !important;
             justify-content: flex-end !important;
             gap: 0.75rem !important;
+            padding-top: 0.75rem !important;
+            border-top: 1px solid var(--border-default) !important;
         }
 
-        /* 🔥 Calculation Box */
+        /* ─── Form ─── */
+        .form-group { margin-bottom: 1rem !important; }
+        .form-label {
+            display: block !important;
+            font-size: 0.6875rem !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-200) !important;
+            letter-spacing: 0.03em !important;
+            margin-bottom: 0.25rem !important;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100% !important;
+            padding: 0.625rem 1rem !important;
+            border: 1px solid var(--border-input) !important;
+            border-radius: var(--radius-md) !important;
+            font-family: var(--font-family) !important;
+            font-size: 0.875rem !important;
+            color: var(--color-brown-700) !important;
+            background: var(--bg-card) !important;
+            outline: none !important;
+            transition: all 0.2s ease !important;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+        }
+        .form-textarea { resize: vertical !important; min-height: 80px !important; }
+        .form-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 1rem 1.5rem !important;
+        }
+        .form-grid .full-width { grid-column: 1 / -1 !important; }
+        @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr !important; } }
+
+        /* ─── Services Container ─── */
+        .services-container {
+            background: var(--bg-subtle) !important;
+            border-radius: var(--radius-md) !important;
+            padding: 0.75rem !important;
+            border: 1px solid var(--border-default) !important;
+            max-height: 200px !important;
+            overflow-y: auto !important;
+        }
+        .services-container .service-item {
+            display: flex !important;
+            justify-content: space-between !important;
+            padding: 0.3rem 0 !important;
+            border-bottom: 1px solid var(--border-default) !important;
+            font-size: 0.8rem !important;
+        }
+        .services-container .service-item:last-child { border-bottom: none !important; }
+        .services-container .service-total {
+            display: flex !important;
+            justify-content: space-between !important;
+            padding: 0.5rem 0 !important;
+            border-top: 2px solid var(--color-sage) !important;
+            font-weight: var(--font-weight-semibold) !important;
+            margin-top: 0.25rem !important;
+        }
+
+        /* ─── GST Details ─── */
+        .gst-details {
+            background: var(--bg-subtle) !important;
+            border-radius: var(--radius-md) !important;
+            padding: 0.75rem !important;
+            border: 1px solid var(--border-default) !important;
+            margin-top: 0.5rem !important;
+        }
+        .gst-details .gst-row {
+            display: flex !important;
+            justify-content: space-between !important;
+            font-size: 0.75rem !important;
+            padding: 0.125rem 0 !important;
+        }
+        .gst-details .gst-row .label { color: var(--color-brown-200) !important; }
+        .gst-details .gst-row .value { color: var(--color-brown-700) !important; font-weight: var(--font-weight-medium) !important; }
+
+        /* ─── Calculation Box ─── */
         .calculation-box {
-            background-color: var(--bg-subtle) !important;
+            background: var(--bg-subtle) !important;
             border-radius: var(--radius-md) !important;
             padding: 0.75rem 1rem !important;
             border: 1px solid var(--border-default) !important;
@@ -458,31 +518,27 @@
             font-size: 0.8125rem !important;
             padding: 0.125rem 0 !important;
         }
-        .calculation-box .calc-row .label {
-            color: var(--color-brown-200) !important;
-            font-weight: var(--font-weight-light) !important;
-        }
-        .calculation-box .calc-row .value {
-            color: var(--color-brown-700) !important;
-            font-weight: var(--font-weight-medium) !important;
-        }
+        .calculation-box .calc-row .label { color: var(--color-brown-200) !important; font-weight: var(--font-weight-light) !important; }
+        .calculation-box .calc-row .value { color: var(--color-brown-700) !important; font-weight: var(--font-weight-medium) !important; }
         .calculation-box .calc-row.total {
             border-top: 1px solid var(--border-default) !important;
             padding-top: 0.5rem !important;
             margin-top: 0.25rem !important;
             font-weight: var(--font-weight-semibold) !important;
         }
-        .calculation-box .calc-row.total .value {
-            color: var(--color-sage-dark) !important;
-            font-size: 1rem !important;
-        }
+        .calculation-box .calc-row.total .value { color: var(--color-sage-dark) !important; font-size: 1rem !important; }
 
-        /* 🔥 Buttons */
+        /* ─── Error Text ─── */
+        .error-text { color: var(--color-error-text) !important; font-size: 0.6875rem !important; margin-top: 0.25rem !important; display: none !important; font-weight: var(--font-weight-light) !important; }
+        .error-text.show { display: block !important; }
+        .form-input.error, .form-select.error { border-color: var(--color-error-text) !important; }
+
+        /* ─── Buttons ─── */
         .btn-success {
             display: inline-flex !important;
             align-items: center !important;
             gap: 0.375rem !important;
-            background-color: var(--color-sage) !important;
+            background: var(--color-sage) !important;
             color: white !important;
             font-family: var(--font-family) !important;
             font-size: 0.8125rem !important;
@@ -494,15 +550,15 @@
             transition: all 0.2s ease !important;
         }
         .btn-success:hover {
-            background-color: var(--color-sage-dark) !important;
-            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+            background: var(--color-sage-dark) !important;
             transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
         }
         .btn-danger {
             display: inline-flex !important;
             align-items: center !important;
             gap: 0.375rem !important;
-            background-color: #ef4444 !important;
+            background: #ef4444 !important;
             color: white !important;
             font-family: var(--font-family) !important;
             font-size: 0.8125rem !important;
@@ -514,8 +570,122 @@
             transition: all 0.2s ease !important;
         }
         .btn-danger:hover {
-            background-color: #dc2626 !important;
+            background: #dc2626 !important;
+            transform: translateY(-1px) !important;
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
+        }
+
+        /* ─── Delete Modal ─── */
+        .delete-icon-circle {
+            width: 3.5rem !important;
+            height: 3.5rem !important;
+            border-radius: 50% !important;
+            background: #fee2e2 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 auto 1rem !important;
+            color: #dc2626 !important;
+            font-size: 1.25rem !important;
+        }
+
+        /* ─── Invoice Print Area ─── */
+        .invoice-print {
+            font-family: 'Segoe UI', Arial, sans-serif !important;
+            color: #333 !important;
+        }
+        .invoice-print .invoice-header {
+            text-align: center !important;
+            border-bottom: 2px solid #4a8c3a !important;
+            padding-bottom: 1rem !important;
+            margin-bottom: 1.25rem !important;
+        }
+        .invoice-print .invoice-header .hospital-name {
+            font-size: 1.25rem !important;
+            font-weight: bold !important;
+            color: #3a7a2a !important;
+        }
+        .invoice-print .invoice-header .hospital-details {
+            font-size: 0.75rem !important;
+            color: #666 !important;
+            margin-top: 0.25rem !important;
+        }
+        .invoice-print .invoice-info {
+            display: flex !important;
+            justify-content: space-between !important;
+            margin-bottom: 1.25rem !important;
+        }
+        .invoice-print .invoice-info .info-block { font-size: 0.8125rem !important; }
+        .invoice-print .invoice-info .info-block strong { color: #333 !important; }
+        .invoice-print .invoice-info .info-block span { color: #666 !important; }
+        .invoice-print .invoice-table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            margin-bottom: 1rem !important;
+        }
+        .invoice-print .invoice-table th {
+            background: #f5f5f5 !important;
+            padding: 0.5rem !important;
+            text-align: left !important;
+            font-size: 0.75rem !important;
+            font-weight: 600 !important;
+            color: #333 !important;
+        }
+        .invoice-print .invoice-table td {
+            padding: 0.5rem !important;
+            font-size: 0.8125rem !important;
+            color: #555 !important;
+            border-bottom: 1px solid #eee !important;
+        }
+        .invoice-print .invoice-totals {
+            margin-top: 0.5rem !important;
+        }
+        .invoice-print .invoice-totals .total-row {
+            display: flex !important;
+            justify-content: flex-end !important;
+            padding: 0.25rem 0 !important;
+            font-size: 0.8125rem !important;
+        }
+        .invoice-print .invoice-totals .total-row .label {
+            width: 150px !important;
+            text-align: right !important;
+            color: #666 !important;
+            padding-right: 1rem !important;
+        }
+        .invoice-print .invoice-totals .total-row .value {
+            width: 120px !important;
+            text-align: right !important;
+            font-weight: 500 !important;
+        }
+        .invoice-print .invoice-totals .total-row.grand-total {
+            border-top: 2px solid #4a8c3a !important;
+            padding-top: 0.5rem !important;
+            margin-top: 0.25rem !important;
+        }
+        .invoice-print .invoice-totals .total-row.grand-total .value {
+            font-size: 1.125rem !important;
+            font-weight: 700 !important;
+            color: #3a7a2a !important;
+        }
+        .invoice-print .invoice-footer {
+            text-align: center !important;
+            font-size: 0.6875rem !important;
+            color: #999 !important;
+            border-top: 1px solid #ddd !important;
+            padding-top: 1rem !important;
+            margin-top: 1rem !important;
+        }
+
+        /* ─── Reminder Badge ─── */
+        .reminder-badge {
+            background: #fee2e2 !important;
+            color: #dc2626 !important;
+            padding: 0.1rem 0.4rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.5rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            margin-left: 0.25rem !important;
+            animation: pulse-status 2s infinite !important;
         }
 
         @media print {
@@ -523,6 +693,16 @@
             body { background: white !important; margin: 0 !important; padding: 0 !important; }
             .invoice-print { padding: 20px !important; }
             .modal-overlay { display: none !important; }
+        }
+
+        .services-container::-webkit-scrollbar,
+        .form-card::-webkit-scrollbar {
+            width: 4px !important;
+        }
+        .services-container::-webkit-scrollbar-thumb,
+        .form-card::-webkit-scrollbar-thumb {
+            background: var(--border-default) !important;
+            border-radius: var(--radius-full) !important;
         }
     </style>
 </head>
@@ -533,50 +713,49 @@
 
     <main class="main-content" id="mainContent">
         
-        <!-- Stats Cards -->
+        <!-- Page Header -->
+        <div class="page-header-custom">
+            <div>
+                <h1><i class="fas fa-file-invoice"></i> Invoices</h1>
+                <p>Manage patient invoices, payments, and financial tracking</p>
+            </div>
+            <div class="header-actions">
+                <button id="generateFromPatientBtn" class="btn-header btn-header-secondary">
+                    <i class="fas fa-magic"></i> Auto-Generate
+                </button>
+                <button id="createInvoiceBtn" class="btn-header btn-header-primary">
+                    <i class="fas fa-plus"></i> New Invoice
+                </button>
+                <button id="refreshBtn" class="btn-header btn-header-secondary">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats -->
         <div class="grid-stats">
             <div class="stat-card stat-card-blue">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Total Invoices</p>
-                        <p class="stat-value" id="totalInvoices">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-file-invoice" style="color:#3b82f6;"></i>
-                    </div>
+                    <div><p class="stat-label">Total Invoices</p><p class="stat-value" id="totalInvoices">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-file-invoice" style="color:#3b82f6;"></i></div>
                 </div>
             </div>
             <div class="stat-card stat-card-green">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Total Revenue</p>
-                        <p class="stat-value" id="totalRevenue">₹0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-chart-line" style="color:var(--color-success-text);"></i>
-                    </div>
+                    <div><p class="stat-label">Total Revenue</p><p class="stat-value" id="totalRevenue">₹0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-chart-line" style="color:var(--color-success-text);"></i></div>
                 </div>
             </div>
             <div class="stat-card stat-card-orange">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Pending Amount</p>
-                        <p class="stat-value text-warning-text" id="pendingAmount">₹0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-clock" style="color:var(--color-warning-text);"></i>
-                    </div>
+                    <div><p class="stat-label">Pending Amount</p><p class="stat-value" id="pendingAmount">₹0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-clock" style="color:var(--color-warning-text);"></i></div>
                 </div>
             </div>
             <div class="stat-card stat-card-purple">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Collection Rate</p>
-                        <p class="stat-value" style="color:#9333ea;" id="collectionRate">0%</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-percent" style="color:#9333ea;"></i>
-                    </div>
+                    <div><p class="stat-label">Collection Rate</p><p class="stat-value" id="collectionRate">0%</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-percent" style="color:#9333ea;"></i></div>
                 </div>
             </div>
         </div>
@@ -591,17 +770,14 @@
                 <option value="">All Status</option>
                 <option value="Paid">Paid</option>
                 <option value="Pending">Pending</option>
+                <option value="Partial">Partial</option>
+                <option value="Overdue">Overdue</option>
                 <option value="Cancelled">Cancelled</option>
             </select>
             <input type="date" id="dateFrom" class="form-input" placeholder="From Date">
             <input type="date" id="dateTo" class="form-input" placeholder="To Date">
             <button id="resetFilter" class="btn-secondary">
-                <i class="fas fa-undo-alt"></i>
-                <span>Reset</span>
-            </button>
-            <button id="createInvoiceBtn" class="btn-primary">
-                <i class="fas fa-plus"></i>
-                <span>New Invoice</span>
+                <i class="fas fa-undo-alt"></i> <span>Reset</span>
             </button>
         </div>
 
@@ -617,7 +793,7 @@
                             <th style="width:110px; text-align:center;">Amount</th>
                             <th class="hidden lg:table-cell" style="width:90px;">Type</th>
                             <th style="width:110px;">Status</th>
-                            <th style="width:160px; text-align:center;">Actions</th>
+                            <th style="width:210px; text-align:center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="invoicesTableBody">
@@ -639,19 +815,17 @@
 
     <!-- Create/Edit Invoice Modal -->
     <div id="invoiceModal" class="modal-overlay" role="dialog" aria-modal="true">
-        <div class="form-card" style="max-width:48rem;">
+        <div class="form-card form-card-wide">
             <div class="modal-header">
                 <h3 class="modal-title" id="modalTitle">
                     <i class="fas fa-file-invoice"></i> Create New Invoice
                 </h3>
-                <button class="close-btn" id="closeModalBtn" aria-label="Close modal">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button class="close-btn" id="closeModalBtn"><i class="fas fa-times"></i></button>
             </div>
             <form id="invoiceForm">
                 <input type="hidden" id="invoiceId">
                 <div class="modal-body">
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem 1.5rem;">
+                    <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label">Select Patient <span style="color:var(--color-error-text);">*</span></label>
                             <select id="patientId" required class="form-select">
@@ -667,6 +841,8 @@
                                 <option value="Pharmacy">Pharmacy</option>
                                 <option value="Laboratory">Laboratory</option>
                                 <option value="Radiology">Radiology</option>
+                                <option value="Surgery">Surgery</option>
+                                <option value="Emergency">Emergency</option>
                             </select>
                             <span class="error-text" id="invoiceTypeError">Please select invoice type</span>
                         </div>
@@ -679,7 +855,20 @@
                             <label class="form-label">Due Date</label>
                             <input type="date" id="dueDate" class="form-input">
                         </div>
-                        <div class="form-group" style="grid-column:1 / -1;">
+                        <div class="form-group">
+                            <label class="form-label">GST Rate (%)</label>
+                            <select id="gstRate" class="form-select">
+                                <option value="0">0%</option>
+                                <option value="5" selected>5%</option>
+                                <option value="12">12%</option>
+                                <option value="18">18%</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">HSN Code</label>
+                            <input type="text" id="hsnCode" class="form-input" placeholder="999999" value="999999">
+                        </div>
+                        <div class="form-group full-width">
                             <label class="form-label">Description</label>
                             <textarea id="description" rows="2" class="form-textarea" placeholder="Consultation fee, medicines, lab tests..."></textarea>
                         </div>
@@ -687,10 +876,6 @@
                             <label class="form-label">Amount (₹) <span style="color:var(--color-error-text);">*</span></label>
                             <input type="number" id="amount" step="0.01" required class="form-input" placeholder="0.00" min="0">
                             <span class="error-text" id="amountError">Amount must be greater than 0</span>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Tax (%)</label>
-                            <input type="number" id="tax" step="0.01" value="0" class="form-input" placeholder="0">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Discount (₹)</label>
@@ -701,9 +886,16 @@
                             <select id="status" required class="form-select">
                                 <option value="Pending">Pending</option>
                                 <option value="Paid">Paid</option>
+                                <option value="Partial">Partial</option>
                                 <option value="Cancelled">Cancelled</option>
                             </select>
                             <span class="error-text" id="statusError">Please select status</span>
+                        </div>
+                        <div class="form-group" style="grid-column:1 / -1;">
+                            <label class="form-label">Services Breakdown</label>
+                            <div class="services-container" id="servicesContainer">
+                                <p style="color:var(--color-brown-100); font-size:0.8rem;">Select a patient to auto-load services</p>
+                            </div>
                         </div>
                     </div>
                     
@@ -713,7 +905,7 @@
                             <span class="value" id="subtotalDisplay">₹0.00</span>
                         </div>
                         <div class="calc-row">
-                            <span class="label">Tax (<span id="taxRate">0</span>%):</span>
+                            <span class="label">GST (<span id="taxRate">5</span>%):</span>
                             <span class="value" id="taxAmountDisplay">₹0.00</span>
                         </div>
                         <div class="calc-row">
@@ -723,6 +915,21 @@
                         <div class="calc-row total">
                             <span class="label">Total Amount:</span>
                             <span class="value" id="totalDisplay">₹0.00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="gst-details" id="gstDetails">
+                        <div class="gst-row">
+                            <span class="label">CGST (2.5%):</span>
+                            <span class="value" id="cgstDisplay">₹0.00</span>
+                        </div>
+                        <div class="gst-row">
+                            <span class="label">SGST (2.5%):</span>
+                            <span class="value" id="sgstDisplay">₹0.00</span>
+                        </div>
+                        <div class="gst-row">
+                            <span class="label">HSN Code:</span>
+                            <span class="value" id="hsnDisplay">999999</span>
                         </div>
                     </div>
                 </div>
@@ -747,9 +954,10 @@
                     <button id="printInvoiceBtn" class="btn-secondary" style="padding:0.3rem 0.75rem; font-size:0.75rem;">
                         <i class="fas fa-print"></i> Print
                     </button>
-                    <button class="close-btn" id="closeViewModalBtn" aria-label="Close view modal">
-                        <i class="fas fa-times"></i>
+                    <button id="emailInvoiceBtn" class="btn-secondary" style="padding:0.3rem 0.75rem; font-size:0.75rem;">
+                        <i class="fas fa-envelope"></i> Email
                     </button>
+                    <button class="close-btn" id="closeViewModalBtn"><i class="fas fa-times"></i></button>
                 </div>
             </div>
             <div id="invoicePrintArea" class="modal-body invoice-print"></div>
@@ -766,9 +974,7 @@
                 <h3 class="modal-title">
                     <i class="fas fa-money-bill-wave" style="color:#10b981;"></i> Record Payment
                 </h3>
-                <button class="close-btn" id="closePaymentModalBtn" aria-label="Close payment modal">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button class="close-btn" id="closePaymentModalBtn"><i class="fas fa-times"></i></button>
             </div>
             <form id="paymentForm">
                 <input type="hidden" id="paymentInvoiceId">
@@ -804,6 +1010,47 @@
         </div>
     </div>
 
+    <!-- Generate from Patient Modal -->
+    <div id="generateModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="form-card" style="max-width:30rem;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-magic" style="color:var(--color-sage);"></i> Auto-Generate Invoice
+                </h3>
+                <button class="close-btn" id="closeGenerateModalBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Select Patient <span style="color:var(--color-error-text);">*</span></label>
+                    <select id="generatePatientId" required class="form-select">
+                        <option value="">-- Select Patient --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Select Services to Include</label>
+                    <div id="generateServicesList" style="max-height:150px; overflow-y:auto; border:1px solid var(--border-default); border-radius:var(--radius-md); padding:0.5rem;">
+                        <p style="color:var(--color-brown-100); font-size:0.8rem;">Select a patient to view services</p>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label">GST Rate</label>
+                    <select id="generateGstRate" class="form-select">
+                        <option value="0">0%</option>
+                        <option value="5" selected>5%</option>
+                        <option value="12">12%</option>
+                        <option value="18">18%</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cancelGenerateBtn" class="btn-secondary">Cancel</button>
+                <button type="button" id="confirmGenerateBtn" class="btn-primary">
+                    <i class="fas fa-magic"></i> Generate Invoice
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Delete Confirmation Modal -->
     <div id="deleteModal" class="modal-overlay modal-danger" role="dialog" aria-modal="true">
         <div class="form-card" style="max-width:26rem; border-top-color:#ef4444;">
@@ -811,26 +1058,16 @@
                 <h3 class="modal-title" style="color:var(--color-brown-700);">
                     <i class="fas fa-triangle-exclamation" style="color:#ef4444;"></i> Confirm Delete
                 </h3>
-                <button class="close-btn" id="closeDeleteModalBtn" aria-label="Close delete modal">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button class="close-btn" id="closeDeleteModalBtn"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body" style="text-align:center; padding:1.75rem 1.25rem;">
-                <div class="delete-icon-circle">
-                    <i class="fas fa-trash-alt"></i>
-                </div>
-                <p style="font-size:0.9375rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin-bottom:0.5rem;">
-                    Delete Invoice?
-                </p>
-                <p style="font-size:0.8125rem; color:var(--color-brown-300); font-weight:var(--font-weight-light); line-height:1.6;">
-                    This action cannot be undone. This invoice will be permanently removed.
-                </p>
+                <div class="delete-icon-circle"><i class="fas fa-trash-alt"></i></div>
+                <p style="font-size:0.9375rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin-bottom:0.5rem;">Delete Invoice?</p>
+                <p style="font-size:0.8125rem; color:var(--color-brown-300); font-weight:var(--font-weight-light); line-height:1.6;">This action cannot be undone. This invoice will be permanently removed.</p>
             </div>
             <div class="modal-footer" style="justify-content:center;">
                 <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
-                <button id="confirmDeleteBtn" class="btn-danger">
-                    <i class="fas fa-trash-alt"></i> Delete
-                </button>
+                <button id="confirmDeleteBtn" class="btn-danger"><i class="fas fa-trash-alt"></i> Delete</button>
             </div>
         </div>
     </div>
