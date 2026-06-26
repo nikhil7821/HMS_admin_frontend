@@ -3,20 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Shifts | Staff Management | MedFlow</title>
+    <title>Staff List | Staff Management | MedFlow</title>
     
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Theme CSS -->
     <link rel="stylesheet" href="../../css/theme.css">
 
     <style>
-        /* ============================================================
-           SHIFTS MODULE — Page-specific only
-           ============================================================ */
-
-        /* 🔥 FIX: Prevent layout shift */
         .main-content {
             margin-left: 260px !important;
             margin-top: 70px !important;
@@ -26,47 +18,101 @@
             opacity: 0;
             animation: fadeIn 0.3s ease forwards;
         }
-        .main-content.loaded {
-            opacity: 1;
-        }
+        .main-content.loaded { opacity: 1; }
         #mainSidebar[data-collapsed="true"] ~ .main-content,
         #mainSidebar[data-collapsed="true"] + .main-content {
             margin-left: 72px !important;
         }
         @media (max-width: 1024px) {
-            .main-content {
-                margin-left: 0 !important;
-                padding: 1rem !important;
-            }
+            .main-content { margin-left: 0 !important; padding: 1rem !important; }
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 🔥 Page Header - Hidden */
-        .page-header {
-            display: none !important;
+        .page-header-custom {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 1.25rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.75rem !important;
+        }
+        .page-header-custom h1 {
+            font-size: 1.375rem !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-700) !important;
+            margin: 0 !important;
+        }
+        .page-header-custom h1 i { color: var(--color-sage) !important; margin-right: 0.5rem !important; }
+        .page-header-custom p { font-size: 0.75rem !important; color: var(--color-brown-100) !important; margin: 0 !important; }
+
+        .header-actions { display: flex !important; gap: 0.5rem !important; flex-wrap: wrap !important; }
+        .btn-header {
+            padding: 0.4rem 0.85rem !important;
+            font-size: 0.8rem !important;
+            border-radius: var(--radius-md) !important;
+            font-family: var(--font-family) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            border: none !important;
+        }
+        .btn-header-primary {
+            background: var(--color-sage) !important;
+            color: white !important;
+        }
+        .btn-header-primary:hover {
+            background: var(--color-sage-dark) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+        }
+        .btn-header-secondary {
+            background: var(--bg-card) !important;
+            color: var(--color-brown-200) !important;
+            border: 1px solid var(--border-input) !important;
+        }
+        .btn-header-secondary:hover {
+            background: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+        }
+        .btn-header-success {
+            background: var(--color-success-text) !important;
+            color: white !important;
+        }
+        .btn-header-success:hover {
+            background: #059669 !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
         }
 
-        /* 🔥 Stats Cards - Perfect Spacing */
         .grid-stats {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
             gap: 1rem !important;
             margin-bottom: 1.25rem !important;
         }
         .stat-card {
-            padding: 1rem 1.25rem !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
             border-radius: var(--radius-lg) !important;
+            padding: 1rem 1.25rem !important;
+            transition: all 0.2s ease !important;
         }
+        .stat-card:hover { transform: translateY(-2px) !important; box-shadow: var(--shadow-md) !important; }
         .stat-card .stat-value {
             font-size: 1.5rem !important;
             font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
             margin-top: 0.125rem !important;
         }
         .stat-card .stat-label {
             font-size: 0.625rem !important;
-            letter-spacing: 0.06em !important;
             text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
             color: var(--color-brown-200) !important;
         }
         .stat-card .stat-icon-bg {
@@ -78,26 +124,29 @@
             justify-content: center !important;
             background: var(--bg-muted) !important;
         }
-        .stat-card .stat-icon-bg i {
-            font-size: 1rem !important;
-        }
+        .stat-card .stat-icon-bg i { font-size: 1rem !important; }
+        .stat-card-blue { border-left: 4px solid #3b82f6 !important; }
+        .stat-card-green { border-left: 4px solid var(--color-success-text) !important; }
+        .stat-card-purple { border-left: 4px solid #9333ea !important; }
+        .stat-card-orange { border-left: 4px solid var(--color-warning-text) !important; }
+        .text-success-text { color: var(--color-success-text) !important; }
+        .text-warning-text { color: var(--color-warning-text) !important; }
 
-        /* 🔥 Filter Bar - Perfect Alignment */
         .filter-bar {
-            padding: 0.625rem 1rem !important;
-            gap: 0.625rem !important;
-            margin-bottom: 1.25rem !important;
-            border-radius: var(--radius-lg) !important;
-            background: var(--bg-card) !important;
-            border: 1px solid var(--border-default) !important;
             display: flex !important;
             align-items: center !important;
-            flex-wrap: wrap !important;
+            flex-wrap: nowrap !important;
+            gap: 0.625rem !important;
+            padding: 0.625rem 1rem !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-lg) !important;
+            margin-bottom: 1.25rem !important;
         }
         .filter-bar .search-wrapper {
             flex: 1 1 200px !important;
             min-width: 150px !important;
-            max-width: 280px !important;
+            max-width: 320px !important;
             position: relative !important;
         }
         .filter-bar .search-wrapper i {
@@ -105,7 +154,7 @@
             left: 0.75rem !important;
             top: 50% !important;
             transform: translateY(-50%) !important;
-            color: var(--color-brown-100);
+            color: var(--color-brown-100) !important;
             font-size: 0.8125rem !important;
             pointer-events: none !important;
             z-index: 1 !important;
@@ -115,34 +164,40 @@
             padding: 0.375rem 0.75rem 0.375rem 2.25rem !important;
             font-size: 0.8125rem !important;
             height: 36px !important;
-            border-radius: var(--radius-md) !important;
             border: 1px solid var(--border-input) !important;
-            background-color: var(--bg-card) !important;
+            border-radius: var(--radius-md) !important;
+            background: var(--bg-card) !important;
             color: var(--color-brown-700) !important;
             font-family: var(--font-family) !important;
+            outline: none !important;
+            transition: all 0.2s ease !important;
         }
         .filter-bar .search-input:focus {
             border-color: var(--color-sage-light) !important;
             box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
-            outline: none !important;
         }
         .filter-bar .form-select {
-            min-width: 130px !important;
-            max-width: 160px !important;
+            min-width: 120px !important;
+            max-width: 180px !important;
             padding: 0.375rem 1.75rem 0.375rem 0.75rem !important;
             font-size: 0.8125rem !important;
             height: 36px !important;
             border: 1px solid var(--border-input) !important;
             border-radius: var(--radius-md) !important;
-            background-color: var(--bg-card) !important;
+            background: var(--bg-card) !important;
             color: var(--color-brown-700) !important;
-            cursor: pointer !important;
             font-family: var(--font-family) !important;
+            outline: none !important;
+            cursor: pointer !important;
+            appearance: none !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b8aa9a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 0.625rem center !important;
+            background-size: 10px !important;
         }
         .filter-bar .form-select:focus {
             border-color: var(--color-sage-light) !important;
             box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
-            outline: none !important;
         }
         .filter-bar .btn-primary,
         .filter-bar .btn-secondary {
@@ -157,101 +212,118 @@
             white-space: nowrap !important;
             font-family: var(--font-family) !important;
             cursor: pointer !important;
+            transition: all 0.2s ease !important;
         }
         .filter-bar .btn-primary {
-            background-color: var(--color-sage) !important;
+            background: var(--color-sage) !important;
             color: white !important;
             border: none !important;
         }
         .filter-bar .btn-primary:hover {
-            background-color: var(--color-sage-dark) !important;
-            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+            background: var(--color-sage-dark) !important;
             transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
         }
         .filter-bar .btn-secondary {
-            background-color: transparent !important;
+            background: transparent !important;
             color: var(--color-brown-200) !important;
             border: 1px solid var(--border-input) !important;
         }
         .filter-bar .btn-secondary:hover {
-            background-color: var(--bg-hover) !important;
+            background: var(--bg-hover) !important;
             color: var(--color-brown-600) !important;
             border-color: var(--color-brown-100) !important;
         }
 
         @media (max-width: 768px) {
-            .filter-bar {
-                flex-direction: column !important;
-                align-items: stretch !important;
-                gap: 0.5rem !important;
-                padding: 0.75rem !important;
-            }
-            .filter-bar .search-wrapper {
-                max-width: 100% !important;
-            }
-            .filter-bar .form-select {
-                max-width: 100% !important;
-            }
+            .filter-bar { flex-wrap: wrap !important; gap: 0.5rem !important; padding: 0.5rem 0.75rem !important; }
+            .filter-bar .search-wrapper { flex: 1 1 100% !important; min-width: 100px !important; max-width: 100% !important; }
+            .filter-bar .form-select { min-width: 90px !important; max-width: 140px !important; font-size: 0.75rem !important; height: 32px !important; }
             .filter-bar .btn-primary span,
-            .filter-bar .btn-secondary span {
-                display: none !important;
-            }
-            .data-table th,
-            .data-table td {
-                padding: 0.5rem 0.5rem !important;
-                font-size: 0.6875rem !important;
-            }
+            .filter-bar .btn-secondary span { display: none !important; }
+            .filter-bar .btn-primary,
+            .filter-bar .btn-secondary { padding: 0.3rem 0.6rem !important; font-size: 0.75rem !important; height: 32px !important; }
+            .grid-stats { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 480px) { .grid-stats { grid-template-columns: 1fr !important; } }
+
+        .staff-grid {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+        }
+        @media (min-width: 640px) {
+            .staff-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (min-width: 1024px) {
+            .staff-grid { grid-template-columns: repeat(3, 1fr) !important; }
+        }
+        @media (min-width: 1280px) {
+            .staff-grid { grid-template-columns: repeat(4, 1fr) !important; }
         }
 
-        /* 🔥 Table - Perfect Alignment */
-        .card-white {
-            border-radius: var(--radius-lg) !important;
+        .staff-card {
+            background: var(--bg-card) !important;
             border: 1px solid var(--border-default) !important;
-            overflow: hidden !important;
-            margin-top: 0 !important;
+            border-radius: var(--radius-lg) !important;
+            padding: 1rem 1.25rem !important;
+            transition: all 0.25s ease !important;
+            box-shadow: var(--shadow-card) !important;
         }
-        .table-wrapper {
-            overflow-x: auto !important;
-            -webkit-overflow-scrolling: touch !important;
+        .staff-card:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: var(--shadow-md) !important;
+            border-color: var(--color-sage-pale) !important;
         }
-        .data-table {
-            width: 100% !important;
-            border-collapse: collapse !important;
-            font-size: 0.8125rem !important;
-        }
-        .data-table thead {
-            background-color: var(--bg-muted) !important;
-            border-bottom: 1px solid var(--border-default) !important;
-        }
-        .data-table th {
-            padding: 0.625rem 1rem !important;
-            text-align: left !important;
+        .staff-card .staff-avatar {
+            width: 2.5rem !important;
+            height: 2.5rem !important;
+            background: linear-gradient(135deg, var(--color-sage) 0%, var(--color-sage-dark) 100%) !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: white !important;
+            font-size: 0.75rem !important;
             font-weight: var(--font-weight-medium) !important;
-            color: var(--color-brown-300) !important;
-            font-size: 0.625rem !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.06em !important;
+            flex-shrink: 0 !important;
         }
-        .data-table td {
-            padding: 0.625rem 1rem !important;
+        .staff-card .staff-name {
+            font-weight: var(--font-weight-medium) !important;
             color: var(--color-brown-700) !important;
-            vertical-align: middle !important;
-            border-bottom: 1px solid var(--border-default) !important;
+            font-size: 0.875rem !important;
+            margin: 0 !important;
         }
-        .data-table tbody tr:last-child td {
-            border-bottom: none !important;
+        .staff-card .staff-id {
+            font-size: 0.625rem !important;
+            color: var(--color-brown-100) !important;
+            margin: 0 !important;
+        }
+        .staff-card .staff-info-row {
+            display: flex !important;
+            justify-content: space-between !important;
+            font-size: 0.6875rem !important;
+            padding: 0.125rem 0 !important;
+        }
+        .staff-card .staff-info-row .label {
+            color: var(--color-brown-100) !important;
+        }
+        .staff-card .staff-info-row .value {
+            color: var(--color-brown-700) !important;
+            font-weight: var(--font-weight-medium) !important;
+        }
+        .staff-card .staff-qualifications {
+            font-size: 0.625rem !important;
+            color: var(--color-brown-100) !important;
+            padding-top: 0.5rem !important;
+            margin-top: 0.5rem !important;
+            border-top: 1px solid var(--border-default) !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+            white-space: nowrap !important;
         }
 
-        /* 🔥 Table Row */
-        .shift-row {
-            transition: var(--transition-base) !important;
-        }
-        .shift-row:hover {
-            background-color: var(--bg-subtle) !important;
-        }
-
-        /* 🔥 Shift Type Badges */
-        .shift-morning {
+        .status-badge-active {
             background: var(--color-success-bg) !important;
             color: var(--color-success-text) !important;
             padding: 0.15rem 0.625rem !important;
@@ -260,7 +332,16 @@
             font-weight: var(--font-weight-medium) !important;
             display: inline-block !important;
         }
-        .shift-evening {
+        .status-badge-inactive {
+            background: var(--color-error-bg) !important;
+            color: var(--color-error-text) !important;
+            padding: 0.15rem 0.625rem !important;
+            border-radius: var(--radius-full) !important;
+            font-size: 0.625rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            display: inline-block !important;
+        }
+        .status-badge-leave {
             background: var(--color-warning-bg) !important;
             color: var(--color-warning-text) !important;
             padding: 0.15rem 0.625rem !important;
@@ -269,16 +350,8 @@
             font-weight: var(--font-weight-medium) !important;
             display: inline-block !important;
         }
-        .shift-night {
-            background: var(--color-info-bg) !important;
-            color: var(--color-info-text) !important;
-            padding: 0.15rem 0.625rem !important;
-            border-radius: var(--radius-full) !important;
-            font-size: 0.625rem !important;
-            font-weight: var(--font-weight-medium) !important;
-            display: inline-block !important;
-        }
-        .shift-general {
+
+        .role-badge {
             background: var(--bg-muted) !important;
             color: var(--color-brown-400) !important;
             padding: 0.15rem 0.625rem !important;
@@ -288,90 +361,144 @@
             display: inline-block !important;
         }
 
-        /* 🔥 Day Badge */
-        .day-badge {
-            background: var(--bg-muted) !important;
-            color: var(--color-brown-400) !important;
-            padding: 0.15rem 0.625rem !important;
-            border-radius: var(--radius-full) !important;
-            font-size: 0.625rem !important;
-            font-weight: var(--font-weight-medium) !important;
-            display: inline-block !important;
-        }
-
-        /* 🔥 Action Buttons */
-        .action-btn {
+        .card-btn {
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
-            width: 2rem !important;
-            height: 2rem !important;
-            border-radius: var(--radius-sm) !important;
-            border: 1px solid var(--border-default) !important;
-            background: var(--bg-card) !important;
-            color: var(--color-brown-200) !important;
+            gap: 0.375rem !important;
+            padding: 0.375rem 0.75rem !important;
+            border-radius: var(--radius-md) !important;
+            font-size: 0.6875rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            border: none !important;
             cursor: pointer !important;
             transition: all 0.2s ease !important;
-            font-size: 0.75rem !important;
+            font-family: var(--font-family) !important;
+            flex: 1 !important;
         }
-        .action-btn i {
-            font-size: 0.75rem !important;
+        .card-btn-primary {
+            background: var(--color-sage) !important;
+            color: white !important;
         }
-        .action-btn:hover {
-            background-color: var(--bg-hover) !important;
-            color: var(--color-brown-600) !important;
-            border-color: var(--color-brown-100) !important;
+        .card-btn-primary:hover {
+            background: var(--color-sage-dark) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
         }
-        .action-btn.edit:hover {
-            color: var(--color-sage) !important;
-            border-color: var(--color-sage) !important;
-            background: #eef7ea !important;
+        .card-btn-danger {
+            background: var(--color-warm-tan) !important;
+            color: white !important;
         }
-        .action-btn.delete:hover {
-            color: #dc2626 !important;
-            border-color: #dc2626 !important;
-            background: #fee2e2 !important;
-        }
-
-        /* 🔥 Cell Styles */
-        .staff-name {
-            font-weight: var(--font-weight-medium) !important;
-            color: var(--color-brown-700) !important;
-            font-size: 0.875rem !important;
-        }
-        .staff-role {
-            font-size: 0.8125rem !important;
-            color: var(--color-brown-300) !important;
-        }
-        .shift-time {
-            font-size: 0.75rem !important;
-            color: var(--color-brown-300) !important;
-            font-family: monospace !important;
+        .card-btn-danger:hover {
+            background: var(--color-warm-tan-dark) !important;
+            transform: translateY(-1px) !important;
         }
 
-        /* 🔥 Stat Card Border Colors */
-        .stat-card-blue { border-left: 4px solid #3b82f6 !important; }
-        .stat-card-green { border-left: 4px solid var(--color-success-text) !important; }
-        .stat-card-purple { border-left: 4px solid #9333ea !important; }
-        .stat-card-orange { border-left: 4px solid var(--color-warning-text) !important; }
+        .empty-state {
+            grid-column: 1 / -1 !important;
+            text-align: center !important;
+            padding: 3rem 1.25rem !important;
+            color: var(--color-brown-100) !important;
+        }
+        .empty-state i {
+            font-size: 2rem !important;
+            margin-bottom: 0.75rem !important;
+            display: block !important;
+            opacity: 0.4 !important;
+        }
 
-        /* 🔥 Modal */
+        .modal-overlay {
+            position: fixed !important;
+            inset: 0 !important;
+            background: rgba(0, 0, 0, 0.5) !important;
+            backdrop-filter: blur(4px) !important;
+            display: none !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 9999 !important;
+            padding: 1rem !important;
+        }
+        .modal-overlay.active { display: flex !important; }
         .form-card {
+            background: var(--bg-card) !important;
+            border-radius: var(--radius-lg) !important;
+            box-shadow: var(--shadow-lg) !important;
+            max-width: 720px !important;
+            width: 100% !important;
+            max-height: 90vh !important;
+            overflow-y: auto !important;
+            padding: 1.5rem !important;
             border-top: 4px solid var(--color-sage) !important;
         }
-        .modal-body {
-            padding: 1.25rem !important;
+        .modal-header {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 1.25rem !important;
+            padding-bottom: 0.75rem !important;
+            border-bottom: 1px solid var(--border-default) !important;
         }
+        .modal-title {
+            font-size: 1rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+        .close-btn {
+            background: none !important;
+            border: none !important;
+            color: var(--color-brown-100) !important;
+            font-size: 1.125rem !important;
+            cursor: pointer !important;
+            padding: 0.25rem !important;
+            transition: all 0.2s ease !important;
+        }
+        .close-btn:hover { color: var(--color-brown-600) !important; transform: rotate(90deg) !important; }
+        .modal-body { margin-bottom: 1.25rem !important; }
         .modal-footer {
-            padding: 0.75rem 1.25rem !important;
-            background-color: var(--bg-subtle) !important;
-            border-top: 1px solid var(--border-default) !important;
             display: flex !important;
             justify-content: flex-end !important;
             gap: 0.75rem !important;
+            padding-top: 0.75rem !important;
+            border-top: 1px solid var(--border-default) !important;
         }
 
-        /* 🔥 Error Text */
+        .form-group { margin-bottom: 1rem !important; }
+        .form-label {
+            display: block !important;
+            font-size: 0.6875rem !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-200) !important;
+            letter-spacing: 0.03em !important;
+            margin-bottom: 0.25rem !important;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100% !important;
+            padding: 0.625rem 1rem !important;
+            border: 1px solid var(--border-input) !important;
+            border-radius: var(--radius-md) !important;
+            font-family: var(--font-family) !important;
+            font-size: 0.875rem !important;
+            color: var(--color-brown-700) !important;
+            background: var(--bg-card) !important;
+            outline: none !important;
+            transition: all 0.2s ease !important;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--color-sage-light) !important;
+            box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
+        }
+        .form-textarea { resize: vertical !important; min-height: 80px !important; }
+        .form-grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 1rem 1.5rem !important;
+        }
+        .form-grid .full-width { grid-column: 1 / -1 !important; }
+        @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr !important; } }
+
         .error-text {
             color: var(--color-error-text) !important;
             font-size: 0.6875rem !important;
@@ -379,20 +506,14 @@
             display: none !important;
             font-weight: var(--font-weight-light) !important;
         }
-        .error-text.show {
-            display: block !important;
-        }
-        .form-input.error,
-        .form-select.error {
-            border-color: var(--color-error-text) !important;
-        }
+        .error-text.show { display: block !important; }
+        .form-input.error, .form-select.error { border-color: var(--color-error-text) !important; }
 
-        /* 🔥 Delete Icon */
         .delete-icon-circle {
             width: 3.5rem !important;
             height: 3.5rem !important;
             border-radius: 50% !important;
-            background-color: #fee2e2 !important;
+            background: #fee2e2 !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
@@ -400,12 +521,11 @@
             color: #dc2626 !important;
             font-size: 1.25rem !important;
         }
-
         .btn-danger {
             display: inline-flex !important;
             align-items: center !important;
             gap: 0.375rem !important;
-            background-color: #ef4444 !important;
+            background: #ef4444 !important;
             color: white !important;
             font-family: var(--font-family) !important;
             font-size: 0.8125rem !important;
@@ -417,9 +537,11 @@
             transition: all 0.2s ease !important;
         }
         .btn-danger:hover {
-            background-color: #dc2626 !important;
+            background: #dc2626 !important;
+            transform: translateY(-1px) !important;
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
         }
+        .modal-danger .form-card { border-top-color: #ef4444 !important; }
     </style>
 </head>
 <body class="bg-subtle">
@@ -429,156 +551,171 @@
 
     <main class="main-content" id="mainContent">
         
-        <!-- Stats Cards -->
+        <div class="page-header-custom">
+            <div>
+                <h1><i class="fas fa-users"></i> Staff Management</h1>
+                <p>Manage hospital staff, roles, departments, and attendance</p>
+            </div>
+            <div class="header-actions">
+                <button id="refreshBtn" class="btn-header btn-header-secondary">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <a href="shifts.html" class="btn-header btn-header-secondary">
+                    <i class="fas fa-clock"></i> Shifts
+                </a>
+                <a href="attendance.html" class="btn-header btn-header-secondary">
+                    <i class="fas fa-clipboard-list"></i> Attendance
+                </a>
+                <button id="addStaffBtn" class="btn-header btn-header-primary">
+                    <i class="fas fa-plus"></i> Add Staff
+                </button>
+            </div>
+        </div>
+
         <div class="grid-stats">
             <div class="stat-card stat-card-blue">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Total Shifts</p>
-                        <p class="stat-value" id="totalShifts">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-calendar-alt" style="color:#3b82f6;"></i>
-                    </div>
+                    <div><p class="stat-label">Total Staff</p><p class="stat-value" id="totalStaff">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-users" style="color:#3b82f6;"></i></div>
                 </div>
             </div>
             <div class="stat-card stat-card-green">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Staff Assigned</p>
-                        <p class="stat-value text-success-text" id="staffAssigned">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-users" style="color:var(--color-success-text);"></i>
-                    </div>
+                    <div><p class="stat-label">Active</p><p class="stat-value text-success-text" id="activeStaff">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-user-check" style="color:var(--color-success-text);"></i></div>
                 </div>
             </div>
             <div class="stat-card stat-card-purple">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Morning Shifts</p>
-                        <p class="stat-value" style="color:#9333ea;" id="morningCount">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-sun" style="color:#9333ea;"></i>
-                    </div>
+                    <div><p class="stat-label">Departments</p><p class="stat-value" style="color:#9333ea;" id="totalDepts">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-building" style="color:#9333ea;"></i></div>
                 </div>
             </div>
             <div class="stat-card stat-card-orange">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Night Shifts</p>
-                        <p class="stat-value text-warning-text" id="nightCount">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-moon" style="color:var(--color-warning-text);"></i>
-                    </div>
+                    <div><p class="stat-label">On Leave</p><p class="stat-value text-warning-text" id="onLeave">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-clock" style="color:var(--color-warning-text);"></i></div>
                 </div>
             </div>
         </div>
 
-        <!-- Filter Bar -->
         <div class="filter-bar">
             <div class="search-wrapper">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" class="search-input" placeholder="Search by staff or role...">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by name, ID, or department...">
             </div>
-            <select id="shiftFilter" class="form-select">
-                <option value="">All Shifts</option>
-                <option value="Morning">Morning</option>
-                <option value="Evening">Evening</option>
-                <option value="Night">Night</option>
-                <option value="General">General</option>
+            <select id="roleFilter" class="form-select">
+                <option value="">All Roles</option>
+                <option value="Nurse">Nurse</option>
+                <option value="Receptionist">Receptionist</option>
+                <option value="Lab Technician">Lab Technician</option>
+                <option value="Radiology Technician">Radiology Technician</option>
+                <option value="Pharmacist">Pharmacist</option>
+                <option value="Admin">Admin</option>
+                <option value="Accountant">Accountant</option>
+                <option value="Housekeeping">Housekeeping</option>
+            </select>
+            <select id="statusFilter" class="form-select">
+                <option value="">All Status</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+                <option value="On Leave">On Leave</option>
             </select>
             <button id="resetFilter" class="btn-secondary">
-                <i class="fas fa-undo-alt"></i>
-                <span>Reset</span>
-            </button>
-            <button id="addShiftBtn" class="btn-primary">
-                <i class="fas fa-plus"></i>
-                <span>Assign Shift</span>
+                <i class="fas fa-undo-alt"></i> <span>Reset</span>
             </button>
         </div>
 
-        <!-- Shifts Table -->
-        <div class="card-white">
-            <div class="table-wrapper">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th style="min-width:130px;">Staff Name</th>
-                            <th style="width:100px;">Role</th>
-                            <th style="width:100px;">Shift</th>
-                            <th style="width:100px;">Start</th>
-                            <th style="width:100px;">End</th>
-                            <th style="width:90px;">Day</th>
-                            <th style="width:120px; text-align:center;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="shiftsTable">
-                        <tr>
-                            <td colspan="7" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
-                                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
-                                <p style="font-weight:var(--font-weight-light);">Loading shifts...</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <div class="staff-grid" id="staffGrid">
+            <div class="empty-state">
+                <i class="fas fa-spinner fa-pulse"></i>
+                <p>Loading staff members...</p>
             </div>
         </div>
     </main>
 
-    <!-- Assign Shift Modal -->
-    <div id="shiftModal" class="modal-overlay" role="dialog" aria-modal="true">
-        <div class="form-card" style="max-width:32rem;">
+    <!-- Add/Edit Staff Modal -->
+    <div id="staffModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="form-card">
             <div class="modal-header">
                 <h3 class="modal-title" id="modalTitle">
-                    <i class="fas fa-clock"></i> Assign Shift
+                    <i class="fas fa-user-plus" style="color:var(--color-sage);"></i> Add Staff Member
                 </h3>
-                <button class="close-btn" id="closeModalBtn" aria-label="Close modal">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button class="close-btn" id="closeModalBtn"><i class="fas fa-times"></i></button>
             </div>
-            <form id="shiftForm">
-                <input type="hidden" id="shiftId">
+            <form id="staffForm">
+                <input type="hidden" id="staffId">
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label class="form-label">Select Staff <span style="color:var(--color-error-text);">*</span></label>
-                        <select id="staffId" required class="form-select">
-                            <option value="">-- Select Staff --</option>
-                        </select>
-                        <span class="error-text" id="staffIdError">Please select a staff member</span>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Shift Type <span style="color:var(--color-error-text);">*</span></label>
-                        <select id="shiftType" required class="form-select">
-                            <option value="">Select Shift</option>
-                            <option value="Morning">Morning (7:00 AM - 3:00 PM)</option>
-                            <option value="Evening">Evening (3:00 PM - 11:00 PM)</option>
-                            <option value="Night">Night (11:00 PM - 7:00 AM)</option>
-                            <option value="General">General (9:00 AM - 5:00 PM)</option>
-                        </select>
-                        <span class="error-text" id="shiftTypeError">Please select a shift type</span>
-                    </div>
-                    <div class="form-group" style="margin-bottom:0;">
-                        <label class="form-label">Day of Week <span style="color:var(--color-error-text);">*</span></label>
-                        <select id="day" required class="form-select">
-                            <option value="">Select Day</option>
-                            <option value="Monday">Monday</option>
-                            <option value="Tuesday">Tuesday</option>
-                            <option value="Wednesday">Wednesday</option>
-                            <option value="Thursday">Thursday</option>
-                            <option value="Friday">Friday</option>
-                            <option value="Saturday">Saturday</option>
-                            <option value="Sunday">Sunday</option>
-                        </select>
-                        <span class="error-text" id="dayError">Please select a day</span>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Full Name <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="text" id="fullName" required class="form-input" placeholder="e.g., Priya Sharma">
+                            <span class="error-text" id="fullNameError">Full name is required</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Staff ID <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="text" id="staffIdNumber" required class="form-input" placeholder="e.g., NUR001">
+                            <span class="error-text" id="staffIdError">Staff ID is required</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Role <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="role" required class="form-select">
+                                <option value="">Select Role</option>
+                                <option value="Nurse">Nurse</option>
+                                <option value="Receptionist">Receptionist</option>
+                                <option value="Lab Technician">Lab Technician</option>
+                                <option value="Radiology Technician">Radiology Technician</option>
+                                <option value="Pharmacist">Pharmacist</option>
+                                <option value="Admin">Admin</option>
+                                <option value="Accountant">Accountant</option>
+                                <option value="Housekeeping">Housekeeping</option>
+                            </select>
+                            <span class="error-text" id="roleError">Please select a role</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Department</label>
+                            <input type="text" id="department" class="form-input" placeholder="e.g., ICU, Cardiology">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone <span style="color:var(--color-error-text);">*</span></label>
+                            <input type="tel" id="phone" required class="form-input" placeholder="+91 98765 43210">
+                            <span class="error-text" id="phoneError">Phone number is required</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="email" class="form-input" placeholder="staff@medflow.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date of Joining</label>
+                            <input type="date" id="joiningDate" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Salary (₹)</label>
+                            <input type="number" id="salary" class="form-input" placeholder="35000">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status <span style="color:var(--color-error-text);">*</span></label>
+                            <select id="status" required class="form-select">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="On Leave">On Leave</option>
+                            </select>
+                            <span class="error-text" id="statusError">Please select status</span>
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label">Address</label>
+                            <textarea id="address" rows="2" class="form-textarea" placeholder="Enter address..."></textarea>
+                        </div>
+                        <div class="form-group full-width" style="margin-bottom:0;">
+                            <label class="form-label">Qualifications / Skills</label>
+                            <textarea id="qualifications" rows="2" class="form-textarea" placeholder="e.g., B.Sc Nursing, Critical Care Certified"></textarea>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" id="cancelModalBtn" class="btn-secondary">Cancel</button>
                     <button type="submit" class="btn-primary">
-                        <i class="fas fa-save"></i> Assign Shift
+                        <i class="fas fa-save"></i> Save Staff
                     </button>
                 </div>
             </form>
@@ -587,38 +724,28 @@
 
     <!-- Delete Confirmation Modal -->
     <div id="deleteModal" class="modal-overlay modal-danger" role="dialog" aria-modal="true">
-        <div class="form-card" style="max-width:26rem; border-top-color:#ef4444;">
+        <div class="form-card" style="max-width:26rem;">
             <div class="modal-header">
-                <h3 class="modal-title" style="color:var(--color-brown-700);">
-                    <i class="fas fa-triangle-exclamation" style="color:#ef4444;"></i> Confirm Delete
+                <h3 class="modal-title" style="color:#dc2626;">
+                    <i class="fas fa-triangle-exclamation" style="color:#dc2626;"></i> Confirm Delete
                 </h3>
-                <button class="close-btn" id="closeDeleteModalBtn" aria-label="Close delete modal">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button class="close-btn" id="closeDeleteModalBtn"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body" style="text-align:center; padding:1.75rem 1.25rem;">
-                <div class="delete-icon-circle">
-                    <i class="fas fa-trash-alt"></i>
-                </div>
-                <p style="font-size:0.9375rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin-bottom:0.5rem;">
-                    Delete Shift?
-                </p>
-                <p style="font-size:0.8125rem; color:var(--color-brown-300); font-weight:var(--font-weight-light); line-height:1.6;">
-                    This action cannot be undone. This shift assignment will be permanently removed.
-                </p>
+                <div class="delete-icon-circle"><i class="fas fa-trash-alt"></i></div>
+                <p style="font-size:0.9375rem; font-weight:var(--font-weight-medium); color:var(--color-brown-700); margin-bottom:0.5rem;">Delete Staff Member?</p>
+                <p style="font-size:0.8125rem; color:var(--color-brown-300);">This action cannot be undone. This staff record will be permanently removed.</p>
             </div>
             <div class="modal-footer" style="justify-content:center;">
                 <button id="cancelDeleteBtn" class="btn-secondary">Cancel</button>
-                <button id="confirmDeleteBtn" class="btn-danger">
-                    <i class="fas fa-trash-alt"></i> Delete
-                </button>
+                <button id="confirmDeleteBtn" class="btn-danger"><i class="fas fa-trash-alt"></i> Delete</button>
             </div>
         </div>
     </div>
 
     <script src="../../js/core/common.js"></script>
     <script src="../../js/core/form-validation.js"></script>
-    <script src="shifts.js"></script>
+    <script src="staff.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

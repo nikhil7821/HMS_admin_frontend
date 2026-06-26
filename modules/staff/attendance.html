@@ -13,10 +13,9 @@
 
     <style>
         /* ============================================================
-           ATTENDANCE MODULE — Page-specific only
+           ATTENDANCE MODULE — COMPLETE PROFESSIONAL VERSION
            ============================================================ */
 
-        /* 🔥 FIX: Prevent layout shift */
         .main-content {
             margin-left: 260px !important;
             margin-top: 70px !important;
@@ -26,47 +25,103 @@
             opacity: 0;
             animation: fadeIn 0.3s ease forwards;
         }
-        .main-content.loaded {
-            opacity: 1;
-        }
+        .main-content.loaded { opacity: 1; }
         #mainSidebar[data-collapsed="true"] ~ .main-content,
         #mainSidebar[data-collapsed="true"] + .main-content {
             margin-left: 72px !important;
         }
         @media (max-width: 1024px) {
-            .main-content {
-                margin-left: 0 !important;
-                padding: 1rem !important;
-            }
+            .main-content { margin-left: 0 !important; padding: 1rem !important; }
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 🔥 Page Header - Hidden */
-        .page-header {
-            display: none !important;
+        /* ─── Page Header ─── */
+        .page-header-custom {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 1.25rem !important;
+            flex-wrap: wrap !important;
+            gap: 0.75rem !important;
+        }
+        .page-header-custom h1 {
+            font-size: 1.375rem !important;
+            font-weight: var(--font-weight-light) !important;
+            color: var(--color-brown-700) !important;
+            margin: 0 !important;
+        }
+        .page-header-custom h1 i { color: var(--color-sage) !important; margin-right: 0.5rem !important; }
+        .page-header-custom p { font-size: 0.75rem !important; color: var(--color-brown-100) !important; margin: 0 !important; }
+
+        .header-actions { display: flex !important; gap: 0.5rem !important; flex-wrap: wrap !important; }
+        .btn-header {
+            padding: 0.4rem 0.85rem !important;
+            font-size: 0.8rem !important;
+            border-radius: var(--radius-md) !important;
+            font-family: var(--font-family) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            border: none !important;
+        }
+        .btn-header-primary {
+            background: var(--color-sage) !important;
+            color: white !important;
+        }
+        .btn-header-primary:hover {
+            background: var(--color-sage-dark) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+        }
+        .btn-header-secondary {
+            background: var(--bg-card) !important;
+            color: var(--color-brown-200) !important;
+            border: 1px solid var(--border-input) !important;
+        }
+        .btn-header-secondary:hover {
+            background: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+        }
+        .btn-header-success {
+            background: var(--color-success-text) !important;
+            color: white !important;
+        }
+        .btn-header-success:hover {
+            background: #059669 !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
         }
 
-        /* 🔥 Stats Cards - Perfect Spacing */
+        /* ─── Stats ─── */
         .grid-stats {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
             gap: 1rem !important;
             margin-bottom: 1.25rem !important;
         }
         .stat-card {
-            padding: 1rem 1.25rem !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
             border-radius: var(--radius-lg) !important;
+            padding: 1rem 1.25rem !important;
+            transition: all 0.2s ease !important;
         }
+        .stat-card:hover { transform: translateY(-2px) !important; box-shadow: var(--shadow-md) !important; }
         .stat-card .stat-value {
             font-size: 1.5rem !important;
             font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
             margin-top: 0.125rem !important;
         }
         .stat-card .stat-label {
             font-size: 0.625rem !important;
-            letter-spacing: 0.06em !important;
             text-transform: uppercase !important;
+            letter-spacing: 0.06em !important;
             color: var(--color-brown-200) !important;
         }
         .stat-card .stat-icon-bg {
@@ -78,21 +133,26 @@
             justify-content: center !important;
             background: var(--bg-muted) !important;
         }
-        .stat-card .stat-icon-bg i {
-            font-size: 1rem !important;
-        }
+        .stat-card .stat-icon-bg i { font-size: 1rem !important; }
+        .stat-card-green { border-left: 4px solid var(--color-success-text) !important; }
+        .stat-card-red { border-left: 4px solid var(--color-error-text) !important; }
+        .stat-card-yellow { border-left: 4px solid var(--color-warning-text) !important; }
+        .stat-card-purple { border-left: 4px solid #9333ea !important; }
+        .text-success-text { color: var(--color-success-text) !important; }
+        .text-error-text { color: var(--color-error-text) !important; }
+        .text-warning-text { color: var(--color-warning-text) !important; }
 
-        /* 🔥 Filter Bar - Perfect Alignment */
+        /* ─── Filter Bar ─── */
         .filter-bar {
-            padding: 0.625rem 1rem !important;
-            gap: 0.625rem !important;
-            margin-bottom: 1.25rem !important;
-            border-radius: var(--radius-lg) !important;
-            background: var(--bg-card) !important;
-            border: 1px solid var(--border-default) !important;
             display: flex !important;
             align-items: center !important;
-            flex-wrap: wrap !important;
+            flex-wrap: nowrap !important;
+            gap: 0.625rem !important;
+            padding: 0.625rem 1rem !important;
+            background: var(--bg-card) !important;
+            border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-lg) !important;
+            margin-bottom: 1.25rem !important;
         }
         .filter-bar .form-input {
             min-width: 160px !important;
@@ -102,14 +162,14 @@
             height: 36px !important;
             border: 1px solid var(--border-input) !important;
             border-radius: var(--radius-md) !important;
-            background-color: var(--bg-card) !important;
+            background: var(--bg-card) !important;
             color: var(--color-brown-700) !important;
             font-family: var(--font-family) !important;
+            outline: none !important;
         }
         .filter-bar .form-input:focus {
             border-color: var(--color-sage-light) !important;
             box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
-            outline: none !important;
         }
         .filter-bar .form-label {
             font-size: 0.625rem !important;
@@ -136,60 +196,74 @@
             border: none !important;
         }
         .filter-bar .btn-primary {
-            background-color: var(--color-sage) !important;
+            background: var(--color-sage) !important;
             color: white !important;
         }
         .filter-bar .btn-primary:hover {
-            background-color: var(--color-sage-dark) !important;
-            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+            background: var(--color-sage-dark) !important;
             transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
         }
         .filter-bar .btn-success {
-            background-color: var(--color-sage) !important;
+            background: var(--color-success-text) !important;
             color: white !important;
         }
         .filter-bar .btn-success:hover {
-            background-color: var(--color-sage-dark) !important;
-            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+            background: #059669 !important;
             transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+        }
+        .filter-bar .btn-secondary {
+            flex: 0 0 auto !important;
+            padding: 0.375rem 0.875rem !important;
+            font-size: 0.8125rem !important;
+            height: 36px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            border-radius: var(--radius-md) !important;
+            white-space: nowrap !important;
+            font-family: var(--font-family) !important;
+            cursor: pointer !important;
+            border: 1px solid var(--border-input) !important;
+            background: transparent !important;
+            color: var(--color-brown-200) !important;
+        }
+        .filter-bar .btn-secondary:hover {
+            background: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+            border-color: var(--color-brown-100) !important;
         }
 
         @media (max-width: 768px) {
-            .filter-bar {
-                flex-direction: column !important;
-                align-items: stretch !important;
-                gap: 0.5rem !important;
-                padding: 0.75rem !important;
-            }
-            .filter-bar .form-input {
-                width: 100% !important;
-                min-width: unset !important;
-                max-width: unset !important;
-            }
+            .filter-bar { flex-wrap: wrap !important; gap: 0.5rem !important; padding: 0.5rem 0.75rem !important; }
+            .filter-bar .form-input { width: 100% !important; min-width: unset !important; max-width: unset !important; }
+            .filter-bar .btn-primary span,
+            .filter-bar .btn-success span,
+            .filter-bar .btn-secondary span { display: none !important; }
             .filter-bar .btn-primary,
-            .filter-bar .btn-success {
-                justify-content: center !important;
-            }
+            .filter-bar .btn-success,
+            .filter-bar .btn-secondary { padding: 0.3rem 0.6rem !important; font-size: 0.75rem !important; height: 32px !important; }
+            .grid-stats { grid-template-columns: repeat(2, 1fr) !important; }
         }
+        @media (max-width: 480px) { .grid-stats { grid-template-columns: 1fr !important; } }
 
-        /* 🔥 Table - Perfect Alignment */
+        /* ─── Table ─── */
         .card-white {
-            border-radius: var(--radius-lg) !important;
+            background: var(--bg-card) !important;
             border: 1px solid var(--border-default) !important;
+            border-radius: var(--radius-lg) !important;
             overflow: hidden !important;
-            margin-top: 0 !important;
+            margin-top: 1.25rem !important;
         }
-        .table-wrapper {
-            overflow-x: auto !important;
-            -webkit-overflow-scrolling: touch !important;
-        }
+        .table-wrapper { overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; }
         .data-table {
             width: 100% !important;
             border-collapse: collapse !important;
             font-size: 0.8125rem !important;
         }
         .data-table thead {
-            background-color: var(--bg-muted) !important;
+            background: var(--bg-muted) !important;
             border-bottom: 1px solid var(--border-default) !important;
         }
         .data-table th {
@@ -200,6 +274,7 @@
             font-size: 0.625rem !important;
             text-transform: uppercase !important;
             letter-spacing: 0.06em !important;
+            white-space: nowrap !important;
         }
         .data-table td {
             padding: 0.625rem 1rem !important;
@@ -207,19 +282,19 @@
             vertical-align: middle !important;
             border-bottom: 1px solid var(--border-default) !important;
         }
-        .data-table tbody tr:last-child td {
-            border-bottom: none !important;
-        }
+        .data-table tbody tr:last-child td { border-bottom: none !important; }
+        .data-table tbody tr:hover td { background: var(--bg-subtle) !important; }
 
-        /* 🔥 Table Row */
-        .attendance-row {
-            transition: var(--transition-base) !important;
+        .attendance-row { transition: var(--transition-base) !important; }
+        .staff-name {
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            font-size: 0.875rem !important;
         }
-        .attendance-row:hover {
-            background-color: var(--bg-subtle) !important;
-        }
+        .staff-id { font-size: 0.625rem !important; color: var(--color-brown-100) !important; }
+        .staff-role { font-size: 0.8125rem !important; color: var(--color-brown-300) !important; }
 
-        /* 🔥 Status Badges */
+        /* ─── Status Badges ─── */
         .status-present {
             background: var(--color-success-bg) !important;
             color: var(--color-success-text) !important;
@@ -266,7 +341,7 @@
             display: inline-block !important;
         }
 
-        /* 🔥 Form Elements inside Table */
+        /* ─── Form Elements ─── */
         .time-input {
             width: 90px !important;
             padding: 0.3rem 0.5rem !important;
@@ -282,7 +357,6 @@
             border-color: var(--color-sage-light) !important;
             box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
         }
-
         .notes-input {
             width: 130px !important;
             padding: 0.3rem 0.5rem !important;
@@ -298,7 +372,6 @@
             border-color: var(--color-sage-light) !important;
             box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
         }
-
         .status-select {
             padding: 0.3rem 0.5rem !important;
             border-radius: var(--radius-sm) !important;
@@ -315,31 +388,213 @@
             box-shadow: 0 0 0 3px rgba(181, 207, 170, 0.15) !important;
         }
 
-        /* 🔥 Cell Styles */
-        .staff-name {
-            font-weight: var(--font-weight-medium) !important;
-            color: var(--color-brown-700) !important;
-            font-size: 0.875rem !important;
+        /* ─── Action Buttons ─── */
+        .action-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 0.3rem 0.6rem !important;
+            border-radius: var(--radius-sm) !important;
+            border: 1px solid var(--border-default) !important;
+            background: var(--bg-card) !important;
+            color: var(--color-brown-200) !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            font-size: 0.6875rem !important;
+            gap: 0.25rem !important;
         }
-        .staff-id {
-            font-size: 0.625rem !important;
+        .action-btn:hover {
+            background: var(--bg-hover) !important;
+            color: var(--color-brown-600) !important;
+            border-color: var(--color-brown-100) !important;
+        }
+        .action-btn.salary:hover {
+            color: var(--color-gold) !important;
+            border-color: var(--color-gold) !important;
+            background: #fefce8 !important;
+        }
+
+        /* ─── Empty State ─── */
+        .empty-state {
+            text-align: center !important;
+            padding: 3rem 1.25rem !important;
             color: var(--color-brown-100) !important;
         }
-        .staff-role {
-            font-size: 0.8125rem !important;
-            color: var(--color-brown-300) !important;
+        .empty-state i {
+            font-size: 2rem !important;
+            margin-bottom: 0.75rem !important;
+            display: block !important;
+            opacity: 0.4 !important;
         }
 
-        /* 🔥 Stat Card Border Colors */
-        .stat-card-green { border-left: 4px solid var(--color-success-text) !important; }
-        .stat-card-red { border-left: 4px solid var(--color-error-text) !important; }
-        .stat-card-yellow { border-left: 4px solid var(--color-warning-text) !important; }
-        .stat-card-purple { border-left: 4px solid #9333ea !important; }
+        /* ─── Salary Slip Modal ─── */
+        .modal-overlay {
+            position: fixed !important;
+            inset: 0 !important;
+            background: rgba(0, 0, 0, 0.5) !important;
+            backdrop-filter: blur(4px) !important;
+            display: none !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 9999 !important;
+            padding: 1rem !important;
+        }
+        .modal-overlay.active { display: flex !important; }
+        .form-card {
+            background: var(--bg-card) !important;
+            border-radius: var(--radius-lg) !important;
+            box-shadow: var(--shadow-lg) !important;
+            max-width: 680px !important;
+            width: 100% !important;
+            max-height: 90vh !important;
+            overflow-y: auto !important;
+            padding: 1.5rem !important;
+            border-top: 4px solid var(--color-gold) !important;
+        }
+        .modal-header {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-bottom: 1.25rem !important;
+            padding-bottom: 0.75rem !important;
+            border-bottom: 1px solid var(--border-default) !important;
+        }
+        .modal-title {
+            font-size: 1rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            color: var(--color-brown-700) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+        .close-btn {
+            background: none !important;
+            border: none !important;
+            color: var(--color-brown-100) !important;
+            font-size: 1.125rem !important;
+            cursor: pointer !important;
+            padding: 0.25rem !important;
+            transition: all 0.2s ease !important;
+        }
+        .close-btn:hover { color: var(--color-brown-600) !important; transform: rotate(90deg) !important; }
+        .modal-body { margin-bottom: 1.25rem !important; }
+        .modal-footer {
+            display: flex !important;
+            justify-content: flex-end !important;
+            gap: 0.75rem !important;
+            padding-top: 0.75rem !important;
+            border-top: 1px solid var(--border-default) !important;
+        }
 
-        /* 🔥 Text Colors */
-        .text-success-text { color: var(--color-success-text) !important; }
-        .text-error-text { color: var(--color-error-text) !important; }
-        .text-warning-text { color: var(--color-warning-text) !important; }
+        /* ─── Salary Slip Styles ─── */
+        .salary-slip {
+            font-family: 'Poppins', Arial, sans-serif !important;
+            padding: 20px !important;
+        }
+        .salary-slip .slip-header {
+            text-align: center !important;
+            border-bottom: 2px solid var(--color-gold) !important;
+            padding-bottom: 15px !important;
+            margin-bottom: 20px !important;
+        }
+        .salary-slip .slip-header h2 {
+            color: var(--color-brown-700) !important;
+            margin: 0 !important;
+            font-weight: var(--font-weight-medium) !important;
+        }
+        .salary-slip .slip-header p {
+            color: var(--color-brown-300) !important;
+            margin: 0 !important;
+            font-size: 0.8125rem !important;
+        }
+        .salary-slip .slip-row {
+            display: flex !important;
+            justify-content: space-between !important;
+            padding: 6px 0 !important;
+            border-bottom: 1px solid var(--border-default) !important;
+            font-size: 0.8125rem !important;
+        }
+        .salary-slip .slip-row .label {
+            color: var(--color-brown-200) !important;
+            font-weight: var(--font-weight-light) !important;
+        }
+        .salary-slip .slip-row .value {
+            color: var(--color-brown-700) !important;
+            font-weight: var(--font-weight-medium) !important;
+        }
+        .salary-slip .slip-total {
+            display: flex !important;
+            justify-content: space-between !important;
+            padding: 10px 0 !important;
+            border-top: 2px solid var(--color-gold) !important;
+            margin-top: 10px !important;
+            font-size: 1rem !important;
+        }
+        .salary-slip .slip-total .label {
+            color: var(--color-brown-700) !important;
+            font-weight: var(--font-weight-medium) !important;
+        }
+        .salary-slip .slip-total .value {
+            color: var(--color-gold) !important;
+            font-weight: var(--font-weight-bold) !important;
+            font-size: 1.1rem !important;
+        }
+        .salary-slip .slip-footer {
+            text-align: center !important;
+            margin-top: 20px !important;
+            padding-top: 15px !important;
+            border-top: 1px solid var(--border-default) !important;
+            color: var(--color-brown-100) !important;
+            font-size: 0.6875rem !important;
+        }
+
+        .btn-print {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            padding: 0.4rem 1rem !important;
+            border-radius: var(--radius-md) !important;
+            font-size: 0.8125rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            border: none !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            font-family: var(--font-family) !important;
+            background: var(--color-sage) !important;
+            color: white !important;
+        }
+        .btn-print:hover {
+            background: var(--color-sage-dark) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(138, 174, 122, 0.3) !important;
+        }
+        .btn-download {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            padding: 0.4rem 1rem !important;
+            border-radius: var(--radius-md) !important;
+            font-size: 0.8125rem !important;
+            font-weight: var(--font-weight-medium) !important;
+            border: none !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            font-family: var(--font-family) !important;
+            background: var(--color-gold) !important;
+            color: white !important;
+        }
+        .btn-download:hover {
+            background: #c9a54a !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(212, 168, 83, 0.3) !important;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; margin: 0 !important; padding: 0 !important; }
+            .salary-slip { padding: 20px !important; }
+            .modal-overlay { display: none !important; }
+        }
     </style>
 </head>
 <body class="bg-subtle">
@@ -349,50 +604,46 @@
 
     <main class="main-content" id="mainContent">
         
-        <!-- Stats Cards -->
+        <!-- Page Header -->
+        <div class="page-header-custom">
+            <div>
+                <h1><i class="fas fa-clipboard-list"></i> Attendance Management</h1>
+                <p>Track staff attendance, mark status, and generate salary slips</p>
+            </div>
+            <div class="header-actions">
+                <button id="refreshBtn" class="btn-header btn-header-secondary">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+                <button id="generateAllSalaryBtn" class="btn-header btn-header-success">
+                    <i class="fas fa-file-invoice"></i> Generate All Salary Slips
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats -->
         <div class="grid-stats">
             <div class="stat-card stat-card-green">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Present</p>
-                        <p class="stat-value text-success-text" id="presentCount">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-user-check" style="color:var(--color-success-text);"></i>
-                    </div>
+                    <div><p class="stat-label">Present</p><p class="stat-value text-success-text" id="presentCount">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-user-check" style="color:var(--color-success-text);"></i></div>
                 </div>
             </div>
             <div class="stat-card stat-card-red">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Absent</p>
-                        <p class="stat-value text-error-text" id="absentCount">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-user-slash" style="color:var(--color-error-text);"></i>
-                    </div>
+                    <div><p class="stat-label">Absent</p><p class="stat-value text-error-text" id="absentCount">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-user-slash" style="color:var(--color-error-text);"></i></div>
                 </div>
             </div>
             <div class="stat-card stat-card-yellow">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Late</p>
-                        <p class="stat-value text-warning-text" id="lateCount">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-clock" style="color:var(--color-warning-text);"></i>
-                    </div>
+                    <div><p class="stat-label">Late</p><p class="stat-value text-warning-text" id="lateCount">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-clock" style="color:var(--color-warning-text);"></i></div>
                 </div>
             </div>
             <div class="stat-card stat-card-purple">
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <p class="stat-label">Total Staff</p>
-                        <p class="stat-value" style="color:#9333ea;" id="totalStaff">0</p>
-                    </div>
-                    <div class="stat-icon-bg">
-                        <i class="fas fa-users" style="color:#9333ea;"></i>
-                    </div>
+                    <div><p class="stat-label">Total Staff</p><p class="stat-value" style="color:#9333ea;" id="totalStaff">0</p></div>
+                    <div class="stat-icon-bg"><i class="fas fa-users" style="color:#9333ea;"></i></div>
                 </div>
             </div>
         </div>
@@ -411,6 +662,10 @@
                 <i class="fas fa-save"></i>
                 <span>Save</span>
             </button>
+            <button id="resetAttendanceBtn" class="btn-secondary">
+                <i class="fas fa-undo-alt"></i>
+                <span>Reset</span>
+            </button>
         </div>
 
         <!-- Attendance Table -->
@@ -424,14 +679,15 @@
                             <th style="width:130px;">Status</th>
                             <th style="width:110px;">Check In</th>
                             <th style="width:110px;">Check Out</th>
-                            <th>Notes</th>
+                            <th style="min-width:150px;">Notes</th>
+                            <th style="width:120px; text-align:center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="attendanceTable">
                         <tr>
-                            <td colspan="6" style="text-align:center; padding:3rem 1.25rem; color:var(--color-brown-100);">
-                                <i class="fas fa-spinner fa-pulse" style="font-size:2rem; margin-bottom:0.75rem; display:block;"></i>
-                                <p style="font-weight:var(--font-weight-light);">Loading attendance...</p>
+                            <td colspan="7" class="empty-state">
+                                <i class="fas fa-spinner fa-pulse"></i>
+                                <p>Loading attendance...</p>
                             </td>
                         </tr>
                     </tbody>
@@ -440,7 +696,32 @@
         </div>
     </main>
 
+    <!-- Salary Slip Modal -->
+    <div id="salaryModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="form-card" style="border-top-color:var(--color-gold);">
+            <div class="modal-header">
+                <h3 class="modal-title" id="salaryModalTitle">
+                    <i class="fas fa-file-invoice" style="color:var(--color-gold);"></i> Salary Slip
+                </h3>
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    <button id="printSalaryBtn" class="btn-print no-print">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                    <button id="downloadSalaryBtn" class="btn-download no-print">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                    <button class="close-btn no-print" id="closeSalaryModalBtn"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div id="salaryContent" class="modal-body"></div>
+            <div class="modal-footer no-print">
+                <button type="button" id="closeSalaryFooterBtn" class="btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script src="../../js/core/common.js"></script>
+    <script src="../../js/core/form-validation.js"></script>
     <script src="attendance.js"></script>
 
     <script>
